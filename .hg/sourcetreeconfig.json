@@ -1,0 +1,33 @@
+{
+  "$id": "1",
+  "AutoRefresh": true,
+  "AutoRefreshRemotes": true,
+  "CommitTextLinks": null,
+  "DraftCommitMsg": "",
+  "IncomingSavedCount": 0,
+  "LastCheckedRemotes": "2020-06-05T23:01:13.6193022+03:00",
+  "LastUsedView": 1,
+  "LogBranchFilterIndex": 0,
+  "OutgoingSavedCount": 0,
+  "SidebarExpandedItems": [
+    "Состояния файлов",
+    "Ветки"
+  ],
+  "SidebarWidth": 210.0,
+  "SubtreeLinks": [],
+  "RemoteProjectLinks": [
+    {
+      "$id": "2",
+      "BaseUrl": "https://bitbucket.org/",
+      "Identifier": "",
+      "RemoteName": "origin",
+      "Type": 0,
+      "Username": "gorechi",
+      "CloneUrl": "https://gorechi@bitbucket.org/gorechi/game",
+      "ProjectUrl": "https://bitbucket.org/gorechi/game",
+      "AccountId": "gorechi@bitbucket.org",
+      "AvatarUrl": "https://bytebucket.org/ravatar/%7B4143b2bd-ef30-4a9e-9ba6-e5f14ba3bdc2%7D?ts=default",
+      "DisplayName": "origin: https://bitbucket.org/"
+    }
+  ]
+}
