@@ -724,15 +724,15 @@ class Hero:
             return True
 
     def fight(self, enemy):
-        if newCastle.plan[self.currentPosition].center == '' or (
+        if (newCastle.plan[self.currentPosition].center == '' or (
                             newCastle.plan[self.currentPosition].center.name != enemy and newCastle.plan[
                         self.currentPosition].center.name1 != enemy and
                         newCastle.plan[self.currentPosition].center.name[
-                            0] != enemy) or enemy == '':
+                            0] != enemy)) and enemy != '':
             print(self.name + ' не может атаковать. В комнате нет такого существа.')
             return False
         elif str(newCastle.plan[self.currentPosition].center) != 'monster':
-            print('Это всего лишь ' + newCastle.plan[self.currentPosition].center.name + '. Не нужно кипятиться.')
+            print('Не нужно кипятиться. Тут некого атаковать')
         else:
             fight(self, newCastle.plan[self.currentPosition].center)
             return True
@@ -836,6 +836,14 @@ class Hero:
     def use(self, item='', infight=False):
         if item == '':
             print(self.name + ' не понимает, что ему надо использовать.')
+        elif item.isdigit():
+            if int(item)-1 <= len(self.pockets):
+                i = self.pockets[int(item)-1]
+                if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction=False):
+                    self.pockets.remove(i)
+                elif not isinstance(i, Potion) or not isinstance(i, Rune):
+                    i.use(self, inaction=False)
+                return True
         else:
             for i in self.pockets:
                 if i.name == item or i.name1 == item:
