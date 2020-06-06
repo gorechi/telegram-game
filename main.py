@@ -836,6 +836,14 @@ class Hero:
     def use(self, item='', infight=False):
         if item == '':
             print(self.name + ' не понимает, что ему надо использовать.')
+        elif item.isdigit():
+            if int(item)-1 <= len(self.pockets):
+                i = self.pockets[int(item)-1]
+                if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction=False):
+                    self.pockets.remove(i)
+                elif not isinstance(i, Potion) or not isinstance(i, Rune):
+                    i.use(self, inaction=False)
+                return True
         else:
             for i in self.pockets:
                 if i.name == item or i.name1 == item:
