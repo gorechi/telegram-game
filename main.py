@@ -724,15 +724,15 @@ class Hero:
             return True
 
     def fight(self, enemy):
-        if newCastle.plan[self.currentPosition].center == '' or (
+        if (newCastle.plan[self.currentPosition].center == '' or (
                             newCastle.plan[self.currentPosition].center.name != enemy and newCastle.plan[
                         self.currentPosition].center.name1 != enemy and
                         newCastle.plan[self.currentPosition].center.name[
-                            0] != enemy) or enemy == '':
+                            0] != enemy)) and enemy != '':
             print(self.name + ' не может атаковать. В комнате нет такого существа.')
             return False
         elif str(newCastle.plan[self.currentPosition].center) != 'monster':
-            print('Это всего лишь ' + newCastle.plan[self.currentPosition].center.name + '. Не нужно кипятиться.')
+            print('Не нужно кипятиться. Тут некого атаковать')
         else:
             fight(self, newCastle.plan[self.currentPosition].center)
             return True
