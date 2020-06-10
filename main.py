@@ -5,6 +5,7 @@
 from random import randint as dice
 from random import sample as toss
 from time import sleep as pause
+from math import ceil
 import copy
 
 
@@ -55,9 +56,6 @@ def howmany(a, string):
         return str(a) + ' ' + b[1]
     else:
         return str(a) + ' ' + b[2]
-
-
-
 
 # Константы
 
@@ -133,8 +131,6 @@ class Spell:
         self.actions = actions
         self.maxDamage = maxDamage
         self.minDamage = minDamage
-
-
 
 class Weapon:
     def __init__(self, name, damage=0, permdamage=0, actions='бьет,ударяет'):
@@ -232,11 +228,16 @@ class Shield:
         return 'shield'
 
     def protect(self, who):
+        multiplier = 1
+        if who.weapon and who.weapon.element and self.element and weakness[self.element] == who.weapon.element:
+            multiplier = 1.5
+        elif who.weapon and who.weapon.element and self.element and weakness[who.weapon.element] == self.element:
+            multiplier = 0.67
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection
         else:
-            return dice(1, self.protection) + self.permprotection
+            return ceil((dice(1, self.protection) + self.permprotection)*multiplier)
 
     def take(self, who=''):
         if who.shield == '':
