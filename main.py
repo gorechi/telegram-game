@@ -1039,9 +1039,10 @@ class Plant(Monster):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.carryshield = False
         self.carryweapon = False
+        self.agressive = False
 
     def grow(self):
-        newPlant = Plant(self.name, self.name1, self.stren, self.health)
+        newPlant = Plant(self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
         return newPlant
 
     def win(self, loser):
