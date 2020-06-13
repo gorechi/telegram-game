@@ -197,25 +197,18 @@ class Shield:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
             n2 = [['щит', 0], ['броня', 1], ['кольчуга', 1], ['защита', 1], ['панцырь', 0]]
-            n3 = [['магии', 8, 2, 'магия'], ['воды', 7, 1, 'вода'], ['огня', 6, 2, 'огонь'], ['земли', 6, 1, 'земля'],
-                  ['воздуха', 7, 1, 'воздух']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
-            a3 = dice(0, len(n3) * 2)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            if a3 < len(n3):
-                self.name += ' ' + n3[a3][0]
-                self.permprotection = n3[a3][2]
-                self.protection = dice(2, n3[a3][1])
-                self.element = n3[a3][3]
-            else:
-                self.permprotection = 0
-                self.protection = dice(2, 5)
-                self.element = ''
+            self.permprotection = 0
+            self.protection = dice(2, 5)
+            self.element = ''
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.rune1 = ''
+        self.rune2 = ''
 
     def __str__(self):
         return 'shield'
