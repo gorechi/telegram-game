@@ -139,8 +139,6 @@ class Weapon:
             self.name = name
             self.damage = int(damage)
             self.permdamage = int(permdamage)
-            self.element = ''
-
         else:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
@@ -150,13 +148,13 @@ class Weapon:
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
             self.permdamage = 0
             self.damage = dice(3, 12)
-            self.element = ''
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.rune1 = ''
         self.rune2 = ''
+        self.element = ''
 
     def __str__(self):
         return 'weapon'
@@ -191,8 +189,6 @@ class Shield:
             self.name = name
             self.protection = int(protection)
             self.permprotection = int(permprotection)
-            self.element = ''
-
         else:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
@@ -202,13 +198,13 @@ class Shield:
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
             self.permprotection = 0
             self.protection = dice(2, 5)
-            self.element = ''
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.rune1 = ''
         self.rune2 = ''
+        self.element = ''
 
     def __str__(self):
         return 'shield'
