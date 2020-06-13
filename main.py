@@ -963,18 +963,19 @@ class Monster:
             return self.shield.protect(self)
 
     def lose(self, winner):
-        if newCastle.plan[self.currentPosition].loot == '':
+        where = newCastle.plan[self.currentPosition]
+        if where.loot == '':
             b = Loot()
-            newCastle.plan[self.currentPosition].loot = b
+            where.loot = b
         if self.money > 0:
             a = Money(self.money)
-            newCastle.plan[self.currentPosition].loot.add(a)
-            newCastle.plan[self.currentPosition].loot.pile += (self.loot.pile)
+            where.loot.add(a)
+            where.loot.pile += (self.loot.pile)
         if self.shield != '':
-            newCastle.plan[self.currentPosition].loot.add(self.shield)
+            where.loot.add(self.shield)
         if self.weapon != '':
-            newCastle.plan[self.currentPosition].loot.add(self.weapon)
-        newCastle.plan[self.currentPosition].center = ''
+            where.loot.add(self.weapon)
+        where.center = ''
 
     def win(self, loser):
         self.health = self.startHealth
@@ -1012,6 +1013,20 @@ class Plant(Monster):
                     newCastle.plan[self.currentPosition - 1].center = copy
                     copy.currentPosition = self.currentPosition - 1
 
+    def lose(self, winner):
+        where = newCastle.plan[self.currentPosition]
+        if where.loot == '':
+            b = Loot()
+            where.loot = b
+        if self.money > 0:
+            a = Money(self.money)
+            where.loot.add(a)
+            where.loot.pile += (self.loot.pile)
+        if self.shield != '':
+            where.loot.add(self.shield)
+        if self.weapon != '':
+            where.loot.add(self.weapon)
+        where.center = ''
 
 class Shapeshifter(Monster):
     def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
@@ -1038,16 +1053,17 @@ class Shapeshifter(Monster):
             return self.shield.protect(self)
 
     def lose(self, winner):
-        if newCastle.plan[self.currentPosition].loot == '':
+        where = newCastle.plan[self.currentPosition]
+        if where.loot == '':
             b = Loot()
-            newCastle.plan[self.currentPosition].loot = b
+            where.loot = b
         if self.money > 0:
             a = Money(self.money)
-            newCastle.plan[self.currentPosition].loot.add(a)
-            newCastle.plan[self.currentPosition].loot.pile += (self.loot.pile)
+            where.loot.add(a)
+            where.loot.pile += (self.loot.pile)
         if self.shield != '':
-            newCastle.plan[self.currentPosition].loot.add(self.shield)
-        newCastle.plan[self.currentPosition].center = ''
+            where.loot.add(self.shield)
+        where.center = ''
 
 
 class Vampire(Monster):
