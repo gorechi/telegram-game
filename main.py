@@ -1003,19 +1003,19 @@ class Monster:
                     aliveString += 'истекает кровью, теряя при этом ' + str(weaknessAmount) + ' ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы. '
                     self.stren -= weaknessAmount
-                    self.health == self.startHealth
+                    self.health = self.startHealth
                 elif result == 8:
                     aliveString += 'приходит в ярость, получая при этом ' + str(weaknessAmount) + ' ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и теряя ' \
                                    + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
                     self.stren += weaknessAmount
-                    self.health == self.startHealth - illAmount
+                    self.health = self.startHealth - illAmount
                 else:
                     aliveString += 'получает контузию, теряя при этом ' + str(weaknessAmount) + ' ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и получая ' \
                                    + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
                     self.stren -= weaknessAmount
-                    self.health == self.startHealth + illAmount
+                    self.health = self.startHealth + illAmount
                 runningMonsters = [self]
                 if newCastle.inhabit(runningMonsters, 1, True):
                     aliveString += self.name + ' убегает из комнаты.'
@@ -1026,7 +1026,7 @@ class Monster:
                                + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и ' \
                                + howmany(illAmount, 'жизнь,жизни,жизней') + '.'
                 self.stren -= weaknessAmount
-                self.health == self.startHealth - illAmount
+                self.health = self.startHealth - illAmount
                 print(aliveString)
 
     def win(self, loser):
