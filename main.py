@@ -1000,20 +1000,20 @@ class Monster:
                         where.loot.add(self.shield)
                         self.shield = ''
                 elif result == 7:
-                    aliveString += 'истекает кровью, теряя при этом ' + str(weaknessAmount) + ' ' \
+                    aliveString += 'истекает кровью, теряя при этом ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы. '
                     self.stren -= weaknessAmount
                     self.health = self.startHealth
                 elif result == 8:
-                    aliveString += 'приходит в ярость, получая при этом ' + str(weaknessAmount) + ' ' \
+                    aliveString += 'приходит в ярость, получая при этом ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и теряя ' \
-                                   + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                                   + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
                     self.stren += weaknessAmount
                     self.health = self.startHealth - illAmount
                 else:
-                    aliveString += 'получает контузию, теряя при этом ' + str(weaknessAmount) + ' ' \
+                    aliveString += 'получает контузию, теряя при этом ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и получая ' \
-                                   + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                                   + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
                     self.stren -= weaknessAmount
                     self.health = self.startHealth + illAmount
                 runningMonsters = [self]
