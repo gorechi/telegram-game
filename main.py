@@ -6,6 +6,8 @@ from random import randint as dice
 from random import sample as toss
 from time import sleep as pause
 from math import ceil
+from math import sqrt
+from math import floor
 import copy
 
 
@@ -106,16 +108,20 @@ class Rune:
         self.description = self.name
         self.element = element
         elementDictionary = {'огонь': "огня", 'воздух': "воздуха", 'земля': "земли", 'вода': "воды"}
+        self.damage = 4 - floor(sqrt(dice(1, 15)))
+        self.defence = 3 - floor(sqrt(dice(1, 8)))
 
     def use(self, whoisusing, inaction=False):
         if not inaction:
             nextRuneLevel = whoisusing.elements[self.element] + 1
             if whoisusing.intel < whoisusing.elementLevels[str(nextRuneLevel)]:
-                print(whoisusing.name + ' не может изучить ' + self.element + ' до следующего уровня. У него недостаточно интеллекта.')
+                print(whoisusing.name + ' не может изучить ' +
+                      self.element + ' до следующего уровня. У него недостаточно интеллекта.')
                 return False
             else:
                 whoisusing.elements[self.element] += 1
-                print(whoisusing.name + ' изучает ' + self.element + ' до уровня ' + whoisusing.elements[self.element] + '.')
+                print(whoisusing.name + ' изучает ' + self.element +
+                      ' до уровня ' + whoisusing.elements[self.element] + '.')
                 return True
         else:
             print('Во время боя это совершенно неуместно!')
