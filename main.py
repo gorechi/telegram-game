@@ -663,7 +663,7 @@ class Hero:
 
     def gameover(self, goaltype, goal):
         if goaltype == 'killall':
-            if self.wins == goal:
+            if newCastle.monsters() == 0:
                 print(self.name + ' убил всех монстров в замке и выиграл в этой игре!')
                 return True
             else:
@@ -1296,6 +1296,11 @@ class Castle:
                 else:
                     b.loot.add(tossedItems[i])
         return True
+
+    def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
+        roomsWithMonsters = [a for a in self.plan if ((a.center != '' and isinstance(a.center, Monster))
+                                                      or (a.ambush != '' and isinstance(a.ambush, Monster)))]
+        return len(roomsWithMonsters)
 
 
 # Еще константы
