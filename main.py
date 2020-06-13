@@ -105,6 +105,7 @@ class Rune:
         self.name1 = 'руну'
         self.description = self.name
         self.element = element
+        elementDictionary = {'огонь': "огня", 'воздух': "воздуха", 'земля': "земли", 'вода': "воды"}
 
     def use(self, whoisusing, inaction=False):
         if not inaction:
@@ -144,26 +145,18 @@ class Weapon:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
             n2 = [['меч', 0], ['сабля', 1], ['катана', 1], ['топор', 0], ['кинжал', 0], ['дубина', 1], ['шпага', 1]]
-            n3 = [['магии', 10, 2, 'магия'], ['воды', 13, 1, 'вода'], ['огня', 17, 3, 'огонь'],
-                  ['земли', 9, 1, 'земля'], ['воздуха', 15, 1, 'воздух']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
-            a3 = dice(0, len(n3) * 2)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            if a3 <= len(n3) - 1:
-                self.name += ' ' + n3[a3][0]
-                self.permdamage = n3[a3][2]
-                self.damage = dice(5, n3[a3][1])
-                self.element = n3[a3][3]
-
-            else:
-                self.permdamage = 0
-                self.damage = dice(3, 12)
-                self.element = ''
+            self.permdamage = 0
+            self.damage = dice(3, 12)
+            self.element = ''
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.rune1 = ''
+        self.rune2 = ''
 
     def __str__(self):
         return 'weapon'
