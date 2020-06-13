@@ -900,6 +900,7 @@ class Monster:
         self.loot = Loot()
         self.hide = False
         self.run = False
+        self.wounded = False
         self.keyHole = 'видит какую-то неясную фигуру.'
         if carryweapon == 'True':
             self.carryweapon = True
@@ -936,8 +937,9 @@ class Monster:
         meleAttack = dice(1, self.stren)
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
-            string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + ' и наносит ' + str(
-                meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. '
+            string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name \
+                      + ' и наносит ' + str(meleAttack) + '+' \
+                      + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. '
         else:
             weaponAttack = 0
             string1 = self.name + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
@@ -948,8 +950,8 @@ class Monster:
             if targetDefence == 0:
                 string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
             else:
-                string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' + howmany(totalDamage,
-                                                                                                            'жизнь,жизни,жизней') + '.'
+                string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' \
+                          + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
         else:
             totalDamage = 0
             string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
@@ -963,19 +965,69 @@ class Monster:
             return self.shield.protect(self)
 
     def lose(self, winner):
+        result = dice(1, 10)
+        print('RESULT = ' + str(result))
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
             where.loot = b
-        if self.money > 0:
-            a = Money(self.money)
-            where.loot.add(a)
-            where.loot.pile += (self.loot.pile)
-        if self.shield != '':
-            where.loot.add(self.shield)
-        if self.weapon != '':
-            where.loot.add(self.weapon)
-        where.center = ''
+        if result < 6 or self.wounded:
+            if self.money > 0:
+                a = Money(self.money)
+                where.loot.add(a)
+                where.loot.pile += (self.loot.pile)
+            if self.shield != '':
+                where.loot.add(self.shield)
+            if self.weapon != '':
+                where.loot.add(self.weapon)
+            where.center = ''
+        else:
+            self.wounded = True
+            aliveString = self.name + ' остается вживых и '
+            weaknessAmount = ceil(self.stren * 0.4)
+            print('weaknessAmount = ' + str(weaknessAmount))
+            illAmount = ceil(self.startHealth * 0.4)
+            print('illAmount = ' + str(illAmount))
+            if result < 10:
+                if result == 6:
+                    aliveString += 'получает легкое ранение в руку. '
+                    if self.weapon != '':
+                        aliveString += 'На пол падает ' + self.weapon.name + '. '
+                        where.loot.add(self.weapon)
+                        self.weapon = ''
+                    elif self.shield != '':
+                        aliveString += 'На пол падает ' + self.shield.neme + '. '
+                        where.loot.add(self.shield)
+                        self.shield = ''
+                elif result == 7:
+                    aliveString += 'истекает кровью, теряя при этом ' + str(weaknessAmount) + ' ' \
+                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы. '
+                    self.stren -= weaknessAmount
+                    self.health == self.startHealth
+                elif result == 8:
+                    aliveString += 'приходит в ярость, получая при этом ' + str(weaknessAmount) + ' ' \
+                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и теряя ' \
+                                   + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                    self.stren += weaknessAmount
+                    self.health == self.startHealth - illAmount
+                else:
+                    aliveString += 'получает контузию, теряя при этом ' + str(weaknessAmount) + ' ' \
+                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и получая ' \
+                                   + str(illAmount) + ' ' + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                    self.stren -= weaknessAmount
+                    self.health == self.startHealth + illAmount
+                runningMonsters = [self]
+                if newCastle.inhabit(runningMonsters, 1, True):
+                    aliveString += self.name + ' убегает из комнаты.'
+                    print(aliveString)
+                    where.center = ''
+            else:
+                aliveString += 'получает ранение в ногу и не может двигаться, теряя при этом '  \
+                               + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и ' \
+                               + howmany(illAmount, 'жизнь,жизни,жизней') + '.'
+                self.stren -= weaknessAmount
+                self.health == self.startHealth - illAmount
+                print(aliveString)
 
     def win(self, loser):
         self.health = self.startHealth
@@ -1224,12 +1276,15 @@ class Castle:
         for i in range(howManyItems):
             if emptyRoomsOnly:
                 emptyRooms = [a for a in self.plan if (a.center == '' and a.ambush == '')]
+                if len(emptyRooms) == 0:
+                    return False
                 b = randomitem(emptyRooms, False)
                 if isinstance(tossedItems[i], Monster) and dice(1,3) == 1:
                     b.ambush = tossedItems[i] # Монстр садится в засаду
                 else:
                     b.center = tossedItems[i]  # Вытягиваем следующую штуку из колоды и кладем в комнату
                 tossedItems[i].currentPosition = b.position
+
             else:
                 b = randomitem(self.plan, False)
                 if b.center != '':
@@ -1239,6 +1294,7 @@ class Castle:
                         b.center.loot.add(tossedItems[i])
                 else:
                     b.loot.add(tossedItems[i])
+        return True
 
 
 # Еще константы
