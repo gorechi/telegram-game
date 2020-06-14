@@ -80,7 +80,8 @@ chestType = ["Обычный",
              "Странный",
              "Обычный"]
 weakness = {'огонь': "магия", "магия": "воздух", "воздух": "земля", "земля": "вода", "вода": "огонь"}
-
+elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
+                     12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
 
 # Описываем классы
 
@@ -103,29 +104,14 @@ class Item:
 
 class Rune:
     def __init__(self, element):
-        self.name = 'руна'
-        self.name1 = 'руну'
         self.description = self.name
         self.element = element
-        elementDictionary = {'огонь': "огня", 'воздух': "воздуха", 'земля': "земли", 'вода': "воды"}
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
-
-    def use(self, whoisusing, inaction=False):
-        if not inaction:
-            nextRuneLevel = whoisusing.elements[self.element] + 1
-            if whoisusing.intel < whoisusing.elementLevels[str(nextRuneLevel)]:
-                print(whoisusing.name + ' не может изучить ' +
-                      self.element + ' до следующего уровня. У него недостаточно интеллекта.')
-                return False
-            else:
-                whoisusing.elements[self.element] += 1
-                print(whoisusing.name + ' изучает ' + self.element +
-                      ' до уровня ' + whoisusing.elements[self.element] + '.')
-                return True
-        else:
-            print('Во время боя это совершенно неуместно!')
-            return False
+        self.elements = [1, 3, 7, 12]
+        self.element = self.elements[dice(0,3)]
+        self.name = 'руна ' + elementDictionary[self.element]
+        self.name1 = 'руну ' + elementDictionary[self.element]
 
 class Spell:
     def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1, maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
@@ -144,7 +130,6 @@ class Weapon:
         if name != 0:
             self.name = name
             self.damage = int(damage)
-            self.permdamage = int(permdamage)
         else:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
@@ -152,20 +137,29 @@ class Weapon:
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            self.permdamage = 0
             self.damage = dice(3, 12)
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
-        self.rune1 = ''
-        self.rune2 = ''
-        self.element = ''
+        self.runes = []
+        self.element = 0
+        self.permdamage = 0
 
     def __str__(self):
         return 'weapon'
 
+    def enchant(self, rune):
+        if len(self.runes) > 1:
+            return False
+        else:
+            self.runes.append(rune)
+            return True
+
     def attack(self):
+        self.permdamage = 0
+        for rune in self.runes:
+            self.permdamage += rune.damage
         return dice(1, int(self.damage)) + self.permdamage
 
     def take(self, who=''):
@@ -177,6 +171,9 @@ class Weapon:
             print(who.name + ' забирает ' + self.name + ' себе.')
 
     def show(self):
+        self.permdamage = 0
+        for rune in self.runes:
+            self.permdamage += rune.damage
         return self.name + ' (' + str(self.damage) + '+' + str(self.permdamage) + ')'
 
     def use(self, whoUsing, inaction = False):
@@ -194,7 +191,6 @@ class Shield:
         if name != 0:
             self.name = name
             self.protection = int(protection)
-            self.permprotection = int(permprotection)
         else:
             n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
                   ['Новый', 'Новая']]
@@ -202,20 +198,29 @@ class Shield:
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            self.permprotection = 0
             self.protection = dice(2, 5)
 
         self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
-        self.rune1 = ''
-        self.rune2 = ''
-        self.element = ''
+        self.runes = []
+        self.element = 0
+        self.permprotection = 0
 
     def __str__(self):
         return 'shield'
 
+    def enchant(self, rune):
+        if len(self.runes) > 1:
+            return False
+        else:
+            self.runes.append(rune)
+            return True
+
     def protect(self, who):
+        self.permprotection = 0
+        for rune in self.runes:
+            self.permprotection += rune.defence
         multiplier = 1
         if who.weapon and who.weapon.element and self.element and weakness[self.element] == who.weapon.element:
             multiplier = 1.5
@@ -236,6 +241,9 @@ class Shield:
             print(who.name + ' забирает ' + self.name + ' себе.')
 
     def show(self):
+        self.permprotection = 0
+        for rune in self.runes:
+            self.permprotection += rune.defence
         return self.name + ' (' + str(self.protection) + '+' + str(self.permprotection) + ')'
 
     def use(self, whoUsing, inaction = False):
