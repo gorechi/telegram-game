@@ -504,6 +504,13 @@ class Hero:
     def __str__(self):
         return 'hero'
 
+    def pockets(self, itemType):
+        count = 0
+        for item in self.pockets:
+            if isinstance(item, itemType):
+                count += 1
+        return count
+
     def action(self):
         if self.weapon == '':
             return randomitem(self.actions)
@@ -862,8 +869,36 @@ class Hero:
         elif item.isdigit():
             if int(item)-1 <= len(self.pockets):
                 i = self.pockets[int(item)-1]
-                if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction=False):
+                if isinstance(i, Potion) and i.use(self, inaction=False):
                     self.pockets.remove(i)
+                elif not isinstance(i, Potion):
+                    i.use(self, inaction=False)
+                return True
+            else:
+                print(self.name + ' не нашел такой вещи у себя в карманах.')
+                return False
+        else:
+            for i in self.pockets:
+                if i.name == item or i.name1 == item:
+                    if isinstance(i, Potion)  and i.use(self, inaction = False):
+                        self.pockets.remove(i)
+                    else:
+                        i.use(self, inaction = False)
+                    return True
+            print(self.name + ' не нашел такой вещи у себя в карманах.')
+
+    def enchant(self, item=''):
+        if self.pockets(Rune) == 0:
+            print(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
+            return False
+        if item == '':
+            print(self.name + ' не понимает, что ему надо улучшить.')
+            return False
+        elif item.isdigit():
+            if int(item)-1 <= len(self.pockets):
+                i = self.pockets[int(item)-1]
+                if isinstance(i, Weapon) or isinstance(i, Shield):
+
                 elif not isinstance(i, Potion) or not isinstance(i, Rune):
                     i.use(self, inaction=False)
                 return True
@@ -876,6 +911,7 @@ class Hero:
                         i.use(self, inaction = False)
                     return True
             print(self.name + ' не нашел такой вещи у себя в карманах.')
+
 
     def do(self, command):
         commandDict = {'осмотреть': self.lookaround,
