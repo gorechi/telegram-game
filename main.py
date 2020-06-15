@@ -149,8 +149,6 @@ class Weapon:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
-        self.element = 0
-        self.permdamage = 0
 
     def __str__(self):
         return 'weapon'
@@ -163,7 +161,7 @@ class Weapon:
             return True
 
     def enchantment(self):
-        if len(self.runes) < 1 or len(self.runes) > 2:
+        if len(self.runes) not in [1,2]:
             return False
         else:
             element = 0
@@ -171,11 +169,15 @@ class Weapon:
                 element += i.element()
             return ' ' + elementDictionary[element]
 
+    def permdamage(self):
+        damage = 0
+        if len(self.runes) in [1,2]:
+            for rune in self.runes:
+                damage += rune.damage
+        return int(damage)
+
     def attack(self):
-        self.permdamage = 0
-        for rune in self.runes:
-            self.permdamage += rune.damage
-        return dice(1, int(self.damage)) + self.permdamage
+        return dice(1, int(self.damage)) + self.permdamage()
 
     def take(self, who=''):
         if who.weapon == '':
@@ -186,10 +188,10 @@ class Weapon:
             print(who.name + ' забирает ' + self.name + ' себе.')
 
     def show(self):
-        self.permdamage = 0
-        for rune in self.runes:
-            self.permdamage += rune.damage
-        return self.name + self.enchantment() + ' (' + str(self.damage) + '+' + str(self.permdamage) + ')'
+        damageString = str(self.damage)
+        if self.permdamage() != 0:
+            damageString += '+' + str(self.permdamage())
+        return self.name + self.enchantment() + ' (' + damageString + ')'
 
     def use(self, whoUsing, inaction = False):
         if whoUsing.weapon == '':
