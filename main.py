@@ -65,6 +65,7 @@ howManyMonsters = 10
 howManyWeapon = 10
 howManyShields = 10
 howManyPotions = 8
+howManyRunes = 10
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -103,15 +104,20 @@ class Item:
         return self.description
 
 class Rune:
-    def __init__(self, element):
-        self.description = self.name
-        self.element = element
+    def __init__(self):
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
         self.elements = [1, 3, 7, 12]
         self.element = self.elements[dice(0,3)]
-        self.name = 'руна ' + elementDictionary[self.element]
-        self.name1 = 'руну ' + elementDictionary[self.element]
+        self.name = 'руна'
+        self.name1 = 'руну'
+        self.description = self.name + ' ' + elementDictionary[self.element]
+
+    def __str__(self):
+        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+               ' или защита + ' + str(self.defence)
+    def element(self):
+        return int(self.element)
 
 class Spell:
     def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1, maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
@@ -156,6 +162,15 @@ class Weapon:
             self.runes.append(rune)
             return True
 
+    def enchantment(self):
+        if len(self.runes) < 1 or len(self.runes) > 2:
+            return False
+        else:
+            element = 0
+            for i in self.runes:
+                element += i.element()
+            return ' ' + elementDictionary[element]
+
     def attack(self):
         self.permdamage = 0
         for rune in self.runes:
@@ -174,7 +189,7 @@ class Weapon:
         self.permdamage = 0
         for rune in self.runes:
             self.permdamage += rune.damage
-        return self.name + ' (' + str(self.damage) + '+' + str(self.permdamage) + ')'
+        return self.name + self.enchantment() + ' (' + str(self.damage) + '+' + str(self.permdamage) + ')'
 
     def use(self, whoUsing, inaction = False):
         if whoUsing.weapon == '':
@@ -217,6 +232,15 @@ class Shield:
             self.runes.append(rune)
             return True
 
+    def enchantment(self):
+        if len(self.runes) < 1 or len(self.runes) > 2:
+            return False
+        else:
+            element = 0
+            for i in self.runes:
+                element += i.element()
+            return ' ' + elementDictionary[element]
+
     def protect(self, who):
         self.permprotection = 0
         for rune in self.runes:
@@ -244,7 +268,7 @@ class Shield:
         self.permprotection = 0
         for rune in self.runes:
             self.permprotection += rune.defence
-        return self.name + ' (' + str(self.protection) + '+' + str(self.permprotection) + ')'
+        return self.name + self.enchantment() + ' (' + str(self.protection) + '+' + str(self.permprotection) + ')'
 
     def use(self, whoUsing, inaction = False):
         if whoUsing.shield == '':
@@ -474,15 +498,6 @@ class Hero:
             return randomitem(self.actions)
         else:
             return randomitem(self.weapon.actions)
-
-    def learnRune(self, rune):
-        nextRuneLevel = self.elements[rune.element] + 1
-        if self.intel < self.elementLevels[str(nextRuneLevel)]:
-            return False
-        else:
-            self.elements[rune.element] += 1
-            return True
-
 
     def attack(self, target):
         self.run = False
@@ -1275,22 +1290,22 @@ class Castle:
                 emptyRooms = [a for a in self.plan if (a.center == '' and a.ambush == '')]
                 if len(emptyRooms) == 0:
                     return False
-                b = randomitem(emptyRooms, False)
+                room = randomitem(emptyRooms, False)
                 if isinstance(tossedItems[i], Monster) and dice(1,3) == 1:
-                    b.ambush = tossedItems[i] # Монстр садится в засаду
+                    room.ambush = tossedItems[i] # Монстр садится в засаду
                 else:
-                    b.center = tossedItems[i]  # Вытягиваем следующую штуку из колоды и кладем в комнату
-                tossedItems[i].currentPosition = b.position
+                    room.center = tossedItems[i]  # Вытягиваем следующую штуку из колоды и кладем в комнату
+                tossedItems[i].currentPosition = room.position
 
             else:
-                b = randomitem(self.plan, False)
-                if b.center != '':
-                    if isinstance(b.center, Monster):
-                        b.center.give(tossedItems[i])
+                room = randomitem(self.plan, False)
+                if room.center != '':
+                    if isinstance(room.center, Monster):
+                        room.center.give(tossedItems[i])
                     else:
-                        b.center.loot.add(tossedItems[i])
+                        room.center.loot.add(tossedItems[i])
                 else:
-                    b.loot.add(tossedItems[i])
+                    room.loot.add(tossedItems[i])
         return True
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
@@ -1428,6 +1443,9 @@ allWeapon = readitems('оружие')
 allShields = readitems('защита')
 allPotions = readitems('зелье')
 newCastle = Castle(5, 5)  # Генерируем замок
+allRunes = [Rune() for i in range(howManyRunes)]
+for rune in allRunes:
+    print(str(rune))
 newCastle.inhabit(allMonsters, howManyMonsters, True)  # Населяем замок монстрами
 howManyChests = len(newCastle.plan) // 5 + 1
 allChests = createchests(howManyChests, 50, 50)  # Создаем сундуки
