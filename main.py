@@ -133,20 +133,22 @@ class Spell:
         self.minDamage = minDamage
 
 class Weapon:
-    def __init__(self, name, damage=0, actions='бьет,ударяет'):
+    def __init__(self, name, name1='оружие', damage=0, actions='бьет,ударяет'):
         if name != 0:
             self.name = name
             self.damage = int(damage)
+            self.name1 = name1
         else:
-            n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
-                  ['Новый', 'Новая']]
-            n2 = [['меч', 0], ['сабля', 1], ['катана', 1], ['топор', 0], ['кинжал', 0], ['дубина', 1], ['шпага', 1]]
+            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
+                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                  ['Новый', 'Новая', 'Новый', 'Новую']]
+            n2 = [['меч', 0, 'меч'], ['сабля', 1, 'саблю'], ['катана', 1, 'катану'], ['топор', 0, 'топор'],
+                  ['кинжал', 0, 'кинжал'], ['дубина', 1, 'дубину'], ['шпага', 1, 'шпагу']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
+            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
             self.damage = dice(3, 12)
-
-        self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -184,10 +186,10 @@ class Weapon:
     def take(self, who):
         if who.weapon == '':
             who.weapon = self
-            print(who.name + ' берет ' + self.name + ' в руку.')
+            print(who.name + ' берет ' + self.name1 + ' в руку.')
         else:
             who.pockets.append(self)
-            print(who.name + ' забирает ' + self.name + ' себе.')
+            print(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         damageString = str(self.damage)
@@ -202,24 +204,26 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name + ' в качестве оружия!')
+        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
 
 class Shield:
-    def __init__(self, name, protection=0, actions=''):
+    def __init__(self, name, name1='защиту', protection=0, actions=''):
         if name != 0:
             self.name = name
+            self.name1 = name1
             self.protection = int(protection)
         else:
-            n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
-                  ['Новый', 'Новая']]
-            n2 = [['щит', 0], ['броня', 1], ['кольчуга', 1], ['защита', 1], ['панцырь', 0]]
+            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
+                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                  ['Новый', 'Новая', 'Новый', 'Новую']]
+            n2 = [['щит', 0, 'щит'], ['броня', 1, 'броню'], ['кольчуга', 1, 'кольчугу'], ['защита', 1, 'защиту'],
+                  ['панцырь', 0, 'панцырь']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
+            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
             self.protection = dice(2, 5)
-
-        self.name1 = self.name
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -265,10 +269,10 @@ class Shield:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            print(who.name + ' берет ' + self.name + ' в руку.')
+            print(who.name + ' берет ' + self.name1 + ' в руку.')
         else:
             player.pockets.append(self)
-            print(who.name + ' забирает ' + self.name + ' себе.')
+            print(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         protectionString = str(self.protection)
@@ -283,7 +287,7 @@ class Shield:
             whoUsing.pockets.append(whoUsing.shield)
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name + ' в качестве защиты!')
+        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
 
 class Map(Item):
@@ -1364,7 +1368,7 @@ def readitems(whatkind):
     howMany = {'оружие': howManyWeapon, 'защита': howManyShields, 'зелье': howManyPotions}
     for i in allItems:
         if i[0] == whatkind:
-            item = classes[i[0]](i[1], i[2], i[3])
+            item = classes[i[0]](i[1], i[2], i[3], i[4])
             itemTypes[i[0]].append(item)
     while len(itemTypes[whatkind]) < howMany[whatkind]:
         new = classes[whatkind](0)
