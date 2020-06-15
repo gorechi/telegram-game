@@ -28,15 +28,15 @@ def readfile(filename, divide, divider='|'):
 def showsides(side1, side2):
     line = side1.name + ': сила - d' + str(side1.stren)
     if side1.weapon != '':
-        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage)
+        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
     if side1.shield != '':
-        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection)
+        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
     line += ', жизней - ' + str(side1.health) + '. '
     line += side2.name + ': сила - d' + str(side2.stren)
     if side2.weapon != '':
-        line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage)
+        line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
     if side2.shield != '':
-        line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection)
+        line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
     line += ', жизней - ' + str(side2.health) + '.'
     return line
 
@@ -152,7 +152,7 @@ class Weapon:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
-        self.element=''
+        self.element = ''
 
     def __str__(self):
         return 'weapon'
@@ -166,7 +166,7 @@ class Weapon:
 
     def enchantment(self):
         if len(self.runes) not in [1, 2]:
-            return False
+            return ''
         else:
             element = 0
             for i in self.runes:
@@ -227,6 +227,7 @@ class Shield:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+        self.element = ''
 
     def __str__(self):
         return 'shield'
@@ -247,7 +248,7 @@ class Shield:
 
     def enchantment(self):
         if len(self.runes) not in [1, 2]:
-            return False
+            return ''
         else:
             element = 0
             for i in self.runes:
@@ -554,7 +555,7 @@ class Hero:
                 elif targetDefence == 0:
                     string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
                 else:
-                    string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' + howmany(
+                    string2 = target.name + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
                         totalDamage, 'жизнь,жизни,жизней') + '.'
                 target.health -= totalDamage
                 return string1 + string2
@@ -611,12 +612,12 @@ class Hero:
     def show(self):
         if self.weapon != '':
             string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.name, self.weapon.damage,
-                                                                               self.weapon.permdamage)
+                                                                               self.weapon.permdamage())
         else:
             string1 = ' и он предпочитает сражаться голыми руками.'
         if self.shield != '':
             string2 = 'Его защищает ' + self.shield.name + ' (' + str(self.shield.protection) + '+' + str(
-                self.shield.permprotection) + ')'
+                self.shield.permprotection()) + ')'
         else:
             string2 = 'У него нет защиты'
         print(
