@@ -120,7 +120,8 @@ class Rune:
         return int(self.element)
 
 class Spell:
-    def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1, maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
+    def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
+                 maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
         self.name = name
         self.name1 = name1
         self.description = self.name
@@ -132,7 +133,7 @@ class Spell:
         self.minDamage = minDamage
 
 class Weapon:
-    def __init__(self, name, damage=0, permdamage=0, actions='бьет,ударяет'):
+    def __init__(self, name, damage=0, actions='бьет,ударяет'):
         if name != 0:
             self.name = name
             self.damage = int(damage)
@@ -149,6 +150,7 @@ class Weapon:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+        self.element=''
 
     def __str__(self):
         return 'weapon'
@@ -161,7 +163,7 @@ class Weapon:
             return True
 
     def enchantment(self):
-        if len(self.runes) not in [1,2]:
+        if len(self.runes) not in [1, 2]:
             return False
         else:
             element = 0
@@ -171,15 +173,15 @@ class Weapon:
 
     def permdamage(self):
         damage = 0
-        if len(self.runes) in [1,2]:
+        if len(self.runes) in [1, 2]:
             for rune in self.runes:
                 damage += rune.damage
-        return int(damage)
+        return damage
 
     def attack(self):
         return dice(1, int(self.damage)) + self.permdamage()
 
-    def take(self, who=''):
+    def take(self, who):
         if who.weapon == '':
             who.weapon = self
             print(who.name + ' берет ' + self.name + ' в руку.')
@@ -204,7 +206,7 @@ class Weapon:
 
 
 class Shield:
-    def __init__(self, name, protection=0, permprotection=0, actions=''):
+    def __init__(self, name, protection=0, actions=''):
         if name != 0:
             self.name = name
             self.protection = int(protection)
@@ -221,11 +223,16 @@ class Shield:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
-        self.element = 0
-        self.permprotection = 0
 
     def __str__(self):
         return 'shield'
+
+    def permprotection(self):
+        protection = 0
+        if len(self.runes) in [1, 2]:
+            for rune in self.runes:
+                protection += rune.damage
+        return protection
 
     def enchant(self, rune):
         if len(self.runes) > 1:
@@ -235,7 +242,7 @@ class Shield:
             return True
 
     def enchantment(self):
-        if len(self.runes) < 1 or len(self.runes) > 2:
+        if len(self.runes) not in [1, 2]:
             return False
         else:
             element = 0
@@ -244,9 +251,6 @@ class Shield:
             return ' ' + elementDictionary[element]
 
     def protect(self, who):
-        self.permprotection = 0
-        for rune in self.runes:
-            self.permprotection += rune.defence
         multiplier = 1
         if who.weapon and who.weapon.element and self.element and weakness[self.element] == who.weapon.element:
             multiplier = 1.5
@@ -254,11 +258,11 @@ class Shield:
             multiplier = 0.67
         if who.hide:
             who.hide = False
-            return self.protection + self.permprotection
+            return self.protection + self.permprotection()
         else:
-            return ceil((dice(1, self.protection) + self.permprotection)*multiplier)
+            return ceil((dice(1, self.protection) + self.permprotection())*multiplier)
 
-    def take(self, who=''):
+    def take(self, who):
         if who.shield == '':
             who.shield = self
             print(who.name + ' берет ' + self.name + ' в руку.')
@@ -267,12 +271,12 @@ class Shield:
             print(who.name + ' забирает ' + self.name + ' себе.')
 
     def show(self):
-        self.permprotection = 0
-        for rune in self.runes:
-            self.permprotection += rune.defence
-        return self.name + self.enchantment() + ' (' + str(self.protection) + '+' + str(self.permprotection) + ')'
+        protectionString = str(self.protection)
+        if self.permprotection() != 0:
+            protectionString += '+' + str(self.permprotection())
+        return self.name + self.enchantment() + ' (' + protectionString + ')'
 
-    def use(self, whoUsing, inaction = False):
+    def use(self, whoUsing):
         if whoUsing.shield == '':
             whoUsing.shield = self
         else:
