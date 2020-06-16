@@ -94,8 +94,8 @@ class Item:
         self.description = self.name
 
     def take(self, who=''):
-        player.pockets.append(self)
-        print(player.name + ' забирает ' + self.name + ' себе.')
+        who.pockets.append(self)
+        print(who.name + ' забирает ' + self.name + ' себе.')
 
     def use(self, whoisusing, inaction=False):
         print(whoisusing.name + ' не знает, как использовать такие штуки.')
@@ -109,15 +109,25 @@ class Rune:
         self.defence = 3 - floor(sqrt(dice(1, 8)))
         self.elements = [1, 3, 7, 12]
         self.element = self.elements[dice(0,3)]
-        self.name = 'руна'
-        self.name1 = 'руну'
+        self.name = 'Руна'
+        self.name1 = 'Руну'
         self.description = self.name + ' ' + elementDictionary[self.element]
 
     def __str__(self):
         return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
                ' или защита + ' + str(self.defence)
+
     def element(self):
         return int(self.element)
+
+    def take(self, who=''):
+        who.pockets.append(self)
+        print(who.name + ' забирает ' + self.name1 + ' себе.')
+
+    def show(self):
+        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+               ' или защита + ' + str(self.defence)
+
 
 class Spell:
     def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
@@ -1499,15 +1509,14 @@ allWeapon = readitems('оружие')
 allShields = readitems('защита')
 allPotions = readitems('зелье')
 newCastle = Castle(5, 5)  # Генерируем замок
-allRunes = [Rune() for i in range(howManyRunes)]
-for rune in allRunes:
-    print(str(rune))
 newCastle.inhabit(allMonsters, howManyMonsters, True)  # Населяем замок монстрами
 howManyChests = len(newCastle.plan) // 5 + 1
 allChests = createchests(howManyChests, 50, 50)  # Создаем сундуки
 newCastle.inhabit(allChests, howManyChests, True)  # Расставляем сундуки
 newCastle.inhabit(allWeapon, howManyWeapon, False)
 newCastle.inhabit(allShields, howManyShields, False)
+allRunes = [Rune() for i in range(howManyRunes)]
+newCastle.inhabit(allRunes, howManyRunes, False)
 newCastle.inhabit(allPotions, howManyPotions, False)
 lockDoors()  # Создаем запертые комнаты
 map = Map()  # Прячем карту
