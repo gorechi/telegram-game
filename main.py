@@ -65,7 +65,7 @@ howManyMonsters = 10
 howManyWeapon = 10
 howManyShields = 10
 howManyPotions = 8
-howManyRunes = 10
+howManyRunes = 15
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -586,12 +586,9 @@ class Hero:
                 self.rage = 0
                 if self.weapon != '':
                     weaponAttack = self.weapon.attack()
-                    if target.shield !='':
-                        if target.shield.element != '' and self.weapon.element != '':
-                            if target.shield.element == weakness[self.weapon.element]:
-                                weaponAttack += weaponAttack // 2
-                    string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + ' и наносит ' + str(
-                        meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. '
+                    string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + \
+                              ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
+                              ' урона. '
                 else:
                     weaponAttack = 0
                     string1 = self.name + ' бьет ' + target.name1 + ' не используя оружие и наносит ' + howmany(
@@ -1043,6 +1040,43 @@ class Monster:
             self.weapon = item
         elif isinstance(item, Shield) and self.shield == '':
             self.shield = item
+        elif isinstance(item, Rune):
+            if item.damage >= item.defence:
+                if self.weapon != '':
+                    if self.weapon.enchant(item):
+                        return True
+                    elif self.shield != '':
+                        if not self.shield.enchant(item):
+                            self.loot.add(item)
+                            return True
+                    else:
+                        self.loot.add(item)
+                        return True
+                elif self.shield != '':
+                    if not self.shield.enchant(item):
+                        self.loot.add(item)
+                        return True
+                else:
+                    self.loot.add(item)
+                    return True
+            else:
+                if self.shield != '':
+                    if self.shield.enchant(item):
+                        return True
+                    elif self.weapon != '':
+                        if not self.weapon.enchant(item):
+                            self.loot.add(item)
+                            return True
+                    else:
+                        self.loot.add(item)
+                        return True
+                elif self.weapon != '':
+                    if not self.weapon.enchant(item):
+                        self.loot.add(item)
+                        return True
+                else:
+                    self.loot.add(item)
+                    return True
         else:
             self.loot.add(item)
 
