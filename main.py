@@ -683,12 +683,7 @@ class Hero:
         if self.shield == '':
             return 0
         else:
-            defence = self.shield.protect(self)
-            if attacker.weapon !='':
-                if attacker.weapon.element != '' and self.shield.element != '':
-                    if attacker.weapon.element == weakness[self.shield.element]:
-                        defence += defence // 2
-            return defence
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         self.health = self.startHealth
@@ -1086,7 +1081,7 @@ class Monster:
         if self.shield == '':
             return 0
         else:
-            return self.shield.protect(self)
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         result = dice(1, 10)
@@ -1155,7 +1150,6 @@ class Monster:
 
     def win(self, loser):
         self.health = self.startHealth
-
 
 class Plant(Monster):
     def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='растёт', agressive=False,
@@ -1227,7 +1221,7 @@ class Shapeshifter(Monster):
         if self.shield == '':
             return 0
         else:
-            return self.shield.protect(self)
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         where = newCastle.plan[self.currentPosition]
