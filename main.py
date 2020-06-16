@@ -109,8 +109,8 @@ class Rune:
         self.defence = 3 - floor(sqrt(dice(1, 8)))
         self.elements = [1, 3, 7, 12]
         self.element = self.elements[dice(0,3)]
-        self.name = 'Руна'
-        self.name1 = 'Руну'
+        self.name = 'руна'
+        self.name1 = 'руну'
         self.description = self.name + ' ' + elementDictionary[self.element]
 
     def __str__(self):
@@ -906,6 +906,10 @@ class Hero:
         if item == '':
             print(self.name + ' не понимает, что ему надо улучшить.')
             return False
+        elif item == 'оружие' and self.weapon != '':
+            selectedItem = self.weapon
+        elif item in ['защиту', 'защита'] and self.shield != '':
+            selectedItem = self.shield
         elif item.isdigit() and int(item)-1 <= len(self.pockets):
             selectedItem = self.pockets[int(item)-1]
         else:
@@ -932,6 +936,9 @@ class Hero:
                         return False
                 else:
                     print(self.name + ' не находит такую руну у себя в карманах.')
+        else:
+            print(self.name + ' не может улучшить эту вещь.')
+            return False
 
     def do(self, command):
         commandDict = {'осмотреть': self.lookaround,
@@ -940,7 +947,8 @@ class Hero:
                        'взять': self.take,
                        'обыскать': self.search,
                        'открыть': self.open,
-                       'использовать': self.use}
+                       'использовать': self.use,
+                       'улучшить': self.enchant}
         a = command.find(' ')
         fullCommand = []
         if a < 0:
