@@ -504,12 +504,12 @@ class Hero:
     def __str__(self):
         return 'hero'
 
-    def pockets(self, itemType):
-        count = 0
+    def inpockets(self, itemType):
+        itemList = []
         for item in self.pockets:
             if isinstance(item, itemType):
-                count += 1
-        return count
+                itemList.append(item)
+        return itemList
 
     def action(self):
         if self.weapon == '':
@@ -888,30 +888,40 @@ class Hero:
             print(self.name + ' не нашел такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
-        if self.pockets(Rune) == 0:
+        selectedItem = ''
+        runeList = self.inpockets(Rune)
+        if len(runeList) == 0:
             print(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
             return False
         if item == '':
             print(self.name + ' не понимает, что ему надо улучшить.')
             return False
-        elif item.isdigit():
-            if int(item)-1 <= len(self.pockets):
-                i = self.pockets[int(item)-1]
-                if isinstance(i, Weapon) or isinstance(i, Shield):
-
-                elif not isinstance(i, Potion) or not isinstance(i, Rune):
-                    i.use(self, inaction=False)
-                return True
+        elif item.isdigit() and int(item)-1 <= len(self.pockets):
+            selectedItem = self.pockets[int(item)-1]
         else:
             for i in self.pockets:
                 if i.name == item or i.name1 == item:
-                    if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction = False):
-                        self.pockets.remove(i)
+                    selectedItem = i
+                else:
+                    print(self.name + ' не нашел такой вещи у себя в карманах.')
+                    return False
+        if selectedItem != '' and isinstance(selectedItem, Weapon) or isinstance(selectedItem, Shield):
+            print(self.name + ' может использовать следующие руны:')
+            for rune in runeList:
+                print(str(runeList.index(rune)+1) + ': ' + str(rune))
+            print('Введите "отмена" для прекрашения улучшения')
+            while True:
+                answer = input('Какую по номеру руну выберет ' + player.name1 + '? ---->')
+                if answer == 'отмена':
+                    return False
+                elif answer.isdigit() and int(answer)-1 <= len(runeList):
+                    if selectedItem.enchant(runeList[int(answer)-1]):
+                        return True
                     else:
-                        i.use(self, inaction = False)
-                    return True
-            print(self.name + ' не нашел такой вещи у себя в карманах.')
-
+                        print('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
+                        return False
+                else:
+                    print(self.name + ' не находит такую руну у себя в карманах.')
 
     def do(self, command):
         commandDict = {'осмотреть': self.lookaround,
@@ -1481,7 +1491,6 @@ def lockDoors():
                 hide (newKey)
                 break
     return True
-
 
 # Подготовка
 allMonsters = readmonsters()  # Читаем монстров из файла
