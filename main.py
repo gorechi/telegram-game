@@ -80,7 +80,8 @@ chestType = ["Обычный",
              "Антикварный",
              "Странный",
              "Обычный"]
-weakness = {'огонь': "магия", "магия": "воздух", "воздух": "земля", "земля": "вода", "вода": "огонь"}
+weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12], 8: [3, 12], 10: [7, 12], 12: [1, 1],
+            13: [1, 3], 14: [12, 24], 15: [1, 7], 19: [1, 12], 24: [1, 2]}
 elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
                      12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
 
@@ -163,10 +164,25 @@ class Weapon:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
-        self.element = ''
 
     def __str__(self):
         return 'weapon'
+
+    def realname(self):
+        names = []
+        if self.element() != 0:
+            names.append(self.name + ' ' + elementDictionary[self.element()])
+            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+        else:
+            names.append(self.name)
+            names.append(self.name1)
+        return names
+
+    def element(self):
+        elementSum = 0
+        for rune in self.runes:
+            elementSum += rune.element
+        return elementSum
 
     def enchant(self, rune):
         if len(self.runes) > 1:
@@ -238,10 +254,25 @@ class Shield:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
-        self.element = ''
 
     def __str__(self):
         return 'shield'
+
+    def realname(self):
+        names = []
+        if self.element() != 0:
+            names.append(self.name + ' ' + elementDictionary[self.element()])
+            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+        else:
+            names.append(self.name)
+            names.append(self.name1)
+        return names
+
+    def element(self):
+        elementSum = 0
+        for rune in self.runes:
+            elementSum += rune.element
+        return elementSum
 
     def permprotection(self):
         protection = 0
@@ -268,10 +299,12 @@ class Shield:
 
     def protect(self, who):
         multiplier = 1
-        if who.weapon and who.weapon.element and self.element and weakness[self.element] == who.weapon.element:
-            multiplier = 1.5
-        elif who.weapon and who.weapon.element and self.element and weakness[who.weapon.element] == self.element:
-            multiplier = 0.67
+        if who.weapon and who.weapon.element() != 0 and self.element() != 0:
+            if who.weapon.element() in weakness[self.element()]:
+                multiplier = 1.5
+            elif self.element() in weakness[who.weapon.element()]:
+                multiplier = 0.67
+        print('Множитель защиты - ' + str(multiplier))
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection()
@@ -281,7 +314,7 @@ class Shield:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            print(who.name + ' берет ' + self.name1 + ' в руку.')
+            print(who.name + ' использует ' + self.name1 + ' как защиту.')
         else:
             player.pockets.append(self)
             print(who.name + ' забирает ' + self.name1 + ' себе.')
@@ -629,13 +662,15 @@ class Hero:
 
     def show(self):
         if self.weapon != '':
-            string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.name, self.weapon.damage,
+            string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.realname()[0],
+                                                                               self.weapon.damage,
                                                                                self.weapon.permdamage())
         else:
             string1 = ' и он предпочитает сражаться голыми руками.'
         if self.shield != '':
-            string2 = 'Его защищает ' + self.shield.name + ' (' + str(self.shield.protection) + '+' + str(
-                self.shield.permprotection()) + ')'
+            string2 = 'Его защищает {0} ({1}+{2})'.format(self.shield.realname()[0],
+                                                           self.shield.protection,
+                                                           self.shield.permprotection())
         else:
             string2 = 'У него нет защиты'
         print(
