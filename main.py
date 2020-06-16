@@ -109,6 +109,7 @@ class Rune:
         self.defence = 3 - floor(sqrt(dice(1, 8)))
         self.elements = [1, 3, 7, 12]
         self.element = self.elements[dice(0,3)]
+        self.canUseInFight = False
         self.name = 'руна'
         self.name1 = 'руну'
         self.description = self.name + ' ' + elementDictionary[self.element]
@@ -180,7 +181,7 @@ class Weapon:
         else:
             element = 0
             for i in self.runes:
-                element += i.element()
+                element += int(i.element)
             return ' ' + elementDictionary[element]
 
     def permdamage(self):
@@ -246,7 +247,7 @@ class Shield:
         protection = 0
         if len(self.runes) in [1, 2]:
             for rune in self.runes:
-                protection += rune.damage
+                protection += rune.defence
         return protection
 
     def enchant(self, rune):
@@ -262,7 +263,7 @@ class Shield:
         else:
             element = 0
             for i in self.runes:
-                element += i.element()
+                element += int(i.element)
             return ' ' + elementDictionary[element]
 
     def protect(self, who):
@@ -925,11 +926,13 @@ class Hero:
                 print(str(runeList.index(rune)+1) + ': ' + str(rune))
             print('Введите "отмена" для прекрашения улучшения')
             while True:
-                answer = input('Какую по номеру руну выберет ' + player.name1 + '? ---->')
+                answer = input('Какую по номеру руну выберет ' + player.name + '? ---->')
                 if answer == 'отмена':
                     return False
                 elif answer.isdigit() and int(answer)-1 <= len(runeList):
                     if selectedItem.enchant(runeList[int(answer)-1]):
+                        print(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
+                        self.pockets.remove(runeList[int(answer)-1])
                         return True
                     else:
                         print('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
