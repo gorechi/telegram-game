@@ -905,7 +905,7 @@ class Hero:
         if item == '':
             print(self.name + ' не понимает, что ему надо использовать.')
         elif item.isdigit():
-            if int(item)-1 <= len(self.pockets):
+            if int(item)-1 < len(self.pockets):
                 i = self.pockets[int(item)-1]
                 if isinstance(i, Potion) and i.use(self, inaction=False):
                     self.pockets.remove(i)
@@ -951,12 +951,12 @@ class Hero:
             print(self.name + ' может использовать следующие руны:')
             for rune in runeList:
                 print(str(runeList.index(rune)+1) + ': ' + str(rune))
-            print('Введите "отмена" для прекрашения улучшения')
+            print('Введите "отмена" для прекращения улучшения')
             while True:
                 answer = input('Какую по номеру руну выберет ' + player.name + '? ---->')
                 if answer == 'отмена':
                     return False
-                elif answer.isdigit() and int(answer)-1 <= len(runeList):
+                elif answer.isdigit() and int(answer)-1 < len(runeList):
                     if selectedItem.enchant(runeList[int(answer)-1]):
                         print(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
                         self.pockets.remove(runeList[int(answer)-1])
