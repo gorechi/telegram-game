@@ -1233,6 +1233,13 @@ class Plant(Monster):
             where.loot.add(self.weapon)
         where.center = ''
 
+class Walker(Monster):
+    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+                 carryweapon=True, carryshield=True):
+        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+
+
+
 class Shapeshifter(Monster):
     def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=False, carryshield=True):
