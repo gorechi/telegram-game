@@ -6,6 +6,8 @@ from random import randint as dice
 from random import sample as toss
 from time import sleep as pause
 from math import ceil
+from math import sqrt
+from math import floor
 import copy
 
 
@@ -26,15 +28,15 @@ def readfile(filename, divide, divider='|'):
 def showsides(side1, side2):
     line = side1.name + ': сила - d' + str(side1.stren)
     if side1.weapon != '':
-        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage)
+        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
     if side1.shield != '':
-        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection)
+        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
     line += ', жизней - ' + str(side1.health) + '. '
     line += side2.name + ': сила - d' + str(side2.stren)
     if side2.weapon != '':
-        line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage)
+        line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
     if side2.shield != '':
-        line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection)
+        line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
     line += ', жизней - ' + str(side2.health) + '.'
     return line
 
@@ -63,6 +65,7 @@ howManyMonsters = 10
 howManyWeapon = 10
 howManyShields = 10
 howManyPotions = 8
+howManyRunes = 15
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -77,8 +80,10 @@ chestType = ["Обычный",
              "Антикварный",
              "Странный",
              "Обычный"]
-weakness = {'огонь': "магия", "магия": "воздух", "воздух": "земля", "земля": "вода", "вода": "огонь"}
-
+weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12], 8: [3, 12], 10: [7, 12], 12: [1, 1],
+            13: [1, 3], 14: [12, 24], 15: [1, 7], 19: [1, 12], 24: [1, 2]}
+elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
+                     12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
 
 # Описываем классы
 
@@ -90,8 +95,8 @@ class Item:
         self.description = self.name
 
     def take(self, who=''):
-        player.pockets.append(self)
-        print(player.name + ' забирает ' + self.name + ' себе.')
+        who.pockets.append(self)
+        print(who.name + ' забирает ' + self.name + ' себе.')
 
     def use(self, whoisusing, inaction=False):
         print(whoisusing.name + ' не знает, как использовать такие штуки.')
@@ -100,28 +105,35 @@ class Item:
         return self.description
 
 class Rune:
-    def __init__(self, element):
+    def __init__(self):
+        self.damage = 4 - floor(sqrt(dice(1, 15)))
+        self.defence = 3 - floor(sqrt(dice(1, 8)))
+        self.elements = [1, 3, 7, 12]
+        self.element = self.elements[dice(0,3)]
+        self.canUseInFight = False
         self.name = 'руна'
         self.name1 = 'руну'
-        self.description = self.name
-        self.element = element
+        self.description = self.name + ' ' + elementDictionary[self.element]
 
-    def use(self, whoisusing, inaction=False):
-        if not inaction:
-            nextRuneLevel = whoisusing.elements[self.element] + 1
-            if whoisusing.intel < whoisusing.elementLevels[str(nextRuneLevel)]:
-                print(whoisusing.name + ' не может изучить ' + self.element + ' до следующего уровня. У него недостаточно интеллекта.')
-                return False
-            else:
-                whoisusing.elements[self.element] += 1
-                print(whoisusing.name + ' изучает ' + self.element + ' до уровня ' + whoisusing.elements[self.element] + '.')
-                return True
-        else:
-            print('Во время боя это совершенно неуместно!')
-            return False
+    def __str__(self):
+        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+               ' или защита + ' + str(self.defence)
+
+    def element(self):
+        return int(self.element)
+
+    def take(self, who=''):
+        who.pockets.append(self)
+        print(who.name + ' забирает ' + self.name1 + ' себе.')
+
+    def show(self):
+        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+               ' или защита + ' + str(self.defence)
+
 
 class Spell:
-    def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1, maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
+    def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
+                 maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
         self.name = name
         self.name1 = name1
         self.description = self.name
@@ -133,54 +145,84 @@ class Spell:
         self.minDamage = minDamage
 
 class Weapon:
-    def __init__(self, name, damage=0, permdamage=0, actions='бьет,ударяет'):
+    def __init__(self, name, name1='оружие', damage=0, actions='бьет,ударяет'):
         if name != 0:
             self.name = name
             self.damage = int(damage)
-            self.permdamage = int(permdamage)
-            self.element = ''
-
+            self.name1 = name1
         else:
-            n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
-                  ['Новый', 'Новая']]
-            n2 = [['меч', 0], ['сабля', 1], ['катана', 1], ['топор', 0], ['кинжал', 0], ['дубина', 1], ['шпага', 1]]
-            n3 = [['магии', 10, 2, 'магия'], ['воды', 13, 1, 'вода'], ['огня', 17, 3, 'огонь'],
-                  ['земли', 9, 1, 'земля'], ['воздуха', 15, 1, 'воздух']]
+            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
+                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                  ['Новый', 'Новая', 'Новый', 'Новую']]
+            n2 = [['меч', 0, 'меч'], ['сабля', 1, 'саблю'], ['катана', 1, 'катану'], ['топор', 0, 'топор'],
+                  ['кинжал', 0, 'кинжал'], ['дубина', 1, 'дубину'], ['шпага', 1, 'шпагу']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
-            a3 = dice(0, len(n3) * 2)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            if a3 <= len(n3) - 1:
-                self.name += ' ' + n3[a3][0]
-                self.permdamage = n3[a3][2]
-                self.damage = dice(5, n3[a3][1])
-                self.element = n3[a3][3]
-
-            else:
-                self.permdamage = 0
-                self.damage = dice(3, 12)
-                self.element = ''
-
-        self.name1 = self.name
+            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
+            self.damage = dice(3, 12)
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.runes = []
 
     def __str__(self):
         return 'weapon'
 
-    def attack(self):
-        return dice(1, int(self.damage)) + self.permdamage
+    def realname(self):
+        names = []
+        if self.element() != 0:
+            names.append(self.name + ' ' + elementDictionary[self.element()])
+            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+        else:
+            names.append(self.name)
+            names.append(self.name1)
+        return names
 
-    def take(self, who=''):
+    def element(self):
+        elementSum = 0
+        for rune in self.runes:
+            elementSum += rune.element
+        return elementSum
+
+    def enchant(self, rune):
+        if len(self.runes) > 1:
+            return False
+        else:
+            self.runes.append(rune)
+            return True
+
+    def enchantment(self):
+        if len(self.runes) not in [1, 2]:
+            return ''
+        else:
+            element = 0
+            for i in self.runes:
+                element += int(i.element)
+            return ' ' + elementDictionary[element]
+
+    def permdamage(self):
+        damage = 0
+        if len(self.runes) in [1, 2]:
+            for rune in self.runes:
+                damage += rune.damage
+        return damage
+
+    def attack(self):
+        return dice(1, int(self.damage)) + self.permdamage()
+
+    def take(self, who):
         if who.weapon == '':
             who.weapon = self
-            print(who.name + ' берет ' + self.name + ' в руку.')
+            print(who.name + ' берет ' + self.name1 + ' в руку.')
         else:
             who.pockets.append(self)
-            print(who.name + ' забирает ' + self.name + ' себе.')
+            print(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
-        return self.name + ' (' + str(self.damage) + '+' + str(self.permdamage) + ')'
+        damageString = str(self.damage)
+        if self.permdamage() != 0:
+            damageString += '+' + str(self.permdamage())
+        return self.name + self.enchantment() + ' (' + damageString + ')'
 
     def use(self, whoUsing, inaction = False):
         if whoUsing.weapon == '':
@@ -189,75 +231,108 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name + ' в качестве оружия!')
+        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
 
 class Shield:
-    def __init__(self, name, protection=0, permprotection=0, actions=''):
+    def __init__(self, name, name1='защиту', protection=0, actions=''):
         if name != 0:
             self.name = name
+            self.name1 = name1
             self.protection = int(protection)
-            self.permprotection = int(permprotection)
-            self.element = ''
-
         else:
-            n1 = [['Большой', 'Большая'], ['Малый', 'Малая'], ['Старый', 'Старая'], ['Тяжелый', 'Тяжелая'],
-                  ['Новый', 'Новая']]
-            n2 = [['щит', 0], ['броня', 1], ['кольчуга', 1], ['защита', 1], ['панцырь', 0]]
-            n3 = [['магии', 8, 2, 'магия'], ['воды', 7, 1, 'вода'], ['огня', 6, 2, 'огонь'], ['земли', 6, 1, 'земля'],
-                  ['воздуха', 7, 1, 'воздух']]
+            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
+                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                  ['Новый', 'Новая', 'Новый', 'Новую']]
+            n2 = [['щит', 0, 'щит'], ['броня', 1, 'броню'], ['кольчуга', 1, 'кольчугу'], ['защита', 1, 'защиту'],
+                  ['панцырь', 0, 'панцырь']]
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
-            a3 = dice(0, len(n3) * 2)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            if a3 < len(n3):
-                self.name += ' ' + n3[a3][0]
-                self.permprotection = n3[a3][2]
-                self.protection = dice(2, n3[a3][1])
-                self.element = n3[a3][3]
-            else:
-                self.permprotection = 0
-                self.protection = dice(2, 5)
-                self.element = ''
-
-        self.name1 = self.name
+            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
+            self.protection = dice(2, 5)
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.runes = []
 
     def __str__(self):
         return 'shield'
 
+    def realname(self):
+        names = []
+        if self.element() != 0:
+            names.append(self.name + ' ' + elementDictionary[self.element()])
+            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+        else:
+            names.append(self.name)
+            names.append(self.name1)
+        return names
+
+    def element(self):
+        elementSum = 0
+        for rune in self.runes:
+            elementSum += rune.element
+        return elementSum
+
+    def permprotection(self):
+        protection = 0
+        if len(self.runes) in [1, 2]:
+            for rune in self.runes:
+                protection += rune.defence
+        return protection
+
+    def enchant(self, rune):
+        if len(self.runes) > 1:
+            return False
+        else:
+            self.runes.append(rune)
+            return True
+
+    def enchantment(self):
+        if len(self.runes) not in [1, 2]:
+            return ''
+        else:
+            element = 0
+            for i in self.runes:
+                element += int(i.element)
+            return ' ' + elementDictionary[element]
+
     def protect(self, who):
         multiplier = 1
-        if who.weapon and who.weapon.element and self.element and weakness[self.element] == who.weapon.element:
-            multiplier = 1.5
-        elif who.weapon and who.weapon.element and self.element and weakness[who.weapon.element] == self.element:
-            multiplier = 0.67
+        if who.weapon and who.weapon.element() != 0 and self.element() != 0:
+            if who.weapon.element() in weakness[self.element()]:
+                multiplier = 1.5
+            elif self.element() in weakness[who.weapon.element()]:
+                multiplier = 0.67
+        print('Множитель защиты - ' + str(multiplier))
         if who.hide:
             who.hide = False
-            return self.protection + self.permprotection
+            return self.protection + self.permprotection()
         else:
-            return ceil((dice(1, self.protection) + self.permprotection)*multiplier)
+            return ceil((dice(1, self.protection) + self.permprotection())*multiplier)
 
-    def take(self, who=''):
+    def take(self, who):
         if who.shield == '':
             who.shield = self
-            print(who.name + ' берет ' + self.name + ' в руку.')
+            print(who.name + ' использует ' + self.name1 + ' как защиту.')
         else:
             player.pockets.append(self)
-            print(who.name + ' забирает ' + self.name + ' себе.')
+            print(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
-        return self.name + ' (' + str(self.protection) + '+' + str(self.permprotection) + ')'
+        protectionString = str(self.protection)
+        if self.permprotection() != 0:
+            protectionString += '+' + str(self.permprotection())
+        return self.name + self.enchantment() + ' (' + protectionString + ')'
 
-    def use(self, whoUsing, inaction = False):
+    def use(self, whoUsing):
         if whoUsing.shield == '':
             whoUsing.shield = self
         else:
             whoUsing.pockets.append(whoUsing.shield)
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name + ' в качестве защиты!')
+        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
 
 class Map(Item):
@@ -473,20 +548,18 @@ class Hero:
     def __str__(self):
         return 'hero'
 
+    def inpockets(self, itemType):
+        itemList = []
+        for item in self.pockets:
+            if isinstance(item, itemType):
+                itemList.append(item)
+        return itemList
+
     def action(self):
         if self.weapon == '':
             return randomitem(self.actions)
         else:
             return randomitem(self.weapon.actions)
-
-    def learnRune(self, rune):
-        nextRuneLevel = self.elements[rune.element] + 1
-        if self.intel < self.elementLevels[str(nextRuneLevel)]:
-            return False
-        else:
-            self.elements[rune.element] += 1
-            return True
-
 
     def attack(self, target):
         self.run = False
@@ -513,12 +586,9 @@ class Hero:
                 self.rage = 0
                 if self.weapon != '':
                     weaponAttack = self.weapon.attack()
-                    if target.shield !='':
-                        if target.shield.element != '' and self.weapon.element != '':
-                            if target.shield.element == weakness[self.weapon.element]:
-                                weaponAttack += weaponAttack // 2
-                    string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + ' и наносит ' + str(
-                        meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. '
+                    string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + \
+                              ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
+                              ' урона. '
                 else:
                     weaponAttack = 0
                     string1 = self.name + ' бьет ' + target.name1 + ' не используя оружие и наносит ' + howmany(
@@ -533,7 +603,7 @@ class Hero:
                 elif targetDefence == 0:
                     string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
                 else:
-                    string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' + howmany(
+                    string2 = target.name + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
                         totalDamage, 'жизнь,жизни,жизней') + '.'
                 target.health -= totalDamage
                 return string1 + string2
@@ -589,13 +659,15 @@ class Hero:
 
     def show(self):
         if self.weapon != '':
-            string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.name, self.weapon.damage,
-                                                                               self.weapon.permdamage)
+            string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.realname()[0],
+                                                                               self.weapon.damage,
+                                                                               self.weapon.permdamage())
         else:
             string1 = ' и он предпочитает сражаться голыми руками.'
         if self.shield != '':
-            string2 = 'Его защищает ' + self.shield.name + ' (' + str(self.shield.protection) + '+' + str(
-                self.shield.permprotection) + ')'
+            string2 = 'Его защищает {0} ({1}+{2})'.format(self.shield.realname()[0],
+                                                           self.shield.protection,
+                                                           self.shield.permprotection())
         else:
             string2 = 'У него нет защиты'
         print(
@@ -608,12 +680,7 @@ class Hero:
         if self.shield == '':
             return 0
         else:
-            defence = self.shield.protect(self)
-            if attacker.weapon !='':
-                if attacker.weapon.element != '' and self.shield.element != '':
-                    if attacker.weapon.element == weakness[self.shield.element]:
-                        defence += defence // 2
-            return defence
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         self.health = self.startHealth
@@ -838,22 +905,70 @@ class Hero:
         if item == '':
             print(self.name + ' не понимает, что ему надо использовать.')
         elif item.isdigit():
-            if int(item)-1 <= len(self.pockets):
+            if int(item)-1 < len(self.pockets):
                 i = self.pockets[int(item)-1]
-                if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction=False):
+                if isinstance(i, Potion) and i.use(self, inaction=False):
                     self.pockets.remove(i)
-                elif not isinstance(i, Potion) or not isinstance(i, Rune):
+                elif not isinstance(i, Potion):
                     i.use(self, inaction=False)
                 return True
+            else:
+                print(self.name + ' не нашел такой вещи у себя в карманах.')
+                return False
         else:
             for i in self.pockets:
                 if i.name == item or i.name1 == item:
-                    if (isinstance(i, Potion) or isinstance(i, Rune)) and i.use(self, inaction = False):
+                    if isinstance(i, Potion)  and i.use(self, inaction = False):
                         self.pockets.remove(i)
                     else:
                         i.use(self, inaction = False)
                     return True
             print(self.name + ' не нашел такой вещи у себя в карманах.')
+
+    def enchant(self, item=''):
+        selectedItem = ''
+        runeList = self.inpockets(Rune)
+        if len(runeList) == 0:
+            print(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
+            return False
+        if item == '':
+            print(self.name + ' не понимает, что ему надо улучшить.')
+            return False
+        elif item == 'оружие' and self.weapon != '':
+            selectedItem = self.weapon
+        elif item in ['защиту', 'защита'] and self.shield != '':
+            selectedItem = self.shield
+        elif item.isdigit() and int(item)-1 <= len(self.pockets):
+            selectedItem = self.pockets[int(item)-1]
+        else:
+            for i in self.pockets:
+                if i.name == item or i.name1 == item:
+                    selectedItem = i
+                else:
+                    print(self.name + ' не нашел такой вещи у себя в карманах.')
+                    return False
+        if selectedItem != '' and isinstance(selectedItem, Weapon) or isinstance(selectedItem, Shield):
+            print(self.name + ' может использовать следующие руны:')
+            for rune in runeList:
+                print(str(runeList.index(rune)+1) + ': ' + str(rune))
+            print('Введите "отмена" для прекращения улучшения')
+            while True:
+                answer = input('Какую по номеру руну выберет ' + player.name + '? ---->')
+                if answer == 'отмена':
+                    return False
+                elif answer.isdigit() and int(answer)-1 < len(runeList):
+                    if selectedItem.enchant(runeList[int(answer)-1]):
+                        print(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
+                        self.pockets.remove(runeList[int(answer)-1])
+                        return True
+                    else:
+                        print('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
+                        return False
+                else:
+                    print(self.name + ' не находит такую руну у себя в карманах.')
+        else:
+            print(self.name + ' не может улучшить эту вещь.')
+            return False
 
     def do(self, command):
         commandDict = {'осмотреть': self.lookaround,
@@ -862,7 +977,8 @@ class Hero:
                        'взять': self.take,
                        'обыскать': self.search,
                        'открыть': self.open,
-                       'использовать': self.use}
+                       'использовать': self.use,
+                       'улучшить': self.enchant}
         a = command.find(' ')
         fullCommand = []
         if a < 0:
@@ -924,6 +1040,43 @@ class Monster:
             self.weapon = item
         elif isinstance(item, Shield) and self.shield == '':
             self.shield = item
+        elif isinstance(item, Rune):
+            if item.damage >= item.defence:
+                if self.weapon != '':
+                    if self.weapon.enchant(item):
+                        return True
+                    elif self.shield != '':
+                        if not self.shield.enchant(item):
+                            self.loot.add(item)
+                            return True
+                    else:
+                        self.loot.add(item)
+                        return True
+                elif self.shield != '':
+                    if not self.shield.enchant(item):
+                        self.loot.add(item)
+                        return True
+                else:
+                    self.loot.add(item)
+                    return True
+            else:
+                if self.shield != '':
+                    if self.shield.enchant(item):
+                        return True
+                    elif self.weapon != '':
+                        if not self.weapon.enchant(item):
+                            self.loot.add(item)
+                            return True
+                    else:
+                        self.loot.add(item)
+                        return True
+                elif self.weapon != '':
+                    if not self.weapon.enchant(item):
+                        self.loot.add(item)
+                        return True
+                else:
+                    self.loot.add(item)
+                    return True
         else:
             self.loot.add(item)
 
@@ -962,7 +1115,7 @@ class Monster:
         if self.shield == '':
             return 0
         else:
-            return self.shield.protect(self)
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         result = dice(1, 10)
@@ -1031,7 +1184,6 @@ class Monster:
 
     def win(self, loser):
         self.health = self.startHealth
-
 
 class Plant(Monster):
     def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='растёт', agressive=False,
@@ -1103,7 +1255,7 @@ class Shapeshifter(Monster):
         if self.shield == '':
             return 0
         else:
-            return self.shield.protect(self)
+            return self.shield.protect(attacker)
 
     def lose(self, winner):
         where = newCastle.plan[self.currentPosition]
@@ -1279,22 +1431,22 @@ class Castle:
                 emptyRooms = [a for a in self.plan if (a.center == '' and a.ambush == '')]
                 if len(emptyRooms) == 0:
                     return False
-                b = randomitem(emptyRooms, False)
+                room = randomitem(emptyRooms, False)
                 if isinstance(tossedItems[i], Monster) and dice(1,3) == 1:
-                    b.ambush = tossedItems[i] # Монстр садится в засаду
+                    room.ambush = tossedItems[i] # Монстр садится в засаду
                 else:
-                    b.center = tossedItems[i]  # Вытягиваем следующую штуку из колоды и кладем в комнату
-                tossedItems[i].currentPosition = b.position
+                    room.center = tossedItems[i]  # Вытягиваем следующую штуку из колоды и кладем в комнату
+                tossedItems[i].currentPosition = room.position
 
             else:
-                b = randomitem(self.plan, False)
-                if b.center != '':
-                    if isinstance(b.center, Monster):
-                        b.center.give(tossedItems[i])
+                room = randomitem(self.plan, False)
+                if room.center != '':
+                    if isinstance(room.center, Monster):
+                        room.center.give(tossedItems[i])
                     else:
-                        b.center.loot.add(tossedItems[i])
+                        room.center.loot.add(tossedItems[i])
                 else:
-                    b.loot.add(tossedItems[i])
+                    room.loot.add(tossedItems[i])
         return True
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
@@ -1347,7 +1499,7 @@ def readitems(whatkind):
     howMany = {'оружие': howManyWeapon, 'защита': howManyShields, 'зелье': howManyPotions}
     for i in allItems:
         if i[0] == whatkind:
-            item = classes[i[0]](i[1], i[2], i[3])
+            item = classes[i[0]](i[1], i[2], i[3], i[4])
             itemTypes[i[0]].append(item)
     while len(itemTypes[whatkind]) < howMany[whatkind]:
         new = classes[whatkind](0)
@@ -1424,7 +1576,6 @@ def lockDoors():
                 break
     return True
 
-
 # Подготовка
 allMonsters = readmonsters()  # Читаем монстров из файла
 allSpells = readspells() #Читаем из файла заклинания
@@ -1438,6 +1589,8 @@ allChests = createchests(howManyChests, 50, 50)  # Создаем сундуки
 newCastle.inhabit(allChests, howManyChests, True)  # Расставляем сундуки
 newCastle.inhabit(allWeapon, howManyWeapon, False)
 newCastle.inhabit(allShields, howManyShields, False)
+allRunes = [Rune() for i in range(howManyRunes)]
+newCastle.inhabit(allRunes, howManyRunes, False)
 newCastle.inhabit(allPotions, howManyPotions, False)
 lockDoors()  # Создаем запертые комнаты
 map = Map()  # Прячем карту
