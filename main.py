@@ -2,65 +2,10 @@
 # -*- coding: utf-8 -*-
 # Импортируем необходимые модули
 
-from random import randint as dice
-from random import sample as toss
-from time import sleep as pause
-from math import ceil
-from math import sqrt
-from math import floor
-import copy
-
-
-# Функции
-
-def readfile(filename, divide, divider='|'):
-    filelines = []
-    newfile = open(filename, encoding='utf-8')
-    for line in newfile:
-        if divide:
-            filelines.append(line.rstrip('\n').split(divider))
-        else:
-            filelines.append(line.rstrip('\n'))
-    newfile.close()
-    return filelines
-
-
-def showsides(side1, side2):
-    line = side1.name + ': сила - d' + str(side1.stren)
-    if side1.weapon != '':
-        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
-    if side1.shield != '':
-        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
-    line += ', жизней - ' + str(side1.health) + '. '
-    line += side2.name + ': сила - d' + str(side2.stren)
-    if side2.weapon != '':
-        line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
-    if side2.shield != '':
-        line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
-    line += ', жизней - ' + str(side2.health) + '.'
-    return line
-
-
-def randomitem(list, neednumber=False):
-    a = dice(0, len(list) - 1)
-    if not neednumber:
-        return list[a]
-    else:
-        return list[a], a
-
-
-def howmany(a, string):
-    b = string.split(',')
-    a1, a2 = int(a % 10), int(a % 100)
-    if a1 == 1 and a2 != 11:
-        return str(a) + ' ' + b[0]
-    elif 1 < a1 < 5 and (a2 < 12 or a2 > 14):
-        return str(a) + ' ' + b[1]
-    else:
-        return str(a) + ' ' + b[2]
+from functions import *
 
 # Константы
-
+howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
 howManyMonsters = 10
 howManyWeapon = 10
 howManyShields = 10
@@ -70,16 +15,6 @@ decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
 decor4 = readfile('decorate4', False)
-chestType = ["Обычный",
-             "Кованный",
-             "Большой",
-             "Деревянный",
-             "Железный",
-             "Маленький",
-             "Старинный",
-             "Антикварный",
-             "Странный",
-             "Обычный"]
 weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12], 8: [3, 12], 10: [7, 12], 12: [1, 1],
             13: [1, 3], 14: [12, 24], 15: [1, 7], 19: [1, 12], 24: [1, 2]}
 elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
@@ -1379,6 +1314,16 @@ class Castle:
     def __init__(self, floors=5, rooms=5):
         self.floors = floors
         self.rooms = rooms
+        self.chestType = ["Обычный",
+             "Кованный",
+             "Большой",
+             "Деревянный",
+             "Железный",
+             "Маленький",
+             "Старинный",
+             "Антикварный",
+             "Странный",
+             "Обычный"]
         f = self.floors
         r = self.rooms
         self.allRooms = [2] * r
@@ -1412,6 +1357,56 @@ class Castle:
             a = Room(self.allDoors[i], '', newLoot)
             a.position = i
             self.plan.append(a)
+        self.howManyChests = len(self.plan) // 5 + 1
+
+    def createchests(self, money, probability):
+        list = []
+        for i in range(self.howManyChests):
+            name = randomitem(self.chestType) + ' сундук'
+            newChest = Chest(name)
+            newLoot = Loot()
+            newChest.loot = newLoot
+            if dice(1, 4) == 1:
+                newChest.locked = True
+                veryNewKey = Key()
+                self.hide(veryNewKey)
+            if dice(1, 100) <= probability:
+                newChest.inside = []
+                newMoney = Money(dice(1, money))
+                newChest.loot.pile.append(newMoney)
+            else:
+                newChest.loot.pile = []
+            list.append(newChest)
+        self.inhabit(list, self.howManyChests, True)  # Расставляем сундуки
+        return True
+
+    def hide(self, item):
+        while True:
+            b = randomitem(self.plan)
+            if not b.locked:
+                if b.center == '':
+                    b.loot.pile.append(item)
+                else:
+                    b.center.loot.pile.append(item)
+                break
+        return True
+
+    def lockDoors(self):
+        howManyLockedRooms = len(self.plan) // 8
+        for i in range(howManyLockedRooms):
+            while True:
+                a = randomitem(self.plan)
+                if a != self.plan[0]:
+                    newMoney = Money(dice(25, 75))
+                    a.lock(2)
+                    if a.center == '':
+                        a.loot.pile.append(newMoney)
+                    else:
+                        a.center.loot.pile.append(newMoney)
+                    newKey = Key()
+                    self.hide(newKey)
+                    break
+        return True
 
     def map(self):
         f = self.floors
@@ -1477,129 +1472,20 @@ classes = {'монстр': Monster,
            'руна': Rune,
            'заклинание': Spell}
 
-
-# Еще функции
-
-def readmonsters():
-    monsterslist = readfile('monsters', True, '\\')
-    for i in range(len(monsterslist)):
-        monsterslist[i] = classes[monsterslist[i][0]](monsterslist[i][1], monsterslist[i][2], monsterslist[i][3],
-                                                      monsterslist[i][4], monsterslist[i][5], monsterslist[i][6],
-                                                      monsterslist[i][7], monsterslist[i][8])
-    return monsterslist
-
-def readspells():
-    spellslist = readfile('spells', True, '\\')
-    for i in range(len(spellslist)):
-        spellslist[i] = classes[spellslist[i][0]](spellslist[i][1], spellslist[i][2], spellslist[i][3],
-                                                      spellslist[i][4], spellslist[i][5], spellslist[i][6],
-                                                      spellslist[i][7], spellslist[i][8])
-    return spellslist
-
-
-def readitems(whatkind):
-    allItems = readfile('items', True, '\\')
-    allWeapons = []
-    allShields = []
-    allPotions = []
-    itemTypes = {'оружие': allWeapons, 'защита': allShields, 'зелье': allPotions}
-    howMany = {'оружие': howManyWeapon, 'защита': howManyShields, 'зелье': howManyPotions}
-    for i in allItems:
-        if i[0] == whatkind:
-            item = classes[i[0]](i[1], i[2], i[3], i[4])
-            itemTypes[i[0]].append(item)
-    while len(itemTypes[whatkind]) < howMany[whatkind]:
-        new = classes[whatkind](0)
-        itemTypes[whatkind].append(new)
-    return itemTypes[whatkind]
-
-
-def fight(side1, side2):
-    whoWon = ''
-    whoFirst = dice(1, 2)
-    if whoFirst == 2:
-        side1, side2 = side2, side1
-    print(side1.name + ' начинает схватку!')
-    while whoWon == '':
-        print(side1.attack(side2))
-        if side1.run:
-            break
-        elif side2.health > 0:
-            side1, side2 = side2, side1
-        else:
-            print(side1.name + ' побеждает в бою!')
-            side1.win(side2)
-            side2.lose(side1)
-            break
-        pause(1)
-
-    return whoWon
-
-def createchests(a, money, probability):
-    list = []
-    for i in range(a):
-        name = randomitem(chestType) + ' сундук'
-        newchest = Chest(name)
-        newLoot = Loot()
-        newchest.loot = newLoot
-        if dice (1,4) == 1:
-            newchest.locked = True
-            veryNewKey = Key()
-            hide(veryNewKey)
-        if dice(1, 100) <= probability:
-            newchest.inside = []
-            newMoney = Money(dice(1, money))
-            newchest.loot.pile.append(newMoney)
-        else:
-            newchest.loot.pile = []
-        list.append(newchest)
-    return list
-
-def hide (item):
-    while True:
-        b = randomitem(newCastle.plan)
-        if not b.locked:
-            if b.center == '':
-                b.loot.pile.append(item)
-            else:
-                b.center.loot.pile.append(item)
-            break
-    return True
-
-def lockDoors():
-    howManyLockedRooms = len(newCastle.plan) // 8
-    for i in range(howManyLockedRooms):
-        while True:
-            a = randomitem(newCastle.plan)
-            if a != newCastle.plan[0]:
-                newMoney = Money(dice(25, 75))
-                a.lock(2)
-                if a.center == '':
-                    a.loot.pile.append(newMoney)
-                else:
-                    a.center.loot.pile.append(newMoney)
-                newKey = Key()
-                hide (newKey)
-                break
-    return True
-
 # Подготовка
-allMonsters = readmonsters()  # Читаем монстров из файла
-allSpells = readspells() #Читаем из файла заклинания
-allWeapon = readitems('оружие')
-allShields = readitems('защита')
-allPotions = readitems('зелье')
+allMonsters = readmonsters(classes)  # Читаем монстров из файла
+allSpells = readspells(classes) #Читаем из файла заклинания
+allWeapon = readitems('оружие', howMany, classes)
+allShields = readitems('защита', howMany, classes)
+allPotions = readitems('зелье', howMany, classes)
 newCastle = Castle(5, 5)  # Генерируем замок
 newCastle.inhabit(allMonsters, howManyMonsters, True)  # Населяем замок монстрами
-howManyChests = len(newCastle.plan) // 5 + 1
-allChests = createchests(howManyChests, 50, 50)  # Создаем сундуки
-newCastle.inhabit(allChests, howManyChests, True)  # Расставляем сундуки
 newCastle.inhabit(allWeapon, howManyWeapon, False)
 newCastle.inhabit(allShields, howManyShields, False)
 allRunes = [Rune() for i in range(howManyRunes)]
 newCastle.inhabit(allRunes, howManyRunes, False)
-newCastle.inhabit(allPotions, howManyPotions, False)
-lockDoors()  # Создаем запертые комнаты
+newCastle.inhabit(allPotions, howManyPotions, False)  # Создаем запертые комнаты
+newCastle.lockDoors()
 map = Map()  # Прячем карту
 newCastle.plan[0].visited = '+'
 Arthur = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает')
