@@ -9,6 +9,7 @@ from functions import *
 
 # Константы
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
+telegram_commands = ['обыскать', '?']
 howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
 howManyMonsters = 10
 howManyWeapon = 10
@@ -746,26 +747,28 @@ class Hero:
 
     def search(self, item=''):
         if str(newCastle.plan[self.currentPosition].center) == 'monster':
-            print(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
+            tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
         elif newCastle.plan[self.currentPosition].ambush != '' and item == '':
             ambusher = newCastle.plan[self.currentPosition].ambush
-            print ('Неожиданно из засады выскакивает ' + ambusher.name + ' и нападает на ' + self.name1)
+            tprint ('Неожиданно из засады выскакивает ' + ambusher.name + ' и нападает на ' + self.name1)
             newCastle.plan[self.currentPosition].center = ambusher
             newCastle.plan[self.currentPosition].ambush = ''
             fight(self, newCastle.plan[self.currentPosition].center)
         else:
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
-                print('В комнате есть:')
+                text = []
+                text.append('В комнате есть:')
                 for i in newCastle.plan[self.currentPosition].loot.pile:
-                    print(i.name)
+                    text.append(i.name)
+                tprint(text)
             elif item == '':
-                print('В комнате нет ничего интересного.')
+                tprint('В комнате нет ничего интересного.')
 
     def take(self, item='все'):
         currentLoot = newCastle.plan[self.currentPosition].loot
         if currentLoot == '':
-            print('Здесь нечего брать.')
+            tprint('Здесь нечего брать.')
             return False
         elif item == 'все' or item == 'всё' or item == '':
             for i in currentLoot.pile:
@@ -778,20 +781,20 @@ class Hero:
                     i.take(self)
                     currentLoot.pile.remove(i)
                     return True
-        print('Такой вещи здесь нет.')
+        tprint('Такой вещи здесь нет.')
         return False
 
     def open(self, item=''):
         whatIsInRoom = newCastle.plan[self.currentPosition].center
         if item == '' or (not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0):
             if whatIsInRoom == '':
-                print('В комнате нет вещей, которые можно открыть.')
+                tprint('В комнате нет вещей, которые можно открыть.')
                 return False
             elif not isinstance(whatIsInRoom, Chest):
-                print('Пожалуй, ' + self.name + ' не сможет это открыть.')
+                tprint('Пожалуй, ' + self.name + ' не сможет это открыть.')
                 return False
             elif whatIsInRoom.opened:
-                print('Этот ' + whatIsInRoom.name1 + ' уже открыт. Зачем его открывать во второй раз?')
+                tprint('Этот ' + whatIsInRoom.name1 + ' уже открыт. Зачем его открывать во второй раз?')
                 return False
             elif whatIsInRoom.locked:
                 key = False
@@ -801,20 +804,22 @@ class Hero:
                 if key:
                     self.pockets.remove(key)
                     whatIsInRoom.locked = False
-                    print (self.name + ' отпирает сундук ключом.')
+                    tprint (self.name + ' отпирает сундук ключом.')
                 else:
-                    print ('Чтобы открыть этот сундук нужен ключ')
+                    tprint ('Чтобы открыть этот сундук нужен ключ')
             if not whatIsInRoom.locked:
-                print(self.name + ' открывает ' + whatIsInRoom.name)
+                text = []
+                text.append(self.name + ' открывает ' + whatIsInRoom.name)
                 newCastle.plan[self.currentPosition].loot.pile += whatIsInRoom.loot.pile
                 if len(whatIsInRoom.loot.pile) > 0:
-                    print(self.name + ' роется в сундуке и обнаруживает в нем:')
+                    text.append(self.name + ' роется в сундуке и обнаруживает в нем:')
                     for i in whatIsInRoom.loot.pile:
-                        print(i.name1)
-                    print('Все эти вещи теперь разбросаны по всей комнате.')
+                        text.append(i.name1)
+                    text.append('Все эти вещи теперь разбросаны по всей комнате.')
+                    tprint(text)
                     whatIsInRoom.loot.pile = []
                 else:
-                    print('В сундуке пусто.')
+                    tprint('В сундуке пусто.')
                 whatIsInRoom.opened = True
                 whatIsInRoom.name = 'открытый пустой ' + whatIsInRoom.name
                 whatIsInRoom.inside = ''
@@ -825,24 +830,24 @@ class Hero:
                 if isinstance(i, Key):
                     key = i
             if not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0:
-                print(self.name + ' не может это открыть.')
+                tprint(self.name + ' не может это открыть.')
                 return False
             elif newCastle.plan[self.currentPosition].doors[self.doorsDict[item]] != 2:
-                print('В той стороне нечего открывать.')
+                tprint('В той стороне нечего открывать.')
                 return False
             elif not key:
-                print('Нужен ключ.')
+                tprint('Нужен ключ.')
                 return False
             else:
                 self.pockets.remove(key)
                 newCastle.plan[self.currentPosition].doors[self.doorsDict[item]] = 1
                 j = self.doorsDict[item] + 2 if (self.doorsDict[item] + 2) < 4 else self.doorsDict[item] - 2
                 newCastle.plan[self.currentPosition + self.directionsDict[item]].doors[j] = 1
-                print(self.name + ' открывает дверь.')
+                tprint(self.name + ' открывает дверь.')
 
     def use(self, item='', infight=False):
         if item == '':
-            print(self.name + ' не понимает, что ему надо использовать.')
+            tprint(self.name + ' не понимает, что ему надо использовать.')
         elif item.isdigit():
             if int(item)-1 < len(self.pockets):
                 i = self.pockets[int(item)-1]
@@ -852,7 +857,7 @@ class Hero:
                     i.use(self, inaction=False)
                 return True
             else:
-                print(self.name + ' не нашел такой вещи у себя в карманах.')
+                tprint(self.name + ' не нашел такой вещи у себя в карманах.')
                 return False
         else:
             for i in self.pockets:
@@ -862,16 +867,16 @@ class Hero:
                     else:
                         i.use(self, inaction = False)
                     return True
-            print(self.name + ' не нашел такой вещи у себя в карманах.')
+            tprint(self.name + ' не нашел такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
         selectedItem = ''
         runeList = self.inpockets(Rune)
         if len(runeList) == 0:
-            print(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
+            tprint(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
             return False
         if item == '':
-            print(self.name + ' не понимает, что ему надо улучшить.')
+            tprint(self.name + ' не понимает, что ему надо улучшить.')
             return False
         elif item == 'оружие' and self.weapon != '':
             selectedItem = self.weapon
@@ -884,13 +889,16 @@ class Hero:
                 if i.name == item or i.name1 == item:
                     selectedItem = i
                 else:
-                    print(self.name + ' не нашел такой вещи у себя в карманах.')
+                    tprint(self.name + ' не нашел такой вещи у себя в карманах.')
                     return False
         if selectedItem != '' and isinstance(selectedItem, Weapon) or isinstance(selectedItem, Shield):
-            print(self.name + ' может использовать следующие руны:')
+            text = []
+            text.append(self.name + ' может использовать следующие руны:')
             for rune in runeList:
-                print(str(runeList.index(rune)+1) + ': ' + str(rune))
-            print('Введите "отмена" для прекращения улучшения')
+                text.append(str(runeList.index(rune)+1) + ': ' + str(rune))
+            text.append('Введите "отмена" для прекращения улучшения')
+            tprint(text)
+            #Здесь нужна доработка т.к. управление переходит на работу с рунами
             while True:
                 answer = input('Какую по номеру руну выберет ' + player.name + '? ---->')
                 if answer == 'отмена':
@@ -906,7 +914,7 @@ class Hero:
                 else:
                     print(self.name + ' не находит такую руну у себя в карманах.')
         else:
-            print(self.name + ' не может улучшить эту вещь.')
+            tprint(self.name + ' не может улучшить эту вещь.')
             return False
 
     def do(self, command):
@@ -925,13 +933,15 @@ class Hero:
         fullCommand.append(command[:a])
         fullCommand.append(command[a + 1:])
         if fullCommand[0] == '?':
-            print(self.name + " может:")
+            text = []
+            text.append(self.name + " может:")
             for i in commandDict.keys():
-                print(i)
+                text.append(i)
+            tprint(text)
             return True
         c = commandDict.get(fullCommand[0], False)
         if not c:
-            print('Такого ' + self.name + ' не умеет!')
+            tprint('Такого ' + self.name + ' не умеет!')
         elif len(fullCommand) == 1:
             c()
         else:
@@ -1277,7 +1287,7 @@ class Room:
             whoIsHere = 'Не видно ничего интересного.'
         else:
             whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
-        print(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
+        tprint(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
                                                                           self.decoration2,
                                                                           whoIsHere,
                                                                           self.decoration4))
@@ -1300,7 +1310,7 @@ class Room:
             string3 += ' '
         string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
         string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
-        print(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4)
+        tprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4)
         return True
 
     def lock(self, lockOrNot=2):
@@ -1497,29 +1507,51 @@ randomSword = Weapon(0)
 player = Arthur
 newKey = Key()
 player.pockets.append(newKey)
-
+gameIsOn = False
 # Основная программа
 
 # Запускаем бота
 bot = telebot.TeleBot(TOKEN)
-
+chat_id = 0
 #Функции бота
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
+def tprint (text):
+    global chat_id
+    if isinstance(text, str):
+        bot.send_message(chat_id, text)
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            final_text = final_text + str(line) + '\n'
+        bot.send_message(chat_id, final_text.rstrip('\n'))
+
+@bot.message_handler(commands=['start', 'старт'])
+def welcome(message):
+    global chat_id
+    chat_id = message.chat.id
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     itembtn1 = types.KeyboardButton('Новая игра')
     itembtn2 = types.KeyboardButton('Отмена')
-    markup.add(itembtn1, itembtn2)
-    bot.reply_to(message, "Привет!\nЯ генерирую бред из русских пословиц.\n"
-                          "Иногда это смешно, но часто - вовсе нет.\n"
-                          "Напиши что угодно или нажми на кнопку внизу, "
-                          "и я отвечу очередной мудростью.\nЕсли у тебя дергается глаз от легкого издевательства "
-                          "над русским языком, то лучше сходи сюда: @grammarrulez", reply_markup=markup)
+    if gameIsOn:
+        markup.add(itembtn1, itembtn2)
+        bot.reply_to(message, "Игра уже запущена.\nТы точно хочешь начать новую игру?\n", reply_markup=markup)
+    else:
+        markup.add(itembtn1)
+        bot.reply_to(message, "Привет!\nХочешь начать игру?\n", reply_markup=markup)
+
+@bot.message_handler(func=lambda message: message.text == 'Новая игра')
+def start_game(message):
+    newCastle.plan[player.currentPosition].show(player)
+    newCastle.plan[player.currentPosition].map()
+
+
+@bot.message_handler(func=lambda message: message.text in telegram_commands)
+def get_command(message):
+    if not player.gameover('killall', howManyMonsters):
+        player.do(message.text)
+
 
 bot.polling(none_stop=True, interval=0)
 
-newCastle.plan[player.currentPosition].show(player)
-newCastle.plan[player.currentPosition].map()
 while not player.gameover('killall', howManyMonsters):
     player.do(input('Что требуется от ' + player.name1 + '? ---->'))
