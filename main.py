@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 # Импортируем необходимые модули
 
+import telebot
+from telebot import types
 from functions import *
 
+
 # Константы
+TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
 howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
 howManyMonsters = 10
 howManyWeapon = 10
@@ -1495,7 +1499,25 @@ newKey = Key()
 player.pockets.append(newKey)
 
 # Основная программа
+
 # Запускаем бота
+bot = telebot.TeleBot(TOKEN)
+
+#Функции бота
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    itembtn1 = types.KeyboardButton('Новая игра')
+    itembtn2 = types.KeyboardButton('Отмена')
+    markup.add(itembtn1, itembtn2)
+    bot.reply_to(message, "Привет!\nЯ генерирую бред из русских пословиц.\n"
+                          "Иногда это смешно, но часто - вовсе нет.\n"
+                          "Напиши что угодно или нажми на кнопку внизу, "
+                          "и я отвечу очередной мудростью.\nЕсли у тебя дергается глаз от легкого издевательства "
+                          "над русским языком, то лучше сходи сюда: @grammarrulez", reply_markup=markup)
+
+bot.polling(none_stop=True, interval=0)
 
 newCastle.plan[player.currentPosition].show(player)
 newCastle.plan[player.currentPosition].map()
