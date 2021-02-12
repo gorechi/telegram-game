@@ -1545,10 +1545,11 @@ def start_game(message):
     newCastle.plan[player.currentPosition].map()
 
 
-@bot.message_handler(func=lambda message: message.text in telegram_commands)
+@bot.message_handler(func=lambda message: message.text.lower() in telegram_commands)
 def get_command(message):
     if not player.gameover('killall', howManyMonsters):
-        player.do(message.text)
+        lower_message = message.text.lower()
+        player.do(lower_message)
 
 
 bot.polling(none_stop=True, interval=0)
