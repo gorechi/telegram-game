@@ -6,6 +6,9 @@ from time import sleep as pause
 from math import ceil
 from math import sqrt
 from math import floor
+import telebot
+from telebot import types
+
 
 # Функции
 

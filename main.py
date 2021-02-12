@@ -1495,6 +1495,7 @@ newKey = Key()
 player.pockets.append(newKey)
 
 # Основная программа
+# Запускаем бота
 
 newCastle.plan[player.currentPosition].show(player)
 newCastle.plan[player.currentPosition].map()
