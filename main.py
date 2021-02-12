@@ -36,10 +36,10 @@ class Item:
 
     def take(self, who=''):
         who.pockets.append(self)
-        print(who.name + ' забирает ' + self.name + ' себе.')
+        tprint(who.name + ' забирает ' + self.name + ' себе.')
 
     def use(self, whoisusing, inaction=False):
-        print(whoisusing.name + ' не знает, как использовать такие штуки.')
+        tprint(whoisusing.name + ' не знает, как использовать такие штуки.')
 
     def show(self):
         return self.description
@@ -64,7 +64,7 @@ class Rune:
 
     def take(self, who=''):
         who.pockets.append(self)
-        print(who.name + ' забирает ' + self.name1 + ' себе.')
+        tprint(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
@@ -153,10 +153,10 @@ class Weapon:
     def take(self, who):
         if who.weapon == '':
             who.weapon = self
-            print(who.name + ' берет ' + self.name1 + ' в руку.')
+            tprint(who.name + ' берет ' + self.name1 + ' в руку.')
         else:
             who.pockets.append(self)
-            print(who.name + ' забирает ' + self.name1 + ' себе.')
+            tprint(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         damageString = str(self.damage)
@@ -171,7 +171,7 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
+        tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
 
 class Shield:
@@ -244,7 +244,7 @@ class Shield:
                 multiplier = 1.5
             elif self.element() in weakness[who.weapon.element()]:
                 multiplier = 0.67
-        print('Множитель защиты - ' + str(multiplier))
+        tprint('Множитель защиты - ' + str(multiplier))
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection()
@@ -254,10 +254,10 @@ class Shield:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            print(who.name + ' использует ' + self.name1 + ' как защиту.')
+            tprint(who.name + ' использует ' + self.name1 + ' как защиту.')
         else:
             player.pockets.append(self)
-            print(who.name + ' забирает ' + self.name1 + ' себе.')
+            tprint(who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         protectionString = str(self.protection)
@@ -272,7 +272,7 @@ class Shield:
             whoUsing.pockets.append(whoUsing.shield)
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
-        print(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
+        tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
 
 class Map(Item):
@@ -296,11 +296,11 @@ class Map(Item):
 
     def use(self, whoisusing, inaction=False):
         if not inaction:
-            print(whoisusing.name + ' смотрит на карту замка.')
+            tprint(whoisusing.name + ' смотрит на карту замка.')
             newCastle.map()
             return True
         else:
-            print('Во время боя это совершенно неуместно!')
+            tprint('Во время боя это совершенно неуместно!')
             return False
 
 
@@ -338,25 +338,25 @@ class Potion(Item):
             if self.type == 1:
                 whoUsing.startHealth += self.effect
                 whoUsing.health += self.effect
-                print (whoUsing.name + ' увеличивает свое максмальное здоровье на ' + str(self.effect) + ' до ' + str(whoUsing.health) + '.')
+                tprint (whoUsing.name + ' увеличивает свое максмальное здоровье на ' + str(self.effect) + ' до ' + str(whoUsing.health) + '.')
                 return True
             elif self.type == 2:
                 whoUsing.stren += self.effect
                 whoUsing.startStren += self.effect
-                print (whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
+                tprint (whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 4:
                 whoUsing.dext += self.effect
                 whoUsing.startDext += self.effect
-                print (whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
+                tprint (whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 6:
                 whoUsing.intel += self.effect
                 whoUsing.startIntel += self.effect
-                print (whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
+                tprint (whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
-                print('Это зелье можно использовать только в бою!')
+                tprint('Это зелье можно использовать только в бою!')
                 return False
         else:
             if self.type == 0:
@@ -365,22 +365,22 @@ class Potion(Item):
                 else:
                     heal = dice(1, self.effect)
                 whoUsing.health += heal
-                print (whoUsing.name + ' восполняет ' + howmany(heal, 'единицу жизни,единицы жизни,единиц жизни'))
+                tprint (whoUsing.name + ' восполняет ' + howmany(heal, 'единицу жизни,единицы жизни,единиц жизни'))
                 return True
             elif self.type == 3:
                 whoUsing.stren += self.effect
-                print ('На время боя ' + whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 5:
                 whoUsing.dext += self.effect
-                print ('На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 7:
                 whoUsing.intel += self.effect
-                print ('На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
-                print('Это зелье нельзя использовать в бою!')
+                tprint('Это зелье нельзя использовать в бою!')
                 return False
     def __str__(self):
         return 'potion'
@@ -439,7 +439,7 @@ class Money:
 
     def take(self, luckyOne):
         luckyOne.money.howmanymoney += self.howmanymoney
-        print(luckyOne.name + ' забрал ' + howmany(self.howmanymoney, 'монету,монеты,монет'))
+        tprint(luckyOne.name + ' забрал ' + howmany(self.howmanymoney, 'монету,монеты,монет'))
 
     def show(self):
         if self.howmanymoney > 0:
@@ -508,7 +508,7 @@ class Hero:
         else:
             rage = 1
         meleAttack = dice(1, self.stren) * rage
-        print(showsides(self, target))
+        tprint(showsides(self, target))
         canUse = []
         for i in self.pockets:
             if i.canUseInFight:
@@ -554,14 +554,14 @@ class Hero:
             elif action == 'б' or action == 'бежать' or action == 'убежать':
                 a = dice(1, 2)
                 if a == 1 and self.weapon != '':
-                    print('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
+                    tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
                     if target.weapon == '' and target.carryweapon:
                         target.weapon = self.weapon
                     else:
                         newCastle.plan[self.currentPosition].loot.add(self.weapon)
                     self.weapon = ''
                 elif a == 2 and self.shield != '':
-                    print('Убегая ' + self.name + ' роняет из рук ' + self.shield.name)
+                    tprint('Убегая ' + self.name + ' роняет из рук ' + self.shield.name)
                     if target.shield == '' and target.carryshield:
                         target.shield = self.shield
                     else:
@@ -570,7 +570,7 @@ class Hero:
                 a = dice(0, len(self.pockets))
                 for i in range(a):
                     b = dice(0, len(self.pockets) - 1)
-                    print(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
+                    tprint(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
                     newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
                     self.pockets.pop(b)
                 self.run = True
