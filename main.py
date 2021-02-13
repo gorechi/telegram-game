@@ -5,6 +5,7 @@
 import telebot
 from telebot import types
 from functions import *
+from PIL import Image, ImageDraw, ImageFont
 
 
 # Константы
@@ -1300,9 +1301,9 @@ class Room:
 
     def map(self):
         doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
-        doorsVertical = {'0': '\u01C1', '1': ' ', '2': '|'}
+        doorsVertical = {'0': '║', '1': ' ', '2': '|'}
         string1 = '=={0}=='.format(doorsHorizontal[str(self.doors[0])])
-        string2 = '\u01C1   \u01C1'
+        string2 = '║   ║'
         string3 = '{0} '.format(doorsVertical[str(self.doors[3])])
         if self.center != '':
             string3 += self.center.name[0]
@@ -1310,7 +1311,7 @@ class Room:
             string3 += ' '
         string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
         string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
-        tprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4)
+        pprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
         return True
 
     def lock(self, lockOrNot=2):
@@ -1426,19 +1427,21 @@ class Castle:
         f = self.floors
         r = self.rooms
         doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
-        doorsVertical = {'0': '\u01C1', '1': ' ', '2': '|'}
-        print('======' * r + '=')
+        doorsVertical = {'0': '║', '1': ' ', '2': '|'}
+        text = []
+        text.append('======' * r + '=')
         for i in range(f):
-            print('\u01C1' + '     \u01C1' * r)
-            line1 = '\u01C1'
+            text.append('║' + '     ║' * r)
+            line1 = '║'
             line2 = ''
             for j in range(r):
                 a = player.name[0] if player.currentPosition == i * r + j else self.plan[i*r+j].visited
                 line1 += '  {0}  {1}'.format(a, doorsVertical[str(self.allDoors[i * r + j][1])])
                 line2 += '==={0}=='.format(doorsHorizontal[str(self.allDoors[i * r + j][2])])
-            print(line1)
-            print('\u01C1' + '     \u01C1' * r)
-            print(line2 + '=')
+            text.append(line1)
+            text.append('║' + '     ║' * r)
+            text.append(line2 + '=')
+            pprint(text, 1000, 1000)
 
     def inhabit(self, itemsList, howManyItems, emptyRoomsOnly=True):  # Расселяем штуки из списка по замку
         tossedItems = toss(itemsList, len(itemsList))  # Перетасовываем штуки
@@ -1513,10 +1516,10 @@ gameIsOn = False
 # Запускаем бота
 bot = telebot.TeleBot(TOKEN)
 chat_id = 0
+
 #Функции бота
 
 def tprint (text):
-    global chat_id
     if isinstance(text, str):
         bot.send_message(chat_id, text)
     elif isinstance(text, list):
@@ -1524,6 +1527,31 @@ def tprint (text):
         for line in text:
             final_text = final_text + str(line) + '\n'
         bot.send_message(chat_id, final_text.rstrip('\n'))
+
+def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
+    pic = Image.new('RGB', (width,height), color=(color))
+    font = ImageFont.truetype('PTMono-Regular.ttf', size=18)
+    draw_text = ImageDraw.Draw(pic)
+    if isinstance(text, str):
+        draw_text.text(
+            (10, 10),
+            text,
+            font=font,
+            fill=('#000000')
+        )
+        bot.send_photo(chat_id, pic)
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            final_text = final_text + str(line) + '\n'
+        draw_text.text(
+            (10, 10),
+            final_text,
+            font=font,
+            fill=('#000000')
+        )
+        bot.send_photo(chat_id, pic)
+    return pic
 
 @bot.message_handler(commands=['start', 'старт'])
 def welcome(message):
