@@ -34,6 +34,29 @@ weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12],
 elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
                      12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
 
+# Функции
+
+def fight(side1, side2):
+    whoWon = ''
+    whoFirst = dice(1, 2)
+    if whoFirst == 2:
+        side1, side2 = side2, side1
+    tprint(side1.name + ' начинает схватку!')
+    while whoWon == '':
+        tprint(side1.attack(side2))
+        if side1.run:
+            break
+        elif side2.health > 0:
+            side1, side2 = side2, side1
+        else:
+            tprint(side1.name + ' побеждает в бою!')
+            side1.win(side2)
+            side2.lose(side1)
+            break
+        pause(1)
+
+    return whoWon
+
 # Описываем классы
 
 class Item:

@@ -88,24 +88,3 @@ def readitems(whatkind, howMany, classes):
         itemTypes[whatkind].append(new)
     return itemTypes[whatkind]
 
-
-def fight(side1, side2):
-    whoWon = ''
-    whoFirst = dice(1, 2)
-    if whoFirst == 2:
-        side1, side2 = side2, side1
-    print(side1.name + ' начинает схватку!')
-    while whoWon == '':
-        print(side1.attack(side2))
-        if side1.run:
-            break
-        elif side2.health > 0:
-            side1, side2 = side2, side1
-        else:
-            print(side1.name + ' побеждает в бою!')
-            side1.win(side2)
-            side2.lose(side1)
-            break
-        pause(1)
-
-    return whoWon
