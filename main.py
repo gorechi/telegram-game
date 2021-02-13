@@ -1592,7 +1592,7 @@ def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
 def welcome(message):
     global chat_id
     chat_id = message.chat.id
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     itembtn1 = types.KeyboardButton('Новая игра')
     itembtn2 = types.KeyboardButton('Отмена')
     if gameIsOn:
@@ -1604,6 +1604,8 @@ def welcome(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Новая игра')
 def start_game(message):
+    global gameIsOn
+    gameIsOn = True
     newCastle.plan[player.currentPosition].show(player)
     newCastle.plan[player.currentPosition].map()
 
