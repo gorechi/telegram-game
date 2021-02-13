@@ -10,7 +10,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Константы
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
-telegram_commands = ['обыскать', '?']
+telegram_commands = ['обыскать',
+                     '?',
+                     'осмотреть',
+                     'идти',
+                     'атаковать',
+                     'взять',
+                     'открыть',
+                     'использовать',
+                     'улучшить']
 howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
 howManyMonsters = 10
 howManyWeapon = 10
@@ -577,10 +585,10 @@ class Hero:
                 self.run = True
                 return self.name + ' сбегает с поля боя.'
             elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
-                print('Во время боя ' + self.name + ' может использовать:')
+                tprint('Во время боя ' + self.name + ' может использовать:')
                 for i in self.pockets:
                     if i.canUseInFight:
-                        print(i.name)
+                        tprint(i.name)
                 while True:
                     a = input('Что нужно использовать? ---->')
                     if a == 'ничего' or a == '':
@@ -596,7 +604,7 @@ class Hero:
                                 break
                         if itemUsed:
                             break
-                        print('Что-то не выходит')
+                        tprint('Что-то не выходит')
 
     def show(self):
         if self.weapon != '':
@@ -611,7 +619,7 @@ class Hero:
                                                            self.shield.permprotection())
         else:
             string2 = 'У него нет защиты'
-        print(
+        tprint(
             '{0} - это смелый герой {7} уровня. Его сила - {1}{2} {3} и сейчас у него {4} здоровья, что составляет {5}% от максимально возможного.\n{0} имеет при себе {6} золотом.'.format(
                 self.name, self.stren, string1, string2, howmany(self.health, 'единица,единицы,единиц'),
                 self.health * 100 // self.startHealth, howmany(self.money.howmanymoney, 'монету,монеты,монет'),
@@ -630,7 +638,7 @@ class Hero:
         self.intel = self.startIntel
         self.currentPosition = 0
         pause(2)
-        print('После поражения в схватке ' + self.name + ' очнулся у входа в замок.')
+        tprint('После поражения в схватке ' + self.name + ' очнулся у входа в замок.')
 
     def win(self, loser):
         self.health = self.startHealth
@@ -638,41 +646,41 @@ class Hero:
         self.dext = self.startDext
         self.intel = self.startIntel
         self.wins += 1
-        print(self.name + ' получает ' + howmany(loser.exp, 'единицу,единицы,единиц') + ' опыта!')
+        tprint(self.name + ' получает ' + howmany(loser.exp, 'единицу,единицы,единиц') + ' опыта!')
         self.exp += loser.exp
         if self.exp > self.levels[self.level]:
             self.levelup()
 
     def levelup(self):
-        print(self.name, ' получает новый уровень!')
+        tprint(self.name, ' получает новый уровень!')
         while True:
             a = input('Что необходимо прокачать: (1)здоровье, (2)силу, (3)ловкость или 4(интеллект)? ---->')
             if a == '1' or a == 'здоровье':
                 self.health += 3
                 self.startHealth += 3
-                print(self.name + ' получает 3 единицы здоровья.')
+                tprint(self.name + ' получает 3 единицы здоровья.')
                 break
             elif a == '2' or a == 'силу':
                 self.stren += 1
                 self.startStren += 1
-                print(self.name + ' увеличивает свою силу на 1.')
+                tprint(self.name + ' увеличивает свою силу на 1.')
                 break
             elif a == '3' or a == 'ловкость':
                 self.dext += 1
                 self.startDext += 1
-                print(self.name + ' увеличивает свою ловкость на 1.')
+                tprint(self.name + ' увеличивает свою ловкость на 1.')
                 break
             elif a == '4' or a == 'интеллект':
                 self.intel += 1
                 self.startIntel += 1
-                print(self.name + ' увеличивает свой интеллект на 1.')
+                tprint(self.name + ' увеличивает свой интеллект на 1.')
                 break
         self.level += 1
 
     def gameover(self, goaltype, goal):
         if goaltype == 'killall':
             if newCastle.monsters() == 0:
-                print(self.name + ' убил всех монстров в замке и выиграл в этой игре!')
+                tprint(self.name + ' убил всех монстров в замке и выиграл в этой игре!')
                 return True
             else:
                 return False
@@ -685,15 +693,17 @@ class Hero:
         elif a == 'себя':
             self.show()
         elif a == 'карманы':
-            print(self.name + ' осматривает свои карманы и обнаруживает в них:')
+            text = []
+            text.append(self.name + ' осматривает свои карманы и обнаруживает в них:')
             for i in range(len(self.pockets)):
-                print(str(i+1) + ': ' + self.pockets[i].show())
-            print(self.money.show())
+                text.append(str(i+1) + ': ' + self.pockets[i].show())
+            text.append(self.money.show())
+            tprint(text)
         elif a in self.directionsDict.keys():
             if newCastle.plan[self.currentPosition].doors[self.doorsDict[a]] == 0:
-                print (self.name + ' осматривает стену и не находит ничего заслуживающего внимания.')
+                tprint (self.name + ' осматривает стену и не находит ничего заслуживающего внимания.')
             else:
-                print(self.name + ' заглядывает в замочную скважину и ' + newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
+                tprint(self.name + ' заглядывает в замочную скважину и ' + newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
 
         if newCastle.plan[self.currentPosition].center != '':
             if (a == newCastle.plan[self.currentPosition].center.name or a == newCastle.plan[
@@ -703,25 +713,27 @@ class Hero:
 
         if self.weapon != '':
             if a == self.weapon.name or a == self.weapon.name1 or a == 'оружие':
-                print(self.weapon.show())
+                tprint(self.weapon.show())
         if self.shield != '':
             if a == self.shield.name or a == self.shield.name1 or a == 'защиту':
-                print(self.shield.show())
+                tprint(self.shield.show())
 
         if len(self.pockets) > 0:
+            text = []
             for i in self.pockets:
                 if a == i.name or a == i.name1:
-                    print(i.show())
+                    text.append(i.show())
+            tprint(text)
 
     def go(self, direction):
         if direction not in self.directionsDict.keys():
-            print(self.name + ' не знает такого направления!')
+            tprint(self.name + ' не знает такого направления!')
             return False
         elif newCastle.plan[self.currentPosition].doors[self.doorsDict[direction]] == 0:
-            print('Там нет двери. ' + self.name + ' не может туда пройти!')
+            tprint('Там нет двери. ' + self.name + ' не может туда пройти!')
             return False
         elif newCastle.plan[self.currentPosition].doors[self.doorsDict[direction]] == 2:
-            print('Эта дверь заперта. ' + self.name + ' не может туда пройти, нужен ключ!')
+            tprint('Эта дверь заперта. ' + self.name + ' не может туда пройти, нужен ключ!')
             return False
         else:
             self.currentPosition += self.directionsDict[direction]
@@ -738,10 +750,10 @@ class Hero:
                         self.currentPosition].center.name1 != enemy and
                         newCastle.plan[self.currentPosition].center.name[
                             0] != enemy)) and enemy != '':
-            print(self.name + ' не может атаковать. В комнате нет такого существа.')
+            tprint(self.name + ' не может атаковать. В комнате нет такого существа.')
             return False
         elif str(newCastle.plan[self.currentPosition].center) != 'monster':
-            print('Не нужно кипятиться. Тут некого атаковать')
+            tprint('Не нужно кипятиться. Тут некого атаковать')
         else:
             fight(self, newCastle.plan[self.currentPosition].center)
             return True
@@ -906,14 +918,14 @@ class Hero:
                     return False
                 elif answer.isdigit() and int(answer)-1 < len(runeList):
                     if selectedItem.enchant(runeList[int(answer)-1]):
-                        print(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
+                        tprint(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
                         self.pockets.remove(runeList[int(answer)-1])
                         return True
                     else:
-                        print('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
+                        tprint('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
                         return False
                 else:
-                    print(self.name + ' не находит такую руну у себя в карманах.')
+                    tprint(self.name + ' не находит такую руну у себя в карманах.')
         else:
             tprint(self.name + ' не может улучшить эту вещь.')
             return False
@@ -1069,7 +1081,7 @@ class Monster:
 
     def lose(self, winner):
         result = dice(1, 10)
-        print('RESULT = ' + str(result))
+        tprint('RESULT = ' + str(result))
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
@@ -1088,9 +1100,9 @@ class Monster:
             self.wounded = True
             aliveString = self.name + ' остается вживых и '
             weaknessAmount = ceil(self.stren * 0.4)
-            print('weaknessAmount = ' + str(weaknessAmount))
+            tprint('weaknessAmount = ' + str(weaknessAmount))
             illAmount = ceil(self.startHealth * 0.4)
-            print('illAmount = ' + str(illAmount))
+            tprint('illAmount = ' + str(illAmount))
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
@@ -1122,7 +1134,7 @@ class Monster:
                 runningMonsters = [self]
                 if newCastle.inhabit(runningMonsters, 1, True):
                     aliveString += self.name + ' убегает из комнаты.'
-                    print(aliveString)
+                    tprint(aliveString)
                     where.center = ''
             else:
                 aliveString += 'получает ранение в ногу и не может двигаться, теряя при этом '  \
@@ -1130,7 +1142,7 @@ class Monster:
                                + howmany(illAmount, 'жизнь,жизни,жизней') + '.'
                 self.stren -= weaknessAmount
                 self.health = self.startHealth - illAmount
-                print(aliveString)
+                tprint(aliveString)
 
     def win(self, loser):
         self.health = self.startHealth
@@ -1206,7 +1218,7 @@ class Shapeshifter(Monster):
                 weaponString = ' и ' + self.weapon.name + ' в руках.'
             else:
                 weaponString = ''
-            print(
+            tprint(
                 self.name + ' меняет форму и становится точь в точь как ' + attacker.name + '. У него теперь сила ' + str(
                     self.stren) + weaponString)
         if self.shield == '':
@@ -1573,11 +1585,10 @@ def start_game(message):
     newCastle.plan[player.currentPosition].map()
 
 
-@bot.message_handler(func=lambda message: message.text.lower() in telegram_commands)
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands)
 def get_command(message):
     if not player.gameover('killall', howManyMonsters):
-        lower_message = message.text.lower()
-        player.do(lower_message)
+        player.do(message.text.lower())
 
 
 bot.polling(none_stop=True, interval=0)
