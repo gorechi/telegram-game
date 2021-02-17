@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Константы
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
+IN_FIGHT = False
 telegram_commands = ['обыскать',
                      '?',
                      'осмотреть',
@@ -19,6 +20,11 @@ telegram_commands = ['обыскать',
                      'открыть',
                      'использовать',
                      'улучшить']
+fight_commands = ['ударить',
+                  '?',
+                  'защититься',
+                  'бежать',
+                  'использовать']
 howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
 howManyMonsters = 10
 howManyWeapon = 10
@@ -37,6 +43,8 @@ elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4:
 # Функции
 
 def fight(side1, side2):
+    global IN_FIGHT
+    IN_FIGHT = True
     whoWon = ''
     whoFirst = dice(1, 2)
     if whoFirst == 2:
@@ -45,11 +53,13 @@ def fight(side1, side2):
     while whoWon == '':
         tprint(side1.attack(side2))
         if side1.run:
+            IN_FIGHT = False
             break
         elif side2.health > 0:
             side1, side2 = side2, side1
         else:
             tprint(side1.name + ' побеждает в бою!')
+            IN_FIGHT = False
             side1.win(side2)
             side2.lose(side1)
             break
@@ -196,7 +206,7 @@ class Weapon:
             damageString += '+' + str(self.permdamage())
         return self.name + self.enchantment() + ' (' + damageString + ')'
 
-    def use(self, whoUsing, inaction = False):
+    def use(self, whoUsing, inaction=False):
         if whoUsing.weapon == '':
             whoUsing.weapon = self
         else:
@@ -297,7 +307,7 @@ class Shield:
             protectionString += '+' + str(self.permprotection())
         return self.name + self.enchantment() + ' (' + protectionString + ')'
 
-    def use(self, whoUsing):
+    def use(self, whoUsing, inaction=False):
         if whoUsing.shield == '':
             whoUsing.shield = self
         else:
@@ -533,7 +543,8 @@ class Hero:
         else:
             return randomitem(self.weapon.actions)
 
-    def attack(self, target):
+    def attack(self, target, action):
+        global IN_FIGHT
         self.run = False
         if self.rage > 1:
             rage = dice(2, self.rage)
@@ -546,88 +557,88 @@ class Hero:
             if i.canUseInFight:
                 canUse.append(i)
 
+        if action == '' or action == 'у' or action == 'ударить':
+            self.rage = 0
+            if self.weapon != '':
+                weaponAttack = self.weapon.attack()
+                string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + \
+                          ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
+                          ' урона. '
+            else:
+                weaponAttack = 0
+                string1 = self.name + ' бьет ' + target.name1 + ' не используя оружие и наносит ' + howmany(
+                    meleAttack, 'единицу,единицы,единиц') + ' урона. '
+            targetDefence = target.defence(self)
+            if (weaponAttack + meleAttack - targetDefence) > 0:
+                totalDamage = weaponAttack + meleAttack - targetDefence
+            else:
+                totalDamage = 0
+            if totalDamage == 0:
+               string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
+            elif targetDefence == 0:
+               string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
+            else:
+               string2 = target.name + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
+                    totalDamage, 'жизнь,жизни,жизней') + '.'
+            target.health -= totalDamage
+            return string1 + string2
+        elif action == 'з' or action == 'защититься' or action == 'защита':
+            self.hide = True
+            self.rage += 1
+            return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
+        elif action == 'б' or action == 'бежать' or action == 'убежать':
+            a = dice(1, 2)
+            if a == 1 and self.weapon != '':
+                tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
+                if target.weapon == '' and target.carryweapon:
+                    target.weapon = self.weapon
+                else:
+                    newCastle.plan[self.currentPosition].loot.add(self.weapon)
+                self.weapon = ''
+            elif a == 2 and self.shield != '':
+                tprint('Убегая ' + self.name + ' роняет из рук ' + self.shield.name)
+                if target.shield == '' and target.carryshield:
+                    target.shield = self.shield
+                else:
+                    newCastle.plan[self.currentPosition].loot.add(self.shield)
+                self.shield = ''
+            a = dice(0, len(self.pockets))
+            for i in range(a):
+                b = dice(0, len(self.pockets) - 1)
+                tprint(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
+                newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
+                self.pockets.pop(b)
+            self.run = True
+            IN_FIGHT = False
+            return self.name + ' сбегает с поля боя.'
+        elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
+            tprint('Во время боя ' + self.name + ' может использовать:')
+            for i in self.pockets:
+                if i.canUseInFight:
+                    tprint(i.name)
+            while True:
+                a = input('Что нужно использовать? ---->')
+                if a == 'ничего' or a == '':
+                    break
+                else:
+                    itemUsed = False
+                    for i in canUse:
+                        if i.name == a or i.name1 == a:
+                            if i.use(self, inaction=True) and isinstance(i, Potion):
+                                self.pockets.remove(i)
+                            itemUsed = True
+                            # self.use(a, True)
+                            break
+                    if itemUsed:
+                        break
+                    tprint('Что-то не выходит')
         line = self.name + ' может (у)дарить'
         if self.shield != '':
             line += ', (з)ащититься'
         if len(canUse) > 0:
             line += ', (и)спользовать'
         line += ' или (б)ежать ---->'
-        while True:
-            action = input(line)
-            if action == '' or action == 'у' or action == 'ударить':
-                self.rage = 0
-                if self.weapon != '':
-                    weaponAttack = self.weapon.attack()
-                    string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + \
-                              ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
-                              ' урона. '
-                else:
-                    weaponAttack = 0
-                    string1 = self.name + ' бьет ' + target.name1 + ' не используя оружие и наносит ' + howmany(
-                        meleAttack, 'единицу,единицы,единиц') + ' урона. '
-                targetDefence = target.defence(self)
-                if (weaponAttack + meleAttack - targetDefence) > 0:
-                    totalDamage = weaponAttack + meleAttack - targetDefence
-                else:
-                    totalDamage = 0
-                if totalDamage == 0:
-                    string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
-                elif targetDefence == 0:
-                    string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
-                else:
-                    string2 = target.name + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
-                        totalDamage, 'жизнь,жизни,жизней') + '.'
-                target.health -= totalDamage
-                return string1 + string2
-            elif action == 'з' or action == 'защититься' or action == 'защита':
-                self.hide = True
-                self.rage += 1
-                return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
-            elif action == 'б' or action == 'бежать' or action == 'убежать':
-                a = dice(1, 2)
-                if a == 1 and self.weapon != '':
-                    tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
-                    if target.weapon == '' and target.carryweapon:
-                        target.weapon = self.weapon
-                    else:
-                        newCastle.plan[self.currentPosition].loot.add(self.weapon)
-                    self.weapon = ''
-                elif a == 2 and self.shield != '':
-                    tprint('Убегая ' + self.name + ' роняет из рук ' + self.shield.name)
-                    if target.shield == '' and target.carryshield:
-                        target.shield = self.shield
-                    else:
-                        newCastle.plan[self.currentPosition].loot.add(self.shield)
-                    self.shield = ''
-                a = dice(0, len(self.pockets))
-                for i in range(a):
-                    b = dice(0, len(self.pockets) - 1)
-                    tprint(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
-                    newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
-                    self.pockets.pop(b)
-                self.run = True
-                return self.name + ' сбегает с поля боя.'
-            elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
-                tprint('Во время боя ' + self.name + ' может использовать:')
-                for i in self.pockets:
-                    if i.canUseInFight:
-                        tprint(i.name)
-                while True:
-                    a = input('Что нужно использовать? ---->')
-                    if a == 'ничего' or a == '':
-                        break
-                    else:
-                        itemUsed = False
-                        for i in canUse:
-                            if i.name == a or i.name1 == a:
-                                if i.use(self, inaction=True) and isinstance(i, Potion):
-                                    self.pockets.remove(i)
-                                itemUsed = True
-                                # self.use(a, True)
-                                break
-                        if itemUsed:
-                            break
-                        tprint('Что-то не выходит')
+        tprint(line)
 
     def show(self):
         if self.weapon != '':
@@ -768,6 +779,7 @@ class Hero:
             return True
 
     def fight(self, enemy):
+        global IN_FIGHT
         if (newCastle.plan[self.currentPosition].center == '' or (
                             newCastle.plan[self.currentPosition].center.name != enemy and newCastle.plan[
                         self.currentPosition].center.name1 != enemy and
@@ -778,7 +790,14 @@ class Hero:
         elif str(newCastle.plan[self.currentPosition].center) != 'monster':
             tprint('Не нужно кипятиться. Тут некого атаковать')
         else:
-            fight(self, newCastle.plan[self.currentPosition].center)
+            IN_FIGHT = True
+            enemy = newCastle.plan[self.currentPosition].center
+            whoFirst = dice(1, 2)
+            if whoFirst == 1:
+                self.attack(enemy, 'атаковать')
+            else:
+                tprint(enemy.name + ' начинает схватку!')
+                tprint(enemy.attack(self))
             return True
 
     def search(self, item=''):
@@ -789,7 +808,7 @@ class Hero:
             tprint ('Неожиданно из засады выскакивает ' + ambusher.name + ' и нападает на ' + self.name1)
             newCastle.plan[self.currentPosition].center = ambusher
             newCastle.plan[self.currentPosition].ambush = ''
-            fight(self, newCastle.plan[self.currentPosition].center)
+            self.fight(ambusher)
         else:
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
@@ -887,10 +906,10 @@ class Hero:
         elif item.isdigit():
             if int(item)-1 < len(self.pockets):
                 i = self.pockets[int(item)-1]
-                if isinstance(i, Potion) and i.use(self, inaction=False):
+                if isinstance(i, Potion) and i.use(self, False):
                     self.pockets.remove(i)
                 elif not isinstance(i, Potion):
-                    i.use(self, inaction=False)
+                    i.use(self, False)
                 return True
             else:
                 tprint(self.name + ' не нашел такой вещи у себя в карманах.')
@@ -1586,9 +1605,8 @@ def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
             fill=('#000000')
         )
         bot.send_photo(chat_id, pic)
-    return pic
 
-@bot.message_handler(commands=['start', 'старт'])
+@bot.message_handler(commands=['start', 'старт', 's'])
 def welcome(message):
     global chat_id
     chat_id = message.chat.id
@@ -1610,11 +1628,29 @@ def start_game(message):
     newCastle.plan[player.currentPosition].map()
 
 
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands)
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands and not IN_FIGHT)
 def get_command(message):
     if not player.gameover('killall', howManyMonsters):
         player.do(message.text.lower())
 
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands and IN_FIGHT)
+def get_in_fight_command(message):
+    global IN_FIGHT
+    enemy = newCastle.plan[player.currentPosition].center
+    tprint(player.attack(enemy, message.text))
+    if IN_FIGHT:
+        if enemy.run:
+            IN_FIGHT = False
+        elif enemy.health > 0:
+            tprint(enemy.attack(player))
+        else:
+            tprint(player.name + ' побеждает в бою!')
+            IN_FIGHT = False
+            player.win(enemy)
+            enemy.lose(player)
+    else:
+        newCastle.plan[player.currentPosition].show(player)
+        newCastle.plan[player.currentPosition].map()
 
 bot.polling(none_stop=True, interval=0)
 
