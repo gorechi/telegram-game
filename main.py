@@ -496,9 +496,32 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.elementLevels = {'1': 2, '2': 4, '3': 7, '4': 10}
-        self.directionsDict = {'наверх': (0 - newCastle.rooms), 'направо': 1, 'вправо': 1, 'налево': (0 - 1), 'лево': (0 - 1),
-                          'влево': (0 - 1), 'вниз': newCastle.rooms, 'низ': newCastle.rooms, 'вверх': (0 - newCastle.rooms), 'верх': (0 - newCastle.rooms), 'право': 1}
-        self.doorsDict = {'наверх': 0, 'направо': 1, 'вправо': 1, 'право': 1, 'налево': 3, 'влево': 3, 'лево': 3, 'вниз': 2, 'низ': 2, 'вверх': 0, 'верх': 0}
+        self.directionsDict = {0: (0 - newCastle.rooms),
+                               1: 1,
+                               2: newCastle.rooms,
+                               3: (0 - 1),
+                               'наверх': (0 - newCastle.rooms),
+                               'направо': 1,
+                               'вправо': 1,
+                               'налево': (0 - 1),
+                               'лево': (0 - 1),
+                               'влево': (0 - 1),
+                               'вниз': newCastle.rooms,
+                               'низ': newCastle.rooms,
+                               'вверх': (0 - newCastle.rooms),
+                               'верх': (0 - newCastle.rooms),
+                               'право': 1}
+        self.doorsDict = {'наверх': 0,
+                          'направо': 1,
+                          'вправо': 1,
+                          'право': 1,
+                          'налево': 3,
+                          'влево': 3,
+                          'лево': 3,
+                          'вниз': 2,
+                          'низ': 2,
+                          'вверх': 0,
+                          'верх': 0}
 
     def __str__(self):
         return 'hero'
@@ -515,6 +538,21 @@ class Hero:
             return randomitem(self.actions)
         else:
             return randomitem(self.weapon.actions)
+
+    def run_away(self):
+        global IN_FIGHT
+        availableDirections = []
+        for i in range (3):
+            if newCastle.plan[self.currentPosition].doors[i] == 1:
+                availableDirections.append(i)
+        self.currentPosition += self.directionsDict[availableDirections[dice(0,len(availableDirections))]]
+        newCastle.plan[self.currentPosition].visited = '+'
+        IN_FIGHT = False
+        self.lookaround()
+        if newCastle.plan[self.currentPosition].center != '':
+            if newCastle.plan[self.currentPosition].center.agressive:
+                self.fight(newCastle.plan[self.currentPosition].center, True)
+        return True
 
     def attack(self, target, action):
         global IN_FIGHT
@@ -560,6 +598,7 @@ class Hero:
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
         elif action == 'б' or action == 'бежать' or action == 'убежать':
+            tprint(self.name + ' сбегает с поля боя.')
             a = dice(1, 2)
             if a == 1 and self.weapon != '':
                 tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
@@ -581,8 +620,7 @@ class Hero:
                 tprint(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
                 newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
                 self.pockets.pop(b)
-            self.run = True
-            IN_FIGHT = False
+            self.run = self.run_away()
             return self.name + ' сбегает с поля боя.'
         elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
             tprint('Во время боя ' + self.name + ' может использовать:')
@@ -748,10 +786,10 @@ class Hero:
             self.lookaround()
             if newCastle.plan[self.currentPosition].center != '':
                 if newCastle.plan[self.currentPosition].center.agressive:
-                    fight(newCastle.plan[self.currentPosition].center, self)
+                    self.fight(newCastle.plan[self.currentPosition].center)
             return True
 
-    def fight(self, enemy):
+    def fight(self, enemy, agressive = False):
         global IN_FIGHT
         if (newCastle.plan[self.currentPosition].center == '' or (
                             newCastle.plan[self.currentPosition].center.name != enemy and newCastle.plan[
@@ -1468,7 +1506,7 @@ class Castle:
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
-            pprint(text, 1000, 1000)
+        pprint(text, r*72, f*90)
 
     def inhabit(self, itemsList, howManyItems, emptyRoomsOnly=True):  # Расселяем штуки из списка по замку
         tossedItems = toss(itemsList, len(itemsList))  # Перетасовываем штуки
