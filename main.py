@@ -1040,15 +1040,15 @@ class Monster:
         self.keyHole = 'видит какую-то неясную фигуру.'
         if carryweapon == 'True':
             self.carryweapon = True
-        elif carryweapon == 'False':
+        else:
             self.carryweapon = False
         if carryshield == 'True':
             self.carryshield = True
-        elif carryshield == 'False':
+        else:
             self.carryshield = False
         if agressive == 'True':
             self.agressive = True
-        elif agressive == 'False':
+        else:
             self.agressive = False
         self.exp = self.stren * dice(1, 10) + dice(1, self.health)
 
