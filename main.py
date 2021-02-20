@@ -539,8 +539,33 @@ class Hero:
         else:
             return randomitem(self.weapon.actions)
 
-    def run_away(self):
+    def run_away(self, target):
         global IN_FIGHT
+        tprint(self.name + ' сбегает с поля боя.')
+        a = dice(1, 2)
+        if a == 1 and self.weapon != '':
+            tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name1)
+            if target.weapon == '' and target.carryweapon:
+                target.weapon = self.weapon
+            else:
+                newCastle.plan[self.currentPosition].loot.add(self.weapon)
+            self.weapon = ''
+        elif a == 2 and self.shield != '':
+            tprint('Убегая ' + self.name + ' теряет ' + self.shield.name1)
+            if target.shield == '' and target.carryshield:
+                target.shield = self.shield
+            else:
+                newCastle.plan[self.currentPosition].loot.add(self.shield)
+            self.shield = ''
+        a = dice(0, len(self.pockets))
+        firstLine = self.name + ' бежит настолько быстро, что не замечает, как теряет:'
+        text = [firstLine]
+        for i in range(a):
+            b = dice(0, len(self.pockets) - 1)
+            text.append(self.pockets[b].name1)
+            newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
+            self.pockets.pop(b)
+        tprint(text)
         availableDirections = []
         for i in range (3):
             if newCastle.plan[self.currentPosition].doors[i] == 1:
@@ -552,7 +577,7 @@ class Hero:
         if newCastle.plan[self.currentPosition].center != '':
             if newCastle.plan[self.currentPosition].center.agressive:
                 self.fight(newCastle.plan[self.currentPosition].center, True)
-        return True
+        return self.name + ' еле стоит на ногах.'
 
     def attack(self, target, action):
         global IN_FIGHT
@@ -598,30 +623,7 @@ class Hero:
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
         elif action == 'б' or action == 'бежать' or action == 'убежать':
-            tprint(self.name + ' сбегает с поля боя.')
-            a = dice(1, 2)
-            if a == 1 and self.weapon != '':
-                tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name)
-                if target.weapon == '' and target.carryweapon:
-                    target.weapon = self.weapon
-                else:
-                    newCastle.plan[self.currentPosition].loot.add(self.weapon)
-                self.weapon = ''
-            elif a == 2 and self.shield != '':
-                tprint('Убегая ' + self.name + ' роняет из рук ' + self.shield.name)
-                if target.shield == '' and target.carryshield:
-                    target.shield = self.shield
-                else:
-                    newCastle.plan[self.currentPosition].loot.add(self.shield)
-                self.shield = ''
-            a = dice(0, len(self.pockets))
-            for i in range(a):
-                b = dice(0, len(self.pockets) - 1)
-                tprint(self.name + ' не замечает, как из его карманов вываливается ' + self.pockets[b].name)
-                newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
-                self.pockets.pop(b)
-            self.run = self.run_away()
-            return self.name + ' сбегает с поля боя.'
+            return self.run_away(target)
         elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
             tprint('Во время боя ' + self.name + ' может использовать:')
             for i in self.pockets:
@@ -1659,9 +1661,6 @@ def get_in_fight_command(message):
             IN_FIGHT = False
             player.win(enemy)
             enemy.lose(player)
-    else:
-        newCastle.plan[player.currentPosition].show(player)
-        newCastle.plan[player.currentPosition].map()
 
 bot.polling(none_stop=True, interval=0)
 
