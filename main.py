@@ -85,6 +85,9 @@ class Rune:
         return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
                ' или защита + ' + str(self.defence)
 
+    def use(self, whoisusing, inaction=False):
+        tprint(whoisusing.name + ' не знает, как использовать такие штуки.')
+
 
 class Spell:
     def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
