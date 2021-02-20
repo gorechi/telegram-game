@@ -568,19 +568,20 @@ class Hero:
                 newCastle.plan[self.currentPosition].loot.add(self.shield)
             self.shield = ''
         a = dice(0, len(self.pockets))
-        firstLine = self.name + ' бежит настолько быстро, что не замечает, как теряет:'
-        text = [firstLine]
-        for i in range(a):
-            b = dice(0, len(self.pockets) - 1)
-            text.append(self.pockets[b].name1)
-            newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
-            self.pockets.pop(b)
-        tprint(text)
+        if a > 0:
+            firstLine = self.name + ' бежит настолько быстро, что не замечает, как теряет:'
+            text = [firstLine]
+            for i in range(a):
+                b = dice(0, len(self.pockets) - 1)
+                text.append(self.pockets[b].name1)
+                newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
+                self.pockets.pop(b)
+            tprint(text)
         availableDirections = []
-        for i in range (3):
+        for i in range(4):
             if newCastle.plan[self.currentPosition].doors[i] == 1:
                 availableDirections.append(i)
-        self.currentPosition += self.directionsDict[availableDirections[dice(0,len(availableDirections))]]
+        self.currentPosition += self.directionsDict[availableDirections[dice(0,len(availableDirections)-1)]]
         newCastle.plan[self.currentPosition].visited = '+'
         IN_FIGHT = False
         self.lookaround()
@@ -597,13 +598,13 @@ class Hero:
         else:
             rage = 1
         meleAttack = dice(1, self.stren) * rage
-        tprint(showsides(self, target))
         canUse = []
         for i in self.pockets:
             if i.canUseInFight:
                 canUse.append(i)
 
         if action == '' or action == 'у' or action == 'ударить':
+            tprint(showsides(self, target))
             self.rage = 0
             if self.weapon != '':
                 weaponAttack = self.weapon.attack()
@@ -629,6 +630,7 @@ class Hero:
             target.health -= totalDamage
             return string1 + string2
         elif action == 'з' or action == 'защититься' or action == 'защита':
+            tprint(showsides(self, target))
             self.hide = True
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
@@ -803,38 +805,50 @@ class Hero:
 
     def fight(self, enemy, agressive = False):
         global IN_FIGHT
-        if (newCastle.plan[self.currentPosition].center == '' or (
-                            newCastle.plan[self.currentPosition].center.name != enemy and newCastle.plan[
-                        self.currentPosition].center.name1 != enemy and
-                        newCastle.plan[self.currentPosition].center.name[
-                            0] != enemy)) and enemy != '':
-            tprint(self.name + ' не может атаковать. В комнате нет такого существа.')
-            return False
-        elif str(newCastle.plan[self.currentPosition].center) != 'monster':
-            tprint('Не нужно кипятиться. Тут некого атаковать')
+        if isinstance(enemy, Monster):
+            whoisfighting = enemy
+        elif newCastle.plan[self.currentPosition].center != '':
+            if not isinstance(newCastle.plan[self.currentPosition].center, Monster):
+                tprint('Не нужно кипятиться. Тут некого атаковать')
+                return False
+            elif (newCastle.plan[self.currentPosition].center.name != enemy
+                    and newCastle.plan[self.currentPosition].center.name1 != enemy
+                    and newCastle.plan[self.currentPosition].center.name[0] != enemy) \
+                    and enemy != '':
+                tprint(self.name + ' не может атаковать. В комнате нет такого существа.')
+                return False
+            else:
+                whoisfighting = newCastle.plan[self.currentPosition].center
+        IN_FIGHT = True
+        if agressive:
+            whoFirst = 2
         else:
-            IN_FIGHT = True
-            enemy = newCastle.plan[self.currentPosition].center
-            if agressive:
-                whoFirst = 2
-            else:
-                whoFirst = dice(1, 2)
-            if whoFirst == 1:
-                self.attack(enemy, 'атаковать')
-            else:
-                tprint(enemy.name + ' начинает схватку!')
-                tprint(enemy.attack(self))
+            whoFirst = dice(1, 2)
+        if whoFirst == 1:
+            self.attack(whoisfighting, 'атаковать')
+        else:
+            tprint(whoisfighting.name + ' начинает схватку!')
+            tprint(whoisfighting.attack(self))
             return True
 
     def search(self, item=''):
-        if str(newCastle.plan[self.currentPosition].center) == 'monster':
-            tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
-        elif newCastle.plan[self.currentPosition].ambush != '' and item == '':
-            newCastle.plan[self.currentPosition].center = newCastle.plan[self.currentPosition].ambush
+        enemyinroom = newCastle.plan[self.currentPosition].center
+        enemyinambush = newCastle.plan[self.currentPosition].ambush
+        tprint('1 - ' + str(enemyinroom))
+        tprint('2 - ' + str(enemyinambush))
+        if enemyinroom != '':
+            if isinstance(enemyinroom, Monster):
+                tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
+        elif enemyinambush != '' and item == '':
+            tprint('3 - ' + str(enemyinroom))
+            tprint('4 - ' + str(enemyinambush))
+            newCastle.plan[self.currentPosition].center = enemyinambush
             newCastle.plan[self.currentPosition].ambush = ''
-            enemy = newCastle.plan[self.currentPosition].center
-            tprint ('Неожиданно из засады выскакивает ' + enemy.name + ' и нападает на ' + self.name1)
-            self.fight(enemy, True)
+            enemyinroom = newCastle.plan[self.currentPosition].center
+            tprint('5 - ' + str(enemyinroom))
+            tprint('6 - ' + str(newCastle.plan[self.currentPosition].ambush))
+            tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
+            self.fight(enemyinroom, True)
         else:
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
