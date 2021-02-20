@@ -805,7 +805,10 @@ class Hero:
         else:
             IN_FIGHT = True
             enemy = newCastle.plan[self.currentPosition].center
-            whoFirst = dice(1, 2)
+            if agressive:
+                whoFirst = 2
+            else:
+                whoFirst = dice(1, 2)
             if whoFirst == 1:
                 self.attack(enemy, 'атаковать')
             else:
@@ -817,11 +820,11 @@ class Hero:
         if str(newCastle.plan[self.currentPosition].center) == 'monster':
             tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
         elif newCastle.plan[self.currentPosition].ambush != '' and item == '':
-            ambusher = newCastle.plan[self.currentPosition].ambush
-            tprint ('Неожиданно из засады выскакивает ' + ambusher.name + ' и нападает на ' + self.name1)
-            newCastle.plan[self.currentPosition].center = ambusher
+            newCastle.plan[self.currentPosition].center = newCastle.plan[self.currentPosition].ambush
             newCastle.plan[self.currentPosition].ambush = ''
-            self.fight(ambusher)
+            enemy = newCastle.plan[self.currentPosition].center
+            tprint ('Неожиданно из засады выскакивает ' + enemy.name + ' и нападает на ' + self.name1)
+            self.fight(enemy, True)
         else:
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
