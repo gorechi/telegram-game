@@ -25,12 +25,7 @@ fight_commands = ['ударить',
                   'защититься',
                   'бежать',
                   'использовать']
-howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 10, 'руна': 10}
-howManyMonsters = 10
-howManyWeapon = 10
-howManyShields = 10
-howManyPotions = 8
-howManyRunes = 15
+howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 8, 'руна': 15}
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -48,6 +43,9 @@ class Item:
         self.name1 = 'штуку'
         self.canUseInFight = False
         self.description = self.name
+
+    def __str__(self):
+        return self.name
 
     def take(self, who=''):
         who.pockets.append(self)
@@ -102,6 +100,9 @@ class Spell:
         self.maxDamage = maxDamage
         self.minDamage = minDamage
 
+    def __str__(self):
+        return self.name
+
 class Weapon:
     def __init__(self, name, name1='оружие', damage=0, actions='бьет,ударяет'):
         if name != 0:
@@ -124,7 +125,10 @@ class Weapon:
         self.runes = []
 
     def __str__(self):
-        return 'weapon'
+        damageString = str(self.damage)
+        if self.permdamage() != 0:
+            damageString += '+' + str(self.permdamage())
+        return self.name + self.enchantment() + ' (' + damageString + ')'
 
     def realname(self):
         names = []
@@ -214,7 +218,10 @@ class Shield:
         self.runes = []
 
     def __str__(self):
-        return 'shield'
+        protectionString = str(self.protection)
+        if self.permprotection() != 0:
+            protectionString += '+' + str(self.permprotection())
+        return self.name + self.enchantment() + ' (' + protectionString + ')'
 
     def realname(self):
         names = []
@@ -330,7 +337,7 @@ class Key(Item):
         self.description = 'Ключ, пригодный для дверей и сундуков'
 
     def __str__(self):
-        return 'key'
+        return self.description
 
 
 class Potion(Item):
@@ -401,7 +408,7 @@ class Potion(Item):
                 tprint('Это зелье нельзя использовать в бою!')
                 return False
     def __str__(self):
-        return 'potion'
+        return self.description
 
 
 class Loot:
@@ -433,7 +440,7 @@ class Chest:
         self.keyHole = 'видит какой-то крупный предмет.'
 
     def __str__(self):
-        return 'chest'
+        return self.name
 
 
 class Money:
@@ -453,7 +460,7 @@ class Money:
             self.name1 = 'Много монет'
 
     def __str__(self):
-        return 'money'
+        return self.name + ' (' + self.howmanymoney + ')'
 
     def take(self, luckyOne):
         luckyOne.money.howmanymoney += self.howmanymoney
@@ -1056,7 +1063,7 @@ class Monster:
         self.exp = self.stren * dice(1, 10) + dice(1, self.health)
 
     def __str__(self):
-        return 'monster'
+        return self.name
 
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon == '':
@@ -1560,30 +1567,30 @@ classes = {'монстр': Monster,
            'карта': Map,
            'зелье': Potion,
            'руна': Rune,
-           'заклинание': Spell}
+           'заклинание': Spell,
+           }
 
 # Подготовка
+
 allMonsters = readmonsters(classes)  # Читаем монстров из файла
 allSpells = readspells(classes) #Читаем из файла заклинания
 allWeapon = readitems('оружие', howMany, classes)
 allShields = readitems('защита', howMany, classes)
 allPotions = readitems('зелье', howMany, classes)
 newCastle = Castle(5, 5)  # Генерируем замок
-newCastle.inhabit(allMonsters, howManyMonsters, True)  # Населяем замок монстрами
-newCastle.inhabit(allWeapon, howManyWeapon, False)
-newCastle.inhabit(allShields, howManyShields, False)
-allRunes = [Rune() for i in range(howManyRunes)]
-newCastle.inhabit(allRunes, howManyRunes, False)
-newCastle.inhabit(allPotions, howManyPotions, False)  # Создаем запертые комнаты
-newCastle.lockDoors()
+newCastle.inhabit(allMonsters, howMany['монстры'], True)  # Населяем замок монстрами
+newCastle.inhabit(allWeapon, howMany['оружие'], False)
+newCastle.inhabit(allShields, howMany['защита'], False)
+allRunes = [Rune() for i in range(howMany['руна'])]
+newCastle.inhabit(allRunes, howMany['руна'], False)
+newCastle.inhabit(allPotions, howMany['зелье'], False)
+newCastle.lockDoors() # Создаем запертые комнаты
 map = Map()  # Прячем карту
-newCastle.plan[0].visited = '+'
-Arthur = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает')
-randomSword = Weapon(0)
-player = Arthur
-newKey = Key()
-player.pockets.append(newKey)
-gameIsOn = False
+newCastle.plan[0].visited = '+' # Делаем первую комнату посещенной
+player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает') # Создаем персонажа
+newKey = Key() # Создаем ключ
+player.pockets.append(newKey) # Отдаем ключ игроку
+gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 # Основная программа
 
 # Запускаем бота
@@ -1649,7 +1656,7 @@ def start_game(message):
 
 @bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands and not IN_FIGHT)
 def get_command(message):
-    if not player.gameover('killall', howManyMonsters):
+    if not player.gameover('killall', howMany['монстры']):
         player.do(message.text.lower())
 
 @bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands and IN_FIGHT)
@@ -1670,5 +1677,5 @@ def get_in_fight_command(message):
 
 bot.polling(none_stop=True, interval=0)
 
-while not player.gameover('killall', howManyMonsters):
+while not player.gameover('killall', howMany['монстры']):
     player.do(input('Что требуется от ' + player.name1 + '? ---->'))
