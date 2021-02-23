@@ -657,12 +657,20 @@ class Hero:
                     if itemUsed:
                         break
                     tprint('Что-то не выходит')
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
+        item1 = types.KeyboardButton('ударить')
+        item2 = types.KeyboardButton('')
+        item3 = types.KeyboardButton('')
         line = self.name + ' может (у)дарить'
         if self.shield != '':
             line += ', (з)ащититься'
+            item2 = types.KeyboardButton('защититься')
         if len(canUse) > 0:
             line += ', (и)спользовать'
+            item3 = types.KeyboardButton('использовать')
         line += ' или (б)ежать ---->'
+        item4 = types.KeyboardButton('бежать')
+        markup.add(item1, item2, item3, item4)
         tprint(line)
 
     def show(self):
@@ -696,8 +704,7 @@ class Hero:
         self.dext = self.startDext
         self.intel = self.startIntel
         self.currentPosition = 0
-        pause(2)
-        tprint('После поражения в схватке ' + self.name + ' очнулся у входа в замок.')
+        #tprint('После поражения в схватке ' + self.name + ' очнулся у входа в замок.')
 
     def win(self, loser):
         self.health = self.startHealth
@@ -825,28 +832,23 @@ class Hero:
         else:
             whoFirst = dice(1, 2)
         if whoFirst == 1:
+            tprint(player.name + ' начинает схватку!', 'fight')
             self.attack(whoisfighting, 'атаковать')
         else:
-            tprint(whoisfighting.name + ' начинает схватку!')
+            tprint(whoisfighting.name + ' начинает схватку!', 'fight')
             tprint(whoisfighting.attack(self))
             return True
 
     def search(self, item=''):
         enemyinroom = newCastle.plan[self.currentPosition].center
         enemyinambush = newCastle.plan[self.currentPosition].ambush
-        tprint('1 - ' + str(enemyinroom))
-        tprint('2 - ' + str(enemyinambush))
         if enemyinroom != '':
             if isinstance(enemyinroom, Monster):
                 tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
         elif enemyinambush != '' and item == '':
-            tprint('3 - ' + str(enemyinroom))
-            tprint('4 - ' + str(enemyinambush))
             newCastle.plan[self.currentPosition].center = enemyinambush
             newCastle.plan[self.currentPosition].ambush = ''
             enemyinroom = newCastle.plan[self.currentPosition].center
-            tprint('5 - ' + str(enemyinroom))
-            tprint('6 - ' + str(newCastle.plan[self.currentPosition].ambush))
             tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
             self.fight(enemyinroom, True)
         else:
@@ -1131,29 +1133,38 @@ class Monster:
             return randomitem(self.weapon.actions)
 
     def attack(self, target):
+        global IN_FIGHT
+        text = []
         meleAttack = dice(1, self.stren)
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
-            string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name \
+            text.append(self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name \
                       + ' и наносит ' + str(meleAttack) + '+' \
-                      + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. '
+                      + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. ')
         else:
             weaponAttack = 0
-            string1 = self.name + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
-                meleAttack, 'единицу,единицы,единиц') + ' урона. '
+            text.append(self.name + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
+                meleAttack, 'единицу,единицы,единиц') + ' урона. ')
         targetDefence = target.defence(self)
         if (weaponAttack + meleAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
             if targetDefence == 0:
-                string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
+                text.append(target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
             else:
-                string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' \
-                          + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
+                text.append(target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' \
+                          + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
         else:
             totalDamage = 0
-            string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
+            text.append(self.name + ' не смог пробить защиту ' + target.name1 + '.')
         target.health -= totalDamage
-        return string1 + string2
+        if target.health <= 0:
+            IN_FIGHT = False
+            target.lose(self)
+            text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
+            tprint(text, 'off')
+        else:
+            tprint(text)
+        return True
 
     def defence(self, attacker):
         if self.shield == '':
@@ -1385,7 +1396,7 @@ class Room:
         tprint(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
                                                                           self.decoration2,
                                                                           whoIsHere,
-                                                                          self.decoration4))
+                                                                          self.decoration4), state = 'direction')
 
     def showThroughKeyHole(self, who):
         if self.center == '':
@@ -1613,14 +1624,40 @@ chat_id = 0
 
 #Функции бота
 
-def tprint (text):
+def tprint (text, state=''):
+    if state == 'off':
+        markup = types.ReplyKeyboardRemove(selective=False)
+    elif state == 'fight':
+        canUse = []
+        for i in player.pockets:
+            if i.canUseInFight:
+                canUse.append(i)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('ударить')
+        item2 = types.KeyboardButton('')
+        item3 = types.KeyboardButton('')
+        if player.shield != '':
+            item2 = types.KeyboardButton('защититься')
+        if len(canUse) > 0:
+            item3 = types.KeyboardButton('использовать')
+        item4 = types.KeyboardButton('бежать')
+        markup.add(item1, item2, item3, item4)
+    elif state == 'direction':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('идти вверх')
+        item2 = types.KeyboardButton('идти вниз')
+        item3 = types.KeyboardButton('идти налево')
+        item4 = types.KeyboardButton('идти направо')
+        markup.add(item1, item2, item3, item4)
+    else:
+        markup = ''
     if isinstance(text, str):
-        bot.send_message(chat_id, text)
+        bot.send_message(chat_id, text, reply_markup=markup)
     elif isinstance(text, list):
         final_text = ''
         for line in text:
             final_text = final_text + str(line) + '\n'
-        bot.send_message(chat_id, final_text.rstrip('\n'))
+        bot.send_message(chat_id, final_text.rstrip('\n'), reply_markup=markup)
 
 def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
     pic = Image.new('RGB', (width,height), color=(color))
@@ -1682,9 +1719,9 @@ def get_in_fight_command(message):
         if enemy.run:
             IN_FIGHT = False
         elif enemy.health > 0:
-            tprint(enemy.attack(player))
+            enemy.attack(player)
         else:
-            tprint(player.name + ' побеждает в бою!')
+            tprint(player.name + ' побеждает в бою!', 'off')
             IN_FIGHT = False
             player.win(enemy)
             enemy.lose(player)
