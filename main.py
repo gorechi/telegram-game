@@ -1311,9 +1311,12 @@ class Shapeshifter(Monster):
                 weaponString = ' и ' + self.weapon.name + ' в руках.'
             else:
                 weaponString = ''
-            tprint(
-                self.name + ' меняет форму и становится точь в точь как ' + attacker.name + '. У него теперь сила ' + str(
-                    self.stren) + weaponString)
+            tprint(self.name +
+                   ' меняет форму и становится точь в точь как ' +
+                   attacker.name +
+                   '. У него теперь сила ' +
+                   str(self.stren) +
+                   weaponString)
         if self.shield == '':
             return 0
         else:
@@ -1339,33 +1342,68 @@ class Vampire(Monster):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
     def attack(self, target):
+        text = []
         meleAttack = dice(1, self.stren)
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
-            string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + ' и наносит ' + howmany(
-                meleAttack, 'единицу,единицы,единиц') + '+' + str(weaponAttack) + ' урона. '
+            text.append(self.name +
+                        ' ' +
+                        self.action() +
+                        ' ' +
+                        target.name1 +
+                        ' используя ' +
+                        self.weapon.name +
+                        ' и наносит ' +
+                        howmany(meleAttack, 'единицу,единицы,единиц') +
+                        '+' +
+                        str(weaponAttack) +
+                        ' урона. ')
         else:
             weaponAttack = 0
-            string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' не используя оружия и наносит ' + howmany(
-                meleAttack, 'единицу,единицы,единиц') + ' урона. '
+            text.append(self.name +
+                        ' ' +
+                        self.action() +
+                        ' ' +
+                        target.name1 +
+                        ' не используя оружия и наносит ' +
+                        howmany(meleAttack, 'единицу,единицы,единиц') +
+                        ' урона. ')
         targetDefence = target.defence(self)
         if (weaponAttack + meleAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
         else:
             totalDamage = 0
         if totalDamage == 0:
-            string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
+            text.append(self.name + ' не смог пробить защиту ' + target.name1 + '.')
         elif targetDefence == 0:
-            string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage,
-                                                                      'жизнь,жизни,жизней') + '.' + self.name + ' высасывает ' + str(
-                totalDamage // 2) + ' себе.'
+            text.append(target.name + ' беззащитен и теряет ' +
+                        howmany(totalDamage, 'жизнь,жизни,жизней') +
+                        '.' +
+                        self.name +
+                        ' высасывает ' +
+                        str(totalDamage // 2) +
+                        ' себе.')
         else:
-            string2 = target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' + howmany(totalDamage,
-                                                                                                            'жизнь,жизни,жизней') + '.' + self.name + ' высасывает ' + str(
-                totalDamage // 2) + ' себе.'
+            text.append(target.name +
+                        ' использует для защиты ' +
+                        target.shield.name +
+                        ' и теряет ' +
+                        howmany(totalDamage, 'жизнь,жизни,жизней') +
+                        '.' +
+                        self.name +
+                        ' высасывает ' +
+                        str(totalDamage // 2) +
+                        ' себе.')
         target.health -= totalDamage
         self.health += totalDamage // 2
-        return string1 + string2
+        if target.health <= 0:
+            IN_FIGHT = False
+            target.lose(self)
+            text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
+            tprint(text, 'off')
+        else:
+            tprint(text)
+        return True
 
 
 class Room:
