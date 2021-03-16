@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 # Константы
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
 IN_FIGHT = False
+LEVEL_UP = False
 telegram_commands = ['обыскать',
                      '?',
                      'осмотреть',
@@ -25,6 +26,10 @@ fight_commands = ['ударить',
                   'защититься',
                   'бежать',
                   'использовать']
+level_up_commands = ['здоровье',
+                     'силу',
+                     'ловкость',
+                     'интеллект']
 howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 8, 'руна': 15}
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
@@ -718,30 +723,14 @@ class Hero:
             self.levelup()
 
     def levelup(self):
-        tprint(self.name, ' получает новый уровень!')
-        while True:
-            a = input('Что необходимо прокачать: (1)здоровье, (2)силу, (3)ловкость или 4(интеллект)? ---->')
-            if a == '1' or a == 'здоровье':
-                self.health += 3
-                self.startHealth += 3
-                tprint(self.name + ' получает 3 единицы здоровья.')
-                break
-            elif a == '2' or a == 'силу':
-                self.stren += 1
-                self.startStren += 1
-                tprint(self.name + ' увеличивает свою силу на 1.')
-                break
-            elif a == '3' or a == 'ловкость':
-                self.dext += 1
-                self.startDext += 1
-                tprint(self.name + ' увеличивает свою ловкость на 1.')
-                break
-            elif a == '4' or a == 'интеллект':
-                self.intel += 1
-                self.startIntel += 1
-                tprint(self.name + ' увеличивает свой интеллект на 1.')
-                break
+        global LEVEL_UP
+        LEVEL_UP = True
+        level_up_message = []
+        level_up_message.append(self.name + ' получает новый уровень!')
+        level_up_message.append('Что необходимо прокачать: здоровье, силу, ловкость или интеллект?')
+        tprint(level_up_message, 'levelup')
         self.level += 1
+        return True
 
     def gameover(self, goaltype, goal):
         if goaltype == 'killall':
@@ -1687,6 +1676,13 @@ def tprint (text, state=''):
         item3 = types.KeyboardButton('идти налево')
         item4 = types.KeyboardButton('идти направо')
         markup.add(item1, item2, item3, item4)
+    elif state == 'levelup':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('Здоровье')
+        item2 = types.KeyboardButton('Силу')
+        item3 = types.KeyboardButton('Ловкость')
+        item4 = types.KeyboardButton('Интеллект')
+        markup.add(item1, item2, item3, item4)
     else:
         markup = ''
     if isinstance(text, str):
@@ -1743,12 +1739,42 @@ def start_game(message):
     newCastle.plan[player.currentPosition].map()
 
 
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands and not IN_FIGHT)
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands
+                                          and not IN_FIGHT
+                                          and not LEVEL_UP)
 def get_command(message):
     if not player.gameover('killall', howMany['монстры']):
         player.do(message.text.lower())
 
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands and IN_FIGHT)
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in level_up_commands
+                                          and LEVEL_UP)
+def get_level_up_command(message):
+    global LEVEL_UP
+    global player
+    a = message.text.lower().split(' ')[0]
+    if a == 'здоровье':
+        player.health += 3
+        player.startHealth += 3
+        tprint(player.name + ' получает 3 единицы здоровья.')
+        LEVEL_UP = False
+    elif a == 'силу':
+        player.stren += 1
+        player.startStren += 1
+        tprint(player.name + ' увеличивает свою силу на 1.')
+        LEVEL_UP = False
+    elif a == '3' or a == 'ловкость':
+        player.dext += 1
+        player.startDext += 1
+        tprint(player.name + ' увеличивает свою ловкость на 1.')
+        LEVEL_UP = False
+    elif a == '4' or a == 'интеллект':
+        player.intel += 1
+        player.startIntel += 1
+        tprint(player.name + ' увеличивает свой интеллект на 1.')
+        LEVEL_UP = False
+
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands
+                                          and IN_FIGHT)
 def get_in_fight_command(message):
     global IN_FIGHT
     enemy = newCastle.plan[player.currentPosition].center
