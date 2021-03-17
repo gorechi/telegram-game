@@ -863,7 +863,7 @@ class Hero:
             return True
         else:
             for i in currentLoot.pile:
-                if i.name == item or i.name1 == item:
+                if i.name.lower() == item or i.name1.lower() == item:
                     i.take(self)
                     currentLoot.pile.remove(i)
                     return True
@@ -1755,22 +1755,22 @@ def get_level_up_command(message):
     if a == 'здоровье':
         player.health += 3
         player.startHealth += 3
-        tprint(player.name + ' получает 3 единицы здоровья.')
+        tprint(player.name + ' получает 3 единицы здоровья.', 'off')
         LEVEL_UP = False
     elif a == 'силу':
         player.stren += 1
         player.startStren += 1
-        tprint(player.name + ' увеличивает свою силу на 1.')
+        tprint(player.name + ' увеличивает свою силу на 1.', 'off')
         LEVEL_UP = False
     elif a == '3' or a == 'ловкость':
         player.dext += 1
         player.startDext += 1
-        tprint(player.name + ' увеличивает свою ловкость на 1.')
+        tprint(player.name + ' увеличивает свою ловкость на 1.', 'off')
         LEVEL_UP = False
     elif a == '4' or a == 'интеллект':
         player.intel += 1
         player.startIntel += 1
-        tprint(player.name + ' увеличивает свой интеллект на 1.')
+        tprint(player.name + ' увеличивает свой интеллект на 1.', 'off')
         LEVEL_UP = False
 
 @bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands
