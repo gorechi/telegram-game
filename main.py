@@ -1111,10 +1111,13 @@ class Monster:
         else:
             return randomitem(self.weapon.actions)
 
+    def mele(self):
+        return dice(1, self.stren)
+
     def attack(self, target):
         global IN_FIGHT
         text = []
-        meleAttack = dice(1, self.stren)
+        meleAttack = self.mele()
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
             text.append(self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name \
@@ -1153,7 +1156,7 @@ class Monster:
 
     def lose(self, winner):
         result = dice(1, 10)
-        tprint('RESULT = ' + str(result))
+        #tprint('RESULT = ' + str(result))
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
@@ -1172,9 +1175,9 @@ class Monster:
             self.wounded = True
             aliveString = self.name + ' остается вживых и '
             weaknessAmount = ceil(self.stren * 0.4)
-            tprint('weaknessAmount = ' + str(weaknessAmount))
+            #tprint('weaknessAmount = ' + str(weaknessAmount))
             illAmount = ceil(self.startHealth * 0.4)
-            tprint('illAmount = ' + str(illAmount))
+            #tprint('illAmount = ' + str(illAmount))
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
@@ -1271,6 +1274,19 @@ class Walker(Monster):
     def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+
+class Berserk(Monster):
+    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+                 carryweapon=True, carryshield=True):
+        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        self.agressive = True
+        self.carryshield = False
+        self.rage = 0
+        self.base_health = health
+
+    def mele(self):
+        self.rage = (self.base_health - self.health) // 3
+        return dice(1, (self.stren + self.rage))
 
 
 
@@ -1604,6 +1620,8 @@ classes = {'монстр': Monster,
            'притворщик': Shapeshifter,
            'сундук': Chest,
            'вампир': Vampire,
+           'берсерк': Berserk,
+           'ходок': Walker,
            'растение': Plant,
            'ключ': Key,
            'карта': Map,
@@ -1633,6 +1651,29 @@ player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бь�
 newKey = Key() # Создаем ключ
 player.pockets.append(newKey) # Отдаем ключ игроку
 gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
+
+#Функция рестарта игры
+def restart():
+    global newCastle
+    global map
+    global player
+    global newKey
+    newCastle = None
+    player = None
+    newCastle = Castle(5, 5)  # Генерируем замок
+    newCastle.inhabit(allMonsters, howMany['монстры'], True)  # Населяем замок монстрами
+    newCastle.inhabit(allWeapon, howMany['оружие'], False)
+    newCastle.inhabit(allShields, howMany['защита'], False)
+    newCastle.inhabit(allRunes, howMany['руна'], False)
+    newCastle.inhabit(allPotions, howMany['зелье'], False)
+    newCastle.lockDoors()  # Создаем запертые комнаты
+    map = Map()  # Прячем карту
+    newCastle.plan[0].visited = '+'  # Делаем первую комнату посещенной
+    player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '',
+                  'бьет,калечит,терзает,протыкает')  # Создаем персонажа
+    newKey = Key()  # Создаем ключ
+    player.pockets.append(newKey)  # Отдаем ключ игроку
+
 # Основная программа
 
 # Запускаем бота
@@ -1729,6 +1770,7 @@ def welcome(message):
 def start_game(message):
     global gameIsOn
     gameIsOn = True
+    restart()
     newCastle.plan[player.currentPosition].show(player)
     newCastle.plan[player.currentPosition].map()
 

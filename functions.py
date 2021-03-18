@@ -7,7 +7,6 @@ from math import ceil
 from math import sqrt
 from math import floor
 
-
 # Функции
 
 def readfile(filename, divide, divider='|'):
