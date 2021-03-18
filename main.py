@@ -12,6 +12,8 @@ from PIL import Image, ImageDraw, ImageFont
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
 IN_FIGHT = False
 LEVEL_UP = False
+ENCHANTING = False
+selectedItem = ''
 telegram_commands = ['обыскать',
                      '?',
                      'осмотреть',
@@ -956,7 +958,8 @@ class Hero:
             tprint(self.name + ' не нашел такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
-        selectedItem = ''
+        global ENCHANTING
+        global selectedItem
         runeList = self.inpockets(Rune)
         if len(runeList) == 0:
             tprint(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
@@ -972,7 +975,7 @@ class Hero:
             selectedItem = self.pockets[int(item)-1]
         else:
             for i in self.pockets:
-                if i.name == item or i.name1 == item:
+                if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
                     selectedItem = i
                 else:
                     tprint(self.name + ' не нашел такой вещи у себя в карманах.')
@@ -982,23 +985,10 @@ class Hero:
             text.append(self.name + ' может использовать следующие руны:')
             for rune in runeList:
                 text.append(str(runeList.index(rune)+1) + ': ' + str(rune))
-            text.append('Введите "отмена" для прекращения улучшения')
-            tprint(text)
+            text.append('Введите номер руны или "отмена" для прекращения улучшения')
             #Здесь нужна доработка т.к. управление переходит на работу с рунами
-            while True:
-                answer = input('Какую по номеру руну выберет ' + player.name + '? ---->')
-                if answer == 'отмена':
-                    return False
-                elif answer.isdigit() and int(answer)-1 < len(runeList):
-                    if selectedItem.enchant(runeList[int(answer)-1]):
-                        tprint(self.name + ' улучшает ' + selectedItem.name1 + ' новой руной.')
-                        self.pockets.remove(runeList[int(answer)-1])
-                        return True
-                    else:
-                        tprint('Похоже, что ' + self.name + 'не может вставить руну в ' + selectedItem.name1 + '.')
-                        return False
-                else:
-                    tprint(self.name + ' не находит такую руну у себя в карманах.')
+            ENCHANTING = True
+            tprint(text, 'enchant')
         else:
             tprint(self.name + ' не может улучшить эту вещь.')
             return False
@@ -1683,6 +1673,10 @@ def tprint (text, state=''):
         item3 = types.KeyboardButton('Ловкость')
         item4 = types.KeyboardButton('Интеллект')
         markup.add(item1, item2, item3, item4)
+    elif state == 'enchant':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
+        item1 = types.KeyboardButton('Отмена')
+        markup.add(item1)
     else:
         markup = ''
     if isinstance(text, str):
@@ -1741,7 +1735,8 @@ def start_game(message):
 
 @bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands
                                           and not IN_FIGHT
-                                          and not LEVEL_UP)
+                                          and not LEVEL_UP
+                                          and not ENCHANTING)
 def get_command(message):
     if not player.gameover('killall', howMany['монстры']):
         player.do(message.text.lower())
@@ -1772,6 +1767,31 @@ def get_level_up_command(message):
         player.startIntel += 1
         tprint(player.name + ' увеличивает свой интеллект на 1.', 'off')
         LEVEL_UP = False
+
+@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0]
+                                          and ENCHANTING)
+def get_enchanting_command(message):
+    global ENCHANTING
+    global selectedItem
+    global player
+    answer = message.text.lower()
+    runeList = player.inpockets(Rune)
+    if answer == 'отмена':
+        ENCHANTING = False
+        return True
+    elif answer.isdigit() and int(answer) - 1 < len(runeList):
+        if selectedItem.enchant(runeList[int(answer) - 1]):
+            tprint(player.name + ' улучшает ' + selectedItem.name1 + ' новой руной.', 'off')
+            player.pockets.remove(runeList[int(answer) - 1])
+            ENCHANTING = False
+            return True
+        else:
+            tprint('Похоже, что ' + player.name + 'не может вставить руну в ' + selectedItem.name1 + '.', 'off')
+            ENCHANTING = False
+            return False
+    else:
+        tprint(self.name + ' не находит такую руну у себя в карманах.', 'off')
+
 
 @bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands
                                           and IN_FIGHT)
