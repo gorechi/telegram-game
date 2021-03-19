@@ -832,10 +832,20 @@ class Hero:
 
     def search(self, item=''):
         enemyinroom = newCastle.plan[self.currentPosition].center
+        print("enemyinroom", enemyinroom)
         enemyinambush = newCastle.plan[self.currentPosition].ambush
+        print('enemyinambush', enemyinambush)
         if enemyinroom != '':
             if isinstance(enemyinroom, Monster):
                 tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
+            elif isinstance(enemyinroom, Chest):
+                message = ["В комнате стоит " + newCastle.plan[self.currentPosition].center.name]
+                if newCastle.plan[self.currentPosition].loot != '' and \
+                        len(newCastle.plan[self.currentPosition].loot.pile) > 0:
+                    message.append('Вокруг сундука валяются:')
+                    for i in newCastle.plan[self.currentPosition].loot.pile:
+                        message.append(i.name)
+                tprint(message)
         elif enemyinambush != '' and item == '':
             newCastle.plan[self.currentPosition].center = enemyinambush
             newCastle.plan[self.currentPosition].ambush = ''
@@ -843,6 +853,7 @@ class Hero:
             tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
             self.fight(enemyinroom, True)
         else:
+            print (newCastle.plan[self.currentPosition].loot)
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
                 text = []
@@ -1338,7 +1349,7 @@ class Vampire(Monster):
 
     def attack(self, target):
         text = []
-        meleAttack = dice(1, self.stren)
+        meleAttack = self.mele()
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
             text.append(self.name +
@@ -1420,6 +1431,7 @@ class Room:
         self.visited = ' '
         self.ambush = ''
         self.runePlace = ''
+        self.light = True
 
     def show(self, player):
         if self.center == '':
@@ -1511,6 +1523,7 @@ class Castle:
             a.position = i
             self.plan.append(a)
         self.howManyChests = len(self.plan) // 5 + 1
+        self.allChests = self.createchests(50, 50)  # Создаем сундуки
 
     def createchests(self, money, probability):
         list = []

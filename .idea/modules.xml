@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../GameGitHub/Game/.idea/Game.iml" filepath="$PROJECT_DIR$/../GameGitHub/Game/.idea/Game.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/telegram-game.iml" filepath="$PROJECT_DIR$/.idea/telegram-game.iml" />
     </modules>
   </component>
