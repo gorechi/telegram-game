@@ -832,9 +832,7 @@ class Hero:
 
     def search(self, item=''):
         enemyinroom = newCastle.plan[self.currentPosition].center
-        print("enemyinroom", enemyinroom)
         enemyinambush = newCastle.plan[self.currentPosition].ambush
-        print('enemyinambush', enemyinambush)
         if enemyinroom != '':
             if isinstance(enemyinroom, Monster):
                 tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
@@ -853,7 +851,6 @@ class Hero:
             tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
             self.fight(enemyinroom, True)
         else:
-            print (newCastle.plan[self.currentPosition].loot)
             if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
                     newCastle.plan[self.currentPosition].loot.pile) > 0:
                 text = []
@@ -1434,14 +1431,20 @@ class Room:
         self.light = True
 
     def show(self, player):
-        if self.center == '':
-            whoIsHere = 'Не видно ничего интересного.'
-        else:
-            whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
-        tprint(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
+        if self.light:
+            if self.center == '':
+                whoIsHere = 'Не видно ничего интересного.'
+            else:
+                whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
+            tprint(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
                                                                           self.decoration2,
                                                                           whoIsHere,
                                                                           self.decoration4), state = 'direction')
+        else:
+            message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
+            if isinstance(self.center, Monster):
+                message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
+            tprint(message)
 
     def showThroughKeyHole(self, who):
         if self.center == '':
@@ -1524,6 +1527,14 @@ class Castle:
             self.plan.append(a)
         self.howManyChests = len(self.plan) // 5 + 1
         self.allChests = self.createchests(50, 50)  # Создаем сундуки
+        self.lights_off() #Выключаем свет в некоторых комнатах
+
+    def lights_off(self):
+        self.how_many_dark_rooms = len(self.plan) // 8
+        darkRooms = randomitem(self.plan, False, self.how_many_dark_rooms)
+        print ("darkRooms: ", darkRooms )
+        for room in darkRooms:
+            room.light = False
 
     def createchests(self, money, probability):
         list = []

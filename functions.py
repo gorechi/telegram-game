@@ -37,12 +37,21 @@ def showsides(side1, side2):
     return line
 
 
-def randomitem(list, neednumber=False):
-    a = dice(0, len(list) - 1)
-    if not neednumber:
-        return list[a]
+def randomitem(list, neednumber=False, howMany = 1):
+    if not howMany or int(howMany) < 2:
+        a = dice(0, len(list) - 1)
+        if not neednumber:
+            return list[a]
+        else:
+            return list[a], a
     else:
-        return list[a], a
+        result = []
+        while howMany > 0:
+            a = dice(0, len(list) - 1)
+            if list[a] not in result:
+                result.append(list[a])
+                howMany -= 1
+        return result
 
 
 def howmany(a, string):
