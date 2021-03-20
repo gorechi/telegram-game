@@ -641,6 +641,13 @@ class Hero:
 
     def attack(self, target, action):
         global IN_FIGHT
+        room = newCastle.plan[self.currentPosition]
+        if room.light:
+            targetName = target.name
+            targetName1 = target.name1
+        else:
+            targetName = 'Неизвестная тварь из темноты'
+            targetName1 = 'черт знает кого'
         self.run = False
         if self.rage > 1:
             rage = dice(2, self.rage)
@@ -653,16 +660,16 @@ class Hero:
                 canUse.append(i)
 
         if action == '' or action == 'у' or action == 'ударить':
-            tprint(showsides(self, target))
+            tprint(showsides(self, target, newCastle))
             self.rage = 0
             if self.weapon != '':
                 weaponAttack = self.weapon.attack()
-                string1 = self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name + \
+                string1 = self.name + ' ' + self.action() + ' ' + targetName1 + ' используя ' + self.weapon.name + \
                           ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
                           ' урона. '
             else:
                 weaponAttack = 0
-                string1 = self.name + ' бьет ' + target.name1 + ' не используя оружие и наносит ' + howmany(
+                string1 = self.name + ' бьет ' + targetName1 + ' не используя оружие и наносит ' + howmany(
                     meleAttack, 'единицу,единицы,единиц') + ' урона. '
             targetDefence = target.defence(self)
             if (weaponAttack + meleAttack - targetDefence) > 0:
@@ -670,16 +677,16 @@ class Hero:
             else:
                 totalDamage = 0
             if totalDamage == 0:
-               string2 = self.name + ' не смог пробить защиту ' + target.name1 + '.'
+               string2 = self.name + ' не смог пробить защиту ' + targetName1 + '.'
             elif targetDefence == 0:
-               string2 = target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
+               string2 = targetName + ' не имеет защиты и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
             else:
-               string2 = target.name + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
+               string2 = targetName + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
                     totalDamage, 'жизнь,жизни,жизней') + '.'
             target.health -= totalDamage
             return string1 + string2
         elif action == 'з' or action == 'защититься' or action == 'защита':
-            tprint(showsides(self, target))
+            tprint(showsides(self, target, newCastle))
             self.hide = True
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
@@ -808,7 +815,7 @@ class Hero:
             if (a == newCastle.plan[self.currentPosition].center.name or a == newCastle.plan[
                 self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[
                 0]) and isinstance(newCastle.plan[self.currentPosition].center, Monster):
-                print(showsides(self, newCastle.plan[self.currentPosition].center))
+                tprint(showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
 
         if self.weapon != '':
             if a == self.weapon.name or a == self.weapon.name1 or a == 'оружие':
@@ -855,20 +862,21 @@ class Hero:
 
     def fight(self, enemy, agressive = False):
         global IN_FIGHT
+        room = newCastle.plan[self.currentPosition]
         if isinstance(enemy, Monster):
             whoisfighting = enemy
-        elif newCastle.plan[self.currentPosition].center != '':
-            if not isinstance(newCastle.plan[self.currentPosition].center, Monster):
+        elif room.center != '':
+            if not isinstance(room.center, Monster):
                 tprint('Не нужно кипятиться. Тут некого атаковать')
                 return False
-            elif (newCastle.plan[self.currentPosition].center.name != enemy
-                    and newCastle.plan[self.currentPosition].center.name1 != enemy
-                    and newCastle.plan[self.currentPosition].center.name[0] != enemy) \
+            elif (room.center.name != enemy
+                    and room.center.name1 != enemy
+                    and room.center.name[0] != enemy) \
                     and enemy != '':
                 tprint(self.name + ' не может атаковать. В комнате нет такого существа.')
                 return False
             else:
-                whoisfighting = newCastle.plan[self.currentPosition].center
+                whoisfighting = room.center
         IN_FIGHT = True
         if agressive:
             whoFirst = 2
@@ -878,7 +886,11 @@ class Hero:
             tprint(player.name + ' начинает схватку!', 'fight')
             self.attack(whoisfighting, 'атаковать')
         else:
-            tprint(whoisfighting.name + ' начинает схватку!', 'fight')
+            if room.light:
+                message = [whoisfighting.name + ' начинает схватку!']
+            else:
+                message = ['Что-то жуткое и непонятное нападает первым из темноты.']
+            tprint(message, 'fight')
             tprint(whoisfighting.attack(self))
             return True
 
@@ -1205,17 +1217,24 @@ class Monster:
         return dice(1, self.stren)
 
     def attack(self, target):
+        room = newCastle.plan[self.currentPosition]
+        if room.light:
+            selfName = self.name
+            selfName1 = self.name1
+        else:
+            selfName = 'Кто-то страшный'
+            selfName1 = 'черт знает кого'
         global IN_FIGHT
         text = []
         meleAttack = self.mele()
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
-            text.append(self.name + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name \
+            text.append(selfName + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name1 \
                       + ' и наносит ' + str(meleAttack) + '+' \
                       + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. ')
         else:
             weaponAttack = 0
-            text.append(self.name + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
+            text.append(selfName + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
                 meleAttack, 'единицу,единицы,единиц') + ' урона. ')
         targetDefence = target.defence(self)
         if (weaponAttack + meleAttack - targetDefence) > 0:
@@ -1227,7 +1246,7 @@ class Monster:
                           + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
         else:
             totalDamage = 0
-            text.append(self.name + ' не смог пробить защиту ' + target.name1 + '.')
+            text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
         target.health -= totalDamage
         if target.health <= 0:
             IN_FIGHT = False
@@ -1427,11 +1446,18 @@ class Vampire(Monster):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
     def attack(self, target):
+        room = newCastle.plan[self.currentPosition]
+        if room.light:
+            selfName = self.name
+            selfName1 = self.name1
+        else:
+            selfName = 'Кто-то страшный'
+            selfName1 = 'черт знает кого'
         text = []
         meleAttack = self.mele()
         if self.weapon != '':
             weaponAttack = self.weapon.attack()
-            text.append(self.name +
+            text.append(selfName +
                         ' ' +
                         self.action() +
                         ' ' +
@@ -1439,13 +1465,13 @@ class Vampire(Monster):
                         ' используя ' +
                         self.weapon.name +
                         ' и наносит ' +
-                        howmany(meleAttack, 'единицу,единицы,единиц') +
+                        str(meleAttack) +
                         '+' +
                         str(weaponAttack) +
-                        ' урона. ')
+                        ' единиц урона. ')
         else:
             weaponAttack = 0
-            text.append(self.name +
+            text.append(selfName +
                         ' ' +
                         self.action() +
                         ' ' +
@@ -1459,12 +1485,12 @@ class Vampire(Monster):
         else:
             totalDamage = 0
         if totalDamage == 0:
-            text.append(self.name + ' не смог пробить защиту ' + target.name1 + '.')
+            text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
         elif targetDefence == 0:
             text.append(target.name + ' беззащитен и теряет ' +
                         howmany(totalDamage, 'жизнь,жизни,жизней') +
-                        '.' +
-                        self.name +
+                        '. ' +
+                        selfName +
                         ' высасывает ' +
                         str(totalDamage // 2) +
                         ' себе.')
@@ -1475,7 +1501,7 @@ class Vampire(Monster):
                         ' и теряет ' +
                         howmany(totalDamage, 'жизнь,жизни,жизней') +
                         '.' +
-                        self.name +
+                        selfName +
                         ' высасывает ' +
                         str(totalDamage // 2) +
                         ' себе.')
