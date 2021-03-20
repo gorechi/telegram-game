@@ -783,22 +783,32 @@ class Hero:
             tprint(text)
 
     def go(self, direction):
+        room = newCastle.plan[self.currentPosition]
         if direction not in self.directionsDict.keys():
             tprint(self.name + ' не знает такого направления!')
             return False
-        elif newCastle.plan[self.currentPosition].doors[self.doorsDict[direction]] == 0:
-            tprint('Там нет двери. ' + self.name + ' не может туда пройти!')
+        elif room.doors[self.doorsDict[direction]] == 0:
+            if room.light:
+                message = ['Там нет двери. ' + self.name + ' не может туда пройти!']
+            else:
+                message = ['В темноте ' + self.name + ' врезается во что-то носом.']
+            tprint(message)
             return False
-        elif newCastle.plan[self.currentPosition].doors[self.doorsDict[direction]] == 2:
-            tprint('Эта дверь заперта. ' + self.name + ' не может туда пройти, нужен ключ!')
+        elif room.doors[self.doorsDict[direction]] == 2:
+            if room.light:
+                message = ['Эта дверь заперта. ' + self.name + ' не может туда пройти, нужен ключ!']
+            else:
+                message = ['В темноте ' + self.name + ' врезается во что-то носом.']
+            tprint(message)
             return False
         else:
             self.currentPosition += self.directionsDict[direction]
-            newCastle.plan[self.currentPosition].visited = '+'
+            room = newCastle.plan[self.currentPosition]
+            room.visited = '+'
             self.lookaround()
-            if newCastle.plan[self.currentPosition].center != '':
-                if newCastle.plan[self.currentPosition].center.agressive:
-                    self.fight(newCastle.plan[self.currentPosition].center)
+            if room.center != '':
+                if room.center.agressive:
+                    self.fight(room.center)
             return True
 
     def fight(self, enemy, agressive = False):
@@ -1458,7 +1468,7 @@ class Room:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
             if isinstance(self.center, Monster):
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
-            tprint(message)
+            tprint(message, state = 'direction')
 
     def showThroughKeyHole(self, who):
         if self.center == '':
