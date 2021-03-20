@@ -599,7 +599,10 @@ class Hero:
     def run_away(self, target):
         global IN_FIGHT
         room = newCastle.plan[self.currentPosition]
-        tprint(self.name + ' сбегает с поля боя.')
+        if room.light:
+            tprint(self.name + ' сбегает с поля боя.')
+        else:
+            tprint(self.name + ' в кромешной тьме пытается убежать хоть куда-нибудь.')
         a = dice(1, 2)
         if a == 1 and self.weapon != '':
             tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name1)
@@ -629,7 +632,13 @@ class Hero:
         for i in range(4):
             if room.doors[i] == 1:
                 availableDirections.append(i)
-        self.currentPosition += self.directionsDict[availableDirections[dice(0,len(availableDirections)-1)]]
+        if room.light:
+            direction = availableDirections[dice(0,len(availableDirections)-1)]
+        else:
+            direction = dice(0, 3)
+            if direction not in availableDirections:
+                return False
+        self.currentPosition += self.directionsDict[direction]
         room = newCastle.plan[self.currentPosition]
         room.visited = '+'
         IN_FIGHT = False
@@ -693,14 +702,18 @@ class Hero:
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
         elif action == 'б' or action == 'бежать' or action == 'убежать':
-            return self.run_away(target)
+            result = self.run_away(target)
+            if not result:
+                return self.name + ' с разбега врезается в стену и отлетает в сторону. Схватка продолжается.'
+            else:
+                return result
         elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
             tprint('Во время боя ' + self.name + ' может использовать:')
             for i in self.pockets:
                 if i.canUseInFight:
                     tprint(i.name)
             while True:
-                a = input('Что нужно использовать? ---->')
+                a = input('Что нужно использовать?')
                 if a == 'ничего' or a == '':
                     break
                 else:
@@ -1652,8 +1665,6 @@ class Castle:
         self.howManyChests = len(self.plan) // 5 + 1
         self.allChests = self.createchests(50, 50)  # Создаем сундуки
         self.lights_off() #Выключаем свет в некоторых комнатах
-        self.plan[0].light = False
-        #self.plan[0].torch = True
 
     def lights_off(self):
         self.how_many_dark_rooms = len(self.plan) // 8
