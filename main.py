@@ -307,6 +307,45 @@ class Shield:
             whoUsing.pockets.remove(self)
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
+class Matches(Item):
+    def __init__(self):
+        super().__init__()
+        self.name = 'спички'
+        self.name1 = 'спички'
+        self.description = 'Спички, которыми можно что-то поджечь'
+        self.room = None
+
+    def place(self, room = None):
+        if not room or not isinstance(room, Room):
+            done = False
+            while not done:
+                room = randomitem(newCastle.plan, False)
+                if not room.locked and room.light:
+                    done = True
+        self.room = room
+        if room.center != '':
+            room.center.loot.add(self)
+        else:
+            room.loot.add(self)
+
+    def use(self, whoIsUsing = None, inaction = False):
+        global player
+        if not whoIsUsing:
+            whoIsUsing = player
+        room = newCastle.plan[whoIsUsing.currentPosition]
+        if room.light:
+            message = ['Незачем тратить спички, здесь и так светло.']
+            tprint(message)
+        else:
+            room.light = True
+            room.torch = True
+            message = [whoIsUsing.name + ' зажигает факел и комната озаряется светом']
+            tprint(message)
+            room.show(whoIsUsing)
+            room.map()
+            if room.center.agressive:
+                self.fight(room.center, True)
+
 
 class Map(Item):
     def __init__(self):
@@ -1704,6 +1743,7 @@ classes = {'монстр': Monster,
            'растение': Plant,
            'ключ': Key,
            'карта': Map,
+           'спички': Matches,
            'зелье': Potion,
            'руна': Rune,
            'заклинание': Spell,
@@ -1729,6 +1769,8 @@ newCastle.plan[0].visited = '+' # Делаем первую комнату по�
 player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает') # Создаем персонажа
 newKey = Key() # Создаем ключ
 player.pockets.append(newKey) # Отдаем ключ игроку
+matches = Matches()
+matches.place()
 gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 
 #Функция рестарта игры
