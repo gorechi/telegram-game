@@ -8,6 +8,7 @@ from functions import *
 from PIL import Image, ImageDraw, ImageFont
 
 
+
 # Константы
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
 IN_FIGHT = False
@@ -896,49 +897,72 @@ class Hero:
         return False
 
     def open(self, item=''):
-        whatIsInRoom = newCastle.plan[self.currentPosition].center
+        room = newCastle.plan[self.currentPosition]
+        whatIsInRoom = room.center
         if item == '' or (not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0):
             if whatIsInRoom == '':
-                tprint('В комнате нет вещей, которые можно открыть.')
+                if room.light:
+                    message = ['В комнате нет вещей, которые можно открыть.']
+                else:
+                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
+                tprint(message)
                 return False
             elif not isinstance(whatIsInRoom, Chest):
-                tprint('Пожалуй, ' + self.name + ' не сможет это открыть.')
+                if room.light:
+                    message = ['Пожалуй, ' + self.name + ' не сможет это открыть.']
+                else:
+                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
+                tprint(message)
                 return False
             elif whatIsInRoom.opened:
-                tprint('Этот ' + whatIsInRoom.name1 + ' уже открыт. Зачем его открывать во второй раз?')
+                if room.light:
+                    message =['Этот ' + whatIsInRoom.name1 + ' уже открыт. Зачем его открывать во второй раз?']
+                else:
+                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
+                tprint(message)
                 return False
             elif whatIsInRoom.locked:
                 key = False
                 for i in self.pockets:
                     if isinstance(i, Key):
                         key = i
-                if key:
-                    self.pockets.remove(key)
-                    whatIsInRoom.locked = False
-                    tprint (self.name + ' отпирает сундук ключом.')
+                if room.light:
+                    if key:
+                        self.pockets.remove(key)
+                        whatIsInRoom.locked = False
+                        message = [self.name + ' отпирает сундук ключом.']
+                    else:
+                        message = ['Чтобы открыть этот сундук нужен ключ']
                 else:
-                    tprint ('Чтобы открыть этот сундук нужен ключ')
+                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
+                tprint(message)
             if not whatIsInRoom.locked:
-                text = []
-                text.append(self.name + ' открывает ' + whatIsInRoom.name)
-                if newCastle.plan[self.currentPosition].loot == '':
-                    newCastle.plan[self.currentPosition].loot = []
-                newCastle.plan[self.currentPosition].loot.pile += whatIsInRoom.loot.pile
-                if len(whatIsInRoom.loot.pile) > 0:
-                    text.append(self.name + ' роется в сундуке и обнаруживает в нем:')
-                    for i in whatIsInRoom.loot.pile:
-                        text.append(i.name1)
-                    text.append('Все эти вещи теперь разбросаны по всей комнате.')
-                    tprint(text)
-                    whatIsInRoom.loot.pile = []
+                if room.light:
+                    message = [self.name + ' открывает ' + whatIsInRoom.name]
+                    if room.loot == '':
+                        room.loot = []
+                    room.loot.pile += whatIsInRoom.loot.pile
+                    if len(whatIsInRoom.loot.pile) > 0:
+                        message.append(self.name + ' роется в сундуке и обнаруживает в нем:')
+                        for i in whatIsInRoom.loot.pile:
+                            message.append(i.name1)
+                        message.append('Все эти вещи теперь разбросаны по всей комнате.')
+                        whatIsInRoom.loot.pile = []
+                    else:
+                        message = ['В сундуке пусто.']
+                    whatIsInRoom.opened = True
+                    whatIsInRoom.name = 'открытый пустой ' + whatIsInRoom.name
+                    whatIsInRoom.inside = ''
                 else:
-                    tprint('В сундуке пусто.')
-                whatIsInRoom.opened = True
-                whatIsInRoom.name = 'открытый пустой ' + whatIsInRoom.name
-                whatIsInRoom.inside = ''
+                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
+                tprint (message)
                 return True
         else:
             key = False
+            if not room.light:
+                message = [self.name + ' ничего не видит и не может нащупать замочную скважину.']
+                tprint (message)
+                return False
             for i in self.pockets:
                 if isinstance(i, Key):
                     key = i
@@ -953,7 +977,7 @@ class Hero:
                 return False
             else:
                 self.pockets.remove(key)
-                newCastle.plan[self.currentPosition].doors[self.doorsDict[item]] = 1
+                room.doors[self.doorsDict[item]] = 1
                 j = self.doorsDict[item] + 2 if (self.doorsDict[item] + 2) < 4 else self.doorsDict[item] - 2
                 newCastle.plan[self.currentPosition + self.directionsDict[item]].doors[j] = 1
                 tprint(self.name + ' открывает дверь.')
@@ -1736,6 +1760,8 @@ chat_id = 0
 #Функции бота
 
 def tprint (text, state=''):
+    global bot
+    global chat_id
     if state == 'off':
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
