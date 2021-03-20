@@ -559,6 +559,7 @@ class Hero:
 
     def run_away(self, target):
         global IN_FIGHT
+        room = newCastle.plan[self.currentPosition]
         tprint(self.name + ' сбегает с поля боя.')
         a = dice(1, 2)
         if a == 1 and self.weapon != '':
@@ -566,14 +567,14 @@ class Hero:
             if target.weapon == '' and target.carryweapon:
                 target.weapon = self.weapon
             else:
-                newCastle.plan[self.currentPosition].loot.add(self.weapon)
+                room.loot.add(self.weapon)
             self.weapon = ''
         elif a == 2 and self.shield != '':
             tprint('Убегая ' + self.name + ' теряет ' + self.shield.name1)
             if target.shield == '' and target.carryshield:
                 target.shield = self.shield
             else:
-                newCastle.plan[self.currentPosition].loot.add(self.shield)
+                room.loot.add(self.shield)
             self.shield = ''
         a = dice(0, len(self.pockets))
         if a > 0:
@@ -582,20 +583,21 @@ class Hero:
             for i in range(a):
                 b = dice(0, len(self.pockets) - 1)
                 text.append(self.pockets[b].name1)
-                newCastle.plan[self.currentPosition].loot.add(self.pockets[b])
+                room.loot.add(self.pockets[b])
                 self.pockets.pop(b)
             tprint(text)
         availableDirections = []
         for i in range(4):
-            if newCastle.plan[self.currentPosition].doors[i] == 1:
+            if room.doors[i] == 1:
                 availableDirections.append(i)
         self.currentPosition += self.directionsDict[availableDirections[dice(0,len(availableDirections)-1)]]
-        newCastle.plan[self.currentPosition].visited = '+'
+        room = newCastle.plan[self.currentPosition]
+        room.visited = '+'
         IN_FIGHT = False
         self.lookaround()
-        if newCastle.plan[self.currentPosition].center != '':
-            if newCastle.plan[self.currentPosition].center.agressive:
-                self.fight(newCastle.plan[self.currentPosition].center, True)
+        if room.center != '':
+            if room.center.agressive and room.light:
+                self.fight(room.center, True)
         return self.name + ' еле стоит на ногах.'
 
     def attack(self, target, action):
@@ -808,7 +810,7 @@ class Hero:
             room.visited = '+'
             self.lookaround()
             if room.center != '':
-                if room.center.agressive:
+                if room.center.agressive and room.light:
                     self.fight(room.center)
             return True
 
