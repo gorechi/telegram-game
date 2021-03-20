@@ -831,31 +831,36 @@ class Hero:
             return True
 
     def search(self, item=''):
+        room = newCastle.plan[self.currentPosition]
         enemyinroom = newCastle.plan[self.currentPosition].center
         enemyinambush = newCastle.plan[self.currentPosition].ambush
+        if not room.light:
+            message = ['В комнате настолько темно, что невозможно что-то отыскать.']
+            tprint(message)
+            return True
         if enemyinroom != '':
             if isinstance(enemyinroom, Monster):
-                tprint(newCastle.plan[self.currentPosition].center.name + " мешает толком осмотреть комнату.")
+                tprint(room.center.name + " мешает толком осмотреть комнату.")
             elif isinstance(enemyinroom, Chest):
-                message = ["В комнате стоит " + newCastle.plan[self.currentPosition].center.name]
-                if newCastle.plan[self.currentPosition].loot != '' and \
-                        len(newCastle.plan[self.currentPosition].loot.pile) > 0:
+                message = ["В комнате стоит " + room.center.name]
+                if room.loot != '' and \
+                        len(room.loot.pile) > 0:
                     message.append('Вокруг сундука валяются:')
-                    for i in newCastle.plan[self.currentPosition].loot.pile:
+                    for i in room.loot.pile:
                         message.append(i.name)
                 tprint(message)
         elif enemyinambush != '' and item == '':
-            newCastle.plan[self.currentPosition].center = enemyinambush
-            newCastle.plan[self.currentPosition].ambush = ''
-            enemyinroom = newCastle.plan[self.currentPosition].center
+            room.center = enemyinambush
+            room.ambush = ''
+            enemyinroom = room.center
             tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
             self.fight(enemyinroom, True)
         else:
-            if item == '' and newCastle.plan[self.currentPosition].loot != '' and len(
-                    newCastle.plan[self.currentPosition].loot.pile) > 0:
+            if item == '' and room.loot != '' and len(
+                    room.loot.pile) > 0:
                 text = []
                 text.append('В комнате есть:')
-                for i in newCastle.plan[self.currentPosition].loot.pile:
+                for i in room.loot.pile:
                     text.append(i.name)
                 tprint(text)
             elif item == '':
@@ -906,6 +911,8 @@ class Hero:
             if not whatIsInRoom.locked:
                 text = []
                 text.append(self.name + ' открывает ' + whatIsInRoom.name)
+                if newCastle.plan[self.currentPosition].loot == '':
+                    newCastle.plan[self.currentPosition].loot = []
                 newCastle.plan[self.currentPosition].loot.pile += whatIsInRoom.loot.pile
                 if len(whatIsInRoom.loot.pile) > 0:
                     text.append(self.name + ' роется в сундуке и обнаруживает в нем:')
@@ -1429,9 +1436,16 @@ class Room:
         self.ambush = ''
         self.runePlace = ''
         self.light = True
+        self.torchDice = dice(1, 5)
+        if not self.light or self.torchDice != 4:
+            self.torch = False
+        else:
+            self.torch = True
 
     def show(self, player):
         if self.light:
+            if self.torch:
+                self.decoration1 = 'освещенную факелом ' + self.decoration1
             if self.center == '':
                 whoIsHere = 'Не видно ничего интересного.'
             else:
@@ -1464,8 +1478,11 @@ class Room:
             string3 += ' '
         string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
         string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
-        pprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
-        return True
+        if self.light:
+            pprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
+            return True
+        else:
+            return False
 
     def lock(self, lockOrNot=2):
         a = [-newCastle.rooms, 1, newCastle.rooms, -1]
@@ -1528,6 +1545,8 @@ class Castle:
         self.howManyChests = len(self.plan) // 5 + 1
         self.allChests = self.createchests(50, 50)  # Создаем сундуки
         self.lights_off() #Выключаем свет в некоторых комнатах
+        self.plan[0].light = False
+        #self.plan[0].torch = True
 
     def lights_off(self):
         self.how_many_dark_rooms = len(self.plan) // 8
@@ -1794,7 +1813,6 @@ def welcome(message):
 def start_game(message):
     global gameIsOn
     gameIsOn = True
-    restart()
     newCastle.plan[player.currentPosition].show(player)
     newCastle.plan[player.currentPosition].map()
 

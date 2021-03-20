@@ -37,7 +37,12 @@ def showsides(side1, side2):
     return line
 
 
-def randomitem(list, neednumber=False, howMany = 1):
+# Возвращает случайные элементы списка
+# list - список, из которого нужно начитать случайный элемент
+# neednumber (boolean) - признак того, что кроме самого элемента нужно вернуть и его номер в списке
+# howMany (integer) - число случайных элементов списка, которые нужно вернуть
+# Если howMany > 1, возвращается список из howMany случайных элементов списка list. Элементы не повторяются.
+def randomitem(list, neednumber=False, howMany=1):
     if not howMany or int(howMany) < 2:
         a = dice(0, len(list) - 1)
         if not neednumber:
