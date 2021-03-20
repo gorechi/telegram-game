@@ -645,15 +645,17 @@ class Hero:
         if room.light:
             targetName = target.name
             targetName1 = target.name1
+            if self.rage > 1:
+                rage = dice(2, self.rage)
+            else:
+                rage = 1
+            meleAttack = dice(1, self.stren) * rage
         else:
             targetName = 'Неизвестная тварь из темноты'
             targetName1 = 'черт знает кого'
-        self.run = False
-        if self.rage > 1:
-            rage = dice(2, self.rage)
-        else:
             rage = 1
-        meleAttack = dice(1, self.stren) * rage
+            meleAttack = dice(1, self.stren) // dice (1, 3)
+        self.run = False
         canUse = []
         for i in self.pockets:
             if i.canUseInFight:
@@ -1214,7 +1216,11 @@ class Monster:
             return randomitem(self.weapon.actions)
 
     def mele(self):
-        return dice(1, self.stren)
+        room = newCastle.plan[self.currentPosition]
+        if room.light:
+            return dice(1, self.stren)
+        else:
+            return dice(1, self.stren) // dice(1, 3)
 
     def attack(self, target):
         room = newCastle.plan[self.currentPosition]
