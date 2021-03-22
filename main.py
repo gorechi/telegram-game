@@ -7,13 +7,11 @@ from telebot import types
 from functions import *
 from PIL import Image, ImageDraw, ImageFont
 
-
-
-# Константы
-TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8'
-IN_FIGHT = False
-LEVEL_UP = False
-ENCHANTING = False
+# Константы и настройки
+TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8' #Токен телеграм-бота
+IN_FIGHT = False # Константа, отвечающая за то, что сейчас бой
+LEVEL_UP = False # Константа, отвечающая за то, что сейчас происходит прокачка
+ENCHANTING = False # Константа, отвечающая за то, что сейчас происходит улучшение шмотки
 selectedItem = ''
 telegram_commands = ['обыскать',
                      '?',
@@ -23,25 +21,33 @@ telegram_commands = ['обыскать',
                      'взять',
                      'открыть',
                      'использовать',
-                     'улучшить']
+                     'улучшить'] # Команды для бота во время игры
 fight_commands = ['ударить',
                   '?',
                   'защититься',
                   'бежать',
-                  'использовать']
+                  'использовать'] # Команды для бота во время боя
 level_up_commands = ['здоровье',
                      'силу',
                      'ловкость',
-                     'интеллект']
-howMany = {'монстры': 10, 'оружие': 10, 'защита': 10, 'зелье': 8, 'руна': 15}
+                     'интеллект'] # Команды для бота во время прокачки
+howMany = {'монстры': 10,
+           'оружие': 10,
+           'щит': 5,
+           'доспех': 5,
+           'зелье': 8,
+           'руна': 15} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
 decor4 = readfile('decorate4', False)
+# Таблица слабостей
 weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12], 8: [3, 12], 10: [7, 12], 12: [1, 1],
             13: [1, 3], 14: [12, 24], 15: [1, 7], 19: [1, 12], 24: [1, 2]}
+# Таблица стихий
 elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
                      12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
+
 
 # Описываем классы
 
@@ -203,24 +209,10 @@ class Weapon:
             whoUsing.pockets.remove(self)
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
-
-class Shield:
+class Protection:
     def __init__(self, name, name1='защиту', protection=0, actions=''):
-        if name != 0:
-            self.name = name
-            self.name1 = name1
-            self.protection = int(protection)
-        else:
-            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
-                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
-                  ['Новый', 'Новая', 'Новый', 'Новую']]
-            n2 = [['щит', 0, 'щит'], ['броня', 1, 'броню'], ['кольчуга', 1, 'кольчугу'], ['защита', 1, 'защиту'],
-                  ['панцырь', 0, 'панцырь']]
-            a1 = dice(0, len(n1) - 1)
-            a2 = dice(0, len(n2) - 1)
-            self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
-            self.protection = dice(2, 5)
+        self.name = name
+        self.name1 = name1
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -306,6 +298,55 @@ class Shield:
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
+
+
+class Armor(Protection):
+    def __init__(self, name, name1='защиту', protection=0, actions=''):
+        #super().__init__()
+        if name != 0:
+            self.name = name
+            self.name1 = name1
+            self.protection = int(protection)
+        else:
+            n1 = [['Большой', 'Большая', 'Большой', 'Большую'],
+                  ['Малый', 'Малая', 'Малый', 'Малую'],
+                  ['Старый', 'Старая', 'Старый', 'Старую'],
+                  ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                  ['Новый', 'Новая', 'Новый', 'Новую']]
+            n2 = [['броня', 1, 'броню'],
+                  ['кольчуга', 1, 'кольчугу'],
+                  ['защита', 1, 'защиту'],
+                  ['панцырь', 0, 'панцырь']]
+            a1 = dice(0, len(n1) - 1)
+            a2 = dice(0, len(n2) - 1)
+            self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
+            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
+            self.protection = dice(2, 5)
+        self.actions = actions.split(',')
+        self.canUseInFight = True
+        self.runes = []
+
+class Shield (Protection):
+    def __init__(self, name, name1='щит', protection=0, actions=''):
+        #super().__init__()
+        if name != 0:
+            self.name = name
+            self.name1 = name1
+            self.protection = int(protection)
+        else:
+            n1 = ['Большой',
+                  'Малый',
+                  'Старый',
+                  'Тяжелый',
+                  'Новый']
+            a1 = dice(0, len(n1) - 1)
+            self.name = n1[a1] + ' щит'
+            self.name1 = self.name
+            self.protection = dice(2, 5)
+        self.actions = actions.split(',')
+        self.canUseInFight = True
+        self.runes = []
+
 
 class Matches(Item):
     def __init__(self):
@@ -538,6 +579,7 @@ class Hero:
         self.health = int(health)
         self.actions = actions.split(',')
         self.weapon = weapon
+        self.armor = None
         self.shield = shield
         self.pockets = pockets
         self.money = Money(0)
@@ -1556,6 +1598,7 @@ class Room:
         self.ambush = ''
         self.runePlace = ''
         self.light = True
+        self.furniture = []
         self.torchDice = dice(1, 5)
         if not self.light or self.torchDice != 4:
             self.torch = False
@@ -1669,7 +1712,6 @@ class Castle:
     def lights_off(self):
         self.how_many_dark_rooms = len(self.plan) // 8
         darkRooms = randomitem(self.plan, False, self.how_many_dark_rooms)
-        print ("darkRooms: ", darkRooms )
         for room in darkRooms:
             room.light = False
 
@@ -1777,7 +1819,9 @@ class Castle:
 classes = {'монстр': Monster,
            'герой': Hero,
            'оружие': Weapon,
-           'защита': Shield,
+           'защита': Protection,
+           'щит': Shield,
+           'доспех': Armor,
            'притворщик': Shapeshifter,
            'сундук': Chest,
            'вампир': Vampire,
@@ -1797,12 +1841,14 @@ classes = {'монстр': Monster,
 allMonsters = readmonsters(classes)  # Читаем монстров из файла
 allSpells = readspells(classes) #Читаем из файла заклинания
 allWeapon = readitems('оружие', howMany, classes)
-allShields = readitems('защита', howMany, classes)
+allShields = readitems('щит', howMany, classes)
+allArmor = readitems('доспех', howMany, classes)
 allPotions = readitems('зелье', howMany, classes)
 newCastle = Castle(5, 5)  # Генерируем замок
 newCastle.inhabit(allMonsters, howMany['монстры'], True)  # Населяем замок монстрами
 newCastle.inhabit(allWeapon, howMany['оружие'], False)
-newCastle.inhabit(allShields, howMany['защита'], False)
+newCastle.inhabit(allShields, howMany['щит'], False)
+newCastle.inhabit(allArmor, howMany['доспех'], False)
 allRunes = [Rune() for i in range(howMany['руна'])]
 newCastle.inhabit(allRunes, howMany['руна'], False)
 newCastle.inhabit(allPotions, howMany['зелье'], False)
