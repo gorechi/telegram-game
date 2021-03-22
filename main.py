@@ -48,7 +48,6 @@ weakness = {1: [3, 3], 2: [3, 6], 3: [7, 7], 4: [3, 7], 6: [7, 14], 7: [12, 12],
 elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4: 'дыма', 6: 'ветра', 7: 'земли', 8: 'лавы', 10: 'пыли',
                      12: 'воды', 13: 'пара', 14: 'камня', 15: 'дождя', 19: 'грязи', 24: 'потопа'}
 
-
 # Описываем классы
 
 class Item:
@@ -299,7 +298,7 @@ class Protection:
             whoUsing.pockets.remove(self)
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
-
+#Класс Доспех (подкласс Защиты)
 class Armor(Protection):
     def __init__(self, name, name1='защиту', protection=0, actions=''):
         #super().__init__()
@@ -326,6 +325,17 @@ class Armor(Protection):
         self.canUseInFight = True
         self.runes = []
 
+# Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
+    def take(self, who):
+        oldArmor = who.armor
+        message = [who.name + ' использует ' + self.name1 + ' как защиту.']
+        if oldArmor != '':
+            message.append('При этом он снимает ' + oldArmor.name1 + ' и оставляет валяться на полу.')
+            who.drop(oldArmor)
+        who.armor = self
+        tprint(message)
+
+#Класс Щит (подкласс Защиты)
 class Shield (Protection):
     def __init__(self, name, name1='щит', protection=0, actions=''):
         #super().__init__()
@@ -347,6 +357,15 @@ class Shield (Protection):
         self.canUseInFight = True
         self.runes = []
 
+# Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
+    def take(self, who):
+        oldShield = who.shield
+        message = [who.name + ' берет ' + self.name1 + ' в руку.']
+        if oldShield != '':
+            message.append('При этом он бросает старый ' + oldShield.name1 + ' и оставляет валяться на полу.')
+            who.drop(oldShield)
+        who.shield = self
+        tprint(message)
 
 class Matches(Item):
     def __init__(self):
@@ -355,6 +374,7 @@ class Matches(Item):
         self.name1 = 'спички'
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
+        self.place()
 
     def place(self, room = None):
         if not room or not isinstance(room, Room):
@@ -987,6 +1007,13 @@ class Hero:
             elif item == '':
                 tprint('В комнате нет ничего интересного.')
 
+    def can_take(self, object):
+        classes = [Weapon, Shield, Armor]
+        for i in classes:
+            if isinstance(object, i):
+                return False
+        return True
+
     def take(self, item='все'):
         currentLoot = newCastle.plan[self.currentPosition].loot
         if currentLoot == '':
@@ -994,8 +1021,10 @@ class Hero:
             return False
         elif item == 'все' or item == 'всё' or item == '':
             for i in currentLoot.pile:
-                i.take(self)
-            newCastle.plan[self.currentPosition].loot = ''
+                if self.can_take(i):
+                    i.take(self)
+                    currentLoot.pile.remove(i)
+            #newCastle.plan[self.currentPosition].loot = ''
             return True
         else:
             for i in currentLoot.pile:
@@ -1005,6 +1034,18 @@ class Hero:
                     return True
         tprint('Такой вещи здесь нет.')
         return False
+
+    def drop(self, object):
+        currentLoot = newCastle.plan[self.currentPosition].loot
+        currentLoot.pile.append(object)
+        if self.armor == object:
+            self.armor = ''
+        if self.shield == object:
+            self.shield = ''
+        if self.weapon == object:
+            self.weapon = ''
+        if object in self.pockets:
+            self.pockets.remove(object)
 
     def open(self, item=''):
         room = newCastle.plan[self.currentPosition]
@@ -1455,7 +1496,7 @@ class Berserk(Monster):
         self.base_health = health
 
     def mele(self):
-        self.rage = (self.base_health - self.health) // 3
+        self.rage = (int(self.base_health) - int(self.health)) // 3
         return dice(1, (self.stren + self.rage))
 
 
@@ -1507,6 +1548,7 @@ class Vampire(Monster):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
     def attack(self, target):
+        global IN_FIGHT
         room = newCastle.plan[self.currentPosition]
         if room.light:
             selfName = self.name
@@ -1859,8 +1901,12 @@ player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бь�
 newKey = Key() # Создаем ключ
 player.pockets.append(newKey) # Отдаем ключ игроку
 matches = Matches()
-matches.place()
 gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
+shield1 = Shield('Простой щит')
+shield2 = Shield('Непростой щит')
+newCastle.plan[0].loot.pile.append(shield1)
+newCastle.plan[0].loot.pile.append(shield2)
+
 
 #Функция рестарта игры
 def restart():
@@ -1883,6 +1929,10 @@ def restart():
                   'бьет,калечит,терзает,протыкает')  # Создаем персонажа
     newKey = Key()  # Создаем ключ
     player.pockets.append(newKey)  # Отдаем ключ игроку
+    shield1 = Shield()
+    shield2 = Shield()
+    newCastle.plan[0].loot.append(shield1)
+    newCastle.plan[0].loot.append(shield2)
 
 # Основная программа
 
