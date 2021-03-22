@@ -320,7 +320,7 @@ class Armor(Protection):
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
             self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
-            self.protection = dice(2, 5)
+            self.protection = dice(1, 3)
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -352,7 +352,7 @@ class Shield (Protection):
             a1 = dice(0, len(n1) - 1)
             self.name = n1[a1] + ' щит'
             self.name1 = self.name
-            self.protection = dice(2, 5)
+            self.protection = dice(1, 3)
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -826,10 +826,12 @@ class Hero:
                 self.level))
 
     def defence(self, attacker):
-        if self.shield == '':
-            return 0
-        else:
-            return self.shield.protect(attacker)
+        result = 0
+        if self.shield != '':
+            result += self.shield.protect(attacker)
+        if self.armor != '':
+            result += self.armor.protect(attacker)
+        return result
 
     def lose(self, winner):
         self.health = self.startHealth
