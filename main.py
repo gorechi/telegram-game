@@ -1895,7 +1895,10 @@ classes = {'монстр': Monster,
            'руна': Rune,
            'заклинание': Spell,
            }
-
+# Функция чтения данных из JSON. Принимает на вход имя файла.
+# Читает данные из файла, создает объекты класса, указанного в JSON в параметре class.
+# Наполняет созданный объект значениями параметров из JSON. для каждого объекта выполняется его функция on_create().
+# Отдает список полученных объектов
 def readobjects(file):
     with open(file, encoding='utf-8') as read_data:
         parsed_data = json.load(read_data)
@@ -1948,32 +1951,6 @@ newCastle.plan[0].loot.pile.append(sword2)
 newCastle.plan[0].loot.pile.append(sword3)
 key = Key()
 newCastle.plan[0].loot.pile.append(key)
-
-#Функция рестарта игры
-def restart():
-    global newCastle
-    global map
-    global player
-    global newKey
-    newCastle = None
-    player = None
-    newCastle = Castle(5, 5)  # Генерируем замок
-    newCastle.inhabit(allMonsters, howMany['монстры'], True)  # Населяем замок монстрами
-    newCastle.inhabit(allWeapon, howMany['оружие'], False)
-    newCastle.inhabit(allShields, howMany['защита'], False)
-    newCastle.inhabit(allRunes, howMany['руна'], False)
-    newCastle.inhabit(allPotions, howMany['зелье'], False)
-    newCastle.lockDoors()  # Создаем запертые комнаты
-    map = Map()  # Прячем карту
-    newCastle.plan[0].visited = '+'  # Делаем первую комнату посещенной
-    player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '',
-                  'бьет,калечит,терзает,протыкает')  # Создаем персонажа
-    newKey = Key()  # Создаем ключ
-    player.pockets.append(newKey)  # Отдаем ключ игроку
-    shield1 = Shield()
-    shield2 = Shield()
-    newCastle.plan[0].loot.append(shield1)
-    newCastle.plan[0].loot.append(shield2)
 
 # Основная программа
 

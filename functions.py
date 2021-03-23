@@ -78,18 +78,6 @@ def howmany(a, string):
     else:
         return str(a) + ' ' + b[2]
 
-def readmonsters(classes):
-    monsterslist = readfile('monsters', True, '\\')
-    for i in range(len(monsterslist)):
-        monsterslist[i] = classes[monsterslist[i][0]](monsterslist[i][1],
-                                                      monsterslist[i][2],
-                                                      monsterslist[i][3],
-                                                      monsterslist[i][4],
-                                                      monsterslist[i][5],
-                                                      monsterslist[i][6],
-                                                      monsterslist[i][7],
-                                                      monsterslist[i][8])
-    return monsterslist
 
 def readspells(classes):
     spellslist = readfile('spells', True, '\\')
