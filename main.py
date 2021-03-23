@@ -26,6 +26,8 @@ fight_commands = ['ударить',
                   '?',
                   'защититься',
                   'бежать',
+                  'сменить оружие',
+                  'сменить',
                   'использовать'] # Команды для бота во время боя
 level_up_commands = ['здоровье',
                      'силу',
@@ -117,21 +119,21 @@ class Spell:
         return self.name
 
 class Weapon:
-    def __init__(self, name, name1='оружие', damage=0, actions='бьет,ударяет'):
+    def __init__(self, name, name1='оружие', damage=1, actions='бьет,ударяет'):
         if name != 0:
             self.name = name
             self.damage = int(damage)
             self.name1 = name1
         else:
-            n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
+            self.n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
                   ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
                   ['Новый', 'Новая', 'Новый', 'Новую']]
-            n2 = [['меч', 0, 'меч'], ['сабля', 1, 'саблю'], ['катана', 1, 'катану'], ['топор', 0, 'топор'],
+            self.n2 = [['меч', 0, 'меч'], ['сабля', 1, 'саблю'], ['катана', 1, 'катану'], ['топор', 0, 'топор'],
                   ['кинжал', 0, 'кинжал'], ['дубина', 1, 'дубину'], ['шпага', 1, 'шпагу']]
-            a1 = dice(0, len(n1) - 1)
-            a2 = dice(0, len(n2) - 1)
-            self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
+            self.a1 = dice(0, len(self.n1) - 1)
+            self.a2 = dice(0, len(self.n2) - 1)
+            self.name = self.n1[self.a1][self.n2[self.a2][1]] + ' ' + self.n2[self.a2][0]
+            self.name1 = self.n1[self.a1][self.n2[self.a2][1]+2] + ' ' + self.n2[self.a2][2]
             self.damage = dice(3, 12)
         self.actions = actions.split(',')
         self.canUseInFight = True
@@ -186,12 +188,21 @@ class Weapon:
         return dice(1, int(self.damage)) + self.permdamage()
 
     def take(self, who):
-        if who.weapon == '':
+        message = [who.name + ' берет ' + self.name1 + '.']
+        weapon = who.weapon
+        second_weapon = who.second_weapon()
+        if weapon == '':
             who.weapon = self
-            tprint(who.name + ' берет ' + self.name1 + ' в руку.')
+            message.append(who.name + ' теперь использует ' + self.name1 + ' в качестве оружия.')
         else:
-            who.pockets.append(self)
-            tprint(who.name + ' забирает ' + self.name1 + ' себе.')
+            if second_weapon:
+                message.append('В рюкзаке для нового оружия нет места, поэтому приходится бросить ' + weapon.name + '.')
+                who.drop(weapon)
+                who.weapon = self
+            else:
+                message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
+                who.pockets.append(self)
+        tprint(message)
 
     def show(self):
         damageString = str(self.damage)
@@ -209,7 +220,7 @@ class Weapon:
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
 class Protection:
-    def __init__(self, name, name1='защиту', protection=0, actions=''):
+    def __init__(self, name, name1='защиту', protection=1, actions=''):
         self.name = name
         self.name1 = name1
         self.actions = actions.split(',')
@@ -273,7 +284,10 @@ class Protection:
             who.hide = False
             return self.protection + self.permprotection()
         else:
-            return ceil((dice(1, self.protection) + self.permprotection())*multiplier)
+            if self.protection > 0:
+                return ceil((dice(1, self.protection) + self.permprotection())*multiplier)
+            else:
+                return 0
 
     def take(self, who):
         if who.shield == '':
@@ -300,7 +314,7 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, name, name1='защиту', protection=0, actions=''):
+    def __init__(self, name, name1='доспех', protection=1, actions=''):
         #super().__init__()
         if name != 0:
             self.name = name
@@ -337,7 +351,7 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, name, name1='щит', protection=0, actions=''):
+    def __init__(self, name, name1='щит', protection=1, actions=''):
         #super().__init__()
         if name != 0:
             self.name = name
@@ -599,7 +613,7 @@ class Hero:
         self.health = int(health)
         self.actions = actions.split(',')
         self.weapon = weapon
-        self.armor = None
+        self.armor = ''
         self.shield = shield
         self.pockets = pockets
         self.money = Money(0)
@@ -657,6 +671,12 @@ class Hero:
             return randomitem(self.actions)
         else:
             return randomitem(self.weapon.actions)
+
+    def second_weapon(self):
+        for i in self.pockets:
+            if isinstance(i, Weapon):
+                return i
+        return False
 
     def run_away(self, target):
         global IN_FIGHT
@@ -790,21 +810,18 @@ class Hero:
                     if itemUsed:
                         break
                     tprint('Что-то не выходит')
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
-        item1 = types.KeyboardButton('ударить')
-        item2 = types.KeyboardButton('')
-        item3 = types.KeyboardButton('')
-        line = self.name + ' может (у)дарить'
-        if self.shield != '':
-            line += ', (з)ащититься'
-            item2 = types.KeyboardButton('защититься')
-        if len(canUse) > 0:
-            line += ', (и)спользовать'
-            item3 = types.KeyboardButton('использовать')
-        line += ' или (б)ежать ---->'
-        item4 = types.KeyboardButton('бежать')
-        markup.add(item1, item2, item3, item4)
-        tprint(line)
+        elif (action == 'с' or action == 'сменить оружие' or action == 'сменить'):
+            weapon = self.weapon
+            spareWeapon = False
+            for item in self.pockets:
+                if isinstance(item, Weapon):
+                    spareWeapon = item
+            self.weapon = spareWeapon
+            self.pockets.remove(spareWeapon)
+            self.pockets.append(weapon)
+            message = [self.name + ' меняет ' + weapon.name1 + ' на ' + spareWeapon.name1 + '.']
+            tprint(message)
+        return True
 
     def show(self):
         if self.weapon != '':
@@ -1151,7 +1168,7 @@ class Hero:
                 return False
         else:
             for i in self.pockets:
-                if i.name == item or i.name1 == item:
+                if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
                     if isinstance(i, Potion)  and i.use(self, inaction = False):
                         self.pockets.remove(i)
                     else:
@@ -1905,10 +1922,21 @@ player.pockets.append(newKey) # Отдаем ключ игроку
 matches = Matches()
 gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 shield1 = Shield('Простой щит')
+print (shield1.name, shield1.protection, shield1.permprotection())
 shield2 = Shield('Непростой щит')
 newCastle.plan[0].loot.pile.append(shield1)
 newCastle.plan[0].loot.pile.append(shield2)
-
+sword1 = Weapon(0)
+print (sword1.name, sword1.name1)
+sword2 = Weapon(0)
+print (sword2.name, sword2.name1)
+sword3 = Weapon(0)
+print (sword3.name, sword3.name1)
+newCastle.plan[0].loot.pile.append(sword1)
+newCastle.plan[0].loot.pile.append(sword2)
+newCastle.plan[0].loot.pile.append(sword3)
+key = Key()
+newCastle.plan[0].loot.pile.append(key)
 
 #Функция рестарта игры
 def restart():
@@ -1958,12 +1986,19 @@ def tprint (text, state=''):
         item1 = types.KeyboardButton('ударить')
         item2 = types.KeyboardButton('')
         item3 = types.KeyboardButton('')
+        item5 = types.KeyboardButton('')
         if player.shield != '':
             item2 = types.KeyboardButton('защититься')
         if len(canUse) > 0:
             item3 = types.KeyboardButton('использовать')
         item4 = types.KeyboardButton('бежать')
-        markup.add(item1, item2, item3, item4)
+        haveSpareWeapon = False
+        for item in player.pockets:
+            if isinstance(item, Weapon):
+                haveSpareWeapon = True
+        if player.weapon != '' and haveSpareWeapon:
+            item5 = types.KeyboardButton('сменить оружие')
+        markup.add(item1, item2, item3, item4, item5)
     elif state == 'direction':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
         item1 = types.KeyboardButton('идти вверх')
