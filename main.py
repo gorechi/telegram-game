@@ -1244,8 +1244,8 @@ class Hero:
 
 
 class Monster:
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=False,
-                 carryweapon=True, carryshield=True):
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
+                 carryweapon=True, carryshield=True, wearArmor=True):
         self.name = name
         self.name1 = name1
         self.stren = int(stren)
@@ -1254,6 +1254,7 @@ class Monster:
         self.state = state
         self.weapon = ''
         self.shield = ''
+        self.armor = ''
         self.money = 5
         self.currentPosition = 0
         self.startHealth = self.health
@@ -1262,65 +1263,62 @@ class Monster:
         self.run = False
         self.wounded = False
         self.keyHole = 'видит какую-то неясную фигуру.'
-        if carryweapon == 'True':
-            self.carryweapon = True
-        else:
+        if carryweapon == 'False':
             self.carryweapon = False
-        if carryshield == 'True':
-            self.carryshield = True
         else:
+            self.carryweapon = True
+        if wearArmor == 'False':
+            self.wearArmor = False
+        else:
+            self.wearArmor = True
+        if carryshield == 'False':
             self.carryshield = False
+        else:
+            self.carryshield = True
         if agressive == 'True':
             self.agressive = True
         else:
             self.agressive = False
         self.exp = self.stren * dice(1, 10) + dice(1, self.health)
 
+    def on_create(self):
+        return True
+
     def __str__(self):
         return self.name
 
     def give(self, item):
-        if isinstance(item, Weapon) and self.weapon == '':
+        if isinstance(item, Weapon) and self.weapon == '' and self.carryweapon:
             self.weapon = item
-        elif isinstance(item, Shield) and self.shield == '':
+        elif isinstance(item, Shield) and self.shield == '' and self.carryshield:
             self.shield = item
+        elif isinstance(item, Armor) and self.armor == '' and self.wearArmor:
+            self.armor = item
         elif isinstance(item, Rune):
             if item.damage >= item.defence:
                 if self.weapon != '':
                     if self.weapon.enchant(item):
                         return True
-                    elif self.shield != '':
-                        if not self.shield.enchant(item):
-                            self.loot.add(item)
-                            return True
-                    else:
-                        self.loot.add(item)
+                if self.armor != '':
+                    if self.armor.enchant(item):
                         return True
-                elif self.shield != '':
-                    if not self.shield.enchant(item):
-                        self.loot.add(item)
+                if self.shield != '':
+                    if self.shield.enchant(item):
                         return True
-                else:
-                    self.loot.add(item)
-                    return True
+                self.loot.add(item)
+                return True
             else:
                 if self.shield != '':
                     if self.shield.enchant(item):
                         return True
-                    elif self.weapon != '':
-                        if not self.weapon.enchant(item):
-                            self.loot.add(item)
-                            return True
-                    else:
-                        self.loot.add(item)
+                if self.armor != '':
+                    if self.armor.enchant(item):
                         return True
-                elif self.weapon != '':
+                if self.weapon != '':
                     if not self.weapon.enchant(item):
-                        self.loot.add(item)
                         return True
-                else:
-                    self.loot.add(item)
-                    return True
+                self.loot.add(item)
+                return True
         else:
             self.loot.add(item)
 
@@ -1453,11 +1451,12 @@ class Monster:
         self.health = self.startHealth
 
 class Plant(Monster):
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='растёт', agressive=False,
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='растёт', agressive=False,
                  carryweapon=False, carryshield=False):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.carryshield = False
         self.carryweapon = False
+        self.wearArmor = False
         self.agressive = False
 
     def grow(self):
@@ -1501,12 +1500,12 @@ class Plant(Monster):
         where.center = ''
 
 class Walker(Monster):
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
 class Berserk(Monster):
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.agressive = True
@@ -1521,7 +1520,7 @@ class Berserk(Monster):
 
 
 class Shapeshifter(Monster):
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=False, carryshield=True):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.shifted = False
@@ -1562,7 +1561,7 @@ class Shapeshifter(Monster):
 
 
 class Vampire(Monster):
-    def __init__(self, name, name1, stren=10, health=20, actions='бьет', state='стоит', agressive=False,
+    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
                  carryweapon=True, carryshield=True):
         super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
@@ -1897,9 +1896,21 @@ classes = {'монстр': Monster,
            'заклинание': Spell,
            }
 
+def readobjects(file):
+    with open(file, encoding='utf-8') as read_data:
+        parsed_data = json.load(read_data)
+    objects = []
+    for i in parsed_data:
+        object = classes[i['class']]()
+        for param in i:
+            vars(object)[param] = i[param]
+        object.on_create()
+        objects.append(object)
+    return objects
+
 # Подготовка
 
-allMonsters = readmonsters(classes)  # Читаем монстров из файла
+allMonsters = readobjects('monsters.json')  # Читаем монстров из файла
 allSpells = readspells(classes) #Читаем из файла заклинания
 allWeapon = readitems('оружие', howMany, classes)
 allShields = readitems('щит', howMany, classes)

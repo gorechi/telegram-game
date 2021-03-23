@@ -1,0 +1,182 @@
+[
+  {
+    "class": "монстр",
+    "name": "Гоблин",
+    "name1": "Гоблина",
+    "stren": 9,
+    "health": 18,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "шарахает"
+      ],
+    "state": "стоит",
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Тролль",
+    "name1": "Тролля",
+    "stren": 12,
+    "health": 25,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "шарахает"
+      ],
+    "state": "тяжело дышит",
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Оборотень",
+    "name1": "Оборотня",
+    "stren": 10,
+    "health": 29,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "шарахает"
+      ],
+    "state": "прячется",
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Сундук-людоед",
+    "name1": "Сундук-людоед",
+    "stren": 10,
+    "health": 15,
+    "actions":
+      [
+      "клацает",
+      "щелкает",
+      "зажевывает"
+      ],
+    "state": "стоит",
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "притворщик",
+    "name": "Перевёртыш",
+    "name1": "Перевёртыша",
+    "stren": 10,
+    "health": 18,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "шарахает"
+      ],
+    "state": "прячется",
+    "agressive": true,
+    "carryweapon": false,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Зомби",
+    "name1": "Зомби",
+    "stren": 8,
+    "health": 30,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "шарахает"
+      ],
+    "state": "рычит",
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": false,
+    "wearArmor": true
+  },
+  {
+    "class": "растение",
+    "name": "Мухоловка",
+    "name1": "Мухоловку",
+    "stren": 7,
+    "health": 28,
+    "actions":
+      [
+      "атакует",
+      "кусает",
+      "жалит"
+      ],
+    "state": "растет",
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": false,
+    "wearArmor": false
+  },
+  {
+    "class": "растение",
+    "name": "Лиана",
+    "name1": "Лиану",
+    "stren": 10,
+    "health": 35,
+    "actions":
+      [
+      "атакует",
+      "обвивает",
+      "жалит"
+      ],
+    "state": "растет",
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": false,
+    "wearArmor": false
+  },
+  {
+    "class": "вампир",
+    "name": "Дракула",
+    "name1": "Дракулу",
+    "stren": 8,
+    "health": 30,
+    "actions":
+      [
+      "царапает",
+      "кусает",
+      "рвет"
+      ],
+    "state": "парит",
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "берсерк",
+    "name": "Берсерк",
+    "name1": "Берсерка",
+    "stren": 10,
+    "health": 25,
+    "actions":
+      [
+      "сокрушает",
+      "бьет",
+      "рвет"
+      ],
+    "state": "ревет",
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": false,
+    "wearArmor": true
+  }
+]

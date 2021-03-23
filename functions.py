@@ -7,6 +7,7 @@ from time import sleep as pause
 from math import ceil
 from math import sqrt
 from math import floor
+import json
 
 # Функции
 
@@ -115,3 +116,4 @@ def readitems(whatkind, howMany, classes):
         new = classes[whatkind](0)
         itemsList.append(new)
     return itemsList
+
