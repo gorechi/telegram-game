@@ -37,7 +37,7 @@ howMany = {'монстры': 10,
            'оружие': 10,
            'щит': 5,
            'доспех': 5,
-           'зелье': 8,
+           'зелье': 10,
            'сундук':5,
            'руна': 10} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
@@ -591,44 +591,88 @@ class Key(Item):
 
 
 class Potion(Item):
-    def __init__(self, name, effect=0, type=0, canUseInFight=True, ):
-        super().__init__()
+    def __init__(self, name='', effect=0, type=0, canUseInFight=True):
         self.name = name
-        self.name1 = self.name
-        self.effect = int(effect)
-        self.type = int(type)
-        self.canUseInFight = canUseInFight
-        descriptions = ['Лечебное зелье восстанавливает некоторое количество единиц здоровья.',
-                        'Зелье здоровья увеличивает максимальный запас здоровья персонажа.',
-                        'Зелье силы увеличивает максимальное значение силы персонажа.',
-                        'Зелье усиления временно добавляет персонажу силы.',
-                        'Зелье ловкости увеличивает максимальное значение ловкости персонажа.',
-                        'Зелье увертливости временно добавляет персонажу ловкости.',
-                        'Зелье ума увеличивает максимальное значение силы интеллекта.',
-                        'Зелье просветления временно добавляет персонажу интеллекта.']
-        self.description = descriptions[self.type]
+        potions = [['Зелье исцеления', 10, 0, True,
+                    'Лечебное зелье восстанавливает некоторое количество единиц здоровья.'],
+                   ['Зелье здоровья', 1, 1, False,
+                    'Зелье здоровья увеличивает максимальный запас здоровья персонажа.'],
+                   ['Зелье силы', 1, 2, False,
+                    'Зелье силы увеличивает максимальное значение силы персонажа.'],
+                   ['Зелье усиления', 5, 3, True,
+                    'Зелье усиления временно добавляет персонажу силы.'],
+                   ['Зелье ловкости', 1, 4, False,
+                    'Зелье ловкости увеличивает максимальное значение ловкости персонажа.'],
+                   ['Зелье увертливости', 5, 5, True,
+                    'Зелье увертливости временно добавляет персонажу ловкости.'],
+                   ['Зелье ума', 1, 6, False,
+                    'Зелье ума увеличивает максимальное значение силы интеллекта.'],
+                   ['Зелье просветления', 5, 7, True,
+                    'Зелье просветления временно добавляет персонажу интеллекта.']]
+        if self.name != 0:
+            self.name = name
+            self.name1 = self.name
+            self.effect = int(effect)
+            self.type = int(type)
+            self.canUseInFight = canUseInFight
+            self.description = potions[self.type][4]
+        elif self.name == 0:
+            n = dice (0, 5)
+            self.name = potions[n][0]
+            self.name1 = self.name
+            self.effect = potions[n][1]
+            self.type = potions[n][2]
+            self.canUseInFight = potions[n][3]
+            self.description = potions[n][4]
+
+    def on_create(self):
+        return True
+
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+        print ('room center = ', room.center)
+        if room.center != '':
+            if isinstance(room.center, Chest):
+                room.center.put(self)
+                print ('Положено в сундук')
+            else:
+                room.loot.add(self)
+                print('Брошено в комнату')
+        else:
+            room.loot.add(self)
+            print('Брошено в комнату')
+        print('-'*20)
 
     def use(self, whoUsing, inaction = False):
         if not inaction:
             if self.type == 1:
                 whoUsing.startHealth += self.effect
                 whoUsing.health += self.effect
-                tprint (whoUsing.name + ' увеличивает свое максмальное здоровье на ' + str(self.effect) + ' до ' + str(whoUsing.health) + '.')
+                tprint (whoUsing.name + ' увеличивает свое максмальное здоровье на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.health) + '.')
                 return True
             elif self.type == 2:
                 whoUsing.stren += self.effect
                 whoUsing.startStren += self.effect
-                tprint (whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
+                tprint (whoUsing.name + ' увеличивает свою силу на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 4:
                 whoUsing.dext += self.effect
                 whoUsing.startDext += self.effect
-                tprint (whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
+                tprint (whoUsing.name + ' увеличивает свою ловкость на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 6:
                 whoUsing.intel += self.effect
                 whoUsing.startIntel += self.effect
-                tprint (whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
+                tprint (whoUsing.name + ' увеличивает свой интеллект на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
                 tprint('Это зелье можно использовать только в бою!')
@@ -644,15 +688,18 @@ class Potion(Item):
                 return True
             elif self.type == 3:
                 whoUsing.stren += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою силу на ' + str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою силу на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 5:
                 whoUsing.dext += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' + str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 7:
                 whoUsing.intel += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' + str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
+                tprint ('На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' +
+                        str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
                 tprint('Это зелье нельзя использовать в бою!')
@@ -2084,9 +2131,11 @@ for shield in allShields:
 allArmor = readobjects('armor.json', howMany['доспех'], Armor)
 for armor in allArmor:
     armor.place(newCastle)
+allPotions = readobjects('potions.json', howMany['зелье'], Potion)
+for potion in allPotions:
+    potion.place(newCastle)
 
 allSpells = readspells(classes) #Читаем из файла заклинания
-allPotions = readitems('зелье', howMany, classes)
 newCastle.inhabit(allShields, howMany['щит'], False)
 newCastle.inhabit(allArmor, howMany['доспех'], False)
 allRunes = [Rune() for i in range(howMany['руна'])]
