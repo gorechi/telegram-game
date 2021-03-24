@@ -109,7 +109,6 @@ class Rune:
         print('Брошено в комнату')
         print('-'*20)
 
-
     def element(self):
         return int(self.element)
 
@@ -568,7 +567,6 @@ class Matches(Item):
             if room.center.agressive:
                 self.fight(room.center, True)
 
-
 class Map(Item):
     def __init__(self):
         super().__init__()
@@ -597,7 +595,6 @@ class Map(Item):
             tprint('Во время боя это совершенно неуместно!')
             return False
 
-
 class Key(Item):
     def __init__(self):
         super().__init__()
@@ -608,6 +605,31 @@ class Key(Item):
     def __str__(self):
         return self.description
 
+    def on_create(self):
+        return True
+
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+            print ('Комната заперта: ', room.locked)
+            while room.locked:
+                room = randomitem(rooms, False)
+                print('Комната заперта: ', room.locked)
+        print ('room center = ', room.center)
+        if room.center != '':
+            if isinstance(room.center, Chest):
+                if not room.center.locked:
+                    room.center.put(self)
+                    print ('Положено в сундук')
+                    print('-' * 20)
+                    return True
+        room.loot.add(self)
+        print('Брошено в комнату')
+        print('-'*20)
 
 class Potion(Item):
     def __init__(self, name='', effect=0, type=0, canUseInFight=True):
@@ -783,7 +805,7 @@ class Chest:
         if dice(1, 4) == 1:
             self.locked = True
             veryNewKey = Key()
-            castle.hide(veryNewKey)
+            veryNewKey.place(castle)
             print ('Заперт')
         if dice(1, 100) <= 50:
             self.inside = []
@@ -2013,17 +2035,6 @@ class Castle:
         for room in darkRooms:
             room.light = False
 
-    def hide(self, item):
-        while True:
-            b = randomitem(self.plan)
-            if not b.locked:
-                if b.center == '':
-                    b.loot.pile.append(item)
-                else:
-                    b.center.loot.pile.append(item)
-                break
-        return True
-
     def lockDoors(self):
         howManyLockedRooms = len(self.plan) // 8
         for i in range(howManyLockedRooms):
@@ -2037,7 +2048,7 @@ class Castle:
                     else:
                         a.center.loot.pile.append(newMoney)
                     newKey = Key()
-                    self.hide(newKey)
+                    newKey.place(self)
                     break
         return True
 
