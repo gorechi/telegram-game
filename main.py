@@ -38,7 +38,8 @@ howMany = {'монстры': 10,
            'щит': 5,
            'доспех': 5,
            'зелье': 8,
-           'руна': 15} # Количество всяких штук, которые разбрасываются по замку
+           'сундук':5,
+           'руна': 10} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -119,25 +120,41 @@ class Spell:
         return self.name
 
 class Weapon:
-    def __init__(self, name, name1='оружие', damage=1, actions='бьет,ударяет'):
+    def __init__(self, name='', name1='оружие', damage=1, actions='бьет,ударяет'):
         if name != 0:
             self.name = name
             self.damage = int(damage)
             self.name1 = name1
         else:
-            self.n1 = [['Большой', 'Большая', 'Большой', 'Большую'], ['Малый', 'Малая', 'Малый', 'Малую'],
-                  ['Старый', 'Старая', 'Старый', 'Старую'], ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
-                  ['Новый', 'Новая', 'Новый', 'Новую']]
-            self.n2 = [['меч', 0, 'меч'], ['сабля', 1, 'саблю'], ['катана', 1, 'катану'], ['топор', 0, 'топор'],
-                  ['кинжал', 0, 'кинжал'], ['дубина', 1, 'дубину'], ['шпага', 1, 'шпагу']]
+            self.n1 = [['Большой', 'Большая', 'Большой', 'Большую'],
+                       ['Малый', 'Малая', 'Малый', 'Малую'],
+                       ['Старый', 'Старая', 'Старый', 'Старую'],
+                       ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
+                       ['Новый', 'Новая', 'Новый', 'Новую']]
+            self.n2 = [['меч', 0, 'меч', 'рубящее'],
+                       ['сабля', 1, 'саблю', 'рубящее'],
+                       ['катана', 1, 'катану', 'рубящее'],
+                       ['рапира', 1, 'рапиру', 'колющее'],
+                       ['пика', 1, 'пику', 'колющее'],
+                       ['топор', 0, 'топор', 'рубящее'],
+                       ['кинжал', 0, 'кинжал', 'колющее'],
+                       ['дубина', 1, 'дубину', 'ударное'],
+                       ['палица', 1, 'палицу', 'ударное'],
+                       ['булава', 1, 'булаву', 'ударное'],
+                       ['молот', 0, 'молот', 'ударное'],
+                       ['шпага', 1, 'шпагу', 'колющее']]
             self.a1 = dice(0, len(self.n1) - 1)
             self.a2 = dice(0, len(self.n2) - 1)
             self.name = self.n1[self.a1][self.n2[self.a2][1]] + ' ' + self.n2[self.a2][0]
             self.name1 = self.n1[self.a1][self.n2[self.a2][1]+2] + ' ' + self.n2[self.a2][2]
             self.damage = dice(3, 12)
+            self.type = self.n2[self.a2][3]
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+
+    def on_create(self):
+        return True
 
     def __str__(self):
         damageString = str(self.damage)
@@ -219,8 +236,42 @@ class Weapon:
             whoUsing.pockets.remove(self)
         tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+        print ('room center = ', room.center)
+        if room.center != '':
+            if isinstance(room.center, Monster):
+                monster = room.center
+                if monster.carryweapon:
+                    monster.give(self)
+                    print ('Отдан ', monster.name)
+                else:
+                    room.loot.add(self)
+                    print('Брошен в комнату')
+            elif isinstance(room.center, Chest):
+                room.center.put(self)
+                print ('Положен в сундук')
+        elif room.ambush != '':
+            print ('room ambush = ', room.ambush)
+            monster = room.ambush
+            if monster.carryweapon:
+                monster.give(self)
+                print('Отдан ', monster.name)
+            else:
+                room.loot.add(self)
+                print('Брошен в комнату')
+        else:
+            room.loot.add(self)
+            print('Брошен в комнату')
+        print('-'*20)
+
 class Protection:
-    def __init__(self, name, name1='защиту', protection=1, actions=''):
+    def __init__(self, name='', name1='защиту', protection=1, actions=''):
         self.name = name
         self.name1 = name1
         self.actions = actions.split(',')
@@ -232,6 +283,9 @@ class Protection:
         if self.permprotection() != 0:
             protectionString += '+' + str(self.permprotection())
         return self.name + self.enchantment() + ' (' + protectionString + ')'
+
+    def on_create(self):
+        return True
 
     def realname(self):
         names = []
@@ -314,7 +368,7 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, name, name1='доспех', protection=1, actions=''):
+    def __init__(self, name='', name1='доспех', protection=1, actions=''):
         #super().__init__()
         if name != 0:
             self.name = name
@@ -339,6 +393,43 @@ class Armor(Protection):
         self.canUseInFight = True
         self.runes = []
 
+    def on_create(self):
+        return True
+
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+        print ('room center = ', room.center)
+        if room.center != '':
+            if isinstance(room.center, Monster):
+                monster = room.center
+                if monster.wearArmor:
+                    monster.give(self)
+                    print ('Отдан ', monster.name)
+                else:
+                    room.loot.add(self)
+                    print('Брошен в комнату')
+            elif isinstance(room.center, Chest):
+                room.center.put(self)
+                print ('Положен в сундук')
+        elif room.ambush != '':
+            print ('room ambush = ', room.ambush)
+            monster = room.ambush
+            if monster.wearArmor:
+                monster.give(self)
+                print('Отдан ', monster.name)
+            else:
+                room.loot.add(self)
+                print('Брошен в комнату')
+        else:
+            room.loot.add(self)
+            print('Брошен в комнату')
+        print('-'*20)
+
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
         oldArmor = who.armor
@@ -351,7 +442,7 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, name, name1='щит', protection=1, actions=''):
+    def __init__(self, name='', name1='щит', protection=1, actions=''):
         #super().__init__()
         if name != 0:
             self.name = name
@@ -370,6 +461,43 @@ class Shield (Protection):
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+
+    def on_create(self):
+        return True
+
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+        print ('room center = ', room.center)
+        if room.center != '':
+            if isinstance(room.center, Monster):
+                monster = room.center
+                if monster.carryshield:
+                    monster.give(self)
+                    print ('Отдан ', monster.name)
+                else:
+                    room.loot.add(self)
+                    print('Брошен в комнату')
+            elif isinstance(room.center, Chest):
+                room.center.put(self)
+                print ('Положен в сундук')
+        elif room.ambush != '':
+            print ('room ambush = ', room.ambush)
+            monster = room.ambush
+            if monster.carryshield:
+                monster.give(self)
+                print('Отдан ', monster.name)
+            else:
+                room.loot.add(self)
+                print('Брошен в комнату')
+        else:
+            room.loot.add(self)
+            print('Брошен в комнату')
+        print('-'*20)
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
@@ -563,6 +691,12 @@ class Chest:
 
     def __str__(self):
         return self.name
+
+    def put(self, item):
+        if self.loot == "":
+            self.loot = Loot()
+        self.loot.add(item)
+        return True
 
 
 class Money:
@@ -1450,6 +1584,19 @@ class Monster:
     def win(self, loser):
         self.health = self.startHealth
 
+    def place(self, castle, roomr_to_place = None):
+        if roomr_to_place:
+            room = roomr_to_place
+        else:
+            emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '')]
+            room = randomitem(emptyRooms, False)
+        if dice(1, 3) == 1 and self.hide:
+            room.ambush = self  # Монстр садится в засаду
+        else:
+            room.center = self  # Вытягиваем следующую штуку из колоды и кладем в комнату
+        self.currentPosition = room.position
+
+
 class Plant(Monster):
     def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='растёт', agressive=False,
                  carryweapon=False, carryshield=False):
@@ -1898,8 +2045,12 @@ classes = {'монстр': Monster,
 # Функция чтения данных из JSON. Принимает на вход имя файла.
 # Читает данные из файла, создает объекты класса, указанного в JSON в параметре class.
 # Наполняет созданный объект значениями параметров из JSON. для каждого объекта выполняется его функция on_create().
+# Если передан howmany, функция всячески старается вернуть список такой длины. Если объектов больше,
+# случайные объекты выкидываются из списка.
+# Если передан object_class и получается слишком коротки список,
+# то в него добавляются случайные объекты переданного класса.
 # Отдает список полученных объектов
-def readobjects(file):
+def readobjects(file, howmany = None, object_class = None):
     with open(file, encoding='utf-8') as read_data:
         parsed_data = json.load(read_data)
     objects = []
@@ -1909,19 +2060,33 @@ def readobjects(file):
             vars(object)[param] = i[param]
         object.on_create()
         objects.append(object)
+    if howmany:
+        while len(objects) > howmany:
+            spareObject = randomitem(objects, False)
+            objects.remove(spareObject)
+        if object_class:
+            while len(objects) < howmany:
+                newObject = object_class(0)
+                objects.append(newObject)
     return objects
 
 # Подготовка
-
-allMonsters = readobjects('monsters.json')  # Читаем монстров из файла
-allSpells = readspells(classes) #Читаем из файла заклинания
-allWeapon = readitems('оружие', howMany, classes)
-allShields = readitems('щит', howMany, classes)
-allArmor = readitems('доспех', howMany, classes)
-allPotions = readitems('зелье', howMany, classes)
 newCastle = Castle(5, 5)  # Генерируем замок
-newCastle.inhabit(allMonsters, howMany['монстры'], True)  # Населяем замок монстрами
-newCastle.inhabit(allWeapon, howMany['оружие'], False)
+allMonsters = readobjects('monsters.json', howMany['монстры']) # Читаем монстров из файла
+for monster in allMonsters:
+    monster.place(newCastle)
+allWeapon = readobjects('weapon.json', howMany['оружие'], Weapon)
+for weapon in allWeapon:
+    weapon.place(newCastle)
+allShields = readobjects('shields.json', howMany['щит'], Shield)
+for shield in allShields:
+    shield.place(newCastle)
+allArmor = readobjects('armor.json', howMany['доспех'], Armor)
+for armor in allArmor:
+    armor.place(newCastle)
+
+allSpells = readspells(classes) #Читаем из файла заклинания
+allPotions = readitems('зелье', howMany, classes)
 newCastle.inhabit(allShields, howMany['щит'], False)
 newCastle.inhabit(allArmor, howMany['доспех'], False)
 allRunes = [Rune() for i in range(howMany['руна'])]
