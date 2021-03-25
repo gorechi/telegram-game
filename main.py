@@ -33,13 +33,14 @@ level_up_commands = ['здоровье',
                      'силу',
                      'ловкость',
                      'интеллект'] # Команды для бота во время прокачки
-howMany = {'монстры': 10,
-           'оружие': 10,
-           'щит': 5,
-           'доспех': 5,
-           'зелье': 10,
-           'сундук':5,
-           'руна': 10} # Количество всяких штук, которые разбрасываются по замку
+howMany = { 'монстры': 10,
+            'оружие': 10,
+            'щит': 5,
+            'доспех': 5,
+            'зелье': 10,
+            'сундук':5,
+            'мебель':10,
+            'руна': 10} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -613,12 +614,8 @@ class Key(Item):
         if room_to_place:
             room = room_to_place
         else:
-            rooms = castle.plan
-            room = randomitem(rooms, False)
-            print ('Комната заперта: ', room.locked)
-            while room.locked:
-                room = randomitem(rooms, False)
-                print('Комната заперта: ', room.locked)
+            unlockedRooms = [a for a in castle.plan if (not a.locked)]
+            room = randomitem(unlockedRooms, False)
         print ('room center = ', room.center)
         if room.center != '':
             if isinstance(room.center, Chest):
@@ -764,6 +761,42 @@ class Loot:
 
     def remove(self, obj):
         self.pile.remove(obj)
+
+class Furniture:
+    def __init__(self, name=''):
+        newloot = Loot()
+        self.loot = newloot
+        self.locked = False
+        self.name = name
+        self.state = 'стоит'
+        self.where = 'в углу'
+        self.name1 = 'мебель'
+
+    def on_create(self):
+        self.name = randomitem(self.descriptions, False) + ' ' + self.name
+        self.state = randomitem(self.states, False)
+        self.where = randomitem(self.wheres, False)
+        return True
+
+    def place(self, castle = None, room_to_place = None):
+        print(self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            room = randomitem(castle.plan, False)
+        room.furniture.append(self)
+        print ('Поставлен в комнату')
+        if dice(1, 4) == 1:
+            self.locked = True
+            veryNewKey = Key()
+            veryNewKey.place(castle)
+            print ('Заперт')
+        if dice(1, 100) <= 50:
+            newMoney = Money(dice(1, 50))
+            self.loot.pile.append(newMoney)
+            print ('Добавлены деньги', newMoney.howmanymoney)
+        print('-'*20)
+        return True
 
 
 class Chest:
@@ -1789,8 +1822,6 @@ class Berserk(Monster):
         self.rage = (int(self.base_health) - int(self.health)) // 3
         return dice(1, (self.stren + self.rage))
 
-
-
 class Shapeshifter(Monster):
     def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=False, carryshield=True):
@@ -2079,25 +2110,26 @@ class Castle:
 
 
 # Еще константы
-classes = {'монстр': Monster,
-           'герой': Hero,
-           'оружие': Weapon,
-           'защита': Protection,
-           'щит': Shield,
-           'доспех': Armor,
-           'притворщик': Shapeshifter,
-           'сундук': Chest,
-           'вампир': Vampire,
-           'берсерк': Berserk,
-           'ходок': Walker,
-           'растение': Plant,
-           'ключ': Key,
-           'карта': Map,
-           'спички': Matches,
-           'зелье': Potion,
-           'руна': Rune,
-           'заклинание': Spell,
-           }
+classes = { 'монстр': Monster,
+            'герой': Hero,
+            'оружие': Weapon,
+            'защита': Protection,
+            'щит': Shield,
+            'доспех': Armor,
+            'притворщик': Shapeshifter,
+            'сундук': Chest,
+            'мебель': Furniture,
+            'вампир': Vampire,
+            'берсерк': Berserk,
+            'ходок': Walker,
+            'растение': Plant,
+            'ключ': Key,
+            'карта': Map,
+            'спички': Matches,
+            'зелье': Potion,
+            'руна': Rune,
+            'заклинание': Spell,
+            }
 
 # Функция чтения данных из JSON. Принимает на вход имя файла.
 # Читает данные из файла, создает объекты класса, указанного в JSON в параметре class.
@@ -2107,17 +2139,26 @@ classes = {'монстр': Monster,
 # Если передан object_class и получается слишком коротки список,
 # то в него добавляются случайные объекты переданного класса.
 # Отдает список полученных объектов
-def readobjects(file = None, howmany = None, object_class = None):
+def readobjects(file = None, howmany = None, object_class = None, random = False):
     objects = []
     if file:
         with open(file, encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
-        for i in parsed_data:
-            object = classes[i['class']]()
-            for param in i:
-                vars(object)[param] = i[param]
-            object.on_create()
-            objects.append(object)
+        if not random:
+            for i in parsed_data:
+                object = classes[i['class']]()
+                for param in i:
+                    vars(object)[param] = i[param]
+                object.on_create()
+                objects.append(object)
+        else:
+            for n in range(howmany):
+                i = randomitem(parsed_data, False)
+                object = classes[i['class']]()
+                for param in i:
+                    vars(object)[param] = i[param]
+                object.on_create()
+                objects.append(object)
     if howmany:
         while len(objects) > howmany:
             spareObject = randomitem(objects, False)
@@ -2138,6 +2179,10 @@ for monster in allMonsters:
 allChests = [Chest() for i in range(howMany['сундук'])]
 for chest in allChests:
     chest.place(newCastle)
+# Создаем мебель и разбрасываем по замку
+allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
+for furniture in allFurniture:
+    furniture.place(newCastle)
 # Читаем оружие из файла и разбрасываем по замку
 allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
 for weapon in allWeapon:
