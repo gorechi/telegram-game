@@ -767,6 +767,7 @@ class Furniture:
         newloot = Loot()
         self.loot = newloot
         self.locked = False
+        self.opened = True
         self.name = name
         self.state = 'стоит'
         self.where = 'в углу'
@@ -781,9 +782,21 @@ class Furniture:
     def place(self, castle = None, room_to_place = None):
         print(self.name)
         if room_to_place:
-            room = room_to_place
+            print(room_to_place.furniture_types(), self.type)
+            if self.type not in room_to_place.furniture_types():
+                room_to_place.furniture.append(self)
+                return True
+            else:
+                print('Нет места')
+                print('-' * 20)
+                return False
         else:
-            room = randomitem(castle.plan, False)
+            can_place = False
+            while not can_place:
+                room = randomitem(castle.plan, False)
+                print('Пытаемся поставить')
+                if self.type not in room.furniture_types():
+                    can_place = True
         room.furniture.append(self)
         print ('Поставлен в комнату')
         if dice(1, 4) == 1:
@@ -1360,82 +1373,74 @@ class Hero:
 
     def open(self, item=''):
         room = newCastle.plan[self.currentPosition]
-        whatIsInRoom = room.center
+        key = False
+        for i in self.pockets:
+            if isinstance(i, Key):
+                key = i
+        if not key:
+            message = ['Чтобы что-то открыть нужен хотя бы один ключ.']
+            tprint(message)
+            return False
+        whatIsInRoom = []
+        if room.center != '':
+            if isinstance(room.center, Chest):
+                if room.center.locked:
+                    whatIsInRoom.append(room.center)
+        if len(room.furniture) > 0:
+            for furniture in room.furniture:
+                if furniture.locked:
+                    whatIsInRoom.append(furniture)
         if item == '' or (not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0):
-            if whatIsInRoom == '':
+            if len(whatIsInRoom) == 0:
                 if room.light:
                     message = ['В комнате нет вещей, которые можно открыть.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
                 tprint(message)
                 return False
-            elif not isinstance(whatIsInRoom, Chest):
+            elif item == '' and len(whatIsInRoom) > 1:
                 if room.light:
-                    message = ['Пожалуй, ' + self.name + ' не сможет это открыть.']
+                    message = ['В комнате слишком много запертых вещей. ' +
+                               self.name +
+                               ' не понимает, что ему нужно открыть.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
                 tprint(message)
                 return False
-            elif whatIsInRoom.opened:
+            elif item != '':
                 if room.light:
-                    message =['Этот ' + whatIsInRoom.name1 + ' уже открыт. Зачем его открывать во второй раз?']
+                    for furniture in whatIsInRoom:
+                        if furniture.name.lower() == item.lower() or furniture.name1.lower() == item.lower():
+                            self.pockets.remove(key)
+                            furniture.locked = False
+                            message = [self.name + ' отпирает ' + furniture.name1 + ' ключом.']
+                            tprint(message)
+                            return True
+                    message = [self.name + ' не находит в комнате такой вещи. Отпирать нечего.']
+                    tprint(message)
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
                 tprint(message)
-                return False
-            elif whatIsInRoom.locked:
-                key = False
-                for i in self.pockets:
-                    if isinstance(i, Key):
-                        key = i
+                return True
+            else:
                 if room.light:
-                    if key:
-                        self.pockets.remove(key)
-                        whatIsInRoom.locked = False
-                        message = [self.name + ' отпирает сундук ключом.']
-                    else:
-                        message = ['Чтобы открыть этот сундук нужен ключ']
+                    self.pockets.remove(key)
+                    whatIsInRoom[0].locked = False
+                    message = [self.name + ' отпирает ' + whatIsInRoom[0].name1 + ' ключом.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
                 tprint(message)
-            if not whatIsInRoom.locked:
-                if room.light:
-                    message = [self.name + ' открывает ' + whatIsInRoom.name]
-                    if room.loot == '':
-                        room.loot = []
-                    room.loot.pile += whatIsInRoom.loot.pile
-                    if len(whatIsInRoom.loot.pile) > 0:
-                        message.append(self.name + ' роется в сундуке и обнаруживает в нем:')
-                        for i in whatIsInRoom.loot.pile:
-                            message.append(i.name1)
-                        message.append('Все эти вещи теперь разбросаны по всей комнате.')
-                        whatIsInRoom.loot.pile = []
-                    else:
-                        message = ['В сундуке пусто.']
-                    whatIsInRoom.opened = True
-                    whatIsInRoom.name = 'открытый пустой ' + whatIsInRoom.name
-                    whatIsInRoom.inside = ''
-                else:
-                    message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
-                tprint (message)
                 return True
         else:
-            key = False
             if not room.light:
                 message = [self.name + ' ничего не видит и не может нащупать замочную скважину.']
                 tprint (message)
                 return False
-            for i in self.pockets:
-                if isinstance(i, Key):
-                    key = i
             if not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0:
                 tprint(self.name + ' не может это открыть.')
                 return False
             elif newCastle.plan[self.currentPosition].doors[self.doorsDict[item]] != 2:
                 tprint('В той стороне нечего открывать.')
-                return False
-            elif not key:
-                tprint('Нужен ключ.')
                 return False
             else:
                 self.pockets.remove(key)
@@ -1992,6 +1997,13 @@ class Room:
         else:
             return self.center.keyHole
 
+    def furniture_types(self):
+        types = []
+        for furniture in self.furniture:
+            if furniture.type not in types:
+                types.append(furniture.type)
+        return types
+
     def map(self):
         doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
         doorsVertical = {'0': '║', '1': ' ', '2': '|'}
@@ -2182,7 +2194,7 @@ for chest in allChests:
 # Создаем мебель и разбрасываем по замку
 allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
 for furniture in allFurniture:
-    furniture.place(newCastle)
+    furniture.place(castle=newCastle, room_to_place=newCastle.plan[0])
 # Читаем оружие из файла и разбрасываем по замку
 allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
 for weapon in allWeapon:
