@@ -767,6 +767,7 @@ class Furniture:
         newloot = Loot()
         self.loot = newloot
         self.locked = False
+        self.lockable = False
         self.opened = True
         self.name = name
         self.state = 'стоит'
@@ -799,7 +800,7 @@ class Furniture:
                     can_place = True
         room.furniture.append(self)
         print ('Поставлен в комнату')
-        if dice(1, 4) == 1:
+        if dice(1, 4) == 1 and self.lockable:
             self.locked = True
             veryNewKey = Key()
             veryNewKey.place(castle)
@@ -1390,6 +1391,8 @@ class Hero:
             for furniture in room.furniture:
                 if furniture.locked:
                     whatIsInRoom.append(furniture)
+        print (whatIsInRoom)
+        print ('item: ', item)
         if item == '' or (not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0):
             if len(whatIsInRoom) == 0:
                 if room.light:
@@ -1981,10 +1984,14 @@ class Room:
                 whoIsHere = 'Не видно ничего интересного.'
             else:
                 whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
-            tprint(player.name + ' попадает в {0} комнату {1}. {2} {3}'.format(self.decoration1,
+            message = []
+            message.append(player.name + ' попадает в {0} комнату {1}. {2}'.format(self.decoration1,
                                                                           self.decoration2,
-                                                                          whoIsHere,
-                                                                          self.decoration4), state = 'direction')
+                                                                          self.decoration4))
+            for furniture in self.furniture:
+                message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
+            message.append(whoIsHere)
+            tprint(message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
             if isinstance(self.center, Monster):
@@ -2194,6 +2201,7 @@ for chest in allChests:
 # Создаем мебель и разбрасываем по замку
 allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
 for furniture in allFurniture:
+    furniture.locked = True
     furniture.place(castle=newCastle, room_to_place=newCastle.plan[0])
 # Читаем оружие из файла и разбрасываем по замку
 allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
