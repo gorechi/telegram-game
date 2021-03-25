@@ -4,6 +4,7 @@
     "type": 1,
     "name": "полка",
     "name1": "полку",
+    "empty": "пуста",
     "lockable": false,
     "can_hide": false,
     "states":
@@ -37,6 +38,7 @@
     "type": 2,
     "name": "шкаф",
     "name1": "шкаф",
+    "empty": "пуст",
     "lockable": true,
     "can_hide": true,
     "states":

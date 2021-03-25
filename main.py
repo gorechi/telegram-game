@@ -770,6 +770,7 @@ class Furniture:
         self.lockable = False
         self.opened = True
         self.name = name
+        self.empty = 'пусто'
         self.state = 'стоит'
         self.where = 'в углу'
         self.name1 = 'мебель'
@@ -1256,7 +1257,8 @@ class Hero:
             self.currentPosition += self.directionsDict[direction]
             room = newCastle.plan[self.currentPosition]
             room.visited = '+'
-            self.lookaround()
+            room.show(self)
+            room.map()
             if room.center != '':
                 if room.center.agressive and room.light:
                     self.fight(room.center)
@@ -1296,41 +1298,75 @@ class Hero:
             tprint(whoisfighting.attack(self))
             return True
 
-    def search(self, item=''):
+    def search(self, item=False):
         room = newCastle.plan[self.currentPosition]
-        enemyinroom = newCastle.plan[self.currentPosition].center
-        enemyinambush = newCastle.plan[self.currentPosition].ambush
+        message = []
+        print ('room.center: ', room.center)
+        chestinroom = False
+        enemyinroom = False
+        if room.center != '':
+            if isinstance(room.center, Monster):
+                enemyinroom = room.center
+            elif isinstance(room.center, Chest):
+                chestinroom = room.center
+        if room.ambush != '':
+            enemyinambush = room.ambush
+        else:
+            enemyinambush = False
         if not room.light:
-            message = ['В комнате настолько темно, что невозможно что-то отыскать.']
+            message.append(['В комнате настолько темно, что невозможно что-то отыскать.'])
             tprint(message)
             return True
-        if enemyinroom != '':
-            if isinstance(enemyinroom, Monster):
-                tprint(room.center.name + " мешает толком осмотреть комнату.")
-            elif isinstance(enemyinroom, Chest):
-                message = ["В комнате стоит " + room.center.name]
-                if room.loot != '' and \
-                        len(room.loot.pile) > 0:
-                    message.append('Вокруг сундука валяются:')
-                    for i in room.loot.pile:
-                        message.append(i.name)
-                tprint(message)
-        elif enemyinambush != '' and item == '':
+        if enemyinroom:
+            message.append(enemyinroom.name + " мешает толком осмотреть комнату.")
+            tprint(message)
+            return True
+        if enemyinambush and not item:
             room.center = enemyinambush
             room.ambush = ''
+            enemyinambush = False
             enemyinroom = room.center
-            tprint ('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
+            message.append('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
+            tprint (message)
             self.fight(enemyinroom, True)
-        else:
-            if item == '' and room.loot != '' and len(
-                    room.loot.pile) > 0:
-                text = []
-                text.append('В комнате есть:')
+            return True
+        if not item:
+            if chestinroom:
+                message.append("В комнате стоит " + chestinroom.name)
+            for furniture in room.furniture:
+                message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
+            if room.loot != '' and len(room.loot.pile) > 0:
+                message.append('По всему полу разбросаны:')
                 for i in room.loot.pile:
-                    text.append(i.name)
-                tprint(text)
-            elif item == '':
-                tprint('В комнате нет ничего интересного.')
+                    message.append(i.name)
+            else:
+                message.append('В комнате нет ничего интересного.')
+            tprint(message)
+            return True
+        else:
+            searchableItems = []
+            searchableItems.extend(room.furniture)
+            whatToSearch = False
+            if chestinroom:
+                searchableItems.append(chestinroom)
+            for i in searchableItems:
+                if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
+                    whatToSearch = i
+            if not whatToSearch:
+                message.append('В комнате нет такой вещи.')
+            elif whatToSearch.locked:
+                message.append('Нельзя обыскать ' + whatToSearch.name1 + '. Там заперто.')
+            elif len(whatToSearch.loot.pile) > 0:
+                message.append(self.name + ' осматривает ' + whatToSearch.name1 + ' и находит:')
+                for i in whatToSearch.loot.pile:
+                    message.append(i.name)
+                    whatToSearch.loot.pile.remove(i)
+                    room.loot.pile.append(i)
+                message.append('Все это богатство теперь разбросано по всей комнате.')
+            elif len(whatToSearch.loot.pile) == 0:
+                message.append(whatToSearch.name + ' ' + whatToSearch.empty)
+            tprint(message)
+            return True
 
     def can_take(self, object):
         classes = [Weapon, Shield, Armor]
@@ -2193,6 +2229,8 @@ newCastle = Castle(5, 5)  # Генерируем замок
 # Читаем монстров из файла и разбрасываем по замку
 allMonsters = readobjects(file='monsters.json', howmany=howMany['монстры'])
 for monster in allMonsters:
+    print(monster.name, monster.agressive)
+    print('-'*20)
     monster.place(newCastle)
 # Создаем сундуки и разбрасываем по замку
 allChests = [Chest() for i in range(howMany['сундук'])]
@@ -2201,8 +2239,7 @@ for chest in allChests:
 # Создаем мебель и разбрасываем по замку
 allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
 for furniture in allFurniture:
-    furniture.locked = True
-    furniture.place(castle=newCastle, room_to_place=newCastle.plan[0])
+    furniture.place(castle=newCastle)
 # Читаем оружие из файла и разбрасываем по замку
 allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
 for weapon in allWeapon:
