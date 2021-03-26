@@ -100,12 +100,12 @@ class Rune:
             rooms = castle.plan
             room = randomitem(rooms, False)
         print ('room center = ', room.center)
-        # if room.center != '':
-        #     if isinstance(room.center, Chest):
-        #         room.center.put(self)
-        #         print ('Положено в сундук')
-        #         print('-' * 20)
-        #         return True
+        if len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            furniture.put(self)
+            print ('Положен в мебель: ' + furniture.name)
+            print('-' * 20)
+            return True
         room.loot.add(self)
         print('Брошено в комнату')
         print('-'*20)
@@ -274,11 +274,6 @@ class Weapon:
                     print ('Отдан ', monster.name)
                     print('-' * 20)
                     return True
-            # elif isinstance(room.center, Chest):
-            #     room.center.put(self)
-            #     print ('Положен в сундук')
-            #     print('-' * 20)
-            #     return True
         elif room.ambush != '':
             print ('room ambush = ', room.ambush)
             monster = room.ambush
@@ -286,6 +281,12 @@ class Weapon:
                 monster.give(self)
                 print('Отдан ', monster.name)
                 print('-' * 20)
+                return True
+        elif len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            if furniture.can_contain_weapon:
+                furniture.put(self)
+                print ('Положен в мебель: ' + furniture.name)
                 return True
         room.loot.add(self)
         print('Брошен в комнату')
@@ -390,7 +391,6 @@ class Protection:
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
     def __init__(self, name='', name1='доспех', protection=1, actions=''):
-        #super().__init__()
         if name != 0:
             self.name = name
             self.name1 = name1
@@ -433,11 +433,6 @@ class Armor(Protection):
                     print ('Отдан ', monster.name)
                     print('-' * 20)
                     return True
-            # elif isinstance(room.center, Chest):
-            #     room.center.put(self)
-            #     print ('Положен в сундук')
-            #     print('-' * 20)
-            #     return True
         elif room.ambush != '':
             print ('room ambush = ', room.ambush)
             monster = room.ambush
@@ -446,6 +441,12 @@ class Armor(Protection):
                 print('Отдан ', monster.name)
                 print('-' * 20)
                 return True
+            elif len(room.furniture) > 0:
+                furniture = randomitem(room.furniture, False)
+                if furniture.can_contain_weapon:
+                    furniture.put(self)
+                    print('Положен в мебель: ' + furniture.name)
+                    return True
         room.loot.add(self)
         print('Брошен в комнату')
         print('-'*20)
@@ -463,7 +464,6 @@ class Armor(Protection):
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
     def __init__(self, name='', name1='щит', protection=1, actions=''):
-        #super().__init__()
         if name != 0:
             self.name = name
             self.name1 = name1
@@ -501,11 +501,6 @@ class Shield (Protection):
                     print ('Отдан ', monster.name)
                     print('-' * 20)
                     return True
-            # elif isinstance(room.center, Chest):
-            #     room.center.put(self)
-            #     print ('Положен в сундук')
-            #     print('-' * 20)
-            #     return True
         elif room.ambush != '':
             print ('room ambush = ', room.ambush)
             monster = room.ambush
@@ -514,6 +509,12 @@ class Shield (Protection):
                 print('Отдан ', monster.name)
                 print('-' * 20)
                 return True
+            elif len(room.furniture) > 0:
+                furniture = randomitem(room.furniture, False)
+                if furniture.can_contain_weapon:
+                    furniture.put(self)
+                    print('Положен в мебель: ' + furniture.name)
+                    return True
         room.loot.add(self)
         print('Брошен в комнату')
         print('-'*20)
@@ -535,20 +536,29 @@ class Matches(Item):
         self.name1 = 'спички'
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
-        self.place()
 
-    def place(self, room = None):
-        if not room or not isinstance(room, Room):
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
             done = False
             while not done:
                 room = randomitem(newCastle.plan, False)
+                print ('В комнате светло: ', room.light, 'Комната заперта: ', room.locked)
                 if not room.locked and room.light:
                     done = True
-        self.room = room
-        if room.center != '':
-            room.center.loot.add(self)
-        else:
-            room.loot.add(self)
+            self.room = room
+        print ('room center = ', room.center)
+        if len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            furniture.put(self)
+            print ('Положен в мебель: ' + furniture.name)
+            print('-' * 20)
+            return True
+        room.loot.add(self)
+        print('Брошено в комнату')
+        print('-'*20)
 
     def use(self, whoIsUsing = None, inaction = False):
         global player
@@ -574,18 +584,24 @@ class Map(Item):
         self.name = 'карта'
         self.name1 = 'карту'
         self.description = 'Карта, показывающая расположение комнат замка'
-        a = randomitem(newCastle.plan, False)
-        if a.center != '':
-            a.center.loot.add(self)
-        else:
-            a.loot.add(self)
 
-    def place(self):
-        a = randomitem(newCastle.plan, False)
-        if a.center != '':
-            a.center.loot.add(self)
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
         else:
-            a.loot.add(self)
+            rooms = castle.plan
+            room = randomitem(rooms, False)
+        print ('room center = ', room.center)
+        if len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            furniture.put(self)
+            print ('Положен в мебель: ' + furniture.name)
+            print('-' * 20)
+            return True
+        room.loot.add(self)
+        print('Брошено в комнату')
+        print('-'*20)
 
     def use(self, whoisusing, inaction=False):
         if not inaction:
@@ -611,19 +627,22 @@ class Key(Item):
 
     def place(self, castle, room_to_place = None):
         print (self.name)
+        furniture = False
         if room_to_place:
             room = room_to_place
         else:
             unlockedRooms = [a for a in castle.plan if (not a.locked)]
             room = randomitem(unlockedRooms, False)
         print ('room center = ', room.center)
-        # if room.center != '':
-        #     if isinstance(room.center, Chest):
-        #         if not room.center.locked:
-        #             room.center.put(self)
-        #             print ('Положено в сундук')
-        #             print('-' * 20)
-        #             return True
+        if len(room.furniture) > 0:
+            for i in room.furniture:
+                if not i.locked:
+                    furniture = i
+            if furniture:
+                furniture.put(self)
+                print ('Положен в мебель: ' + furniture.name)
+                print('-' * 20)
+                return True
         room.loot.add(self)
         print('Брошено в комнату')
         print('-'*20)
@@ -673,15 +692,11 @@ class Potion(Item):
         else:
             rooms = castle.plan
             room = randomitem(rooms, False)
-        print ('room center = ', room.center)
-        # if room.center != '':
-        #     if isinstance(room.center, Chest):
-        #         room.center.put(self)
-        #         print ('Положено в сундук')
-        #     else:
-        #         room.loot.add(self)
-        #         print('Брошено в комнату')
-        # else:
+        if len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            furniture.put(self)
+            print ('Положен в мебель: ' + furniture.name)
+            return True
         room.loot.add(self)
         print('Брошено в комнату')
         print('-'*20)
@@ -769,6 +784,8 @@ class Furniture:
         self.locked = False
         self.lockable = False
         self.opened = True
+        self.can_contain_weapon = True
+        self.can_hide = False
         self.name = name
         self.empty = 'пусто'
         self.state = 'стоит'
@@ -780,6 +797,9 @@ class Furniture:
         self.state = randomitem(self.states, False)
         self.where = randomitem(self.wheres, False)
         return True
+
+    def put(self, item):
+        self.loot.add(item)
 
     def place(self, castle = None, room_to_place = None):
         print(self.name)
@@ -812,64 +832,6 @@ class Furniture:
             print ('Добавлены деньги', newMoney.howmanymoney)
         print('-'*20)
         return True
-
-
-# class Chest:
-#     def __init__(self, name=''):
-#         self.chestType = [
-#                 "Обычный",
-#                 "Кованный",
-#                 "Большой",
-#                 "Деревянный",
-#                 "Железный",
-#                 "Маленький",
-#                 "Старинный",
-#                 "Антикварный",
-#                 "Странный"]
-#         newloot = Loot()
-#         self.loot = newloot
-#         self.locked = False
-#         self.opened = False
-#         self.name = randomitem(self.chestType) + ' сундук'
-#         self.state = 'стоит'
-#         self.name1 = 'сундук'
-#         self.agressive = False
-#         self.keyHole = 'видит какой-то крупный предмет.'
-#
-#     def __str__(self):
-#         return self.name
-#
-#     def place(self, castle = None, room_to_place = None):
-#         print(self.name)
-#         if room_to_place:
-#             room = room_to_place
-#         else:
-#             emptyRooms = [a for a in castle.plan if (a.center == '')]
-#             room = randomitem(emptyRooms, False)
-#         print('room center = ', room.center)
-#         room.center = self
-#         print ('Поставлен в комнату')
-#         if dice(1, 4) == 1:
-#             self.locked = True
-#             veryNewKey = Key()
-#             veryNewKey.place(castle)
-#             print ('Заперт')
-#         if dice(1, 100) <= 50:
-#             self.inside = []
-#             newMoney = Money(dice(1, 50))
-#             self.loot.pile.append(newMoney)
-#             print ('Добавлены деньги', newMoney.howmanymoney)
-#         else:
-#             self.loot.pile = []
-#         print('-'*20)
-#         return True
-#
-#     def put(self, item):
-#         if self.loot == "":
-#             self.loot = Loot()
-#         self.loot.add(item)
-#         return True
-
 
 class Money:
     def __init__(self, howmanymoney):
@@ -1111,7 +1073,6 @@ class Hero:
                             if i.use(self, inaction=True) and isinstance(i, Potion):
                                 self.pockets.remove(i)
                             itemUsed = True
-                            # self.use(a, True)
                             break
                     if itemUsed:
                         break
@@ -1162,7 +1123,6 @@ class Hero:
         self.dext = self.startDext
         self.intel = self.startIntel
         self.currentPosition = 0
-        #tprint('После поражения в схватке ' + self.name + ' очнулся у входа в замок.')
 
     def win(self, loser):
         self.health = self.startHealth
@@ -1306,8 +1266,6 @@ class Hero:
         if room.center != '':
             if isinstance(room.center, Monster):
                 enemyinroom = room.center
-            # elif isinstance(room.center, Chest):
-            #     chestinroom = room.center
         if room.ambush != '':
             enemyinambush = room.ambush
         else:
@@ -1384,7 +1342,6 @@ class Hero:
                 if self.can_take(i):
                     i.take(self)
                     currentLoot.pile.remove(i)
-            #newCastle.plan[self.currentPosition].loot = ''
             return True
         else:
             for i in currentLoot.pile:
@@ -1418,10 +1375,6 @@ class Hero:
             tprint(message)
             return False
         whatIsInRoom = []
-        # if room.center != '':
-            # if isinstance(room.center, Chest):
-            #     if room.center.locked:
-            #         whatIsInRoom.append(room.center)
         if len(room.furniture) > 0:
             for furniture in room.furniture:
                 if furniture.locked:
@@ -1719,7 +1672,6 @@ class Monster:
 
     def lose(self, winner):
         result = dice(1, 10)
-        #tprint('RESULT = ' + str(result))
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
@@ -1738,9 +1690,7 @@ class Monster:
             self.wounded = True
             aliveString = self.name + ' остается вживых и '
             weaknessAmount = ceil(self.stren * 0.4)
-            #tprint('weaknessAmount = ' + str(weaknessAmount))
             illAmount = ceil(self.startHealth * 0.4)
-            #tprint('illAmount = ' + str(illAmount))
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
@@ -2171,7 +2121,6 @@ classes = { 'монстр': Monster,
             'щит': Shield,
             'доспех': Armor,
             'притворщик': Shapeshifter,
-            # 'сундук': Chest,
             'мебель': Furniture,
             'вампир': Vampire,
             'берсерк': Berserk,
@@ -2231,10 +2180,6 @@ for monster in allMonsters:
     print(monster.name, monster.agressive)
     print('-'*20)
     monster.place(newCastle)
-# Создаем сундуки и разбрасываем по замку
-# allChests = [Chest() for i in range(howMany['сундук'])]
-# for chest in allChests:
-#     chest.place(newCastle)
 # Создаем мебель и разбрасываем по замку
 allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
 for furniture in allFurniture:
@@ -2259,14 +2204,16 @@ for potion in allPotions:
 allRunes = [Rune() for i in range(howMany['руна'])]
 for rune in allRunes:
     rune.place(newCastle)
-
 newCastle.lockDoors() # Создаем запертые комнаты
-map = Map()  # Прячем карту
+map = Map()
+map.place(newCastle) # Создаем и прячем карту
+matches = Matches()
+matches.place(newCastle) # Создаем и прячем спички
+
 newCastle.plan[0].visited = '+' # Делаем первую комнату посещенной
 player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает') # Создаем персонажа
 newKey = Key() # Создаем ключ
 player.pockets.append(newKey) # Отдаем ключ игроку
-matches = Matches()
 gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 shield1 = Shield('Простой щит')
 print (shield1.name, shield1.protection, shield1.permprotection())
@@ -2282,8 +2229,6 @@ print (sword3.name, sword3.name1)
 newCastle.plan[0].loot.pile.append(sword1)
 newCastle.plan[0].loot.pile.append(sword2)
 newCastle.plan[0].loot.pile.append(sword3)
-key = Key()
-newCastle.plan[0].loot.pile.append(key)
 
 # Основная программа
 
