@@ -38,8 +38,8 @@ howMany = { 'монстры': 10,
             'щит': 5,
             'доспех': 5,
             'зелье': 10,
-            'сундук':5,
             'мебель':10,
+            'книга':5,
             'руна': 10} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
@@ -760,6 +760,44 @@ class Potion(Item):
     def __str__(self):
         return self.description
 
+class Book(Item):
+    def __init__(self, name=''):
+        self.name = name
+
+    def on_create(self):
+        self.type = dice(0,2)
+        self.name = randomitem(self.descriptions, False) + ' ' + self.name + ' ' + self.decorations[self.type]
+        print(self.name)
+        self.weapon_type = self.weapon_types[self.type]
+        self.armor_type = self.armor_types[self.type]
+        self.shield_type = self.shield_types[self.type]
+        return True
+
+    def place(self, castle, room_to_place = None):
+        print (self.name)
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms = []
+            for i in castle.plan:
+                if len(i.furniture) > 0:
+                    rooms.append(i)
+            room = randomitem(rooms, False)
+        if len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            furniture.put(self)
+            print ('Положена в мебель: ' + furniture.name)
+            print('-' * 20)
+            return True
+        room.loot.add(self)
+        print('Брошена в комнату')
+        print('-'*20)
+
+    def use(self, whoUsing, inaction = False):
+        return True
+
+    def __str__(self):
+        return self.name
 
 class Loot:
     def __init__(self):
@@ -780,6 +818,7 @@ class Loot:
 class Furniture:
     def __init__(self, name=''):
         newloot = Loot()
+        self.ambush = False
         self.loot = newloot
         self.locked = False
         self.lockable = False
@@ -897,6 +936,7 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.elementLevels = {'1': 2, '2': 4, '3': 7, '4': 10}
+        self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0}
         self.directionsDict = {0: (0 - newCastle.rooms),
                                1: 1,
                                2: newCastle.rooms,
@@ -1293,7 +1333,7 @@ class Hero:
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             if room.loot != '' and len(room.loot.pile) > 0:
-                message.append('По всему полу разбросаны:')
+                message.append('По всей комнате можно найти:')
                 for i in room.loot.pile:
                     message.append(i.name)
             else:
@@ -1317,9 +1357,9 @@ class Hero:
                 message.append(self.name + ' осматривает ' + whatToSearch.name1 + ' и находит:')
                 for i in whatToSearch.loot.pile:
                     message.append(i.name)
-                    whatToSearch.loot.pile.remove(i)
                     room.loot.pile.append(i)
-                message.append('Все это богатство теперь разбросано по всей комнате.')
+                if len(whatToSearch.loot.pile) > 0:
+                    message.append('Все эти вещи теперь лежат навиду.')
             elif len(whatToSearch.loot.pile) == 0:
                 message.append(whatToSearch.name + ' ' + whatToSearch.empty)
             tprint(message)
@@ -1741,10 +1781,18 @@ class Monster:
         else:
             emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '')]
             room = randomitem(emptyRooms, False)
-        if dice(1, 3) == 1 and self.hide:
-            room.ambush = self  # Монстр садится в засаду
+        if dice(1, 5) == 1:
+            places_to_hide = []
+            for i in room.furniture:
+                if i.can_hide:
+                    places_to_hide.append(i)
+            places_to_hide.append(room)
+            where_to_hide = randomitem(places_to_hide, False)
+            print ('Прячется в ', where_to_hide)
+            where_to_hide.ambush = self  # Монстр садится в засаду
         else:
-            room.center = self  # Вытягиваем следующую штуку из колоды и кладем в комнату
+            print('Встает в комнату')
+            room.center = self
         self.currentPosition = room.position
 
 
@@ -1797,6 +1845,16 @@ class Plant(Monster):
             where.loot.add(self.weapon)
         where.center = ''
 
+    def place(self, castle, roomr_to_place = None):
+        if roomr_to_place:
+            room = roomr_to_place
+        else:
+            emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '')]
+            room = randomitem(emptyRooms, False)
+        print('Встает в комнату')
+        room.center = self
+        self.currentPosition = room.position
+
 class Walker(Monster):
     def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
@@ -1814,6 +1872,16 @@ class Berserk(Monster):
     def mele(self):
         self.rage = (int(self.base_health) - int(self.health)) // 3
         return dice(1, (self.stren + self.rage))
+
+    def place(self, castle, roomr_to_place = None):
+        if roomr_to_place:
+            room = roomr_to_place
+        else:
+            emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '')]
+            room = randomitem(emptyRooms, False)
+        print('Встает в комнату')
+        room.center = self
+        self.currentPosition = room.position
 
 class Shapeshifter(Monster):
     def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
@@ -1931,6 +1999,23 @@ class Vampire(Monster):
             tprint(text, 'off')
         else:
             tprint(text)
+        return True
+
+    def place(self, castle, roomr_to_place = None):
+        if roomr_to_place:
+            room = roomr_to_place
+        else:
+            emptyRooms = [a for a in castle.plan if (a.ambush == '' and not a.light)]
+            room = randomitem(emptyRooms, False)
+        places_to_hide = []
+        for i in room.furniture:
+            if i.can_hide:
+                places_to_hide.append(i)
+        places_to_hide.append(room)
+        where_to_hide = randomitem(places_to_hide, False)
+        print ('Прячется в ', where_to_hide)
+        where_to_hide.ambush = self  # Монстр садится в засаду
+        self.currentPosition = room.position
         return True
 
 
@@ -2129,6 +2214,7 @@ classes = { 'монстр': Monster,
             'ключ': Key,
             'карта': Map,
             'спички': Matches,
+            'книга': Book,
             'зелье': Potion,
             'руна': Rune,
             'заклинание': Spell,
@@ -2174,16 +2260,16 @@ def readobjects(file = None, howmany = None, object_class = None, random = False
 
 # Подготовка
 newCastle = Castle(5, 5)  # Генерируем замок
+# Создаем мебель и разбрасываем по замку
+allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
+for furniture in allFurniture:
+    furniture.place(castle=newCastle)
 # Читаем монстров из файла и разбрасываем по замку
 allMonsters = readobjects(file='monsters.json', howmany=howMany['монстры'])
 for monster in allMonsters:
     print(monster.name, monster.agressive)
     print('-'*20)
     monster.place(newCastle)
-# Создаем мебель и разбрасываем по замку
-allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
-for furniture in allFurniture:
-    furniture.place(castle=newCastle)
 # Читаем оружие из файла и разбрасываем по замку
 allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
 for weapon in allWeapon:
@@ -2204,6 +2290,10 @@ for potion in allPotions:
 allRunes = [Rune() for i in range(howMany['руна'])]
 for rune in allRunes:
     rune.place(newCastle)
+# Создаем книги и разбрасываем по замку
+allBooks = readobjects(file='books.json', howmany=howMany['книга'], random=True, object_class=Book)
+for book in allBooks:
+    book.place(newCastle)
 newCastle.lockDoors() # Создаем запертые комнаты
 map = Map()
 map.place(newCastle) # Создаем и прячем карту
