@@ -9,10 +9,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Константы и настройки
 TOKEN = '1528705199:AAH_tVPWr6GuxBLdxOhGNUd25tNEc23pSp8' #Токен телеграм-бота
-IN_FIGHT = False # Константа, отвечающая за то, что сейчас бой
-LEVEL_UP = False # Константа, отвечающая за то, что сейчас происходит прокачка
-ENCHANTING = False # Константа, отвечающая за то, что сейчас происходит улучшение шмотки
-selectedItem = ''
+# IN_FIGHT = False # Константа, отвечающая за то, что сейчас бой
+# LEVEL_UP = False # Константа, отвечающая за то, что сейчас происходит прокачка
+# ENCHANTING = False # Константа, отвечающая за то, что сейчас происходит улучшение шмотки
+# selectedItem = ''
+game_sessions = {}
 telegram_commands = ['обыскать',
                      '?',
                      'осмотреть',
@@ -33,14 +34,14 @@ level_up_commands = ['здоровье',
                      'силу',
                      'ловкость',
                      'интеллект'] # Команды для бота во время прокачки
-howMany = { 'монстры': 10,
-            'оружие': 10,
-            'щит': 5,
-            'доспех': 5,
-            'зелье': 10,
-            'мебель':10,
-            'книга':5,
-            'руна': 10} # Количество всяких штук, которые разбрасываются по замку
+# howMany = { 'монстры': 10,
+#             'оружие': 10,
+#             'щит': 5,
+#             'доспех': 5,
+#             'зелье': 10,
+#             'мебель':10,
+#             'книга':5,
+#             'руна': 10} # Количество всяких штук, которые разбрасываются по замку
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
 decor3 = readfile('decorate3', False)
@@ -55,7 +56,8 @@ elementDictionary = {1: 'огня', 2: 'пламени', 3: 'воздуха', 4:
 # Описываем классы
 
 class Item:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.name = 'штука'
         self.name1 = 'штуку'
         self.canUseInFight = False
@@ -65,17 +67,20 @@ class Item:
         return self.name
 
     def take(self, who=''):
+        if who == '':
+            return False
         who.pockets.append(self)
-        tprint(who.name + ' забирает ' + self.name + ' себе.')
+        tprint(self.game, who.name + ' забирает ' + self.name + ' себе.')
 
     def use(self, whoisusing, inaction=False):
-        tprint(whoisusing.name + ' не знает, как использовать такие штуки.')
+        tprint(self.game, whoisusing.name + ' не знает, как использовать такие штуки.')
 
     def show(self):
         return self.description
 
 class Rune:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
         self.elements = [1, 3, 7, 12]
@@ -115,19 +120,20 @@ class Rune:
 
     def take(self, who=''):
         who.pockets.append(self)
-        tprint(who.name + ' забирает ' + self.name1 + ' себе.')
+        tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
                ' или защита + ' + str(self.defence)
 
     def use(self, whoisusing, inaction=False):
-        tprint(whoisusing.name + ' не знает, как использовать такие штуки.')
+        tprint(self.game, whoisusing.name + ' не знает, как использовать такие штуки.')
 
 
 class Spell:
-    def __init__(self, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
+    def __init__(self, game, name='Обычное заклинание', name1='Обычного заклинания', element='магия', minDamage=1,
                  maxDamage=5, minDamageMult=1, maxDamageMult=1, actions='кастует'):
+        self.game = game
         self.name = name
         self.name1 = name1
         self.description = self.name
@@ -142,7 +148,8 @@ class Spell:
         return self.name
 
 class Weapon:
-    def __init__(self, name='', name1='оружие', damage=1, actions='бьет,ударяет'):
+    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет'):
+        self.game = game
         if name != 0:
             self.name = name
             self.damage = int(damage)
@@ -227,6 +234,7 @@ class Weapon:
         return dice(1, int(self.damage)) + self.permdamage()
 
     def take(self, who):
+        game = self.game
         message = [who.name + ' берет ' + self.name1 + '.']
         weapon = who.weapon
         second_weapon = who.second_weapon()
@@ -241,7 +249,7 @@ class Weapon:
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
                 who.pockets.append(self)
-        tprint(message)
+        tprint(game, message)
 
     def show(self):
         damageString = str(self.damage)
@@ -256,7 +264,7 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-        tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
+        tprint(self.game, whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
 
     def place(self, castle, room_to_place = None):
         print (self.name)
@@ -293,7 +301,8 @@ class Weapon:
         print('-'*20)
 
 class Protection:
-    def __init__(self, name='', name1='защиту', protection=1, actions=''):
+    def __init__(self, game, name='', name1='защиту', protection=1, actions=''):
+        self.game = game
         self.name = name
         self.name1 = name1
         self.actions = actions.split(',')
@@ -355,7 +364,7 @@ class Protection:
                 multiplier = 1.5
             elif self.element() in weakness[who.weapon.element()]:
                 multiplier = 0.67
-        tprint('Множитель защиты - ' + str(multiplier))
+        tprint(self.game, 'Множитель защиты - ' + str(multiplier))
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection()
@@ -368,10 +377,10 @@ class Protection:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            tprint(who.name + ' использует ' + self.name1 + ' как защиту.')
+            tprint(self.game, who.name + ' использует ' + self.name1 + ' как защиту.')
         else:
-            player.pockets.append(self)
-            tprint(who.name + ' забирает ' + self.name1 + ' себе.')
+            self.game.player.pockets.append(self)
+            tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
         protectionString = str(self.protection)
@@ -386,11 +395,12 @@ class Protection:
             whoUsing.pockets.append(whoUsing.shield)
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
-        tprint(whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
+        tprint(self.game, whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, name='', name1='доспех', protection=1, actions=''):
+    def __init__(self, game, name='', name1='доспех', protection=1, actions=''):
+        self.game = game
         if name != 0:
             self.name = name
             self.name1 = name1
@@ -459,11 +469,12 @@ class Armor(Protection):
             message.append('При этом он снимает ' + oldArmor.name1 + ' и оставляет валяться на полу.')
             who.drop(oldArmor)
         who.armor = self
-        tprint(message)
+        tprint(self.game, message)
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, name='', name1='щит', protection=1, actions=''):
+    def __init__(self, game, name='', name1='щит', protection=1, actions=''):
+        self.game = game
         if name != 0:
             self.name = name
             self.name1 = name1
@@ -527,24 +538,26 @@ class Shield (Protection):
             message.append('При этом он бросает старый ' + oldShield.name1 + ' и оставляет валяться на полу.')
             who.drop(oldShield)
         who.shield = self
-        tprint(message)
+        tprint(self.game, message)
 
 class Matches(Item):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game):
+        self.game = game
+        self.canUseInFight = False
         self.name = 'спички'
         self.name1 = 'спички'
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
 
     def place(self, castle, room_to_place = None):
+        game = self.game
         print (self.name)
         if room_to_place:
             room = room_to_place
         else:
             done = False
             while not done:
-                room = randomitem(newCastle.plan, False)
+                room = randomitem(game.newCastle.plan, False)
                 print ('В комнате светло: ', room.light, 'Комната заперта: ', room.locked)
                 if not room.locked and room.light:
                     done = True
@@ -561,26 +574,29 @@ class Matches(Item):
         print('-'*20)
 
     def use(self, whoIsUsing = None, inaction = False):
-        global player
+        player = self.game.player
+        game = self.game
         if not whoIsUsing:
             whoIsUsing = player
-        room = newCastle.plan[whoIsUsing.currentPosition]
+        room = game.newCastle.plan[whoIsUsing.currentPosition]
         if room.light:
             message = ['Незачем тратить спички, здесь и так светло.']
-            tprint(message)
+            tprint(game, message)
         else:
             room.light = True
             room.torch = True
             message = [whoIsUsing.name + ' зажигает факел и комната озаряется светом']
-            tprint(message)
+            tprint(game, message)
             room.show(whoIsUsing)
             room.map()
-            if room.center.agressive:
-                self.fight(room.center, True)
+            if room.center != '':
+                if room.center.agressive:
+                    player.fight(room.center, True)
 
 class Map(Item):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game):
+        self.game = game
+        self.canUseInFight = False
         self.name = 'карта'
         self.name1 = 'карту'
         self.description = 'Карта, показывающая расположение комнат замка'
@@ -605,16 +621,17 @@ class Map(Item):
 
     def use(self, whoisusing, inaction=False):
         if not inaction:
-            tprint(whoisusing.name + ' смотрит на карту замка.')
-            newCastle.map()
+            tprint(self.game, whoisusing.name + ' смотрит на карту замка.')
+            self.game.newCastle.map()
             return True
         else:
-            tprint('Во время боя это совершенно неуместно!')
+            tprint(self.game, 'Во время боя это совершенно неуместно!')
             return False
 
 class Key(Item):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game):
+        self.game = game
+        self.canUseInFight = False
         self.name = 'ключ'
         self.name1 = 'ключ'
         self.description = 'Ключ, пригодный для дверей и сундуков'
@@ -648,7 +665,8 @@ class Key(Item):
         print('-'*20)
 
 class Potion(Item):
-    def __init__(self, name='', effect=0, type=0, canUseInFight=True):
+    def __init__(self, game, name='', effect=0, type=0, canUseInFight=True):
+        self.game = game
         self.name = name
         potions = [['Зелье исцеления', 10, 0, True,
                     'Лечебное зелье восстанавливает некоторое количество единиц здоровья.'],
@@ -702,33 +720,34 @@ class Potion(Item):
         print('-'*20)
 
     def use(self, whoUsing, inaction = False):
+        game = self.game
         if not inaction:
             if self.type == 1:
                 whoUsing.startHealth += self.effect
                 whoUsing.health += self.effect
-                tprint (whoUsing.name + ' увеличивает свое максмальное здоровье на ' +
+                tprint (game, whoUsing.name + ' увеличивает свое максмальное здоровье на ' +
                         str(self.effect) + ' до ' + str(whoUsing.health) + '.')
                 return True
             elif self.type == 2:
                 whoUsing.stren += self.effect
                 whoUsing.startStren += self.effect
-                tprint (whoUsing.name + ' увеличивает свою силу на ' +
+                tprint (game, whoUsing.name + ' увеличивает свою силу на ' +
                         str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 4:
                 whoUsing.dext += self.effect
                 whoUsing.startDext += self.effect
-                tprint (whoUsing.name + ' увеличивает свою ловкость на ' +
+                tprint (game, whoUsing.name + ' увеличивает свою ловкость на ' +
                         str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 6:
                 whoUsing.intel += self.effect
                 whoUsing.startIntel += self.effect
-                tprint (whoUsing.name + ' увеличивает свой интеллект на ' +
+                tprint (game, whoUsing.name + ' увеличивает свой интеллект на ' +
                         str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
-                tprint('Это зелье можно использовать только в бою!')
+                tprint(game, 'Это зелье можно использовать только в бою!')
                 return False
         else:
             if self.type == 0:
@@ -737,31 +756,34 @@ class Potion(Item):
                 else:
                     heal = dice(1, self.effect)
                 whoUsing.health += heal
-                tprint (whoUsing.name + ' восполняет ' + howmany(heal, 'единицу жизни,единицы жизни,единиц жизни'))
+                tprint (game, whoUsing.name +
+                        ' восполняет ' +
+                        howmany(heal, 'единицу жизни,единицы жизни,единиц жизни'))
                 return True
             elif self.type == 3:
                 whoUsing.stren += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою силу на ' +
+                tprint (game, 'На время боя ' + whoUsing.name + ' увеличивает свою силу на ' +
                         str(self.effect) + ' до ' + str(whoUsing.stren) + '.')
                 return True
             elif self.type == 5:
                 whoUsing.dext += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' +
+                tprint (game, 'На время боя ' + whoUsing.name + ' увеличивает свою ловкость на ' +
                         str(self.effect) + ' до ' + str(whoUsing.dext) + '.')
                 return True
             elif self.type == 7:
                 whoUsing.intel += self.effect
-                tprint ('На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' +
+                tprint (game, 'На время боя ' + whoUsing.name + ' увеличивает свой интеллект на ' +
                         str(self.effect) + ' до ' + str(whoUsing.intel) + '.')
                 return True
             else:
-                tprint('Это зелье нельзя использовать в бою!')
+                tprint(game, 'Это зелье нельзя использовать в бою!')
                 return False
     def __str__(self):
         return self.description
 
 class Book(Item):
-    def __init__(self, name=''):
+    def __init__(self, game, name=''):
+        self.game = game
         self.name = name
 
     def on_create(self):
@@ -800,7 +822,8 @@ class Book(Item):
         return self.name
 
 class Loot:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.pile = []
 
     def __str__(self):
@@ -816,8 +839,9 @@ class Loot:
         self.pile.remove(obj)
 
 class Furniture:
-    def __init__(self, name=''):
-        newloot = Loot()
+    def __init__(self, game, name=''):
+        self.game = game
+        newloot = Loot(self.game)
         self.ambush = False
         self.loot = newloot
         self.locked = False
@@ -862,52 +886,54 @@ class Furniture:
         print ('Поставлен в комнату')
         if dice(1, 4) == 1 and self.lockable:
             self.locked = True
-            veryNewKey = Key()
+            veryNewKey = Key(self.game)
             veryNewKey.place(castle)
             print ('Заперт')
         if dice(1, 100) <= 50:
-            newMoney = Money(dice(1, 50))
+            newMoney = Money(self.game, dice(1, 50))
             self.loot.pile.append(newMoney)
-            print ('Добавлены деньги', newMoney.howmanymoney)
+            print ('Добавлены деньги', newMoney.howmuchmoney)
         print('-'*20)
         return True
 
 class Money:
-    def __init__(self, howmanymoney):
-        self.howmanymoney = howmanymoney
-        if 0 < self.howmanymoney <= 10:
+    def __init__(self, game, howmuchmoney):
+        self.game = game
+        self.howmuchmoney = howmuchmoney
+        if 0 < self.howmuchmoney <= 10:
             self.name = 'Несколько монет'
             self.name1 = 'Несколько монет'
-        elif 10 < self.howmanymoney <= 20:
+        elif 10 < self.howmuchmoney <= 20:
             self.name = 'Кучка монет'
             self.name1 = 'Кучку монет'
-        elif 20 < self.howmanymoney <= 30:
+        elif 20 < self.howmuchmoney <= 30:
             self.name = 'Груда монет'
             self.name1 = 'Груду монет'
-        elif 30 < self.howmanymoney:
+        elif 30 < self.howmuchmoney:
             self.name = 'Много монет'
             self.name1 = 'Много монет'
 
     def __str__(self):
-        return self.name + ' (' + self.howmanymoney + ')'
+        return self.name + ' (' + self.howmuchmoney + ')'
 
     def take(self, luckyOne):
-        luckyOne.money.howmanymoney += self.howmanymoney
-        tprint(luckyOne.name + ' забрал ' + howmany(self.howmanymoney, 'монету,монеты,монет'))
+        luckyOne.money.howmuchmoney += self.howmuchmoney
+        tprint(self.game, luckyOne.name + ' забрал ' + howmany(self.howmuchmoney, 'монету,монеты,монет'))
 
     def show(self):
-        if self.howmanymoney > 0:
-            return howmany(self.howmanymoney, 'монету,монеты,монет')
+        if self.howmuchmoney > 0:
+            return howmany(self.howmuchmoney, 'монету,монеты,монет')
         else:
             return 'Денег нет'
 
     def __add__(self, other):
-        self.howmanymoney += other.howmanymoney
+        self.howmuchmoney += other.howmuchmoney
 
 
 class Hero:
-    def __init__(self, name, name1, gender, stren=10, dext=2, intel=0, health=20, weapon='', shield='', actions='бьет',
+    def __init__(self, game, name, name1, gender, stren=10, dext=2, intel=0, health=20, weapon='', shield='', actions='бьет',
                  pockets=[]):
+        self.game = game
         self.name = name
         self.name1 = name1
         self.gender = gender
@@ -923,7 +949,7 @@ class Hero:
         self.armor = ''
         self.shield = shield
         self.pockets = pockets
-        self.money = Money(0)
+        self.money = Money(self.game, 0)
         self.currentPosition = 0
         self.gameOver = False
         self.startHealth = self.health
@@ -937,20 +963,20 @@ class Hero:
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.elementLevels = {'1': 2, '2': 4, '3': 7, '4': 10}
         self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0}
-        self.directionsDict = {0: (0 - newCastle.rooms),
+        self.directionsDict = {0: (0 - self.game.newCastle.rooms),
                                1: 1,
-                               2: newCastle.rooms,
+                               2: self.game.newCastle.rooms,
                                3: (0 - 1),
-                               'наверх': (0 - newCastle.rooms),
+                               'наверх': (0 - self.game.newCastle.rooms),
                                'направо': 1,
                                'вправо': 1,
                                'налево': (0 - 1),
                                'лево': (0 - 1),
                                'влево': (0 - 1),
-                               'вниз': newCastle.rooms,
-                               'низ': newCastle.rooms,
-                               'вверх': (0 - newCastle.rooms),
-                               'верх': (0 - newCastle.rooms),
+                               'вниз': self.game.newCastle.rooms,
+                               'низ': self.game.newCastle.rooms,
+                               'вверх': (0 - self.game.newCastle.rooms),
+                               'верх': (0 - self.game.newCastle.rooms),
                                'право': 1}
         self.doorsDict = {'наверх': 0,
                           'направо': 1,
@@ -987,22 +1013,22 @@ class Hero:
         return False
 
     def run_away(self, target):
-        global IN_FIGHT
-        room = newCastle.plan[self.currentPosition]
+        game = self.game
+        room = game.newCastle.plan[self.currentPosition]
         if room.light:
-            tprint(self.name + ' сбегает с поля боя.')
+            tprint(game, self.name + ' сбегает с поля боя.')
         else:
-            tprint(self.name + ' в кромешной тьме пытается убежать хоть куда-нибудь.')
+            tprint(game, self.name + ' в кромешной тьме пытается убежать хоть куда-нибудь.')
         a = dice(1, 2)
         if a == 1 and self.weapon != '':
-            tprint('Убегая ' + self.name + ' роняет из рук ' + self.weapon.name1)
+            tprint(game, 'Убегая ' + self.name + ' роняет из рук ' + self.weapon.name1)
             if target.weapon == '' and target.carryweapon:
                 target.weapon = self.weapon
             else:
                 room.loot.add(self.weapon)
             self.weapon = ''
         elif a == 2 and self.shield != '':
-            tprint('Убегая ' + self.name + ' теряет ' + self.shield.name1)
+            tprint(game, 'Убегая ' + self.name + ' теряет ' + self.shield.name1)
             if target.shield == '' and target.carryshield:
                 target.shield = self.shield
             else:
@@ -1017,7 +1043,7 @@ class Hero:
                 text.append(self.pockets[b].name1)
                 room.loot.add(self.pockets[b])
                 self.pockets.pop(b)
-            tprint(text)
+            tprint(game, text)
         availableDirections = []
         for i in range(4):
             if room.doors[i] == 1:
@@ -1029,9 +1055,9 @@ class Hero:
             if direction not in availableDirections:
                 return False
         self.currentPosition += self.directionsDict[direction]
-        room = newCastle.plan[self.currentPosition]
+        room = game.newCastle.plan[self.currentPosition]
         room.visited = '+'
-        IN_FIGHT = False
+        game.IN_FIGHT = False
         self.lookaround()
         if room.center != '':
             if room.center.agressive and room.light:
@@ -1039,8 +1065,8 @@ class Hero:
         return self.name + ' еле стоит на ногах.'
 
     def attack(self, target, action):
-        global IN_FIGHT
-        room = newCastle.plan[self.currentPosition]
+        game = self.game
+        room = game.newCastle.plan[self.currentPosition]
         if room.light:
             targetName = target.name
             targetName1 = target.name1
@@ -1059,9 +1085,8 @@ class Hero:
         for i in self.pockets:
             if i.canUseInFight:
                 canUse.append(i)
-
         if action == '' or action == 'у' or action == 'ударить':
-            tprint(showsides(self, target, newCastle))
+            tprint(game, showsides(self, target, game.newCastle))
             self.rage = 0
             if self.weapon != '':
                 weaponAttack = self.weapon.attack()
@@ -1087,7 +1112,7 @@ class Hero:
             target.health -= totalDamage
             return string1 + string2
         elif action == 'з' or action == 'защититься' or action == 'защита':
-            tprint(showsides(self, target, newCastle))
+            tprint(game, showsides(self, target, game.newCastle))
             self.hide = True
             self.rage += 1
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
@@ -1098,10 +1123,10 @@ class Hero:
             else:
                 return result
         elif (action == 'и' or action == 'использовать') and len(canUse) > 0:
-            tprint('Во время боя ' + self.name + ' может использовать:')
+            tprint(game, 'Во время боя ' + self.name + ' может использовать:')
             for i in self.pockets:
                 if i.canUseInFight:
-                    tprint(i.name)
+                    tprint(game, i.name)
             while True:
                 a = input('Что нужно использовать?')
                 if a == 'ничего' or a == '':
@@ -1116,7 +1141,7 @@ class Hero:
                             break
                     if itemUsed:
                         break
-                    tprint('Что-то не выходит')
+                    tprint(game, 'Что-то не выходит')
         elif (action == 'с' or action == 'сменить оружие' or action == 'сменить'):
             weapon = self.weapon
             spareWeapon = False
@@ -1127,7 +1152,7 @@ class Hero:
             self.pockets.remove(spareWeapon)
             self.pockets.append(weapon)
             message = [self.name + ' меняет ' + weapon.name1 + ' на ' + spareWeapon.name1 + '.']
-            tprint(message)
+            tprint(game, message)
         return True
 
     def show(self):
@@ -1143,8 +1168,9 @@ class Hero:
                                                            self.shield.permprotection())
         else:
             string2 = 'У него нет защиты'
-        tprint(
-            '{0} - это смелый герой {7} уровня. Его сила - {1}{2} {3} и сейчас у него {4} здоровья, что составляет {5}% от максимально возможного.\n{0} имеет при себе {6} золотом.'.format(
+        tprint(self.game,
+            '{0} - это смелый герой {7} уровня. Его сила - {1}{2} {3} и сейчас у него {4} здоровья, '
+            'что составляет {5}% от максимально возможного.\n{0} имеет при себе {6} золотом.'.format(
                 self.name, self.stren, string1, string2, howmany(self.health, 'единица,единицы,единиц'),
                 self.health * 100 // self.startHealth, howmany(self.money.howmanymoney, 'монету,монеты,монет'),
                 self.level))
@@ -1170,33 +1196,34 @@ class Hero:
         self.dext = self.startDext
         self.intel = self.startIntel
         self.wins += 1
-        tprint(self.name + ' получает ' + howmany(loser.exp, 'единицу,единицы,единиц') + ' опыта!')
+        tprint(self.game, self.name + ' получает ' + howmany(loser.exp, 'единицу,единицы,единиц') + ' опыта!')
         self.exp += loser.exp
         if self.exp > self.levels[self.level]:
             self.levelup()
 
     def levelup(self):
-        global LEVEL_UP
-        LEVEL_UP = True
+        self.game.LEVEL_UP = True
         level_up_message = []
         level_up_message.append(self.name + ' получает новый уровень!')
         level_up_message.append('Что необходимо прокачать: здоровье, силу, ловкость или интеллект?')
-        tprint(level_up_message, 'levelup')
+        tprint(self.game, level_up_message, 'levelup')
         self.level += 1
         return True
 
     def gameover(self, goaltype, goal):
         if goaltype == 'killall':
-            if newCastle.monsters() == 0:
-                tprint(self.name + ' убил всех монстров в замке и выиграл в этой игре!')
+            if self.game.newCastle.monsters() == 0:
+                tprint(self.game, self.name + ' убил всех монстров в замке и выиграл в этой игре!')
                 return True
             else:
                 return False
         return False
 
     def lookaround(self, a=''):
+        game = self.game
+        newCastle = self.game.newCastle
         if a == '':
-            newCastle.plan[self.currentPosition].show(player)
+            newCastle.plan[self.currentPosition].show(game.player)
             newCastle.plan[self.currentPosition].map()
         elif a == 'себя':
             self.show()
@@ -1206,51 +1233,54 @@ class Hero:
             for i in range(len(self.pockets)):
                 text.append(str(i+1) + ': ' + self.pockets[i].show())
             text.append(self.money.show())
-            tprint(text)
+            tprint(game, text)
         elif a in self.directionsDict.keys():
             if newCastle.plan[self.currentPosition].doors[self.doorsDict[a]] == 0:
-                tprint (self.name + ' осматривает стену и не находит ничего заслуживающего внимания.')
+                tprint (game, self.name + ' осматривает стену и не находит ничего заслуживающего внимания.')
             else:
-                tprint(self.name + ' заглядывает в замочную скважину и ' + newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
+                tprint(game, self.name + ' заглядывает в замочную скважину и ' +
+                       newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
 
         if newCastle.plan[self.currentPosition].center != '':
             if (a == newCastle.plan[self.currentPosition].center.name or a == newCastle.plan[
                 self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[
                 0]) and isinstance(newCastle.plan[self.currentPosition].center, Monster):
-                tprint(showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
+                tprint(game, showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
 
         if self.weapon != '':
             if a == self.weapon.name or a == self.weapon.name1 or a == 'оружие':
-                tprint(self.weapon.show())
+                tprint(game, self.weapon.show())
         if self.shield != '':
             if a == self.shield.name or a == self.shield.name1 or a == 'защиту':
-                tprint(self.shield.show())
+                tprint(game, self.shield.show())
 
         if len(self.pockets) > 0:
             text = []
             for i in self.pockets:
                 if a == i.name or a == i.name1:
                     text.append(i.show())
-            tprint(text)
+            tprint(game, text)
 
     def go(self, direction):
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         if direction not in self.directionsDict.keys():
-            tprint(self.name + ' не знает такого направления!')
+            tprint(game, self.name + ' не знает такого направления!')
             return False
         elif room.doors[self.doorsDict[direction]] == 0:
             if room.light:
                 message = ['Там нет двери. ' + self.name + ' не может туда пройти!']
             else:
                 message = ['В темноте ' + self.name + ' врезается во что-то носом.']
-            tprint(message)
+            tprint(game, message)
             return False
         elif room.doors[self.doorsDict[direction]] == 2:
             if room.light:
                 message = ['Эта дверь заперта. ' + self.name + ' не может туда пройти, нужен ключ!']
             else:
                 message = ['В темноте ' + self.name + ' врезается во что-то носом.']
-            tprint(message)
+            tprint(game, message)
             return False
         else:
             self.currentPosition += self.directionsDict[direction]
@@ -1264,40 +1294,43 @@ class Hero:
             return True
 
     def fight(self, enemy, agressive = False):
-        global IN_FIGHT
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         if isinstance(enemy, Monster):
             whoisfighting = enemy
         elif room.center != '':
             if not isinstance(room.center, Monster):
-                tprint('Не нужно кипятиться. Тут некого атаковать')
+                tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
                 return False
             elif (room.center.name != enemy
                     and room.center.name1 != enemy
                     and room.center.name[0] != enemy) \
                     and enemy != '':
-                tprint(self.name + ' не может атаковать. В комнате нет такого существа.')
+                tprint(game, self.name + ' не может атаковать. В комнате нет такого существа.')
                 return False
             else:
                 whoisfighting = room.center
-        IN_FIGHT = True
+        game.IN_FIGHT = True
         if agressive:
             whoFirst = 2
         else:
             whoFirst = dice(1, 2)
         if whoFirst == 1:
-            tprint(player.name + ' начинает схватку!', 'fight')
+            tprint(game, game.player.name + ' начинает схватку!', 'fight')
             self.attack(whoisfighting, 'атаковать')
         else:
             if room.light:
                 message = [whoisfighting.name + ' начинает схватку!']
             else:
                 message = ['Что-то жуткое и непонятное нападает первым из темноты.']
-            tprint(message, 'fight')
-            tprint(whoisfighting.attack(self))
+            tprint(game, message, 'fight')
+            tprint(game, whoisfighting.attack(self))
             return True
 
     def search(self, item=False):
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         message = []
         print ('room.center: ', room.center)
@@ -1312,11 +1345,11 @@ class Hero:
             enemyinambush = False
         if not room.light:
             message.append(['В комнате настолько темно, что невозможно что-то отыскать.'])
-            tprint(message)
+            tprint(game, message)
             return True
         if enemyinroom:
             message.append(enemyinroom.name + " мешает толком осмотреть комнату.")
-            tprint(message)
+            tprint(game, message)
             return True
         if enemyinambush and not item:
             room.center = enemyinambush
@@ -1324,7 +1357,7 @@ class Hero:
             enemyinambush = False
             enemyinroom = room.center
             message.append('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
-            tprint (message)
+            tprint (game, message)
             self.fight(enemyinroom, True)
             return True
         if not item:
@@ -1338,7 +1371,7 @@ class Hero:
                     message.append(i.name)
             else:
                 message.append('В комнате нет ничего интересного.')
-            tprint(message)
+            tprint(game, message)
             return True
         else:
             searchableItems = []
@@ -1362,7 +1395,7 @@ class Hero:
                     message.append('Все эти вещи теперь лежат навиду.')
             elif len(whatToSearch.loot.pile) == 0:
                 message.append(whatToSearch.name + ' ' + whatToSearch.empty)
-            tprint(message)
+            tprint(game, message)
             return True
 
     def can_take(self, object):
@@ -1373,9 +1406,11 @@ class Hero:
         return True
 
     def take(self, item='все'):
+        game = self.game
+        newCastle = self.game.newCastle
         currentLoot = newCastle.plan[self.currentPosition].loot
         if currentLoot == '':
-            tprint('Здесь нечего брать.')
+            tprint(game, 'Здесь нечего брать.')
             return False
         elif item == 'все' or item == 'всё' or item == '':
             for i in currentLoot.pile:
@@ -1389,10 +1424,12 @@ class Hero:
                     i.take(self)
                     currentLoot.pile.remove(i)
                     return True
-        tprint('Такой вещи здесь нет.')
+        tprint(game, 'Такой вещи здесь нет.')
         return False
 
     def drop(self, object):
+        game = self.game
+        newCastle = self.game.newCastle
         currentLoot = newCastle.plan[self.currentPosition].loot
         currentLoot.pile.append(object)
         if self.armor == object:
@@ -1405,6 +1442,8 @@ class Hero:
             self.pockets.remove(object)
 
     def open(self, item=''):
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         key = False
         for i in self.pockets:
@@ -1412,7 +1451,7 @@ class Hero:
                 key = i
         if not key:
             message = ['Чтобы что-то открыть нужен хотя бы один ключ.']
-            tprint(message)
+            tprint(game, message)
             return False
         whatIsInRoom = []
         if len(room.furniture) > 0:
@@ -1427,7 +1466,7 @@ class Hero:
                     message = ['В комнате нет вещей, которые можно открыть.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
-                tprint(message)
+                tprint(game, message)
                 return False
             elif item == '' and len(whatIsInRoom) > 1:
                 if room.light:
@@ -1436,7 +1475,7 @@ class Hero:
                                ' не понимает, что ему нужно открыть.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
-                tprint(message)
+                tprint(game, message)
                 return False
             elif item != '':
                 if room.light:
@@ -1445,13 +1484,13 @@ class Hero:
                             self.pockets.remove(key)
                             furniture.locked = False
                             message = [self.name + ' отпирает ' + furniture.name1 + ' ключом.']
-                            tprint(message)
+                            tprint(game, message)
                             return True
                     message = [self.name + ' не находит в комнате такой вещи. Отпирать нечего.']
-                    tprint(message)
+                    tprint(game, message)
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
-                tprint(message)
+                tprint(game, message)
                 return True
             else:
                 if room.light:
@@ -1460,29 +1499,31 @@ class Hero:
                     message = [self.name + ' отпирает ' + whatIsInRoom[0].name1 + ' ключом.']
                 else:
                     message = [self.name + ' шарит в темноте руками, но не нащупывает ничего интересного']
-                tprint(message)
+                tprint(game, message)
                 return True
         else:
             if not room.light:
                 message = [self.name + ' ничего не видит и не может нащупать замочную скважину.']
-                tprint (message)
+                tprint (game, message)
                 return False
             if not self.doorsDict.get(item, False) and self.doorsDict.get(item, True) != 0:
-                tprint(self.name + ' не может это открыть.')
+                tprint(game, self.name + ' не может это открыть.')
                 return False
             elif newCastle.plan[self.currentPosition].doors[self.doorsDict[item]] != 2:
-                tprint('В той стороне нечего открывать.')
+                tprint(game, 'В той стороне нечего открывать.')
                 return False
             else:
                 self.pockets.remove(key)
                 room.doors[self.doorsDict[item]] = 1
                 j = self.doorsDict[item] + 2 if (self.doorsDict[item] + 2) < 4 else self.doorsDict[item] - 2
                 newCastle.plan[self.currentPosition + self.directionsDict[item]].doors[j] = 1
-                tprint(self.name + ' открывает дверь.')
+                tprint(game, self.name + ' открывает дверь.')
 
     def use(self, item='', infight=False):
+        game = self.game
+        newCastle = self.game.newCastle
         if item == '':
-            tprint(self.name + ' не понимает, что ему надо использовать.')
+            tprint(game, self.name + ' не понимает, что ему надо использовать.')
         elif item.isdigit():
             if int(item)-1 < len(self.pockets):
                 i = self.pockets[int(item)-1]
@@ -1492,7 +1533,7 @@ class Hero:
                     i.use(self, False)
                 return True
             else:
-                tprint(self.name + ' не нашел такой вещи у себя в карманах.')
+                tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
                 return False
         else:
             for i in self.pockets:
@@ -1502,42 +1543,42 @@ class Hero:
                     else:
                         i.use(self, inaction = False)
                     return True
-            tprint(self.name + ' не нашел такой вещи у себя в карманах.')
+            tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
-        global ENCHANTING
-        global selectedItem
+        game = self.game
+        newCastle = self.game.newCastle
         runeList = self.inpockets(Rune)
         if len(runeList) == 0:
-            tprint(self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
+            tprint(game, self.name + 'не может ничего улучшать. В карманах не нашлось ни одной руны.')
             return False
         if item == '':
-            tprint(self.name + ' не понимает, что ему надо улучшить.')
+            tprint(game, self.name + ' не понимает, что ему надо улучшить.')
             return False
         elif item == 'оружие' and self.weapon != '':
-            selectedItem = self.weapon
+            game.selectedItem = self.weapon
         elif item in ['защиту', 'защита'] and self.shield != '':
-            selectedItem = self.shield
+            game.selectedItem = self.shield
         elif item.isdigit() and int(item)-1 <= len(self.pockets):
-            selectedItem = self.pockets[int(item)-1]
+            game.selectedItem = self.pockets[int(item)-1]
         else:
             for i in self.pockets:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
-                    selectedItem = i
+                    game.selectedItem = i
                 else:
-                    tprint(self.name + ' не нашел такой вещи у себя в карманах.')
+                    tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
                     return False
-        if selectedItem != '' and isinstance(selectedItem, Weapon) or isinstance(selectedItem, Shield):
+        if game.selectedItem != '' and isinstance(game.selectedItem, Weapon) or isinstance(game.selectedItem, Shield):
             text = []
             text.append(self.name + ' может использовать следующие руны:')
             for rune in runeList:
                 text.append(str(runeList.index(rune)+1) + ': ' + str(rune))
             text.append('Введите номер руны или "отмена" для прекращения улучшения')
             #Здесь нужна доработка т.к. управление переходит на работу с рунами
-            ENCHANTING = True
-            tprint(text, 'enchant')
+            game.ENCHANTING = True
+            tprint(game, text, 'enchant')
         else:
-            tprint(self.name + ' не может улучшить эту вещь.')
+            tprint(game, self.name + ' не может улучшить эту вещь.')
             return False
 
     def do(self, command):
@@ -1560,11 +1601,11 @@ class Hero:
             text.append(self.name + " может:")
             for i in commandDict.keys():
                 text.append(i)
-            tprint(text)
+            tprint(self.game, text)
             return True
         c = commandDict.get(fullCommand[0], False)
         if not c:
-            tprint('Такого ' + self.name + ' не умеет!')
+            tprint(self.game, 'Такого ' + self.name + ' не умеет!')
         elif len(fullCommand) == 1:
             c()
         else:
@@ -1572,8 +1613,9 @@ class Hero:
 
 
 class Monster:
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
                  carryweapon=True, carryshield=True, wearArmor=True):
+        self.game = game
         self.name = name
         self.name1 = name1
         self.stren = int(stren)
@@ -1586,7 +1628,7 @@ class Monster:
         self.money = 5
         self.currentPosition = 0
         self.startHealth = self.health
-        self.loot = Loot()
+        self.loot = Loot(self.game)
         self.hide = False
         self.run = False
         self.wounded = False
@@ -1657,13 +1699,15 @@ class Monster:
             return randomitem(self.weapon.actions)
 
     def mele(self):
-        room = newCastle.plan[self.currentPosition]
+        room = self.game.newCastle.plan[self.currentPosition]
         if room.light:
             return dice(1, self.stren)
         else:
             return dice(1, self.stren) // dice(1, 3)
 
     def attack(self, target):
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         if room.light:
             selfName = self.name
@@ -1671,7 +1715,6 @@ class Monster:
         else:
             selfName = 'Кто-то страшный'
             selfName1 = 'черт знает кого'
-        global IN_FIGHT
         text = []
         meleAttack = self.mele()
         if self.weapon != '':
@@ -1696,12 +1739,12 @@ class Monster:
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
         target.health -= totalDamage
         if target.health <= 0:
-            IN_FIGHT = False
+            game.IN_FIGHT = False
             target.lose(self)
             text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
-            tprint(text, 'off')
+            tprint(game, text, 'off')
         else:
-            tprint(text)
+            tprint(game, text)
         return True
 
     def defence(self, attacker):
@@ -1711,6 +1754,8 @@ class Monster:
             return self.shield.protect(attacker)
 
     def lose(self, winner):
+        game = self.game
+        newCastle = self.game.newCastle
         result = dice(1, 10)
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
@@ -1762,7 +1807,7 @@ class Monster:
                 runningMonsters = [self]
                 if newCastle.inhabit(runningMonsters, 1, True):
                     aliveString += self.name + ' убегает из комнаты.'
-                    tprint(aliveString)
+                    tprint(game, aliveString)
                     where.center = ''
             else:
                 aliveString += 'получает ранение в ногу и не может двигаться, теряя при этом '  \
@@ -1770,7 +1815,7 @@ class Monster:
                                + howmany(illAmount, 'жизнь,жизни,жизней') + '.'
                 self.stren -= weaknessAmount
                 self.health = self.startHealth - illAmount
-                tprint(aliveString)
+                tprint(game, aliveString)
 
     def win(self, loser):
         self.health = self.startHealth
@@ -1797,9 +1842,9 @@ class Monster:
 
 
 class Plant(Monster):
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='растёт', agressive=False,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='растёт', agressive=False,
                  carryweapon=False, carryshield=False):
-        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.carryshield = False
         self.carryweapon = False
         self.wearArmor = False
@@ -1810,6 +1855,8 @@ class Plant(Monster):
         return newPlant
 
     def win(self, loser):
+        game = self.game
+        newCastle = self.game.newCastle
         self.health = self.startHealth
         for i in range(4):
             if newCastle.plan[self.currentPosition].doors[i] == 1:
@@ -1831,6 +1878,8 @@ class Plant(Monster):
                     copy.currentPosition = self.currentPosition - 1
 
     def lose(self, winner):
+        game = self.game
+        newCastle = self.game.newCastle
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
@@ -1856,14 +1905,14 @@ class Plant(Monster):
         self.currentPosition = room.position
 
 class Walker(Monster):
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
-        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
 class Berserk(Monster):
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=True, carryshield=True):
-        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.agressive = True
         self.carryshield = False
         self.rage = 0
@@ -1884,9 +1933,9 @@ class Berserk(Monster):
         self.currentPosition = room.position
 
 class Shapeshifter(Monster):
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
                  carryweapon=False, carryshield=True):
-        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.shifted = False
         self.agressive = True
 
@@ -1899,7 +1948,7 @@ class Shapeshifter(Monster):
                 weaponString = ' и ' + self.weapon.name + ' в руках.'
             else:
                 weaponString = ''
-            tprint(self.name +
+            tprint(self.game, self.name +
                    ' меняет форму и становится точь в точь как ' +
                    attacker.name +
                    '. У него теперь сила ' +
@@ -1911,7 +1960,7 @@ class Shapeshifter(Monster):
             return self.shield.protect(attacker)
 
     def lose(self, winner):
-        where = newCastle.plan[self.currentPosition]
+        where = self.game.newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
             where.loot = b
@@ -1925,12 +1974,13 @@ class Shapeshifter(Monster):
 
 
 class Vampire(Monster):
-    def __init__(self, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
+    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
                  carryweapon=True, carryshield=True):
-        super().__init__(name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
 
     def attack(self, target):
-        global IN_FIGHT
+        game = self.game
+        newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         if room.light:
             selfName = self.name
@@ -1993,12 +2043,12 @@ class Vampire(Monster):
         target.health -= totalDamage
         self.health += totalDamage // 2
         if target.health <= 0:
-            IN_FIGHT = False
+            game.IN_FIGHT = False
             target.lose(self)
             text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
-            tprint(text, 'off')
+            tprint(game, text, 'off')
         else:
-            tprint(text)
+            tprint(game, text)
         return True
 
     def place(self, castle, roomr_to_place = None):
@@ -2020,7 +2070,8 @@ class Vampire(Monster):
 
 
 class Room:
-    def __init__(self, doors, center='', loot=''):
+    def __init__(self, game, doors, center='', loot=''):
+        self.game = game
         self.doors = doors
         a = dice(0, len(decor1) - 1)
         self.decoration1 = decor1[a]
@@ -2047,6 +2098,7 @@ class Room:
             self.torch = True
 
     def show(self, player):
+        game = self.game
         if self.light:
             if self.torch:
                 self.decoration1 = 'освещенную факелом ' + self.decoration1
@@ -2061,12 +2113,12 @@ class Room:
             for furniture in self.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             message.append(whoIsHere)
-            tprint(message, state = 'direction')
+            tprint(game, message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
             if isinstance(self.center, Monster):
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
-            tprint(message, state = 'direction')
+            tprint(game, message, state = 'direction')
 
     def showThroughKeyHole(self, who):
         if self.center == '':
@@ -2082,6 +2134,7 @@ class Room:
         return types
 
     def map(self):
+        game=self.game
         doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
         doorsVertical = {'0': '║', '1': ' ', '2': '|'}
         string1 = '=={0}=='.format(doorsHorizontal[str(self.doors[0])])
@@ -2094,24 +2147,26 @@ class Room:
         string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
         string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
         if self.light:
-            pprint(string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
+            pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
             return True
         else:
             return False
 
     def lock(self, lockOrNot=2):
-        a = [-newCastle.rooms, 1, newCastle.rooms, -1]
+        game=self.game
+        a = [-game.newCastle.rooms, 1, game.newCastle.rooms, -1]
         for i in range(4):
             if self.doors[i] == 1:
                 self.doors[i] = lockOrNot
                 j = i + 2 if (i + 2) < 4 else i - 2
-                newCastle.plan[self.position + a[i]].doors[j] = lockOrNot
+                game.newCastle.plan[self.position + a[i]].doors[j] = lockOrNot
         self.locked = True
         return None
 
 
 class Castle:
-    def __init__(self, floors=5, rooms=5):
+    def __init__(self, game, floors=5, rooms=5):
+        self.game = game
         self.floors = floors
         self.rooms = rooms
         f = self.floors
@@ -2143,8 +2198,8 @@ class Castle:
                             self.allDoors[i + 1][3] = 1
         self.plan = []
         for i in range(f * r):
-            newLoot = Loot()
-            a = Room(self.allDoors[i], '', newLoot)
+            newLoot = Loot(self.game)
+            a = Room(self.game, self.allDoors[i], '', newLoot)
             a.position = i
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах
@@ -2161,13 +2216,13 @@ class Castle:
             while True:
                 a = randomitem(self.plan)
                 if a != self.plan[0]:
-                    newMoney = Money(dice(25, 75))
+                    newMoney = Money(self.game, dice(25, 75))
                     a.lock(2)
                     if a.center == '':
                         a.loot.pile.append(newMoney)
                     else:
                         a.center.loot.pile.append(newMoney)
-                    newKey = Key()
+                    newKey = Key(self.game)
                     newKey.place(self)
                     break
         return True
@@ -2175,6 +2230,7 @@ class Castle:
     def map(self):
         f = self.floors
         r = self.rooms
+        game = self.game
         doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
         doorsVertical = {'0': '║', '1': ' ', '2': '|'}
         text = []
@@ -2184,18 +2240,134 @@ class Castle:
             line1 = '║'
             line2 = ''
             for j in range(r):
-                a = player.name[0] if player.currentPosition == i * r + j else self.plan[i*r+j].visited
+                a = game.player.name[0] if game.player.currentPosition == i * r + j else self.plan[i*r+j].visited
                 line1 += '  {0}  {1}'.format(a, doorsVertical[str(self.allDoors[i * r + j][1])])
                 line2 += '==={0}=='.format(doorsHorizontal[str(self.allDoors[i * r + j][2])])
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
-        pprint(text, r*72, f*90)
+        pprint(game, text, r*72, f*90)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
         roomsWithMonsters = [a for a in self.plan if ((a.center != '' and isinstance(a.center, Monster))
                                                       or (a.ambush != '' and isinstance(a.ambush, Monster)))]
         return len(roomsWithMonsters)
+
+class Game():
+    def __init__(self, chat_id, howMany=0, hero=None):
+        self.IN_FIGHT = False  # Константа, отвечающая за то, что сейчас бой
+        self.LEVEL_UP = False  # Константа, отвечающая за то, что сейчас происходит прокачка
+        self.ENCHANTING = False  # Константа, отвечающая за то, что сейчас происходит улучшение шмотки
+        self.selectedItem = ''
+        self.gameIsOn = False
+        self.chat_id = chat_id
+        self.newCastle = Castle(self, 5, 5)  # Генерируем замок
+        if howMany == 0:
+            self.howMany = {'монстры': 10,
+                       'оружие': 10,
+                       'щит': 5,
+                       'доспех': 5,
+                       'зелье': 10,
+                       'мебель': 10,
+                       'книга': 5,
+                       'руна': 10}  # Количество всяких штук, которые разбрасываются по замку
+        else:
+            self.howMany = howMany
+        if not hero:
+            self.player = Hero(self, 'Артур', 'Артура', 'male', 10, 2, 1, 25, '', '',
+                                'бьет,калечит,терзает,протыкает')  # Создаем персонажа
+        else:
+            self.player = hero
+        # Создаем мебель и разбрасываем по замку
+        self.allFurniture = self.readobjects(file='furniture.json',
+                                        howmany=self.howMany['мебель'],
+                                        random=True)
+        for furniture in self.allFurniture:
+            furniture.place(castle=self.newCastle)
+        # Читаем монстров из файла и разбрасываем по замку
+        self.allMonsters = self.readobjects(file='monsters.json',
+                                       howmany=self.howMany['монстры'])
+        for monster in self.allMonsters:
+            monster.place(self.newCastle)
+        # Читаем оружие из файла и разбрасываем по замку
+        self.allWeapon = self.readobjects(file='weapon.json',
+                                     howmany=self.howMany['оружие'],
+                                     object_class=Weapon)
+        for weapon in self.allWeapon:
+            weapon.place(self.newCastle)
+        # Читаем щиты из файла и разбрасываем по замку
+        self.allShields = self.readobjects(file='shields.json',
+                                      howmany=self.howMany['щит'],
+                                      object_class=Shield)
+        for shield in self.allShields:
+            shield.place(self.newCastle)
+        # Читаем доспехи из файла и разбрасываем по замку
+        self.allArmor = self.readobjects(file='armor.json',
+                                    howmany=self.howMany['доспех'],
+                                    object_class=Armor)
+        for armor in self.allArmor:
+            armor.place(self.newCastle)
+        # Читаем зелья из файла и разбрасываем по замку
+        self.allPotions = self.readobjects(file='potions.json',
+                                      howmany=self.howMany['зелье'],
+                                      object_class=Potion)
+        for potion in self.allPotions:
+            potion.place(self.newCastle)
+        # Создаем руны и разбрасываем по замку
+        self.allRunes = [Rune(self) for i in range(self.howMany['руна'])]
+        for rune in self.allRunes:
+            rune.place(self.newCastle)
+        # Создаем книги и разбрасываем по замку
+        self.allBooks = self.readobjects(file='books.json',
+                                    howmany=self.howMany['книга'],
+                                    random=True,
+                                    object_class=Book)
+        for book in self.allBooks:
+            book.place(self.newCastle)
+        self.newCastle.lockDoors()  # Создаем запертые комнаты
+        map = Map(self)
+        map.place(self.newCastle)  # Создаем и прячем карту
+        matches = Matches(self)
+        matches.place(self.newCastle)  # Создаем и прячем спички
+        self.newCastle.plan[0].visited = '+'  # Делаем первую комнату посещенной
+        newKey = Key(self)  # Создаем ключ
+        self.player.pockets.append(newKey)  # Отдаем ключ игроку
+        self.gameIsOn = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
+
+    def __del__ (self):
+        print("="*40)
+        print('Игра удалена')
+        print("=" * 40)
+
+    def readobjects(self, file=None, howmany=None, object_class=None, random=False):
+        objects = []
+        if file:
+            with open(file, encoding='utf-8') as read_data:
+                parsed_data = json.load(read_data)
+            if not random:
+                for i in parsed_data:
+                    object = classes[i['class']](self)
+                    for param in i:
+                        vars(object)[param] = i[param]
+                    object.on_create()
+                    objects.append(object)
+            else:
+                for n in range(howmany):
+                    i = randomitem(parsed_data, False)
+                    object = classes[i['class']](self)
+                    for param in i:
+                        vars(object)[param] = i[param]
+                    object.on_create()
+                    objects.append(object)
+        if howmany:
+            while len(objects) > howmany:
+                spareObject = randomitem(objects, False)
+                objects.remove(spareObject)
+            if object_class:
+                while len(objects) < howmany:
+                    newObject = object_class(0)
+                    objects.append(newObject)
+        return objects
 
 
 # Еще константы
@@ -2228,114 +2400,113 @@ classes = { 'монстр': Monster,
 # Если передан object_class и получается слишком коротки список,
 # то в него добавляются случайные объекты переданного класса.
 # Отдает список полученных объектов
-def readobjects(file = None, howmany = None, object_class = None, random = False):
-    objects = []
-    if file:
-        with open(file, encoding='utf-8') as read_data:
-            parsed_data = json.load(read_data)
-        if not random:
-            for i in parsed_data:
-                object = classes[i['class']]()
-                for param in i:
-                    vars(object)[param] = i[param]
-                object.on_create()
-                objects.append(object)
-        else:
-            for n in range(howmany):
-                i = randomitem(parsed_data, False)
-                object = classes[i['class']]()
-                for param in i:
-                    vars(object)[param] = i[param]
-                object.on_create()
-                objects.append(object)
-    if howmany:
-        while len(objects) > howmany:
-            spareObject = randomitem(objects, False)
-            objects.remove(spareObject)
-        if object_class:
-            while len(objects) < howmany:
-                newObject = object_class(0)
-                objects.append(newObject)
-    return objects
+# def readobjects(game, file = None, howmany = None, object_class = None, random = False):
+#     objects = []
+#     if file:
+#         with open(file, encoding='utf-8') as read_data:
+#             parsed_data = json.load(read_data)
+#         if not random:
+#             for i in parsed_data:
+#                 object = classes[i['class']](game)
+#                 for param in i:
+#                     vars(object)[param] = i[param]
+#                 object.on_create()
+#                 objects.append(object)
+#         else:
+#             for n in range(howmany):
+#                 i = randomitem(parsed_data, False)
+#                 object = classes[i['class']](game)
+#                 for param in i:
+#                     vars(object)[param] = i[param]
+#                 object.on_create()
+#                 objects.append(object)
+#     if howmany:
+#         while len(objects) > howmany:
+#             spareObject = randomitem(objects, False)
+#             objects.remove(spareObject)
+#         if object_class:
+#             while len(objects) < howmany:
+#                 newObject = object_class(0)
+#                 objects.append(newObject)
+#     return objects
 
-# Подготовка
-newCastle = Castle(5, 5)  # Генерируем замок
-# Создаем мебель и разбрасываем по замку
-allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
-for furniture in allFurniture:
-    furniture.place(castle=newCastle)
-# Читаем монстров из файла и разбрасываем по замку
-allMonsters = readobjects(file='monsters.json', howmany=howMany['монстры'])
-for monster in allMonsters:
-    print(monster.name, monster.agressive)
-    print('-'*20)
-    monster.place(newCastle)
-# Читаем оружие из файла и разбрасываем по замку
-allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
-for weapon in allWeapon:
-    weapon.place(newCastle)
-# Читаем щиты из файла и разбрасываем по замку
-allShields = readobjects(file='shields.json', howmany=howMany['щит'], object_class=Shield)
-for shield in allShields:
-    shield.place(newCastle)
-# Читаем доспехи из файла и разбрасываем по замку
-allArmor = readobjects(file='armor.json', howmany=howMany['доспех'], object_class=Armor)
-for armor in allArmor:
-    armor.place(newCastle)
-# Читаем зелья из файла и разбрасываем по замку
-allPotions = readobjects(file='potions.json', howmany=howMany['зелье'], object_class=Potion)
-for potion in allPotions:
-    potion.place(newCastle)
-# Создаем руны и разбрасываем по замку
-allRunes = [Rune() for i in range(howMany['руна'])]
-for rune in allRunes:
-    rune.place(newCastle)
-# Создаем книги и разбрасываем по замку
-allBooks = readobjects(file='books.json', howmany=howMany['книга'], random=True, object_class=Book)
-for book in allBooks:
-    book.place(newCastle)
-newCastle.lockDoors() # Создаем запертые комнаты
-map = Map()
-map.place(newCastle) # Создаем и прячем карту
-matches = Matches()
-matches.place(newCastle) # Создаем и прячем спички
-
-newCastle.plan[0].visited = '+' # Делаем первую комнату посещенной
-player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает') # Создаем персонажа
-newKey = Key() # Создаем ключ
-player.pockets.append(newKey) # Отдаем ключ игроку
-gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
-shield1 = Shield('Простой щит')
-print (shield1.name, shield1.protection, shield1.permprotection())
-shield2 = Shield('Непростой щит')
-newCastle.plan[0].loot.pile.append(shield1)
-newCastle.plan[0].loot.pile.append(shield2)
-sword1 = Weapon(0)
-print (sword1.name, sword1.name1)
-sword2 = Weapon(0)
-print (sword2.name, sword2.name1)
-sword3 = Weapon(0)
-print (sword3.name, sword3.name1)
-newCastle.plan[0].loot.pile.append(sword1)
-newCastle.plan[0].loot.pile.append(sword2)
-newCastle.plan[0].loot.pile.append(sword3)
+# # Подготовка
+# newCastle = Castle(5, 5)  # Генерируем замок
+# # Создаем мебель и разбрасываем по замку
+# allFurniture = readobjects(file='furniture.json', howmany=howMany['мебель'], random=True)
+# for furniture in allFurniture:
+#     furniture.place(castle=newCastle)
+# # Читаем монстров из файла и разбрасываем по замку
+# allMonsters = readobjects(file='monsters.json', howmany=howMany['монстры'])
+# for monster in allMonsters:
+#     print(monster.name, monster.agressive)
+#     print('-'*20)
+#     monster.place(newCastle)
+# # Читаем оружие из файла и разбрасываем по замку
+# allWeapon = readobjects(file='weapon.json', howmany=howMany['оружие'], object_class=Weapon)
+# for weapon in allWeapon:
+#     weapon.place(newCastle)
+# # Читаем щиты из файла и разбрасываем по замку
+# allShields = readobjects(file='shields.json', howmany=howMany['щит'], object_class=Shield)
+# for shield in allShields:
+#     shield.place(newCastle)
+# # Читаем доспехи из файла и разбрасываем по замку
+# allArmor = readobjects(file='armor.json', howmany=howMany['доспех'], object_class=Armor)
+# for armor in allArmor:
+#     armor.place(newCastle)
+# # Читаем зелья из файла и разбрасываем по замку
+# allPotions = readobjects(file='potions.json', howmany=howMany['зелье'], object_class=Potion)
+# for potion in allPotions:
+#     potion.place(newCastle)
+# # Создаем руны и разбрасываем по замку
+# allRunes = [Rune() for i in range(howMany['руна'])]
+# for rune in allRunes:
+#     rune.place(newCastle)
+# # Создаем книги и разбрасываем по замку
+# allBooks = readobjects(file='books.json', howmany=howMany['книга'], random=True, object_class=Book)
+# for book in allBooks:
+#     book.place(newCastle)
+# newCastle.lockDoors() # Создаем запертые комнаты
+# map = Map()
+# map.place(newCastle) # Создаем и прячем карту
+# matches = Matches()
+# matches.place(newCastle) # Создаем и прячем спички
+#
+# newCastle.plan[0].visited = '+' # Делаем первую комнату посещенной
+# player = Hero('Артур', 'Артура', 'male', 10, 2, 1, 25, '', '', 'бьет,калечит,терзает,протыкает') # Создаем персонажа
+# newKey = Key() # Создаем ключ
+# player.pockets.append(newKey) # Отдаем ключ игроку
+# gameIsOn = False # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
+# shield1 = Shield('Простой щит')
+# print (shield1.name, shield1.protection, shield1.permprotection())
+# shield2 = Shield('Непростой щит')
+# newCastle.plan[0].loot.pile.append(shield1)
+# newCastle.plan[0].loot.pile.append(shield2)
+# sword1 = Weapon(0)
+# print (sword1.name, sword1.name1)
+# sword2 = Weapon(0)
+# print (sword2.name, sword2.name1)
+# sword3 = Weapon(0)
+# print (sword3.name, sword3.name1)
+# newCastle.plan[0].loot.pile.append(sword1)
+# newCastle.plan[0].loot.pile.append(sword2)
+# newCastle.plan[0].loot.pile.append(sword3)
 
 # Основная программа
 
 # Запускаем бота
 bot = telebot.TeleBot(TOKEN)
-chat_id = 0
-
+IN_FIGHT = False
 #Функции бота
 
-def tprint (text, state=''):
+def tprint (game, text, state=''):
     global bot
     global chat_id
     if state == 'off':
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
         canUse = []
-        for i in player.pockets:
+        for i in game.player.pockets:
             if i.canUseInFight:
                 canUse.append(i)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
@@ -2343,16 +2514,16 @@ def tprint (text, state=''):
         item2 = types.KeyboardButton('')
         item3 = types.KeyboardButton('')
         item5 = types.KeyboardButton('')
-        if player.shield != '':
+        if game.player.shield != '':
             item2 = types.KeyboardButton('защититься')
         if len(canUse) > 0:
             item3 = types.KeyboardButton('использовать')
         item4 = types.KeyboardButton('бежать')
         haveSpareWeapon = False
-        for item in player.pockets:
+        for item in game.player.pockets:
             if isinstance(item, Weapon):
                 haveSpareWeapon = True
-        if player.weapon != '' and haveSpareWeapon:
+        if game.player.weapon != '' and haveSpareWeapon:
             item5 = types.KeyboardButton('сменить оружие')
         markup.add(item1, item2, item3, item4, item5)
     elif state == 'direction':
@@ -2376,14 +2547,14 @@ def tprint (text, state=''):
     else:
         markup = ''
     if isinstance(text, str):
-        bot.send_message(chat_id, text, reply_markup=markup)
+        bot.send_message(game.chat_id, text, reply_markup=markup)
     elif isinstance(text, list):
         final_text = ''
         for line in text:
             final_text = final_text + str(line) + '\n'
-        bot.send_message(chat_id, final_text.rstrip('\n'), reply_markup=markup)
+        bot.send_message(game.chat_id, final_text.rstrip('\n'), reply_markup=markup)
 
-def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
+def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
     pic = Image.new('RGB', (width,height), color=(color))
     font = ImageFont.truetype('PTMono-Regular.ttf', size=18)
     draw_text = ImageDraw.Draw(pic)
@@ -2394,7 +2565,7 @@ def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
             font=font,
             fill=('#000000')
         )
-        bot.send_photo(chat_id, pic)
+        bot.send_photo(game.chat_id, pic)
     elif isinstance(text, list):
         final_text = ''
         for line in text:
@@ -2405,106 +2576,155 @@ def pprint (text, width = 200, height = 200, color = '#FFFFFF'):
             font=font,
             fill=('#000000')
         )
-        bot.send_photo(chat_id, pic)
+        bot.send_photo(game.chat_id, pic)
 
 @bot.message_handler(commands=['start', 'старт', 's'])
 def welcome(message):
     global chat_id
     chat_id = message.chat.id
+    game = game_sessions.get(chat_id)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     itembtn1 = types.KeyboardButton('Новая игра')
     itembtn2 = types.KeyboardButton('Отмена')
-    if gameIsOn:
-        markup.add(itembtn1, itembtn2)
-        bot.reply_to(message, "Игра уже запущена.\nТы точно хочешь начать новую игру?\n", reply_markup=markup)
+    if game:
+        if game.gameIsOn:
+            markup.add(itembtn1, itembtn2)
+            bot.reply_to(message, "Игра уже запущена.\nТы точно хочешь начать новую игру?\n", reply_markup=markup)
+        else:
+            markup.add(itembtn1)
+            bot.reply_to(message, "Привет!\nХочешь начать игру?\n", reply_markup=markup)
     else:
         markup.add(itembtn1)
         bot.reply_to(message, "Привет!\nХочешь начать игру?\n", reply_markup=markup)
 
+
 @bot.message_handler(func=lambda message: message.text == 'Новая игра')
 def start_game(message):
-    global gameIsOn
-    gameIsOn = True
-    newCastle.plan[player.currentPosition].show(player)
-    newCastle.plan[player.currentPosition].map()
+    chat_id = message.chat.id
+    newGame = Game(chat_id)
+    game_sessions[chat_id] = newGame
+    player = newGame.player
+    print('='*40)
+    print(game_sessions)
+    newGame.gameIsOn = True
+    newGame.newCastle.plan[player.currentPosition].show(player)
+    newGame.newCastle.plan[player.currentPosition].map()
 
 
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in telegram_commands
-                                          and not IN_FIGHT
-                                          and not LEVEL_UP
-                                          and not ENCHANTING)
-def get_command(message):
-    if not player.gameover('killall', howMany['монстры']):
-        player.do(message.text.lower())
-
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in level_up_commands
-                                          and LEVEL_UP)
-def get_level_up_command(message):
-    global LEVEL_UP
-    global player
-    a = message.text.lower().split(' ')[0]
-    if a == 'здоровье':
-        player.health += 3
-        player.startHealth += 3
-        tprint(player.name + ' получает 3 единицы здоровья.', 'off')
-        LEVEL_UP = False
-    elif a == 'силу':
-        player.stren += 1
-        player.startStren += 1
-        tprint(player.name + ' увеличивает свою силу на 1.', 'off')
-        LEVEL_UP = False
-    elif a == '3' or a == 'ловкость':
-        player.dext += 1
-        player.startDext += 1
-        tprint(player.name + ' увеличивает свою ловкость на 1.', 'off')
-        LEVEL_UP = False
-    elif a == '4' or a == 'интеллект':
-        player.intel += 1
-        player.startIntel += 1
-        tprint(player.name + ' увеличивает свой интеллект на 1.', 'off')
-        LEVEL_UP = False
-
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0]
-                                          and ENCHANTING)
-def get_enchanting_command(message):
-    global ENCHANTING
-    global selectedItem
-    global player
-    answer = message.text.lower()
-    runeList = player.inpockets(Rune)
-    if answer == 'отмена':
-        ENCHANTING = False
-        return True
-    elif answer.isdigit() and int(answer) - 1 < len(runeList):
-        if selectedItem.enchant(runeList[int(answer) - 1]):
-            tprint(player.name + ' улучшает ' + selectedItem.name1 + ' новой руной.', 'off')
-            player.pockets.remove(runeList[int(answer) - 1])
-            ENCHANTING = False
+def is_common_comand(message):
+    if not game_sessions.get(message.chat.id):
+        return False
+    else:
+        if message.text.lower().split(' ')[0] in telegram_commands and \
+                not game_sessions[message.chat.id].IN_FIGHT and \
+                not game_sessions[message.chat.id].LEVEL_UP and \
+                not game_sessions[message.chat.id].ENCHANTING:
             return True
         else:
-            tprint('Похоже, что ' + player.name + 'не может вставить руну в ' + selectedItem.name1 + '.', 'off')
-            ENCHANTING = False
+            return False
+
+@bot.message_handler(func=is_common_comand)
+def get_command(message):
+    chat_id = message.chat.id
+    game = game_sessions[chat_id]
+    if not game.player.gameover('killall', game.howMany['монстры']):
+        game.player.do(message.text.lower())
+
+def is_levelup_comand(message):
+    if not game_sessions.get(message.chat.id):
+        return False
+    else:
+        if message.text.lower().split(' ')[0] in level_up_commands and game_sessions[message.chat.id].LEVEL_UP:
+            return True
+        else:
+            return False
+
+@bot.message_handler(is_levelup_comand)
+def get_level_up_command(message):
+    chat_id = message.chat.id
+    game = game_sessions[chat_id]
+    a = message.text.lower().split(' ')[0]
+    if a == 'здоровье':
+        game.player.health += 3
+        game.player.startHealth += 3
+        tprint(game.player.name + ' получает 3 единицы здоровья.', 'off')
+        game.LEVEL_UP = False
+    elif a == 'силу':
+        game.player.stren += 1
+        game.player.startStren += 1
+        tprint(game.player.name + ' увеличивает свою силу на 1.', 'off')
+        game.LEVEL_UP = False
+    elif a == '3' or a == 'ловкость':
+        game.player.dext += 1
+        game.player.startDext += 1
+        tprint(game.player.name + ' увеличивает свою ловкость на 1.', 'off')
+        game.LEVEL_UP = False
+    elif a == '4' or a == 'интеллект':
+        game.player.intel += 1
+        game.player.startIntel += 1
+        tprint(game.player.name + ' увеличивает свой интеллект на 1.', 'off')
+        game.LEVEL_UP = False
+
+def is_enchantinf_comand(message):
+    if not game_sessions.get(message.chat.id):
+        return False
+    else:
+        if message.text.lower().split(' ')[0] and game_sessions[message.chat.id].ENCHANTING:
+            return True
+        else:
+            return False
+
+@bot.message_handler(func=is_enchantinf_comand)
+def get_enchanting_command(message):
+    chat_id = message.chat.id
+    game = game_sessions[chat_id]
+    answer = message.text.lower()
+    runeList = game.player.inpockets(Rune)
+    if answer == 'отмена':
+        game.ENCHANTING = False
+        return True
+    elif answer.isdigit() and int(answer) - 1 < len(runeList):
+        if game.selectedItem.enchant(runeList[int(answer) - 1]):
+            tprint(game, game.player.name + ' улучшает ' + game.selectedItem.name1 + ' новой руной.', 'off')
+            game.player.pockets.remove(runeList[int(answer) - 1])
+            game.ENCHANTING = False
+            return True
+        else:
+            tprint(game, 'Похоже, что ' +
+                   game.player.name +
+                   'не может вставить руну в ' +
+                   game.selectedItem.name1 +
+                   '.', 'off')
+            game.ENCHANTING = False
             return False
     else:
-        tprint(self.name + ' не находит такую руну у себя в карманах.', 'off')
+        tprint(game, game.player.name + ' не находит такую руну у себя в карманах.', 'off')
 
-
-@bot.message_handler(func=lambda message: message.text.lower().split(' ')[0] in fight_commands
-                                          and IN_FIGHT)
-def get_in_fight_command(message):
-    global IN_FIGHT
-    enemy = newCastle.plan[player.currentPosition].center
-    tprint(player.attack(enemy, message.text))
-    if IN_FIGHT:
-        if enemy.run:
-            IN_FIGHT = False
-        elif enemy.health > 0:
-            enemy.attack(player)
+def is_fight_comand(message):
+    if not game_sessions.get(message.chat.id):
+        return False
+    else:
+        if message.text.lower().split(' ')[0] in fight_commands and game_sessions[message.chat.id].IN_FIGHT:
+            return True
         else:
-            tprint(player.name + ' побеждает в бою!', 'off')
-            IN_FIGHT = False
-            player.win(enemy)
-            enemy.lose(player)
+            return False
+
+@bot.message_handler(func=is_fight_comand)
+def get_in_fight_command(message):
+    chat_id = message.chat.id
+    game = game_sessions[chat_id]
+    enemy = game.newCastle.plan[game.player.currentPosition].center
+    tprint(game, game.player.attack(enemy, message.text))
+    if game.IN_FIGHT:
+        if enemy.run:
+            game.IN_FIGHT = False
+        elif enemy.health > 0:
+            enemy.attack(game.player)
+        else:
+            tprint(game, game.player.name + ' побеждает в бою!', 'off')
+            game.IN_FIGHT = False
+            game.player.win(enemy)
+            enemy.lose(game.player)
 
 bot.polling(none_stop=True, interval=0)
 
