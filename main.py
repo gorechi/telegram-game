@@ -736,12 +736,25 @@ class Book():
 
     def on_create(self):
         self.type = dice(0,2)
-        self.name = randomitem(self.descriptions, False) + ' ' + self.name + ' ' + self.decorations[self.type]
-        print(self.name)
+        description = randomitem(self.descriptions, False)
+        self.name = description[0] + ' ' + self.name + ' ' + self.decorations[self.type]
+        self.alt_name = description[1] + ' ' + self.name1 + ' ' + self.decorations[self.type]
+        self.name1 = 'книгу'
+        available_texts = []
+        for i in self.texts:
+            if i[0] == self.type:
+                available_texts.append(i[1])
+        self.text = randomitem(available_texts, False)
+        print(self.name, self.name1)
+        print(self.text)
         self.weapon_type = self.weapon_types[self.type]
         self.armor_type = self.armor_types[self.type]
         self.shield_type = self.shield_types[self.type]
         return True
+
+    def print_mastery(self, who):
+        message = [who.name + ' теперь немного лучше знает, как использовать ' + self.weapon_type + ' оружие.']
+        return message
 
     def place(self, castle, room_to_place = None):
         if room_to_place:
@@ -1527,6 +1540,32 @@ class Hero:
             tprint(game, self.name + ' не может улучшить эту вещь.')
             return False
 
+    def read(self, what):
+        books = []
+        message = []
+        for i in self.pockets:
+            if isinstance(i, Book):
+                books.append(i)
+        if len(books) > 0:
+            book = None
+            for i in books:
+                if not what:
+                    book = randomitem(books, False)
+                    message.append(self.name + ' роется в рюкзаке и находит первую попавшуюся книгу.')
+                elif i.name.lower() == what.lower() or i.name1.lower() == what.lower():
+                    book = i
+                    message.append(self.name + ' читает ' + book.alt_name + '.')
+            message.append(book.text)
+            message += book.print_mastery(self)
+            message.append(self.name + ' решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+            self.weapon_mastery[book.weapon_type] += 1
+            print (self.weapon_mastery)
+            self.pockets.remove(book)
+        else:
+            message.append('В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')
+        tprint(self.game, message)
+        return True
+
     def do(self, command):
         commandDict = {'осмотреть': self.lookaround,
                        'идти': self.go,
@@ -1535,6 +1574,7 @@ class Hero:
                        'обыскать': self.search,
                        'открыть': self.open,
                        'использовать': self.use,
+                       'читать': self.read,
                        'улучшить': self.enchant}
         a = command.find(' ')
         fullCommand = []
@@ -2282,6 +2322,11 @@ class Game():
         newKey.place(self.newCastle, self.newCastle.plan[0])
         newKey = Key(self)
         newKey.place(self.newCastle, self.newCastle.plan[0])
+        newBook = self.readobjects(file='books.json',
+                                    howmany=1,
+                                    random=True,
+                                    object_class=Book)[0]
+        newBook.place(self.newCastle, self.newCastle.plan[0])
         self.gameIsOn = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 
     def __del__ (self):
@@ -2327,6 +2372,7 @@ classes = { 'монстр': Monster,
             'защита': Protection,
             'щит': Shield,
             'доспех': Armor,
+            'игра': Game,
             'притворщик': Shapeshifter,
             'мебель': Furniture,
             'вампир': Vampire,
@@ -2455,6 +2501,7 @@ def all_commands(message):
                        'взять',
                        'открыть',
                        'использовать',
+                       'читать',
                        'улучшить']
     level_up_commands = ['здоровье',
                        '?',
@@ -2484,7 +2531,7 @@ def all_commands(message):
         newGame.newCastle.plan[player.currentPosition].show(player)
         newGame.newCastle.plan[player.currentPosition].map()
     if game:
-        if command in common_commands and not game.state == 0:
+        if command in common_commands and game.state == 0:
             chat_id = message.chat.id
             game = game_sessions[chat_id]
             if not game.player.gameover('killall', game.howMany['монстры']):
