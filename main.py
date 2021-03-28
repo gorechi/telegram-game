@@ -1044,9 +1044,14 @@ class Hero:
             self.rage = 0
             if self.weapon != '':
                 weaponAttack = self.weapon.attack()
+                critical_probability = self.weapon_mastery[self.weapon.type] * 5
+                damage_text = ' урона. '
+                if dice(1, 100) <= critical_probability:
+                    weaponAttack = weaponAttack * 2
+                    damage_text = ' критического урона. '
                 string1 = self.name + ' ' + self.action() + ' ' + targetName1 + ' используя ' + self.weapon.name + \
                           ' и наносит ' + str(meleAttack) + '+' + howmany(weaponAttack, 'единицу,единицы,единиц') + \
-                          ' урона. '
+                          damage_text
             else:
                 weaponAttack = 0
                 string1 = self.name + ' бьет ' + targetName1 + ' не используя оружие и наносит ' + howmany(
@@ -1181,12 +1186,15 @@ class Hero:
             newCastle.plan[self.currentPosition].map()
         elif a == 'себя':
             self.show()
-        elif a == 'карманы':
+        elif a == 'рюкзак':
             text = []
-            text.append(self.name + ' осматривает свои карманы и обнаруживает в них:')
-            for i in range(len(self.pockets)):
-                text.append(str(i+1) + ': ' + self.pockets[i].show())
-            text.append(self.money.show())
+            if len(self.pockets) == 0 and self.money.howmuchmoney == 0:
+                text.append(self.name + ' осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
+            else:
+                text.append(self.name + ' осматривает свой рюкзак и обнаруживает в нем:')
+                for i in range(len(self.pockets)):
+                    text.append(str(i+1) + ': ' + self.pockets[i].show())
+                text.append(self.money.show())
             tprint(game, text)
         elif a in self.directionsDict.keys():
             if newCastle.plan[self.currentPosition].doors[self.doorsDict[a]] == 0:
