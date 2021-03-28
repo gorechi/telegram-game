@@ -745,8 +745,6 @@ class Book():
             if i[0] == self.type:
                 available_texts.append(i[1])
         self.text = randomitem(available_texts, False)
-        print(self.name, self.name1)
-        print(self.text)
         self.weapon_type = self.weapon_types[self.type]
         self.armor_type = self.armor_types[self.type]
         self.shield_type = self.shield_types[self.type]
@@ -1567,7 +1565,7 @@ class Hero:
                     message.append(self.name + ' читает ' + book.alt_name + '.')
             message.append(book.text)
             message += book.print_mastery(self)
-            message.append(self.name + ' решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+            message.append('Он решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
             self.weapon_mastery[book.weapon_type] += 1
             print (self.weapon_mastery)
             self.pockets.remove(book)
@@ -2326,17 +2324,6 @@ class Game():
         self.newCastle.plan[0].visited = '+'  # Делаем первую комнату посещенной
         newKey = Key(self)  # Создаем ключ
         self.player.pockets.append(newKey)  # Отдаем ключ игроку
-        newKey = Key(self)
-        newKey.place(self.newCastle, self.newCastle.plan[0])
-        newKey = Key(self)
-        newKey.place(self.newCastle, self.newCastle.plan[0])
-        newKey = Key(self)
-        newKey.place(self.newCastle, self.newCastle.plan[0])
-        newBook = self.readobjects(file='books.json',
-                                    howmany=1,
-                                    random=True,
-                                    object_class=Book)[0]
-        newBook.place(self.newCastle, self.newCastle.plan[0])
         self.gameIsOn = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 
     def __del__ (self):
