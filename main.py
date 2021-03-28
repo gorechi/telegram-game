@@ -1001,7 +1001,7 @@ class Hero:
         self.currentPosition += self.directionsDict[direction]
         room = game.newCastle.plan[self.currentPosition]
         room.visited = '+'
-        game.IN_FIGHT = False
+        game.state = 0
         self.lookaround()
         if room.center != '':
             if room.center.agressive and room.light:
@@ -1146,7 +1146,7 @@ class Hero:
             self.levelup()
 
     def levelup(self):
-        self.game.LEVEL_UP = True
+        self.game.state = 3
         level_up_message = []
         level_up_message.append(self.name + ' получает новый уровень!')
         level_up_message.append('Что необходимо прокачать: здоровье, силу, ловкость или интеллект?')
@@ -1255,7 +1255,7 @@ class Hero:
                 return False
             else:
                 whoisfighting = room.center
-        game.IN_FIGHT = True
+        game.state = 1
         if agressive:
             whoFirst = 2
         else:
@@ -1521,7 +1521,7 @@ class Hero:
                 text.append(str(runeList.index(rune)+1) + ': ' + str(rune))
             text.append('Введите номер руны или "отмена" для прекращения улучшения')
             #Здесь нужна доработка т.к. управление переходит на работу с рунами
-            game.ENCHANTING = True
+            game.state = 2
             tprint(game, text, 'enchant')
         else:
             tprint(game, self.name + ' не может улучшить эту вещь.')
@@ -1685,7 +1685,7 @@ class Monster:
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
         target.health -= totalDamage
         if target.health <= 0:
-            game.IN_FIGHT = False
+            game.state = 0
             target.lose(self)
             text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
@@ -1985,7 +1985,7 @@ class Vampire(Monster):
         target.health -= totalDamage
         self.health += totalDamage // 2
         if target.health <= 0:
-            game.IN_FIGHT = False
+            game.state = 0
             target.lose(self)
             text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
@@ -2196,22 +2196,25 @@ class Castle:
 
 class Game():
     def __init__(self, chat_id, howMany=0, hero=None):
-        self.IN_FIGHT = False  # Константа, отвечающая за то, что сейчас бой
-        self.LEVEL_UP = False  # Константа, отвечающая за то, что сейчас происходит прокачка
-        self.ENCHANTING = False  # Константа, отвечающая за то, что сейчас происходит улучшение шмотки
+        self.state = 0
+        # state - текущее состояние игры.
+        # 0 - обычное состояние. Персонаж ходит, исследует и т.п.
+        # 1 - происходит бой
+        # 2 - персонаж что-то улучшает
+        # 3 - персонаж поднимает уровень
         self.selectedItem = ''
         self.gameIsOn = False
         self.chat_id = chat_id
         self.newCastle = Castle(self, 5, 5)  # Генерируем замок
         if howMany == 0:
             self.howMany = {'монстры': 10,
-                       'оружие': 10,
-                       'щит': 5,
-                       'доспех': 5,
-                       'зелье': 10,
-                       'мебель': 10,
-                       'книга': 5,
-                       'руна': 10}  # Количество всяких штук, которые разбрасываются по замку
+                            'оружие': 10,
+                            'щит': 5,
+                            'доспех': 5,
+                            'зелье': 10,
+                            'мебель': 10,
+                            'книга': 5,
+                            'руна': 10}  # Количество всяких штук, которые разбрасываются по замку
         else:
             self.howMany = howMany
         if not hero:
@@ -2481,43 +2484,43 @@ def all_commands(message):
         newGame.newCastle.plan[player.currentPosition].show(player)
         newGame.newCastle.plan[player.currentPosition].map()
     if game:
-        if command in common_commands and not game.IN_FIGHT and not game.LEVEL_UP and not game.ENCHANTING:
+        if command in common_commands and not game.state == 0:
             chat_id = message.chat.id
             game = game_sessions[chat_id]
             if not game.player.gameover('killall', game.howMany['монстры']):
                 game.player.do(message.text.lower())
-        elif command in level_up_commands and game.LEVEL_UP:
+        elif command in level_up_commands and game.state == 3:
             if command == 'здоровье':
                 game.player.health += 3
                 game.player.startHealth += 3
                 tprint(game, game.player.name + ' получает 3 единицы здоровья.', 'off')
-                game.LEVEL_UP = False
+                game.state = 0
             elif command == 'силу':
                 game.player.stren += 1
                 game.player.startStren += 1
                 tprint(game, game.player.name + ' увеличивает свою силу на 1.', 'off')
-                game.LEVEL_UP = False
+                game.state = 0
             elif command == 'ловкость':
                 game.player.dext += 1
                 game.player.startDext += 1
                 tprint(game, game.player.name + ' увеличивает свою ловкость на 1.', 'off')
-                game.LEVEL_UP = False
+                game.state = 0
             elif command == 'интеллект':
                 game.player.intel += 1
                 game.player.startIntel += 1
                 tprint(game, game.player.name + ' увеличивает свой интеллект на 1.', 'off')
-                game.LEVEL_UP = False
-        elif command and game.ENCHANTING:
+                game.state = 0
+        elif command and game.state ==2:
             answer = text.lower()
             runeList = game.player.inpockets(Rune)
             if answer == 'отмена':
-                game.ENCHANTING = False
+                game.state = 0
                 return True
             elif answer.isdigit() and int(answer) - 1 < len(runeList):
                 if game.selectedItem.enchant(runeList[int(answer) - 1]):
                     tprint(game, game.player.name + ' улучшает ' + game.selectedItem.name1 + ' новой руной.', 'off')
                     game.player.pockets.remove(runeList[int(answer) - 1])
-                    game.ENCHANTING = False
+                    game.state = 0
                     return True
                 else:
                     tprint(game, 'Похоже, что ' +
@@ -2525,21 +2528,21 @@ def all_commands(message):
                            'не может вставить руну в ' +
                            game.selectedItem.name1 +
                            '.', 'off')
-                    game.ENCHANTING = False
+                    game.state = 0
                     return False
             else:
                 tprint(game, game.player.name + ' не находит такую руну у себя в карманах.', 'off')
-        elif command in fight_commands and game.IN_FIGHT:
+        elif command in fight_commands and game.state == 1:
             enemy = game.newCastle.plan[game.player.currentPosition].center
             tprint(game, game.player.attack(enemy, message.text))
-            if game.IN_FIGHT:
+            if game.state == 1:
                 if enemy.run:
-                    game.IN_FIGHT = False
+                    game.state = 0
                 elif enemy.health > 0:
                     enemy.attack(game.player)
                 else:
                     tprint(game, game.player.name + ' побеждает в бою!', 'off')
-                    game.IN_FIGHT = False
+                    game.state = 0
                     game.player.win(enemy)
                     enemy.lose(game.player)
     return True
