@@ -75,7 +75,7 @@ class Rune:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
             return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def element(self):
         return int(self.element)
@@ -257,7 +257,7 @@ class Weapon:
             if furniture.can_contain_weapon:
                 furniture.put(self)
                 return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
 class Protection:
     def __init__(self, game, name='', name1='защиту', protection=1, actions=''):
@@ -408,7 +408,7 @@ class Armor(Protection):
                 if furniture.can_contain_weapon:
                     furniture.put(self)
                     return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
@@ -468,7 +468,7 @@ class Shield (Protection):
                     furniture.put(self)
                     print('Положен в мебель: ' + furniture.name)
                     return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
@@ -507,7 +507,7 @@ class Matches():
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
             return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def use(self, whoIsUsing = None, inaction = False):
         player = self.game.player
@@ -547,7 +547,7 @@ class Map():
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
             return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def show(self):
         return self.description
@@ -598,7 +598,7 @@ class Key():
             if furniture:
                 furniture.put(self)
                 return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def take(self, who=''):
         if who == '':
@@ -658,7 +658,7 @@ class Potion():
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
             return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def use(self, whoUsing, inaction = False):
         game = self.game
@@ -769,7 +769,7 @@ class Book():
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
             return True
-        room.loot.add(self)
+        room.loot.pile.append(self)
 
     def show(self):
         return self.description
@@ -784,7 +784,7 @@ class Book():
         if who == '':
             return False
         who.pockets.append(self)
-        tprint(self.game, who.name + ' забирает ' + self.name + ' себе.')
+        tprint(self.game, who.name + ' забирает ' + self.alt_name + ' себе.')
 
 class Loot:
     def __init__(self, game):
@@ -793,9 +793,6 @@ class Loot:
 
     def __str__(self):
         return 'loot'
-
-    def __add__(self, other):
-        self.pile += other.pile
 
     def add(self, obj):
         self.pile.append(obj)
@@ -827,7 +824,7 @@ class Furniture:
         return True
 
     def put(self, item):
-        self.loot.add(item)
+        self.loot.pile.append(item)
 
     def place(self, castle = None, room_to_place = None):
         if room_to_place:
@@ -982,14 +979,14 @@ class Hero:
             if target.weapon == '' and target.carryweapon:
                 target.weapon = self.weapon
             else:
-                room.loot.add(self.weapon)
+                room.loot.pile.append(self.weapon)
             self.weapon = ''
         elif a == 2 and self.shield != '':
             tprint(game, 'Убегая ' + self.name + ' теряет ' + self.shield.name1)
             if target.shield == '' and target.carryshield:
                 target.shield = self.shield
             else:
-                room.loot.add(self.shield)
+                room.loot.pile.append(self.shield)
             self.shield = ''
         a = dice(0, len(self.pockets))
         if a > 0:
@@ -998,7 +995,7 @@ class Hero:
             for i in range(a):
                 b = dice(0, len(self.pockets) - 1)
                 text.append(self.pockets[b].name1)
-                room.loot.add(self.pockets[b])
+                room.loot.pile.append(self.pockets[b])
                 self.pockets.pop(b)
             tprint(game, text)
         availableDirections = []
@@ -1364,18 +1361,23 @@ class Hero:
 
     def take(self, item='все'):
         game = self.game
-        newCastle = self.game.newCastle
-        currentLoot = newCastle.plan[self.currentPosition].loot
+        castle = self.game.newCastle
+        currentLoot = castle.plan[self.currentPosition].loot
+        print("+"*40)
+        for i in currentLoot.pile:
+            print(i.name)
+        print("+" * 40)
         if currentLoot == '':
             tprint(game, 'Здесь нечего брать.')
             return False
         elif item == 'все' or item == 'всё' or item == '':
-            print(currentLoot)
-            for i in currentLoot.pile:
-                print(i, i.name, self.can_take(i))
-                if self.can_take(i):
-                    i.take(self)
-                    currentLoot.pile.remove(i)
+            items_to_remove = []
+            for item in currentLoot.pile:
+                if self.can_take(item):
+                    item.take(self)
+                    items_to_remove.append(item)
+            for item in items_to_remove:
+                currentLoot.pile.remove(item)
             return True
         else:
             for i in currentLoot.pile:
@@ -1661,7 +1663,7 @@ class Monster:
                 if self.shield != '':
                     if self.shield.enchant(item):
                         return True
-                self.loot.add(item)
+                self.loot.pile.append(item)
                 return True
             else:
                 if self.shield != '':
@@ -1673,10 +1675,10 @@ class Monster:
                 if self.weapon != '':
                     if not self.weapon.enchant(item):
                         return True
-                self.loot.add(item)
+                self.loot.pile.append(item)
                 return True
         else:
-            self.loot.add(item)
+            self.loot.pile.append(item)
 
     def action(self):
         if self.weapon == '':
@@ -1750,12 +1752,12 @@ class Monster:
         if result < 6 or self.wounded:
             if self.money > 0:
                 a = Money(self.money)
-                where.loot.add(a)
-                where.loot.pile += (self.loot.pile)
+                where.loot.pile.append(a)
+                where.loot.pile.extend(self.loot.pile)
             if self.shield != '':
-                where.loot.add(self.shield)
+                where.loot.pile.append(self.shield)
             if self.weapon != '':
-                where.loot.add(self.weapon)
+                where.loot.pile.append(self.weapon)
             where.center = ''
         else:
             self.wounded = True
@@ -1767,11 +1769,11 @@ class Monster:
                     aliveString += 'получает легкое ранение в руку. '
                     if self.weapon != '':
                         aliveString += 'На пол падает ' + self.weapon.name + '. '
-                        where.loot.add(self.weapon)
+                        where.loot.pile.append(self.weapon)
                         self.weapon = ''
                     elif self.shield != '':
                         aliveString += 'На пол падает ' + self.shield.neme + '. '
-                        where.loot.add(self.shield)
+                        where.loot.pile.append(self.shield)
                         self.shield = ''
                 elif result == 7:
                     aliveString += 'истекает кровью, теряя при этом ' \
@@ -1870,12 +1872,12 @@ class Plant(Monster):
             where.loot = b
         if self.money > 0:
             a = Money(self.money)
-            where.loot.add(a)
-            where.loot.pile += (self.loot.pile)
+            where.loot.pile.append(a)
+            where.loot.pile.extend(self.loot.pile)
         if self.shield != '':
-            where.loot.add(self.shield)
+            where.loot.pile.append(self.shield)
         if self.weapon != '':
-            where.loot.add(self.weapon)
+            where.loot.pile.append(self.weapon)
         where.center = ''
 
     def place(self, castle, roomr_to_place = None):
@@ -1948,10 +1950,10 @@ class Shapeshifter(Monster):
             where.loot = b
         if self.money > 0:
             a = Money(self.money)
-            where.loot.add(a)
-            where.loot.pile += (self.loot.pile)
+            where.loot.pile.append(a)
+            where.loot.pile.extend(self.loot.pile)
         if self.shield != '':
-            where.loot.add(self.shield)
+            where.loot.pile.append(self.shield)
         where.center = ''
 
 
