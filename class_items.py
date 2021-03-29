@@ -393,7 +393,11 @@ class Book():
         return self.description
 
     def use(self, whoUsing, inaction = False):
-        return True
+        if inaction:
+            tprint(self.game, 'Сейчас абсолютно не подходящее время для чтения.')
+            return False
+        else:
+            return whoUsing.read(self)
 
     def __str__(self):
         return self.name

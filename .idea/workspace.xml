@@ -2,22 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="19e1e6f4-563e-4fa1-b43e-822e3299fcd6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/class_basic.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_castle.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_game.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_hero.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_items.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_monsters.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_protection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_room.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/class_weapon.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/constants.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/no.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/no.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/savednet.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/savednet.pickle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/yes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../GameGitHub/Game/pogovorki/yes.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_castle.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_castle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_hero.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_hero.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_items.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_items.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_room.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_room.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monsters.json" beforeDir="false" afterPath="$PROJECT_DIR$/monsters.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qq.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/spells" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

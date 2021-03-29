@@ -83,6 +83,7 @@ class Room:
         self.light = True
         self.furniture = []
         self.torchDice = dice(1, 5)
+        self.stink = 0
         if not self.light or self.torchDice != 4:
             self.torch = False
         else:

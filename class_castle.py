@@ -44,6 +44,26 @@ class Castle:
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах
 
+    def stink(self, room, stink_level):
+        directionsDict = {0: (0 - self.rooms),
+                               1: 1,
+                               2: self.rooms,
+                               3: (0 - 1)}
+        availableDirections = []
+        if room.stink != 0:
+            return True
+        else:
+            room.stink = stink_level
+        print ('Комната: ', room.position, 'Уровень вони: ', room.stink)
+        for i in range(4):
+            if room.doors[i] in [1, 2]:
+                availableDirections.append(i)
+        if stink_level > 1:
+            for direction in availableDirections:
+                next_room = self.plan[room.position + directionsDict[direction]]
+                self.stink(next_room, stink_level - 1)
+        return True
+
     def lights_off(self):
         self.how_many_dark_rooms = len(self.plan) // 8
         darkRooms = randomitem(self.plan, False, self.how_many_dark_rooms)

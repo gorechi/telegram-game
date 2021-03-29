@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Импортируем необходимые модули
-
 import telebot
 from telebot import types
 from functions import *
@@ -10,27 +9,6 @@ from class_game import Game
 
 # Константы и настройки
 game_sessions = {}
-
-# classes = { 'монстр': Monster,
-#             'герой': Hero,
-#             'оружие': Weapon,
-#             'щит': Shield,
-#             'доспех': Armor,
-#             'игра': Game,
-#             'притворщик': Shapeshifter,
-#             'мебель': Furniture,
-#             'вампир': Vampire,
-#             'берсерк': Berserk,
-#             'ходок': Walker,
-#             'растение': Plant,
-#             'ключ': Key,
-#             'карта': Map,
-#             'спички': Matches,
-#             'книга': Book,
-#             'зелье': Potion,
-#             'руна': Rune,
-#             'заклинание': Spell,
-#             }
 
 # Запускаем бота
 bot = telebot.TeleBot(TOKEN)

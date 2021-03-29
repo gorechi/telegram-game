@@ -477,10 +477,10 @@ class Hero:
             tprint(game, message)
             return True
 
-    def can_take(self, object):
+    def can_take(self, obj):
         classes = [Weapon, Shield, Armor]
         for i in classes:
-            if isinstance(object, i):
+            if isinstance(obj, i):
                 return False
         return True
 

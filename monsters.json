@@ -37,6 +37,42 @@
   },
   {
     "class": "монстр",
+    "name": "Разбойник",
+    "name1": "Разбойника",
+    "stren": 9,
+    "health": 30,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "стоит",
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Бандит",
+    "name1": "Бандита",
+    "stren": 8,
+    "health": 23,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "притаился",
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": false,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
     "name": "Оборотень",
     "name1": "Оборотня",
     "stren": 10,
