@@ -38,7 +38,7 @@ class Item:
         if who == '':
             return False
         who.pockets.append(self)
-        tprint(self.game, who.name + ' забирает ' + self.name + ' себе.')
+        tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
 
     def use(self, whoisusing, inaction=False):
         tprint(self.game, whoisusing.name + ' не знает, как использовать такие штуки.')
@@ -1129,7 +1129,7 @@ class Hero:
             '{0} - это смелый герой {7} уровня. Его сила - {1}{2} {3} и сейчас у него {4} здоровья, '
             'что составляет {5}% от максимально возможного.\n{0} имеет при себе {6} золотом.'.format(
                 self.name, self.stren, string1, string2, howmany(self.health, 'единица,единицы,единиц'),
-                self.health * 100 // self.startHealth, howmany(self.money.howmanymoney, 'монету,монеты,монет'),
+                self.health * 100 // self.startHealth, howmany(self.money.howmuchmoney, 'монету,монеты,монет'),
                 self.level))
 
     def defence(self, attacker):
@@ -1326,7 +1326,7 @@ class Hero:
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             if room.loot != '' and len(room.loot.pile) > 0:
-                message.append('По всей комнате можно найти:')
+                message.append('В комнате есть:')
                 for i in room.loot.pile:
                     message.append(i.name)
             else:
@@ -1735,6 +1735,7 @@ class Monster:
         if target.health <= 0:
             game.state = 0
             target.lose(self)
+            self.win(target)
             text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
         else:
@@ -1799,7 +1800,7 @@ class Monster:
                     self.stren -= weaknessAmount
                     self.health = self.startHealth + illAmount
                 runningMonsters = [self]
-                if newCastle.inhabit(runningMonsters, 1, True):
+                if self.place(newCastle):
                     aliveString += self.name + ' убегает из комнаты.'
                     tprint(game, aliveString)
                     where.center = ''
@@ -1831,6 +1832,7 @@ class Monster:
         else:
             room.center = self
         self.currentPosition = room.position
+        return True
 
 
 class Plant(Monster):
