@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from random import randint as dice
 from telebot import types
+from PIL import Image, ImageDraw, ImageFont
 from random import sample as toss
 from time import sleep as pause
 from math import ceil
@@ -105,3 +106,77 @@ def readitems(whatkind, howMany, classes):
         itemsList.append(new)
     return itemsList
 
+
+def tprint (game, text, state=''):
+    if state == 'off':
+        markup = types.ReplyKeyboardRemove(selective=False)
+    elif state == 'fight':
+        canUse = []
+        for i in game.player.pockets:
+            if i.canUseInFight:
+                canUse.append(i)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('ударить')
+        item2 = types.KeyboardButton('')
+        item3 = types.KeyboardButton('')
+        item5 = types.KeyboardButton('')
+        if game.player.shield != '':
+            item2 = types.KeyboardButton('защититься')
+        if len(canUse) > 0:
+            item3 = types.KeyboardButton('использовать')
+        item4 = types.KeyboardButton('бежать')
+        if game.player.weapon != '' and game.player.second_weapon():
+            item5 = types.KeyboardButton('сменить оружие')
+        markup.add(item1, item2, item3, item4, item5)
+    elif state == 'direction':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('идти вверх')
+        item2 = types.KeyboardButton('идти вниз')
+        item3 = types.KeyboardButton('идти налево')
+        item4 = types.KeyboardButton('идти направо')
+        markup.add(item1, item2, item3, item4)
+    elif state == 'levelup':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+        item1 = types.KeyboardButton('Здоровье')
+        item2 = types.KeyboardButton('Силу')
+        item3 = types.KeyboardButton('Ловкость')
+        item4 = types.KeyboardButton('Интеллект')
+        markup.add(item1, item2, item3, item4)
+    elif state == 'enchant':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
+        item1 = types.KeyboardButton('Отмена')
+        markup.add(item1)
+    else:
+        markup = ''
+    if isinstance(text, str):
+        game.bot.send_message(game.chat_id, text, reply_markup=markup)
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            final_text = final_text + str(line) + '\n'
+        game.bot.send_message(game.chat_id, final_text.rstrip('\n'), reply_markup=markup)
+
+
+def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
+    pic = Image.new('RGB', (width,height), color=(color))
+    font = ImageFont.truetype('PTMono-Regular.ttf', size=18)
+    draw_text = ImageDraw.Draw(pic)
+    if isinstance(text, str):
+        draw_text.text(
+            (10, 10),
+            text,
+            font=font,
+            fill=('#000000')
+        )
+        game.bot.send_photo(game.chat_id, pic)
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            final_text = final_text + str(line) + '\n'
+        draw_text.text(
+            (10, 10),
+            final_text,
+            font=font,
+            fill=('#000000')
+        )
+        game.bot.send_photo(game.chat_id, pic)
