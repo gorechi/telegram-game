@@ -21,16 +21,18 @@
     "class": "монстр",
     "name": "Тролль",
     "name1": "Тролля",
-    "stren": 12,
-    "health": 25,
+    "stren": 13,
+    "health": 40,
     "actions":
       [
       "крушит",
       "бьет",
       "шарахает"
       ],
-    "state": "тяжело дышит",
+    "state": "стоит и воняет",
     "agressive": false,
+    "stink": true,
+    "hide": false,
     "carryweapon": true,
     "carryshield": true,
     "wearArmor": true

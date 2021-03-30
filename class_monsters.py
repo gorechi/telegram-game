@@ -21,6 +21,7 @@ class Monster:
         self.currentPosition = 0
         self.startHealth = self.health
         self.loot = Loot(self.game)
+        self.stink = False
         self.hide = False
         self.run = False
         self.wounded = False
@@ -230,6 +231,11 @@ class Monster:
         else:
             room.center = self
         self.currentPosition = room.position
+        if self.stink:
+            print('У нас есть вонючка!')
+            print(self.name, room.position)
+            castle.stink(room, 3)
+            castle.stink_map()
         return True
 
 

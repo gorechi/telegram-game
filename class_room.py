@@ -84,6 +84,7 @@ class Room:
         self.furniture = []
         self.torchDice = dice(1, 5)
         self.stink = 0
+        self.stink_levels = {1: 'Немного', 2: 'Сильно', 3: 'Невыносимо'}
         if not self.light or self.torchDice != 4:
             self.torch = False
         else:
@@ -91,6 +92,8 @@ class Room:
 
     def show(self, player):
         game = self.game
+        if self.stink > 0:
+            stink_text = self.stink_levels[self.stink] + ' воняет чем-то очень неприятным.'
         if self.light:
             if self.torch:
                 self.decoration1 = 'освещенную факелом ' + self.decoration1
@@ -105,18 +108,28 @@ class Room:
             for furniture in self.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             message.append(whoIsHere)
+            if self.stink > 0:
+                message.append(stink_text)
             tprint(game, message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
             if isinstance(self.center, Monster):
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
+            if self.stink > 0:
+                message.append(stink_text)
             tprint(game, message, state = 'direction')
 
     def showThroughKeyHole(self, who):
+        message = []
         if self.center == '':
-            return 'не может ничего толком разглядеть.'
+            message.append(who.name + 'заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            return self.center.keyHole
+            message.append(who.name + ' заглядывает в замочную скважину двери и видит ' + self.center.keyHole)
+        if self.stink > 0:
+            message.append('Из замочной скважины ' +
+                           self.stink_levels[self.stink].lower() +
+                           ' воняет чем-то омерзительным.')
+        return message
 
     def furniture_types(self):
         types = []

@@ -321,9 +321,7 @@ class Hero:
             if newCastle.plan[self.currentPosition].doors[self.doorsDict[a]] == 0:
                 tprint (game, self.name + ' осматривает стену и не находит ничего заслуживающего внимания.')
             else:
-                tprint(game, self.name + ' заглядывает в замочную скважину и ' +
-                       newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
-
+                tprint(game, newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
         if newCastle.plan[self.currentPosition].center != '':
             if (a == newCastle.plan[self.currentPosition].center.name or a == newCastle.plan[
                 self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[

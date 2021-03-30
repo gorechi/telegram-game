@@ -63,7 +63,6 @@ def all_commands(message):
     game = game_sessions.get(chat_id)
     command = message.text.lower().split(' ')[0]
     print (text, chat_id, command)
-    print (game)
     if text == "Новая игра":
         newGame = Game(chat_id, bot)
         game_sessions[chat_id] = newGame

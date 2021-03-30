@@ -44,6 +44,12 @@ class Castle:
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах
 
+    # Функция распространения вони.
+    # Получат на вход:
+    # - объект комнаты в замке
+    # - уровень вони (int)
+    # Распространяет вонь через открытые и закрытые двери, постепенно уменьшая уровень.
+    # Уровень вони записывается в параметр stink комнаты.
     def stink(self, room, stink_level):
         directionsDict = {0: (0 - self.rooms),
                                1: 1,
@@ -54,7 +60,6 @@ class Castle:
             return True
         else:
             room.stink = stink_level
-        print ('Комната: ', room.position, 'Уровень вони: ', room.stink)
         for i in range(4):
             if room.doors[i] in [1, 2]:
                 availableDirections.append(i)
@@ -63,6 +68,13 @@ class Castle:
                 next_room = self.plan[room.position + directionsDict[direction]]
                 self.stink(next_room, stink_level - 1)
         return True
+
+    def stink_map(self):
+        for i in range(self.floors):
+            floor = ''
+            for j in range(self.rooms):
+                floor = floor + str(self.plan[i*self.rooms + j].stink) + ' '
+            print(floor)
 
     def lights_off(self):
         self.how_many_dark_rooms = len(self.plan) // 8

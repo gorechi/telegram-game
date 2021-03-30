@@ -8,12 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/class_castle.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_castle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/class_hero.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_hero.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/class_items.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_items.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/class_monsters.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_monsters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/class_room.py" beforeDir="false" afterPath="$PROJECT_DIR$/class_room.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monsters.json" beforeDir="false" afterPath="$PROJECT_DIR$/monsters.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qq.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spells" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
