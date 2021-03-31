@@ -124,7 +124,7 @@ class Room:
         if self.center == '':
             message.append(who.name + 'заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            message.append(who.name + ' заглядывает в замочную скважину двери и видит ' + self.center.keyHole)
+            message.append(who.name + ' заглядывает в замочную скважину двери и ' + self.center.keyHole)
         if self.stink > 0:
             message.append('Из замочной скважины ' +
                            self.stink_levels[self.stink].lower() +

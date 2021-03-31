@@ -183,6 +183,7 @@ class Shield (Protection):
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+        self.accumulated_damage = 0
 
     def on_create(self):
         return True

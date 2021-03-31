@@ -119,8 +119,9 @@ class Monster:
             weaponAttack = 0
             text.append(selfName + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
                 meleAttack, 'единицу,единицы,единиц') + ' урона. ')
+        totalAttack = weaponAttack + meleAttack
         targetDefence = target.defence(self)
-        if (weaponAttack + meleAttack - targetDefence) > 0:
+        if (totalAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
             if targetDefence == 0:
                 text.append(target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
@@ -130,6 +131,15 @@ class Monster:
         else:
             totalDamage = 0
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
+        if target.shield != '':
+            shield = target.shield
+            rand = dice(1, 100)
+            dam = totalAttack * target.shield.accumulated_damage
+            print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
+            if rand < dam:
+                text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
+                game.allShields.remove(shield)
+                target.shield = ''
         target.health -= totalDamage
         if target.health <= 0:
             game.state = 0
@@ -283,7 +293,7 @@ class Plant(Monster):
             b = Loot()
             where.loot = b
         if self.money > 0:
-            a = Money(self.money)
+            a = Money(game, self.money)
             where.loot.pile.append(a)
             where.loot.pile.extend(self.loot.pile)
         if self.shield != '':
