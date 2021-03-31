@@ -162,6 +162,7 @@ class Armor(Protection):
         who.armor = self
         tprint(self.game, message)
 
+
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
     def __init__(self, game, name='', name1='щит', protection=1, actions=''):
@@ -187,6 +188,44 @@ class Shield (Protection):
 
     def on_create(self):
         return True
+
+    def show(self):
+        damage_dict = {1: 'поцарапанный',
+                       2: 'потрепанный',
+                       3: 'почти сломанный',
+                       4: 'еле живой',
+                       }
+        damage = damage_dict.get(self.accumulated_damage//1)
+        protectionString = str(self.protection)
+        text = ''
+        if self.permprotection() != 0:
+            protectionString += '+' + str(self.permprotection())
+        if damage:
+            text += (damage + ' ')
+        text += self.name + self.enchantment() + ' (' + protectionString + ')'
+        return text
+
+    def realname(self):
+        damage_dict = {1: 'поцарапанный',
+                       2: 'потрепанный',
+                       3: 'почти сломанный',
+                       4: 'еле живой',
+                       }
+        damage = damage_dict.get(self.accumulated_damage // 1)
+        names = []
+        if damage:
+            name = damage + ' ' + self.name
+            name1 = damage + ' ' + self.name1
+        else:
+            name = self.name
+            name1 = self.name1
+        if self.element() != 0:
+            names.append(name + ' ' + elementDictionary[self.element()])
+            names.append(name1 + ' ' + elementDictionary[self.element()])
+        else:
+            names.append(name)
+            names.append(name1)
+        return names
 
     def place(self, castle, room_to_place = None):
         if room_to_place:

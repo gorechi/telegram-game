@@ -152,10 +152,20 @@ class Monster:
         return True
 
     def defence(self, attacker):
-        if self.shield == '':
-            return 0
-        else:
-            return self.shield.protect(attacker)
+        result = 0
+        if self.shield != '':
+            result += self.shield.protect(attacker)
+            if self.hide:
+                dice_result = dice(50, 75)/100
+                print('dice result: ', dice_result)
+                self.shield.accumulated_damage += dice_result
+            else:
+                dice_result = dice(10, 25) / 100
+                print('dice result: ', dice_result)
+                self.shield.accumulated_damage += dice_result
+        if self.armor != '':
+            result += self.armor.protect(attacker)
+        return result
 
     def lose(self, winner):
         game = self.game
@@ -360,10 +370,20 @@ class Shapeshifter(Monster):
                    '. У него теперь сила ' +
                    str(self.stren) +
                    weaponString)
-        if self.shield == '':
-            return 0
-        else:
-            return self.shield.protect(attacker)
+        result = 0
+        if self.shield != '':
+            result += self.shield.protect(attacker)
+            if self.hide:
+                dice_result = dice(50, 75) / 100
+                print('dice result: ', dice_result)
+                self.shield.accumulated_damage += dice_result
+            else:
+                dice_result = dice(10, 25) / 100
+                print('dice result: ', dice_result)
+                self.shield.accumulated_damage += dice_result
+        if self.armor != '':
+            result += self.armor.protect(attacker)
+        return result
 
     def lose(self, winner):
         where = self.game.newCastle.plan[self.currentPosition]
@@ -421,7 +441,8 @@ class Vampire(Monster):
                         howmany(meleAttack, 'единицу,единицы,единиц') +
                         ' урона. ')
         targetDefence = target.defence(self)
-        if (weaponAttack + meleAttack - targetDefence) > 0:
+        totalAttack = weaponAttack + meleAttack
+        if (totalAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
         else:
             totalDamage = 0
@@ -446,6 +467,15 @@ class Vampire(Monster):
                         ' высасывает ' +
                         str(totalDamage // 2) +
                         ' себе.')
+        if target.shield != '':
+            shield = target.shield
+            rand = dice(1, 100)
+            dam = totalAttack * target.shield.accumulated_damage
+            print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
+            if rand < dam:
+                text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
+                game.allShields.remove(shield)
+                target.shield = ''
         target.health -= totalDamage
         self.health += totalDamage // 2
         if target.health <= 0:

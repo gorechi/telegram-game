@@ -243,7 +243,8 @@ class Hero:
                 string1 = self.name + ' бьет ' + targetName1 + ' не используя оружие и наносит ' + howmany(
                     meleAttack, 'единицу,единицы,единиц') + ' урона. '
             targetDefence = target.defence(self)
-            if (weaponAttack + meleAttack - targetDefence) > 0:
+            totalAttack = weaponAttack + meleAttack
+            if (totalAttack - targetDefence) > 0:
                 totalDamage = weaponAttack + meleAttack - targetDefence
             else:
                 totalDamage = 0
@@ -254,6 +255,14 @@ class Hero:
             else:
                string2 = targetName + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
                     totalDamage, 'жизнь,жизни,жизней') + '.'
+            if target.shield != '':
+                shield = target.shield
+                rand = dice(1, 100)
+                dam = totalAttack * target.shield.accumulated_damage
+                if rand < dam:
+                    string1 += (' ' + self.name + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
+                    game.allShields.remove(shield)
+                    target.shield = ''
             target.health -= totalDamage
             return string1 + string2
         elif action == 'з' or action == 'защититься' or action == 'защита':
