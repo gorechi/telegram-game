@@ -257,9 +257,17 @@ class Shield (Protection):
             oldShield = who.shield
         if who.removed_shield != '':
             oldShield = who.removed_shield
-        message = [who.name + ' берет ' + self.name1 + ' в руку.']
+        if who.weapon != '':
+            if who.weapon.twohanded:
+                who.removed_shield = self
+                message = [who.name + ' помещает ' + self.name1 + ' за спину.']
+            else:
+                who.shield = self
+                message = [who.name + ' берет ' + self.name1 + ' в руку.']
+        else:
+            who.shield = self
+            message = [who.name + ' берет ' + self.name1 + ' в руку.']
         if oldShield != '':
             message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
             who.drop(oldShield)
-        who.shield = self
         tprint(self.game, message)

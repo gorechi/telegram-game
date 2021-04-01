@@ -16,6 +16,7 @@ class Monster:
         self.state = state
         self.weapon = ''
         self.shield = ''
+        self.removed_shield = None
         self.armor = ''
         self.money = 5
         self.currentPosition = 0
@@ -52,9 +53,22 @@ class Monster:
 
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon == '' and self.carryweapon:
+            if item.twohanded:
+                if self.shield != '':
+                    shield = self.shield
+                    self.shield = ''
+                    self.game.newCastle.plan[self.currentPosition].loot.pile.append(shield)
             self.weapon = item
         elif isinstance(item, Shield) and self.shield == '' and self.carryshield:
+            if self.weapon != '':
+                if self.weapon.twohanded:
+                    self.loot.pile.append(item)
+                    return True
+                else:
+                    self.shield = item
+                    return True
             self.shield = item
+            return True
         elif isinstance(item, Armor) and self.armor == '' and self.wearArmor:
             self.armor = item
         elif isinstance(item, Rune):

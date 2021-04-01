@@ -8,30 +8,34 @@ class Weapon:
             self.name = name
             self.damage = int(damage)
             self.name1 = name1
+            self.twohanded = False
         else:
-            self.n1 = [['Большой', 'Большая', 'Большой', 'Большую'],
-                       ['Малый', 'Малая', 'Малый', 'Малую'],
-                       ['Старый', 'Старая', 'Старый', 'Старую'],
-                       ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
-                       ['Новый', 'Новая', 'Новый', 'Новую']]
-            self.n2 = [['меч', 0, 'меч', 'рубящее'],
-                       ['сабля', 1, 'саблю', 'рубящее'],
-                       ['катана', 1, 'катану', 'рубящее'],
-                       ['рапира', 1, 'рапиру', 'колющее'],
-                       ['пика', 1, 'пику', 'колющее'],
-                       ['топор', 0, 'топор', 'рубящее'],
-                       ['кинжал', 0, 'кинжал', 'колющее'],
-                       ['дубина', 1, 'дубину', 'ударное'],
-                       ['палица', 1, 'палицу', 'ударное'],
-                       ['булава', 1, 'булаву', 'ударное'],
-                       ['молот', 0, 'молот', 'ударное'],
-                       ['шпага', 1, 'шпагу', 'колющее']]
-            self.a1 = dice(0, len(self.n1) - 1)
-            self.a2 = dice(0, len(self.n2) - 1)
-            self.name = self.n1[self.a1][self.n2[self.a2][1]] + ' ' + self.n2[self.a2][0]
-            self.name1 = self.n1[self.a1][self.n2[self.a2][1]+2] + ' ' + self.n2[self.a2][2]
+            n1 = [[['Большой', 'Большой'], ['Большая', 'Большую'], ['Большое', 'Большое']],
+                       [['Малый', 'Малый'], ['Малая', 'Малую'], ['Малое', 'Малое']],
+                       [['Старый', 'Старый'], ['Старая', 'Старую'], ['Старое', 'Старое']],
+                       [['Тяжелый', 'Тяжелый'], ['Тяжелая', 'Тяжелую'], ['Тяжелое', 'Тяжелое']],
+                       [['Новый', 'Новый'], ['Новая', 'Новую'], ['Новое', 'Новое']]]
+            n2 = [['меч', 0, 'меч', 'рубящее', False],
+                        ['сабля', 1, 'саблю', 'рубящее', False],
+                        ['катана', 1, 'катану', 'рубящее', False],
+                        ['рапира', 1, 'рапиру', 'колющее', False],
+                        ['пика', 1, 'пику', 'колющее', True],
+                        ['копье', 2, 'копье', 'колющее', True],
+                        ['топор', 0, 'топор', 'рубящее', False],
+                        ['кинжал', 0, 'кинжал', 'колющее', False],
+                        ['дубина', 1, 'дубину', 'ударное', False],
+                        ['палица', 1, 'палицу', 'ударное', False],
+                        ['булава', 1, 'булаву', 'ударное', False],
+                        ['молот', 0, 'молот', 'ударное', True],
+                        ['шпага', 1, 'шпагу', 'колющее', False]]
+            a1 = dice(0, len(n1) - 1)
+            a2 = dice(0, len(n2) - 1)
+            self.name = n1[a1][n2[a2][1]][0] + ' ' + n2[a2][0]
+            self.name1 = n1[a1][n2[a2][1]][1] + ' ' + n2[a2][2]
             self.damage = dice(3, 12)
-            self.type = self.n2[self.a2][3]
+            self.type = n2[a2][3]
+            self.twohanded = n2[a2][4]
+            self.gender = n2[a2][1]
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
@@ -95,6 +99,13 @@ class Weapon:
         if weapon == '':
             who.weapon = self
             message.append(who.name + ' теперь использует ' + self.name1 + ' в качестве оружия.')
+            if weapon.twohanded and who.shield != '':
+                shield = who.shield
+                who.shield = ''
+                who.removed_shield = shield
+                message.append('Из-за того, что герой взял двуручное оружие, ему пришлось убрать ' +
+                               shield.realname()[1] +
+                               ' за спину.')
         else:
             if second_weapon:
                 message.append('В рюкзаке для нового оружия нет места, поэтому приходится бросить ' + weapon.name + '.')
@@ -118,7 +129,20 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-        tprint(self.game, whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия!')
+            message = [whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия.']
+            if whoUsing.shield != '' and self.twohanded:
+                shield = whoUsing.shield
+                whoUsing.removed_shield = shield
+                whoUsing.shield = ''
+                message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
+            if whoUsing.removed_shield !='' and not self.twohanded:
+                shield = whoUsing.removed_shield
+                whoUsing.shield = shield
+                whoUsing.removed_shield = ''
+                message.append('Из-за того, что новое оружие одноручное, герой теперь держит во второй руке' +
+                               shield.realname()[1] +
+                               '.')
+        tprint(self.game, message)
 
     def place(self, castle, room_to_place = None):
         if room_to_place:

@@ -743,6 +743,11 @@ class Hero:
                 if self.removed_shield.name.lower() == item.lower() or \
                         self.removed_shield.name1.lower() == item.lower() or \
                         item.lower() == 'щит':
+                    if self.weapon != '':
+                        if self.weapon.twohanded:
+                            message = [self.name + ' воюет двуручным оружием, поэтому не может взять щит.']
+                            tprint(game, message)
+                            return True
                     shield = self.removed_shield
                     self.shield = shield
                     self.removed_shield = ''
