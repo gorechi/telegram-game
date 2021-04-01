@@ -78,6 +78,7 @@ class Hero:
                        'открыть': self.open,
                        'использовать': self.use,
                        'читать': self.read,
+                       'убрать': self.remove,
                        'чинить': self.repair,
                        'улучшить': self.enchant}
         a = command.find(' ')
@@ -100,6 +101,26 @@ class Hero:
             c()
         else:
             c(fullCommand[1])
+
+    def remove(self, what):
+        message = []
+        if self.shield != '':
+            if what.lower == 'щит' or what.lower == self.shield.name or what.lower == self.shield.name1:
+                item = self.shield
+        if not what:
+            message.append(self.name + ' оглядывается по сторонам, находит какой-то мусор и '
+                                       'закидывает его в самый темный угол комнаты.')
+        elif not item:
+            message.append(self.name + ' не понимает, как это можно убрать.')
+        elif item == '':
+            message.append('Эта вещь, возможно, уже убрана.')
+        else:
+            if isinstance(item, Shield):
+                shield = self.shield
+                self.removed_shield = shield
+                self.shield = ''
+                message.append(self.name + ' убирает ' + shield.realname()[1] + ' за спину.')
+        tprint(self.game, message)
 
     def repair(self, what=None):
         message = []
@@ -410,6 +431,8 @@ class Hero:
                 for i in range(len(self.pockets)):
                     text.append(str(i+1) + ': ' + self.pockets[i].show())
                 text.append(self.money.show())
+            if self.removed_shield != '':
+                text.append('За спиной у героя висит ' + self.removed_shield.realname()[0])
             tprint(game, text)
         elif a in self.directionsDict.keys():
             if newCastle.plan[self.currentPosition].doors[self.doorsDict[a]] == 0:
@@ -614,6 +637,8 @@ class Hero:
             self.armor = ''
         if self.shield == object:
             self.shield = ''
+        if self.removed_shield == object:
+            self.removed_shield = ''
         if self.weapon == object:
             self.weapon = ''
         if object in self.pockets:
@@ -714,6 +739,16 @@ class Hero:
                 tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
                 return False
         else:
+            if self.removed_shield != '':
+                if self.removed_shield.name.lower() == item.lower() or \
+                        self.removed_shield.name1.lower() == item.lower() or \
+                        item.lower() == 'щит':
+                    shield = self.removed_shield
+                    self.shield = shield
+                    self.removed_shield = ''
+                    message = [self.name + ' достает ' + shield.realname()[0] + ' из-за спины и берет его в руку.']
+                    tprint(game, message)
+                    return True
             for i in self.pockets:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
                     if isinstance(i, Potion)  and i.use(self, inaction = False):

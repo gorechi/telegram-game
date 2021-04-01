@@ -253,10 +253,13 @@ class Shield (Protection):
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
-        oldShield = who.shield
+        if who.shield != '':
+            oldShield = who.shield
+        if who.removed_shield != '':
+            oldShield = who.removed_shield
         message = [who.name + ' берет ' + self.name1 + ' в руку.']
         if oldShield != '':
-            message.append('При этом он бросает старый ' + oldShield.name1 + ' и оставляет валяться на полу.')
+            message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
             who.drop(oldShield)
         who.shield = self
         tprint(self.game, message)
