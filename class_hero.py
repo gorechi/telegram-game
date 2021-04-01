@@ -528,7 +528,6 @@ class Hero:
         room = newCastle.plan[self.currentPosition]
         message = []
         print ('room.center: ', room.center)
-        chestinroom = False
         enemyinroom = False
         if room.center != '':
             if isinstance(room.center, Monster):
@@ -551,12 +550,10 @@ class Hero:
             enemyinambush = False
             enemyinroom = room.center
             message.append('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
-            tprint (game, message)
-            self.fight(enemyinroom, True)
+            tprint(game, message)
+            self.fight(enemyinroom.name, True)
             return True
         if not item:
-            if chestinroom:
-                message.append("В комнате стоит " + chestinroom.name)
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             if room.loot != '' and len(room.loot.pile) > 0:
@@ -568,25 +565,32 @@ class Hero:
             tprint(game, message)
             return True
         else:
-            searchableItems = []
-            searchableItems.extend(room.furniture)
             whatToSearch = False
-            if chestinroom:
-                searchableItems.append(chestinroom)
-            for i in searchableItems:
+            for i in room.furniture:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
                     whatToSearch = i
             if not whatToSearch:
                 message.append('В комнате нет такой вещи.')
             elif whatToSearch.locked:
                 message.append('Нельзя обыскать ' + whatToSearch.name1 + '. Там заперто.')
+            elif whatToSearch.ambush:
+                room.center = whatToSearch.ambush
+                whatToSearch.ambush = False
+                enemyinroom = room.center
+                message.append('Неожиданно из засады выскакивает ' +
+                                   enemyinroom.name +
+                                   ' и нападает на ' +
+                                   self.name1)
+                tprint(game, message)
+                self.fight(enemyinroom.name, True)
+                return True
             elif len(whatToSearch.loot.pile) > 0:
                 message.append(self.name + ' осматривает ' + whatToSearch.name1 + ' и находит:')
                 for i in whatToSearch.loot.pile:
                     message.append(i.name)
                     room.loot.pile.append(i)
                 if len(whatToSearch.loot.pile) > 0:
-                    message.append('Все эти вещи теперь лежат навиду.')
+                    message.append('Все, что было спрятано, теперь лежит навиду.')
             elif len(whatToSearch.loot.pile) == 0:
                 message.append(whatToSearch.name + ' ' + whatToSearch.empty)
             tprint(game, message)
