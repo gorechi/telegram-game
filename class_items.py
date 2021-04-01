@@ -125,6 +125,12 @@ class Matches():
             return True
         room.loot.pile.append(self)
 
+    def take(self, who=''):
+        if who == '':
+            return False
+        who.pockets.append(self)
+        tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
+
     def use(self, whoIsUsing = None, inaction = False):
         player = self.game.player
         game = self.game

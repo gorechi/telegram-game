@@ -268,6 +268,7 @@ class Shield (Protection):
             who.shield = self
             message = [who.name + ' берет ' + self.name1 + ' в руку.']
         if oldShield != '':
+            print('old shield: ', oldShield)
             message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
             who.drop(oldShield)
         tprint(self.game, message)

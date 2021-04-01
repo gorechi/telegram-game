@@ -137,11 +137,7 @@ class Monster:
         targetDefence = target.defence(self)
         if (totalAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
-            if targetDefence == 0:
-                text.append(target.name + ' беззащитен и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
-            else:
-                text.append(target.name + ' использует для защиты ' + target.shield.name + ' и теряет ' \
-                          + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
+            text.append(target.name + ' теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
         else:
             totalDamage = 0
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
@@ -152,7 +148,6 @@ class Monster:
             print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
                 text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
-                game.allShields.remove(shield)
                 target.shield = ''
         target.health -= totalDamage
         if target.health <= 0:
@@ -185,6 +180,7 @@ class Monster:
         game = self.game
         newCastle = self.game.newCastle
         result = dice(1, 10)
+        print('result: ', result)
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
             b = Loot()
@@ -402,10 +398,10 @@ class Shapeshifter(Monster):
     def lose(self, winner):
         where = self.game.newCastle.plan[self.currentPosition]
         if where.loot == '':
-            b = Loot()
+            b = Loot(self.game)
             where.loot = b
         if self.money > 0:
-            a = Money(self.money)
+            a = Money(self.game, self.money)
             where.loot.pile.append(a)
             where.loot.pile.extend(self.loot.pile)
         if self.shield != '':

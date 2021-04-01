@@ -23,7 +23,7 @@ class Hero:
         self.weapon = weapon
         self.armor = ''
         self.shield = shield
-        self.removed_shield = None
+        self.removed_shield = ''
         self.pockets = pockets
         self.money = Money(self.game, 0)
         self.currentPosition = 0

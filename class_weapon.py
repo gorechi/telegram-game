@@ -39,6 +39,7 @@ class Weapon:
         self.actions = actions.split(',')
         self.canUseInFight = True
         self.runes = []
+        self.twohanded_dict = ['двуручный', 'двуручная', 'двуручное']
 
     def on_create(self):
         return True
@@ -98,6 +99,7 @@ class Weapon:
         second_weapon = who.second_weapon()
         if weapon == '':
             who.weapon = self
+            weapon = self
             message.append(who.name + ' теперь использует ' + self.name1 + ' в качестве оружия.')
             if weapon.twohanded and who.shield != '':
                 shield = who.shield
@@ -120,7 +122,11 @@ class Weapon:
         damageString = str(self.damage)
         if self.permdamage() != 0:
             damageString += '+' + str(self.permdamage())
-        return self.name + self.enchantment() + ' (' + damageString + ')'
+        if self.twohanded:
+            name = self.twohanded_dict[self.gender] + ' ' + self.name
+        else:
+            name = self.name
+        return name + self.enchantment() + ' (' + damageString + ')'
 
     def use(self, whoUsing, inaction=False):
         if whoUsing.weapon == '':

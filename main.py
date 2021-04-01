@@ -6,6 +6,7 @@ from telebot import types
 from functions import *
 from constants import *
 from class_game import Game
+from class_items import Rune
 
 # Константы и настройки
 game_sessions = {}
