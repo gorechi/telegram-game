@@ -35,6 +35,13 @@ class Furniture:
     def put(self, item):
         self.loot.pile.append(item)
 
+    def show(self):
+        message = []
+        message.append(self.where + ' ' + self.state + ' ' + self.name + '.')
+        if self.can_hide and self.ambush:
+            message.append('Внутри слышится какая-то возня.')
+        return message
+
     def place(self, castle = None, room_to_place = None):
         if room_to_place:
             print(room_to_place.furniture_types(), self.type)

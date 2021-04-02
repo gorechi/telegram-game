@@ -454,9 +454,11 @@ class Hero:
     def lookaround(self, a=''):
         game = self.game
         newCastle = self.game.newCastle
+        room = newCastle.plan[self.currentPosition]
+        furniture_list = room.furniture
         if a == '':
-            newCastle.plan[self.currentPosition].show(game.player)
-            newCastle.plan[self.currentPosition].map()
+            room.show(game.player)
+            room.map()
         elif a == 'себя':
             self.show()
         elif a == 'рюкзак':
@@ -481,14 +483,19 @@ class Hero:
                 self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[
                 0]) and newCastle.plan[self.currentPosition].monster():
                 tprint(game, showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
-
         if self.weapon != '':
             if a == self.weapon.name or a == self.weapon.name1 or a == 'оружие':
                 tprint(game, self.weapon.show())
         if self.shield != '':
             if a == self.shield.name or a == self.shield.name1 or a == 'защиту':
                 tprint(game, self.shield.show())
-
+        if len(furniture_list) > 0:
+            text = []
+            for i in furniture_list:
+                if i.name1 == a:
+                    text.extend(i.show())
+            if len(text) > 0:
+                tprint(game, text)
         if len(self.pockets) > 0:
             text = []
             for i in self.pockets:
