@@ -274,8 +274,7 @@ class Hero:
             elif targetDefence == 0:
                string2 = targetName + ' не имеет защиты и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
             else:
-               string2 = targetName + ' использует для защиты ' + target.shield.name1 + ' и теряет ' + howmany(
-                    totalDamage, 'жизнь,жизни,жизней') + '.'
+               string2 = targetName + ' защищается и теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.'
             if target.shield != '':
                 shield = target.shield
                 rand = dice(1, 100)
@@ -342,24 +341,62 @@ class Hero:
             return (self.name + ' уходит в глухую защиту, терпит удары и накапливает ярость.')
 
     def show(self):
+        message = []
+        if self.money.howmuchmoney > 1:
+            money_text = 'В кошельке звенят ' + howmany(self.money.howmuchmoney, 'монета,монеты,монет') + '.'
+        elif self.money.howmuchmoney == 1:
+            money_text = 'Одна-единственная монета оттягивает карман героя.'
+        else:
+            money_text = 'Герой беден, как церковная мышь.'
+        message.append(self.name +
+                       ' - это смелый герой ' +
+                       str(self.level) +
+                       ' уровня. Его сила - ' +
+                       str(self.stren) +
+                       ' и сейчас у него ' +
+                       howmany(self.health, 'единица,единицы,единиц') +
+                       ' здоровья, что составляет ' +
+                       str(self.health * 100 // self.startHealth) +
+                       '% от максимально возможного. ' +
+                       money_text)
         if self.weapon != '':
-            string1 = ', а {0} в его руке добавляет к ней еще {1}+{2}.'.format(self.weapon.realname()[0],
-                                                                               self.weapon.damage,
-                                                                               self.weapon.permdamage())
+            weapon_text = self.weapon.realname()[0] + \
+                   ' в руке героя добавляет к его силе ' + \
+                   str(self.weapon.damage) + \
+                   '+' + \
+                   str(self.weapon.permdamage()) + '.'
         else:
-            string1 = ' и он предпочитает сражаться голыми руками.'
-        if self.shield != '':
-            string2 = 'Его защищает {0} ({1}+{2})'.format(self.shield.realname()[0],
-                                                           self.shield.protection,
-                                                           self.shield.permprotection())
+            weapon_text = self.name + ' предпочитает сражаться голыми руками.'
+        message.append(weapon_text)
+        if self.shield != '' or self.armor != '':
+            protection_text = 'Героя '
+            if self.shield != '' and self.armor != '':
+                protect = 'защищают '
+                and_text = ' и '
+            else:
+                protect = 'защищает '
+                and_text = ''
+            if self.shield != '':
+                shield_text = self.shield.realname()[0] + \
+                                ' (' + \
+                                str(self.shield.protection) + \
+                                '+' + \
+                                str(self.shield.permprotection()) + ')'
+            else:
+                shield_text = ''
+            if self.armor != '':
+                armor_text = self.armor.realname()[0] + \
+                                ' (' + \
+                                str(self.armor.protection) + \
+                                '+' + \
+                                str(self.armor.permprotection()) + ')'
+            else:
+                armor_text = ''
+            protection_text += protect + shield_text + and_text + armor_text
         else:
-            string2 = 'У него нет защиты'
-        tprint(self.game,
-            '{0} - это смелый герой {7} уровня. Его сила - {1}{2} {3} и сейчас у него {4} здоровья, '
-            'что составляет {5}% от максимально возможного.\n{0} имеет при себе {6} золотом.'.format(
-                self.name, self.stren, string1, string2, howmany(self.health, 'единица,единицы,единиц'),
-                self.health * 100 // self.startHealth, howmany(self.money.howmuchmoney, 'монету,монеты,монет'),
-                self.level))
+            protection_text = 'У героя нет ни щита, ни доспехов.'
+        message.append(protection_text)
+        tprint(self.game, message)
 
     def defence(self, attacker):
         result = 0
@@ -590,7 +627,7 @@ class Hero:
                     message.append(i.name)
                     room.loot.pile.append(i)
                 if len(whatToSearch.loot.pile) > 0:
-                    message.append('Все, что было спрятано, теперь лежит навиду.')
+                    message.append('Все, что было спрятано, теперь лежит на виду.')
             elif len(whatToSearch.loot.pile) == 0:
                 message.append(whatToSearch.name + ' ' + whatToSearch.empty)
             tprint(game, message)
@@ -811,19 +848,23 @@ class Hero:
                 books.append(i)
         if len(books) > 0:
             book = None
-            for i in books:
-                if not what:
-                    book = randomitem(books, False)
-                    message.append(self.name + ' роется в рюкзаке и находит первую попавшуюся книгу.')
-                elif i.name.lower() == what.lower() or i.name1.lower() == what.lower():
-                    book = i
-                    message.append(self.name + ' читает ' + book.alt_name + '.')
-            message.append(book.text)
-            message += book.print_mastery(self)
-            message.append('Он решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-            self.weapon_mastery[book.weapon_type] += 1
-            print (self.weapon_mastery)
-            self.pockets.remove(book)
+            if not what or what == 'книгу':
+                book = randomitem(books, False)
+                message.append(self.name + ' роется в рюкзаке и находит первую попавшуюся книгу.')
+            else:
+                for i in books:
+                    if i.name.lower() == what.lower() or i.name1.lower() == what.lower():
+                        book = i
+                        message.append(self.name + ' читает ' + book.name1 + '.')
+                if not book:
+                    message.append('В рюкзаке нет такой книги.')
+            if book:
+                message.append(book.text)
+                message += book.print_mastery(self)
+                message.append('Он решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+                self.weapon_mastery[book.weapon_type] += 1
+                print (self.weapon_mastery)
+                self.pockets.remove(book)
         else:
             message.append('В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')
         tprint(self.game, message)

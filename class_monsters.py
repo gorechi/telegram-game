@@ -183,15 +183,17 @@ class Monster:
         print('result: ', result)
         where = newCastle.plan[self.currentPosition]
         if where.loot == '':
-            b = Loot()
+            b = Loot(game)
             where.loot = b
         if result < 6 or self.wounded:
             if self.money > 0:
-                a = Money(self.money)
+                a = Money(game, self.money)
                 where.loot.pile.append(a)
                 where.loot.pile.extend(self.loot.pile)
             if self.shield != '':
                 where.loot.pile.append(self.shield)
+            if self.armor != '':
+                where.loot.pile.append(self.armor)
             if self.weapon != '':
                 where.loot.pile.append(self.weapon)
             where.center = ''
@@ -228,9 +230,12 @@ class Monster:
                                    + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
                     self.stren -= weaknessAmount
                     self.health = self.startHealth + illAmount
-                runningMonsters = [self]
-                if self.place(newCastle):
+                if self.place(newCastle, old_place = where):
                     aliveString += self.name + ' убегает из комнаты.'
+                    tprint(game, aliveString)
+                    where.center = ''
+                else:
+                    aliveString += 'Пытаясь убежать ' + self.name + ' на всей скорости врезается в стену и умирает.'
                     tprint(game, aliveString)
                     where.center = ''
             else:
@@ -244,11 +249,11 @@ class Monster:
     def win(self, loser):
         self.health = self.startHealth
 
-    def place(self, castle, roomr_to_place = None):
+    def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '')]
+            emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '' and a != old_place)]
             room = randomitem(emptyRooms, False)
         if dice(1, 5) == 1:
             places_to_hide = []

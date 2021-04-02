@@ -364,8 +364,7 @@ class Book():
         self.type = dice(0,2)
         description = randomitem(self.descriptions, False)
         self.name = description[0] + ' ' + self.name + ' ' + self.decorations[self.type]
-        self.alt_name = description[1] + ' ' + self.name1 + ' ' + self.decorations[self.type]
-        self.name1 = 'книгу'
+        self.name1 = description[1] + ' ' + self.name1 + ' ' + self.decorations[self.type]
         available_texts = []
         for i in self.texts:
             if i[0] == self.type:
