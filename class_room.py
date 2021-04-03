@@ -79,9 +79,11 @@ class Room:
         self.decoration3 = decor3[a]
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
+        self.description = self.decoration1 + ' комнату ' + self.decoration2 + '. ' + self.decoration4
         self.center = center
         self.money = 0
         self.loot = loot
+        self.secret_loot = Loot(self.game)
         self.locked = False
         self.position = -1
         self.visited = ' '
@@ -96,6 +98,17 @@ class Room:
             self.torch = False
         else:
             self.torch = True
+        self.secret_dict = [
+            'унитаз',
+            'аквариум',
+            'бак',
+            'камин',
+            'хлам'
+        ]
+        self.secret_word = None
+        for i in self.secret_dict:
+            if self.description.find(i) > -1:
+                self.secret_word = i
 
     def show(self, player):
         game = self.game

@@ -5,7 +5,7 @@ from class_weapon import Weapon
 from class_protection import Shield, Armor
 from class_items import Potion, Rune, Book, Matches, Map, Key, Spell
 from class_monsters import Monster, Shapeshifter, Vampire, Berserk, Walker, Plant
-from class_room import Room, Furniture
+from class_room import Furniture
 
 classes = { 'монстр': Monster,
             'герой': Hero,

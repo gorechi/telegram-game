@@ -46,11 +46,15 @@ class Rune:
         return True
 
     def place(self, castle, room_to_place = None):
+        rooms_with_secrets = [i for i in castle.plan if i.secret_word]
         if room_to_place:
             room = room_to_place
         else:
             rooms = castle.plan
             room = randomitem(rooms, False)
+        if room in rooms_with_secrets:
+            room.secret_loot.pile.append(self)
+            return True
         if len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)

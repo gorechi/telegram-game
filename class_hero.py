@@ -823,7 +823,7 @@ class Hero:
             return False
         elif item == 'оружие' and self.weapon != '':
             game.selectedItem = self.weapon
-        elif item in ['защиту', 'защита'] and self.shield != '':
+        elif item == 'щит' and self.shield != '':
             game.selectedItem = self.shield
         elif item.isdigit() and int(item)-1 <= len(self.pockets):
             game.selectedItem = self.pockets[int(item)-1]
