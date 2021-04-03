@@ -609,6 +609,19 @@ class Hero:
             tprint(game, message)
             return True
         else:
+            if room.secret_word.lower() == item.lower():
+                if len(room.secret_loot.pile) == 0:
+                    message.append(self.name + ' осматривает ' + item + ' и ничего не находит.')
+                    tprint(game, message)
+                    return True
+                else:
+                    message.append(self.name + ' осматривает ' + item + ' и находит:')
+                    for i in room.secret_loot.pile:
+                        message.append(i.name)
+                        room.loot.pile.append(i)
+                        message.append('Все, что было спрятано, теперь лежит на виду.')
+                    tprint(game, message)
+                    return True
             whatToSearch = False
             for i in room.furniture:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
