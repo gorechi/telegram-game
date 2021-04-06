@@ -140,6 +140,3 @@ def all_commands(message):
     return True
 
 bot.polling(none_stop=True, interval=0)
-
-while not player.gameover('killall', howMany['монстры']):
-    player.do(input('Что требуется от ' + player.name1 + '? ---->'))

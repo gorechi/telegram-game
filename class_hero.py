@@ -836,8 +836,13 @@ class Hero:
             return False
         elif item == 'оружие' and self.weapon != '':
             game.selectedItem = self.weapon
-        elif item == 'щит' and self.shield != '':
-            game.selectedItem = self.shield
+        elif item == 'щит':
+            if self.shield != '':
+                game.selectedItem = self.shield
+            elif self.removed_shield !='':
+                game.selectedItem = self.removed_shield
+        elif item in ['дооспех', 'доспехи'] and self.armor != '':
+            game.selectedItem = self.armor
         elif item.isdigit() and int(item)-1 <= len(self.pockets):
             game.selectedItem = self.pockets[int(item)-1]
         else:
@@ -847,12 +852,15 @@ class Hero:
                 else:
                     tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
                     return False
-        if game.selectedItem != '' and isinstance(game.selectedItem, Weapon) or isinstance(game.selectedItem, Shield):
+        if game.selectedItem != '' and \
+                (isinstance(game.selectedItem, Weapon) or
+                 isinstance(game.selectedItem, Shield) or
+                 isinstance(game.selectedItem, Armor)):
             text = []
             text.append(self.name + ' может использовать следующие руны:')
             for rune in runeList:
                 text.append(str(runeList.index(rune)+1) + ': ' + str(rune))
-            text.append('Введите номер руны или "отмена" для прекращения улучшения')
+            text.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
             #Здесь нужна доработка т.к. управление переходит на работу с рунами
             game.state = 2
             tprint(game, text, 'enchant')
