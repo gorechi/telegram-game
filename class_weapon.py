@@ -2,7 +2,7 @@ from functions import *
 from constants import *
 
 class Weapon:
-    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет'):
+    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
         self.game = game
         if name != 0:
             self.name = name
@@ -40,6 +40,7 @@ class Weapon:
         self.canUseInFight = True
         self.runes = []
         self.twohanded_dict = ['двуручный', 'двуручная', 'двуручное']
+        self.empty = empty
 
     def on_create(self):
         return True
@@ -67,7 +68,7 @@ class Weapon:
         return elementSum
 
     def enchant(self, rune):
-        if len(self.runes) > 1:
+        if len(self.runes) > 1 or self.empty:
             return False
         else:
             self.runes.append(rune)

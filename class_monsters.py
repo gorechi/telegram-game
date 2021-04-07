@@ -14,7 +14,7 @@ class Monster:
         self.health = int(health)
         self.actions = actions.split(',')
         self.state = state
-        self.weapon = ''
+        self.weapon = self.game.noWeapon
         self.shield = ''
         self.removed_shield = None
         self.armor = ''
@@ -52,7 +52,7 @@ class Monster:
         return self.name
 
     def give(self, item):
-        if isinstance(item, Weapon) and self.weapon == '' and self.carryweapon:
+        if isinstance(item, Weapon) and self.weapon.empty and self.carryweapon:
             if item.twohanded:
                 if self.shield != '':
                     shield = self.shield
@@ -60,22 +60,20 @@ class Monster:
                     self.game.newCastle.plan[self.currentPosition].loot.pile.append(shield)
             self.weapon = item
         elif isinstance(item, Shield) and self.shield == '' and self.carryshield:
-            if self.weapon != '':
-                if self.weapon.twohanded:
-                    self.loot.pile.append(item)
-                    return True
-                else:
-                    self.shield = item
-                    return True
+            if not self.weapon.empty and self.weapon.twohanded:
+                self.loot.pile.append(item)
+                return True
+            else:
+                self.shield = item
+                return True
             self.shield = item
             return True
         elif isinstance(item, Armor) and self.armor == '' and self.wearArmor:
             self.armor = item
         elif isinstance(item, Rune):
             if item.damage >= item.defence:
-                if self.weapon != '':
-                    if self.weapon.enchant(item):
-                        return True
+                if self.weapon.enchant(item):
+                    return True
                 if self.armor != '':
                     if self.armor.enchant(item):
                         return True
@@ -91,19 +89,15 @@ class Monster:
                 if self.armor != '':
                     if self.armor.enchant(item):
                         return True
-                if self.weapon != '':
-                    if not self.weapon.enchant(item):
-                        return True
+                if self.weapon.enchant(item):
+                    return True
                 self.loot.pile.append(item)
                 return True
         else:
             self.loot.pile.append(item)
 
     def action(self):
-        if self.weapon == '':
-            return randomitem(self.actions)
-        else:
-            return randomitem(self.weapon.actions)
+        return randomitem(self.weapon.actions)
 
     def mele(self):
         room = self.game.newCastle.plan[self.currentPosition]
@@ -124,7 +118,7 @@ class Monster:
             selfName1 = 'черт знает кого'
         text = []
         meleAttack = self.mele()
-        if self.weapon != '':
+        if not self.weapon.empty:
             weaponAttack = self.weapon.attack()
             text.append(selfName + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name1 \
                       + ' и наносит ' + str(meleAttack) + '+' \
@@ -194,7 +188,7 @@ class Monster:
                 where.loot.pile.append(self.shield)
             if self.armor != '':
                 where.loot.pile.append(self.armor)
-            if self.weapon != '':
+            if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
             where.center = ''
         else:
@@ -205,10 +199,10 @@ class Monster:
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
-                    if self.weapon != '':
+                    if not self.weapon.empty:
                         aliveString += 'На пол падает ' + self.weapon.name + '. '
                         where.loot.pile.append(self.weapon)
-                        self.weapon = ''
+                        self.weapon = self.game.noWeapon
                     elif self.shield != '':
                         aliveString += 'На пол падает ' + self.shield.neme + '. '
                         where.loot.pile.append(self.shield)
@@ -323,7 +317,7 @@ class Plant(Monster):
             where.loot.pile.extend(self.loot.pile)
         if self.shield != '':
             where.loot.pile.append(self.shield)
-        if self.weapon != '':
+        if not self.weapon.empty:
             where.loot.pile.append(self.weapon)
         where.center = ''
 
@@ -374,7 +368,7 @@ class Shapeshifter(Monster):
         if not self.shifted:
             self.shifted = True
             self.stren = attacker.stren
-            if attacker.weapon != '' and self.weapon == '':
+            if not attacker.weapon.empty and self.weapon.empty:
                 self.weapon = attacker.weapon
                 weaponString = ' и ' + self.weapon.name + ' в руках.'
             else:
@@ -431,7 +425,7 @@ class Vampire(Monster):
             selfName1 = 'черт знает кого'
         text = []
         meleAttack = self.mele()
-        if self.weapon != '':
+        if not self.weapon.empty:
             weaponAttack = self.weapon.attack()
             text.append(selfName +
                         ' ' +
@@ -502,11 +496,11 @@ class Vampire(Monster):
             tprint(game, text)
         return True
 
-    def place(self, castle, roomr_to_place = None):
+    def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            emptyRooms = [a for a in castle.plan if (a.ambush == '' and not a.light)]
+            emptyRooms = [a for a in castle.plan if (a.ambush == '' and not a.light and not a == old_place)]
             room = randomitem(emptyRooms, False)
         places_to_hide = []
         for i in room.furniture:

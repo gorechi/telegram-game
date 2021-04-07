@@ -20,7 +20,10 @@ class Hero:
         self.startIntel = self.intel
         self.health = int(health)
         self.actions = actions.split(',')
-        self.weapon = weapon
+        if weapon == '':
+            self.weapon = self.game.noWeapon
+        else:
+            self.weapon = weapon
         self.armor = ''
         self.shield = shield
         self.removed_shield = ''
@@ -161,10 +164,7 @@ class Hero:
         return itemList
 
     def action(self):
-        if self.weapon == '':
-            return randomitem(self.actions)
-        else:
-            return randomitem(self.weapon.actions)
+        return randomitem(self.weapon.actions)
 
     def second_weapon(self):
         for i in self.pockets:
@@ -180,13 +180,13 @@ class Hero:
         else:
             tprint(game, self.name + ' в кромешной тьме пытается убежать хоть куда-нибудь.')
         a = dice(1, 2)
-        if a == 1 and self.weapon != '':
+        if a == 1 and not self.weapon.empty:
             tprint(game, 'Убегая ' + self.name + ' роняет из рук ' + self.weapon.name1)
-            if target.weapon == '' and target.carryweapon:
+            if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
             else:
                 room.loot.pile.append(self.weapon)
-            self.weapon = ''
+            self.weapon = self.game.noWeapon
         elif a == 2 and self.shield != '':
             tprint(game, 'Убегая ' + self.name + ' теряет ' + self.shield.name1)
             if target.shield == '' and target.carryshield:
@@ -249,7 +249,7 @@ class Hero:
             tprint(game, showsides(self, target, game.newCastle))
             self.rage = 0
             self.hide = False
-            if self.weapon != '':
+            if not self.weapon.empty:
                 weaponAttack = self.weapon.attack()
                 critical_probability = self.weapon_mastery[self.weapon.type] * 5
                 damage_text = ' урона. '
@@ -359,7 +359,7 @@ class Hero:
                        str(self.health * 100 // self.startHealth) +
                        '% от максимально возможного. ' +
                        money_text)
-        if self.weapon != '':
+        if not self.weapon.empty:
             weapon_text = self.weapon.realname()[0] + \
                    ' в руке героя добавляет к его силе ' + \
                    str(self.weapon.damage) + \
@@ -483,9 +483,8 @@ class Hero:
                 self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[
                 0]) and newCastle.plan[self.currentPosition].monster():
                 tprint(game, showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
-        if self.weapon != '':
-            if a == self.weapon.name or a == self.weapon.name1 or a == 'оружие':
-                tprint(game, self.weapon.show())
+        if not self.weapon.empty and (a == self.weapon.name or a == self.weapon.name1 or a == 'оружие'):
+            tprint(game, self.weapon.show())
         if self.shield != '':
             if a == self.shield.name or a == self.shield.name1 or a == 'защиту':
                 tprint(game, self.shield.show())
@@ -701,7 +700,7 @@ class Hero:
         if self.removed_shield == object:
             self.removed_shield = ''
         if self.weapon == object:
-            self.weapon = ''
+            self.weapon = self.game.noWeapon
         if object in self.pockets:
             self.pockets.remove(object)
 
@@ -804,11 +803,10 @@ class Hero:
                 if self.removed_shield.name.lower() == item.lower() or \
                         self.removed_shield.name1.lower() == item.lower() or \
                         item.lower() == 'щит':
-                    if self.weapon != '':
-                        if self.weapon.twohanded:
-                            message = [self.name + ' воюет двуручным оружием, поэтому не может взять щит.']
-                            tprint(game, message)
-                            return True
+                    if not self.weapon.empty and self.weapon.twohanded:
+                        message = [self.name + ' воюет двуручным оружием, поэтому не может взять щит.']
+                        tprint(game, message)
+                        return True
                     shield = self.removed_shield
                     self.shield = shield
                     self.removed_shield = ''
@@ -834,7 +832,7 @@ class Hero:
         if item == '':
             tprint(game, self.name + ' не понимает, что ему надо улучшить.')
             return False
-        elif item == 'оружие' and self.weapon != '':
+        elif item == 'оружие' and not self.weapon.empty:
             game.selectedItem = self.weapon
         elif item == 'щит':
             if self.shield != '':
@@ -891,7 +889,6 @@ class Hero:
                 message += book.print_mastery(self)
                 message.append('Он решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
                 self.weapon_mastery[book.weapon_type] += 1
-                print (self.weapon_mastery)
                 self.pockets.remove(book)
         else:
             message.append('В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')

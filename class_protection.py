@@ -61,7 +61,7 @@ class Protection:
 
     def protect(self, who):
         multiplier = 1
-        if who.weapon and who.weapon.element() != 0 and self.element() != 0:
+        if not who.weapon.empty and who.weapon.element() != 0 and self.element() != 0:
             if who.weapon.element() in weakness[self.element()]:
                 multiplier = 1.5
             elif self.element() in weakness[who.weapon.element()]:
@@ -257,18 +257,13 @@ class Shield (Protection):
             oldShield = who.shield
         if who.removed_shield != '':
             oldShield = who.removed_shield
-        if who.weapon != '':
-            if who.weapon.twohanded:
-                who.removed_shield = self
-                message = [who.name + ' помещает ' + self.name1 + ' за спину.']
-            else:
-                who.shield = self
-                message = [who.name + ' берет ' + self.name1 + ' в руку.']
+        if not who.weapon.empty and who.weapon.twohanded:
+            who.removed_shield = self
+            message = [who.name + ' помещает ' + self.name1 + ' за спину.']
         else:
             who.shield = self
             message = [who.name + ' берет ' + self.name1 + ' в руку.']
         if oldShield != '':
-            print('old shield: ', oldShield)
             message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
             who.drop(oldShield)
         tprint(self.game, message)
