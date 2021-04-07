@@ -3,12 +3,13 @@ from constants import *
 
 
 class Protection:
-    def __init__(self, game, name='', name1='защиту', protection=1, actions=''):
+    def __init__(self, game, name='', name1='защиту', protection=1, actions='', empty=False):
         self.game = game
         self.name = name
         self.name1 = name1
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.empty = empty
         self.runes = []
 
     def __str__(self):
@@ -44,7 +45,7 @@ class Protection:
         return protection
 
     def enchant(self, rune):
-        if len(self.runes) > 1:
+        if len(self.runes) > 1 or self.empty:
             return False
         else:
             self.runes.append(rune)
@@ -101,7 +102,7 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, game, name='', name1='доспех', protection=1, actions=''):
+    def __init__(self, game, name='', name1='доспех', protection=1, actions='', empty=False):
         self.game = game
         if name != 0:
             self.name = name
@@ -124,6 +125,7 @@ class Armor(Protection):
             self.protection = dice(1, 3)
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.empty = empty
         self.runes = []
 
     def on_create(self):
@@ -156,7 +158,7 @@ class Armor(Protection):
     def take(self, who):
         oldArmor = who.armor
         message = [who.name + ' использует ' + self.name1 + ' как защиту.']
-        if oldArmor != '':
+        if not oldArmor.empty:
             message.append('При этом он снимает ' + oldArmor.name1 + ' и оставляет валяться на полу.')
             who.drop(oldArmor)
         who.armor = self
@@ -165,7 +167,7 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, game, name='', name1='щит', protection=1, actions=''):
+    def __init__(self, game, name='', name1='щит', protection=1, actions='', empty=False):
         self.game = game
         if name != 0:
             self.name = name
@@ -183,6 +185,7 @@ class Shield (Protection):
             self.protection = dice(1, 3)
         self.actions = actions.split(',')
         self.canUseInFight = True
+        self.empty = empty
         self.runes = []
         self.accumulated_damage = 0
 
@@ -253,9 +256,10 @@ class Shield (Protection):
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
-        if who.shield != '':
+        oldShield = None
+        if not who.shield.empty:
             oldShield = who.shield
-        if who.removed_shield != '':
+        if not who.removed_shield.empty:
             oldShield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
@@ -263,7 +267,7 @@ class Shield (Protection):
         else:
             who.shield = self
             message = [who.name + ' берет ' + self.name1 + ' в руку.']
-        if oldShield != '':
+        if oldShield:
             message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
             who.drop(oldShield)
         tprint(self.game, message)

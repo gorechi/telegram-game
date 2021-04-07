@@ -118,6 +118,8 @@ class Game():
         self.allShields.append(shield)
         self.player.shield = shield[0]
         self.noWeapon = Weapon(self, empty=True)
+        self.noShield = Shield(self, empty=True)
+        self.noArmor = Armor(self, empty=True)
 
     def __del__ (self):
         print("="*40)

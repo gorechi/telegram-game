@@ -28,17 +28,17 @@ def showsides(side1, side2, castle):
     room = castle.plan[side1.currentPosition]
     message = []
     line = side1.name + ': сила - d' + str(side1.stren)
-    if side1.weapon != '':
+    if not side1.weapon.empty:
         line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
-    if side1.shield != '':
+    if not side1.shield.empty:
         line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
     line += ', жизней - ' + str(side1.health) + '. '
     message.append(line)
     if room.light:
         line = side2.name + ': сила - d' + str(side2.stren)
-        if side2.weapon != '':
+        if not side2.weapon.empty:
             line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
-        if side2.shield != '':
+        if not side2.shield.empty:
             line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
         line += ', жизней - ' + str(side2.health) + '.'
         message.append(line)

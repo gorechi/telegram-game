@@ -98,13 +98,13 @@ class Weapon:
         message = [who.name + ' берет ' + self.name1 + '.']
         weapon = who.weapon
         second_weapon = who.second_weapon()
-        if weapon == '':
+        if not weapon.empty:
             who.weapon = self
             weapon = self
             message.append(who.name + ' теперь использует ' + self.name1 + ' в качестве оружия.')
-            if weapon.twohanded and who.shield != '':
+            if weapon.twohanded and not who.shield.empty:
                 shield = who.shield
-                who.shield = ''
+                who.shield = self.game.noShield
                 who.removed_shield = shield
                 message.append('Из-за того, что герой взял двуручное оружие, ему пришлось убрать ' +
                                shield.realname()[1] +
@@ -130,22 +130,22 @@ class Weapon:
         return name + self.enchantment() + ' (' + damageString + ')'
 
     def use(self, whoUsing, inaction=False):
-        if whoUsing.weapon == '':
+        if whoUsing.weapon.empty:
             whoUsing.weapon = self
         else:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
             message = [whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия.']
-            if whoUsing.shield != '' and self.twohanded:
+            if not whoUsing.shield.empty and self.twohanded:
                 shield = whoUsing.shield
                 whoUsing.removed_shield = shield
-                whoUsing.shield = ''
+                whoUsing.shield = self.game.noShield
                 message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
-            if whoUsing.removed_shield !='' and not self.twohanded:
+            if not whoUsing.removed_shield.empty and not self.twohanded:
                 shield = whoUsing.removed_shield
                 whoUsing.shield = shield
-                whoUsing.removed_shield = ''
+                whoUsing.removed_shield = self.game.noShield
                 message.append('Из-за того, что новое оружие одноручное, герой теперь держит во второй руке' +
                                shield.realname()[1] +
                                '.')

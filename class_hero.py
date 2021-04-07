@@ -6,8 +6,20 @@ from class_protection import Shield, Armor
 from class_monsters import Monster
 
 class Hero:
-    def __init__(self, game, name, name1, gender, stren=10, dext=2, intel=0, health=20, weapon='', shield='', actions='бьет',
-                 pockets=[]):
+    def __init__(self,
+                 game,
+                 name,
+                 name1,
+                 gender,
+                 stren=10,
+                 dext=2,
+                 intel=0,
+                 health=20,
+                 weapon='',
+                 shield='',
+                 actions='бьет',
+                 pockets=[],
+                 armor=''):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -24,9 +36,15 @@ class Hero:
             self.weapon = self.game.noWeapon
         else:
             self.weapon = weapon
-        self.armor = ''
-        self.shield = shield
-        self.removed_shield = ''
+        if armor == '':
+            self.armor = self.game.noArmor
+        else:
+            self.armor = armor
+        if shield == '':
+            self.shield = self.game.noShield
+        else:
+            self.shield = shield
+        self.removed_shield = self.game.noShield
         self.pockets = pockets
         self.money = Money(self.game, 0)
         self.currentPosition = 0
@@ -368,15 +386,15 @@ class Hero:
         else:
             weapon_text = self.name + ' предпочитает сражаться голыми руками.'
         message.append(weapon_text)
-        if self.shield != '' or self.armor != '':
+        if not self.shield.empty or not self.armor.empty:
             protection_text = 'Героя '
-            if self.shield != '' and self.armor != '':
+            if not self.shield.empty and not self.armor.empty:
                 protect = 'защищают '
                 and_text = ' и '
             else:
                 protect = 'защищает '
                 and_text = ''
-            if self.shield != '':
+            if not self.shield.empty:
                 shield_text = self.shield.realname()[0] + \
                                 ' (' + \
                                 str(self.shield.protection) + \
@@ -384,7 +402,7 @@ class Hero:
                                 str(self.shield.permprotection()) + ')'
             else:
                 shield_text = ''
-            if self.armor != '':
+            if not self.armor.empty:
                 armor_text = self.armor.realname()[0] + \
                                 ' (' + \
                                 str(self.armor.protection) + \
@@ -400,7 +418,7 @@ class Hero:
 
     def defence(self, attacker):
         result = 0
-        if self.shield != '':
+        if not self.shield.empty:
             result += self.shield.protect(attacker)
             print ('hero hide: ', self.hide)
             if self.hide:
@@ -411,7 +429,7 @@ class Hero:
                 dice_result = dice(10, 25) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
-        if self.armor != '':
+        if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
 
@@ -470,7 +488,7 @@ class Hero:
                 for i in range(len(self.pockets)):
                     text.append(str(i+1) + ': ' + self.pockets[i].show())
                 text.append(self.money.show())
-            if self.removed_shield != '':
+            if not self.removed_shield.empty:
                 text.append('За спиной у героя висит ' + self.removed_shield.realname()[0])
             tprint(game, text)
         elif a in self.directionsDict.keys():
@@ -485,9 +503,8 @@ class Hero:
                 tprint(game, showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
         if not self.weapon.empty and (a == self.weapon.name or a == self.weapon.name1 or a == 'оружие'):
             tprint(game, self.weapon.show())
-        if self.shield != '':
-            if a == self.shield.name or a == self.shield.name1 or a == 'защиту':
-                tprint(game, self.shield.show())
+        if not self.shield.empty and (a == self.shield.name or a == self.shield.name1 or a == 'защиту'):
+            tprint(game, self.shield.show())
         if len(furniture_list) > 0:
             text = []
             for i in furniture_list:
@@ -694,13 +711,13 @@ class Hero:
         currentLoot = newCastle.plan[self.currentPosition].loot
         currentLoot.pile.append(object)
         if self.armor == object:
-            self.armor = ''
+            self.armor = game.noArmor
         if self.shield == object:
-            self.shield = ''
+            self.shield = game.noShield
         if self.removed_shield == object:
-            self.removed_shield = ''
+            self.removed_shield = game.noShield
         if self.weapon == object:
-            self.weapon = self.game.noWeapon
+            self.weapon = game.noWeapon
         if object in self.pockets:
             self.pockets.remove(object)
 
@@ -799,23 +816,23 @@ class Hero:
                 tprint(game, self.name + ' не нашел такой вещи у себя в карманах.')
                 return False
         else:
-            if self.removed_shield != '':
-                if self.removed_shield.name.lower() == item.lower() or \
-                        self.removed_shield.name1.lower() == item.lower() or \
-                        item.lower() == 'щит':
-                    if not self.weapon.empty and self.weapon.twohanded:
-                        message = [self.name + ' воюет двуручным оружием, поэтому не может взять щит.']
-                        tprint(game, message)
-                        return True
-                    shield = self.removed_shield
-                    self.shield = shield
-                    self.removed_shield = ''
-                    message = [self.name + ' достает ' + shield.realname()[0] + ' из-за спины и берет его в руку.']
+            if not self.removed_shield.empty and \
+                    (self.removed_shield.name.lower() == item.lower() or \
+                    self.removed_shield.name1.lower() == item.lower() or \
+                    item.lower() == 'щит'):
+                if not self.weapon.empty and self.weapon.twohanded:
+                    message = [self.name + ' воюет двуручным оружием, поэтому не может взять щит.']
                     tprint(game, message)
                     return True
+                shield = self.removed_shield
+                self.shield = shield
+                self.removed_shield = self.game.noShield
+                message = [self.name + ' достает ' + shield.realname()[0] + ' из-за спины и берет его в руку.']
+                tprint(game, message)
+                return True
             for i in self.pockets:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
-                    if isinstance(i, Potion)  and i.use(self, inaction = False):
+                    if isinstance(i, Potion) and i.use(self, inaction = False):
                         self.pockets.remove(i)
                     else:
                         i.use(self, inaction = False)
@@ -835,11 +852,11 @@ class Hero:
         elif item == 'оружие' and not self.weapon.empty:
             game.selectedItem = self.weapon
         elif item == 'щит':
-            if self.shield != '':
+            if not self.shield.empty:
                 game.selectedItem = self.shield
-            elif self.removed_shield !='':
+            elif not self.removed_shield.empty:
                 game.selectedItem = self.removed_shield
-        elif item in ['дооспех', 'доспехи'] and self.armor != '':
+        elif item in ['дооспех', 'доспехи'] and not self.armor.empty:
             game.selectedItem = self.armor
         elif item.isdigit() and int(item)-1 <= len(self.pockets):
             game.selectedItem = self.pockets[int(item)-1]
@@ -894,4 +911,3 @@ class Hero:
             message.append('В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')
         tprint(self.game, message)
         return True
-

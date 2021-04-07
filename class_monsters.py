@@ -15,9 +15,9 @@ class Monster:
         self.actions = actions.split(',')
         self.state = state
         self.weapon = self.game.noWeapon
-        self.shield = ''
-        self.removed_shield = None
-        self.armor = ''
+        self.shield = self.game.noShield
+        self.removed_shield = self.game.noShield
+        self.armor = self.game.noArmor
         self.money = 5
         self.currentPosition = 0
         self.startHealth = self.health
@@ -54,12 +54,12 @@ class Monster:
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon.empty and self.carryweapon:
             if item.twohanded:
-                if self.shield != '':
+                if not self.shield.empty:
                     shield = self.shield
-                    self.shield = ''
+                    self.shield = self.game.noShield
                     self.game.newCastle.plan[self.currentPosition].loot.pile.append(shield)
             self.weapon = item
-        elif isinstance(item, Shield) and self.shield == '' and self.carryshield:
+        elif isinstance(item, Shield) and self.shield.empty and self.carryshield:
             if not self.weapon.empty and self.weapon.twohanded:
                 self.loot.pile.append(item)
                 return True
@@ -68,27 +68,23 @@ class Monster:
                 return True
             self.shield = item
             return True
-        elif isinstance(item, Armor) and self.armor == '' and self.wearArmor:
+        elif isinstance(item, Armor) and self.armor.empty and self.wearArmor:
             self.armor = item
         elif isinstance(item, Rune):
             if item.damage >= item.defence:
                 if self.weapon.enchant(item):
                     return True
-                if self.armor != '':
-                    if self.armor.enchant(item):
-                        return True
-                if self.shield != '':
-                    if self.shield.enchant(item):
-                        return True
+                if self.armor.enchant(item):
+                    return True
+                if self.shield.enchant(item):
+                    return True
                 self.loot.pile.append(item)
                 return True
             else:
-                if self.shield != '':
-                    if self.shield.enchant(item):
-                        return True
-                if self.armor != '':
-                    if self.armor.enchant(item):
-                        return True
+                if self.shield.enchant(item):
+                    return True
+                if self.armor.enchant(item):
+                    return True
                 if self.weapon.enchant(item):
                     return True
                 self.loot.pile.append(item)
@@ -135,14 +131,14 @@ class Monster:
         else:
             totalDamage = 0
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
-        if target.shield != '':
+        if not target.shield.empty:
             shield = target.shield
             rand = dice(1, 100)
             dam = totalAttack * target.shield.accumulated_damage
             print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
                 text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
-                target.shield = ''
+                target.shield = self.game.noShield
         target.health -= totalDamage
         if target.health <= 0:
             game.state = 0
@@ -156,7 +152,7 @@ class Monster:
 
     def defence(self, attacker):
         result = 0
-        if self.shield != '':
+        if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
                 dice_result = dice(50, 75)/100
@@ -166,7 +162,7 @@ class Monster:
                 dice_result = dice(10, 25) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
-        if self.armor != '':
+        if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
 
@@ -184,9 +180,9 @@ class Monster:
                 a = Money(game, self.money)
                 where.loot.pile.append(a)
                 where.loot.pile.extend(self.loot.pile)
-            if self.shield != '':
+            if not self.shield.empty:
                 where.loot.pile.append(self.shield)
-            if self.armor != '':
+            if not self.armor.empty:
                 where.loot.pile.append(self.armor)
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
@@ -203,10 +199,10 @@ class Monster:
                         aliveString += 'На пол падает ' + self.weapon.name + '. '
                         where.loot.pile.append(self.weapon)
                         self.weapon = self.game.noWeapon
-                    elif self.shield != '':
+                    elif not self.shield.empty:
                         aliveString += 'На пол падает ' + self.shield.neme + '. '
                         where.loot.pile.append(self.shield)
-                        self.shield = ''
+                        self.shield = self.game.noShield
                 elif result == 7:
                     aliveString += 'истекает кровью, теряя при этом ' \
                                    + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы. '
@@ -315,10 +311,6 @@ class Plant(Monster):
             a = Money(game, self.money)
             where.loot.pile.append(a)
             where.loot.pile.extend(self.loot.pile)
-        if self.shield != '':
-            where.loot.pile.append(self.shield)
-        if not self.weapon.empty:
-            where.loot.pile.append(self.weapon)
         where.center = ''
 
     def place(self, castle, roomr_to_place = None):
@@ -380,7 +372,7 @@ class Shapeshifter(Monster):
                    str(self.stren) +
                    weaponString)
         result = 0
-        if self.shield != '':
+        if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
                 dice_result = dice(50, 75) / 100
@@ -390,7 +382,7 @@ class Shapeshifter(Monster):
                 dice_result = dice(10, 25) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
-        if self.armor != '':
+        if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
 
@@ -403,8 +395,10 @@ class Shapeshifter(Monster):
             a = Money(self.game, self.money)
             where.loot.pile.append(a)
             where.loot.pile.extend(self.loot.pile)
-        if self.shield != '':
+        if not self.shield.empty:
             where.loot.pile.append(self.shield)
+        if not self.armor.empty:
+            where.loot.pile.append(self.armor)
         where.center = ''
 
 
@@ -476,7 +470,7 @@ class Vampire(Monster):
                         ' высасывает ' +
                         str(totalDamage // 2) +
                         ' себе.')
-        if target.shield != '':
+        if not target.shield.empty:
             shield = target.shield
             rand = dice(1, 100)
             dam = totalAttack * target.shield.accumulated_damage
@@ -484,7 +478,7 @@ class Vampire(Monster):
             if rand < dam:
                 text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
                 game.allShields.remove(shield)
-                target.shield = ''
+                target.shield = self.game.noShield
         target.health -= totalDamage
         self.health += totalDamage // 2
         if target.health <= 0:
