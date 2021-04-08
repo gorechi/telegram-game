@@ -40,6 +40,9 @@ class Game():
         self.gameIsOn = False
         self.chat_id = chat_id
         self.bot = bot
+        self.noWeapon = Weapon(self, empty=True)
+        self.noShield = Shield(self, empty=True)
+        self.noArmor = Armor(self, empty=True)
         self.newCastle = Castle(self, 5, 5)  # Генерируем замок
         if howMany == 0:
             self.howMany = {'монстры': 10,
@@ -117,9 +120,6 @@ class Game():
                                            object_class=Shield)
         self.allShields.append(shield)
         self.player.shield = shield[0]
-        self.noWeapon = Weapon(self, empty=True)
-        self.noShield = Shield(self, empty=True)
-        self.noArmor = Armor(self, empty=True)
 
     def __del__ (self):
         print("="*40)

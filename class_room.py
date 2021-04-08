@@ -105,7 +105,7 @@ class Room:
             'камин',
             'хлам'
         ]
-        self.secret_word = None
+        self.secret_word = ''
         for i in self.secret_dict:
             if self.description.find(i) > -1:
                 self.secret_word = i

@@ -33,6 +33,7 @@ class Hero:
         self.health = int(health)
         self.actions = actions.split(',')
         if weapon == '':
+            print(self.game)
             self.weapon = self.game.noWeapon
         else:
             self.weapon = weapon
