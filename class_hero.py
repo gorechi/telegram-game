@@ -415,6 +415,16 @@ class Hero:
         else:
             protection_text = 'У героя нет ни щита, ни доспехов.'
         message.append(protection_text)
+        mastery_text = None
+        for mastery in self.weapon_mastery:
+            if self.weapon_mastery[mastery] > 0:
+                if not mastery_text:
+                    mastery_text = f'{mastery} ({self.weapon_mastery[mastery]})'
+                else:
+                    mastery_text += f' {mastery} ({self.weapon_mastery[mastery]})'
+        if mastery_text:
+            text = f'Герой обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
+            message.append(text)
         tprint(self.game, message)
 
     def defence(self, attacker):

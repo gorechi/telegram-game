@@ -1,18 +1,17 @@
-import json
+test1 = 'один два три (четыре) пять (шесть)'
+test2 = 'один два'
+test3 = 'один'
 
-class Monster():
-    def __init__(self):
-        self.name = None
-        self.name1 = None
+def normal_count(str, exclude=None):
+    str = str.replace(' ', ' и ')
+    if exclude:
+        print(exclude)
+        str = str.replace(' и ' + exclude, ' ' + exclude)
+        print(str)
+    count = str.count(' и ')
+    str = str.replace(' и ', ', ', count-1)
+    return str
 
-file = 'monsters.json'
-with open(file, encoding='utf-8') as read_data:
-    parsed_data = json.load(read_data)
-print(parsed_data)
-monsters = []
-for i in parsed_data:
-    print(i)
-    monster = Monster()
-    for param in i:
-        vars(monster)[param] = i[param]
-    print(monster.name, monster.name1, monster.stren)
+print(normal_count(test1, '('))
+print(normal_count(test2))
+print(normal_count(test3))
