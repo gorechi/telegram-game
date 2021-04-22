@@ -1,5 +1,5 @@
+﻿from constants import *
 from functions import *
-from constants import *
 
 
 class Protection:
@@ -67,7 +67,6 @@ class Protection:
                 multiplier = 1.5
             elif self.element() in weakness[who.weapon.element()]:
                 multiplier = 0.67
-        tprint(self.game, 'Множитель защиты - ' + str(multiplier))
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection()

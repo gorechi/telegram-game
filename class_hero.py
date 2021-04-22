@@ -487,7 +487,12 @@ class Hero:
             else:
                 text.append(self.name + ' осматривает свой рюкзак и обнаруживает в нем:')
                 for i in range(len(self.pockets)):
-                    text.append(str(i+1) + ': ' + self.pockets[i].show())
+                    description = str(i+1) + ': ' + self.pockets[i].show()
+                    if isinstance(self.pockets[i], Weapon):
+                        weapon = self.pockets[i]
+                        if self.weapon_mastery[weapon.type] > 0:
+                            description += f', мастерство - {self.weapon_mastery[weapon.type]}'
+                    text.append(description)
                 text.append(self.money.show())
             if not self.removed_shield.empty:
                 text.append('За спиной у героя висит ' + self.removed_shield.realname()[0])

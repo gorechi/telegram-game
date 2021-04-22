@@ -95,14 +95,12 @@ class Weapon:
 
     def take(self, who):
         game = self.game
-        message = [who.name + ' берет ' + self.name1 + '.']
-        weapon = who.weapon
+        message = [f'{who.name} берет {self.name1}.']
         second_weapon = who.second_weapon()
-        if not weapon.empty:
+        if who.weapon.empty:
             who.weapon = self
-            weapon = self
-            message.append(who.name + ' теперь использует ' + self.name1 + ' в качестве оружия.')
-            if weapon.twohanded and not who.shield.empty:
+            message.append(f'{who.name} теперь использует {self.name1} в качестве оружия.')
+            if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
                 who.shield = self.game.noShield
                 who.removed_shield = shield
@@ -110,9 +108,11 @@ class Weapon:
                                shield.realname()[1] +
                                ' за спину.')
         else:
-            if second_weapon:
-                message.append('В рюкзаке для нового оружия нет места, поэтому приходится бросить ' + weapon.name + '.')
-                who.drop(weapon)
+            if not second_weapon.empty:
+                message.append('В рюкзаке для нового оружия нет места, поэтому приходится бросить ' +
+                               who.weapon.name +
+                               '.')
+                who.drop(who.weapon)
                 who.weapon = self
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
@@ -126,8 +126,8 @@ class Weapon:
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name
         else:
-            name = self.name
-        return name + self.enchantment() + ' (' + damageString + ')'
+            name = self.name + self.enchantment()
+        return f'{name} ({damageString})'
 
     def use(self, whoUsing, inaction=False):
         if whoUsing.weapon.empty:
@@ -136,7 +136,7 @@ class Weapon:
             whoUsing.pockets.append(whoUsing.weapon)
             whoUsing.weapon = self
             whoUsing.pockets.remove(self)
-            message = [whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве оружия.']
+            message = [f'{whoUsing.name} теперь использует {self.name1} в качестве оружия.']
             if not whoUsing.shield.empty and self.twohanded:
                 shield = whoUsing.shield
                 whoUsing.removed_shield = shield

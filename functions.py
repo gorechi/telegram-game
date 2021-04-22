@@ -23,23 +23,47 @@ def readfile(filename, divide, divider='|'):
     newfile.close()
     return filelines
 
-
+# Функция генерирует описание сторон схватки.
+# На вход получает объекты сторон (например, героя и монстра), а также замок, в котором происходит схватка.
+# Возвращает список, ссстоящий из строк, описывающих стороны схватки.
 def showsides(side1, side2, castle):
     room = castle.plan[side1.currentPosition]
     message = []
     line = side1.name + ': сила - d' + str(side1.stren)
     if not side1.weapon.empty:
         line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
-    if not side1.shield.empty:
+    if not side1.shield.empty and side1.armor.empty:
         line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
+    elif side1.shield.empty and not side1.armor.empty:
+        line += ', защита - d' + str(side1.armor.protection) + '+' + str(side1.armor.permprotection())
+    elif not side1.shield.empty and not side1.armor.empty:
+        line += ', защита - d' + \
+                str(side1.armor.protection) + \
+                '+' + \
+                str(side1.armor.permprotection()) + \
+                ' + d' + \
+                str(side1.shield.protection) + \
+                '+' + \
+                str(side1.shield.permprotection())
     line += ', жизней - ' + str(side1.health) + '. '
     message.append(line)
     if room.light:
         line = side2.name + ': сила - d' + str(side2.stren)
         if not side2.weapon.empty:
             line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
-        if not side2.shield.empty:
+        if not side2.shield.empty and side2.armor.empty:
             line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
+        elif side2.shield.empty and not side2.armor.empty:
+            line += ', защита - d' + str(side2.armor.protection) + '+' + str(side2.armor.permprotection())
+        elif not side2.shield.empty and not side2.armor.empty:
+            line += ', защита - d' + \
+                    str(side2.armor.protection) + \
+                    '+' + \
+                    str(side2.armor.permprotection()) + \
+                    ' + d' + \
+                    str(side2.shield.protection) + \
+                    '+' + \
+                    str(side2.shield.permprotection())
         line += ', жизней - ' + str(side2.health) + '.'
         message.append(line)
     else:
