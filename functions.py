@@ -212,12 +212,10 @@ def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
 # Таким образом, строка 'один два три (четыре) пять (шесть)'
 # может быть приобразована в 'один, два, три (четыре) и пять (шесть)'.
 
-def normal_count(str, exclude=None):
-    str = str.replace(' ', ' и ')
+def normal_count(input_string, exclude=None):
+    input_string = input_string.replace(' ', ' и ')
     if exclude:
-        print(exclude)
-        str = str.replace(' и ' + exclude, ' ' + exclude)
-        print(str)
-    count = str.count(' и ')
-    str = str.replace(' и ', ', ', count-1)
-    return str
+        input_string = input_string.replace(' и ' + str(exclude), ' ' + str(exclude))
+    count = input_string.count(' и ')
+    input_string = input_string.replace(' и ', ', ', count-1)
+    return input_string

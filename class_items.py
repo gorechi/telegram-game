@@ -415,4 +415,4 @@ class Book():
         if who == '':
             return False
         who.pockets.append(self)
-        tprint(self.game, who.name + ' забирает ' + self.alt_name + ' себе.')
+        tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
