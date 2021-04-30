@@ -90,6 +90,7 @@ class Room:
         self.ambush = ''
         self.runePlace = ''
         self.light = True
+        self.morgue = None
         self.furniture = []
         self.torchDice = dice(1, 5)
         self.stink = 0
