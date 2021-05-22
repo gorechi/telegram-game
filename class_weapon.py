@@ -1,5 +1,6 @@
 from functions import *
 from constants import *
+from settings import *
 
 class Weapon:
     def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
@@ -54,8 +55,8 @@ class Weapon:
     def realname(self):
         names = []
         if self.element() != 0:
-            names.append(self.name + ' ' + elementDictionary[self.element()])
-            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+            names.append(self.name + ' ' + s_elements_dictionary[self.element()])
+            names.append(self.name1 + ' ' + s_elements_dictionary[self.element()])
         else:
             names.append(self.name)
             names.append(self.name1)
@@ -81,7 +82,7 @@ class Weapon:
             element = 0
             for i in self.runes:
                 element += int(i.element)
-            return ' ' + elementDictionary[element]
+            return ' ' + s_elements_dictionary[element]
 
     def permdamage(self):
         damage = 0

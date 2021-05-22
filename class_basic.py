@@ -1,4 +1,5 @@
 from functions import *
+from settings import *
 
 class Loot:
     def __init__(self, game):
@@ -19,16 +20,16 @@ class Money:
     def __init__(self, game, howmuchmoney):
         self.game = game
         self.howmuchmoney = howmuchmoney
-        if 0 < self.howmuchmoney <= 10:
+        if 0 < self.howmuchmoney <= money_groups[0]:
             self.name = 'Несколько монет'
             self.name1 = 'Несколько монет'
-        elif 10 < self.howmuchmoney <= 20:
+        elif money_groups[0] < self.howmuchmoney <= money_groups[1]:
             self.name = 'Кучка монет'
             self.name1 = 'Кучку монет'
-        elif 20 < self.howmuchmoney <= 30:
+        elif money_groups[1] < self.howmuchmoney <= money_groups[2]:
             self.name = 'Груда монет'
             self.name1 = 'Груду монет'
-        elif 30 < self.howmuchmoney:
+        elif money_groups[2] < self.howmuchmoney:
             self.name = 'Много монет'
             self.name1 = 'Много монет'
 

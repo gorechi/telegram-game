@@ -2,6 +2,7 @@ from functions import *
 from class_monsters import Monster
 from class_basic import Loot, Money
 from class_items import Key
+from settings import *
 
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
@@ -57,12 +58,12 @@ class Furniture:
                 if self.type not in room.furniture_types():
                     can_place = True
         room.furniture.append(self)
-        if dice(1, 4) == 1 and self.lockable:
+        if dice(1, s_furniture_locked_possibility) == 1 and self.lockable:
             self.locked = True
             veryNewKey = Key(self.game)
             veryNewKey.place(castle)
         if dice(1, 100) <= 50:
-            newMoney = Money(self.game, dice(1, 50))
+            newMoney = Money(self.game, dice(1, s_furniture_initial_money_maximum))
             self.loot.pile.append(newMoney)
         return True
 
@@ -92,20 +93,13 @@ class Room:
         self.light = True
         self.morgue = None
         self.furniture = []
-        self.torchDice = dice(1, 5)
         self.stink = 0
-        self.stink_levels = {1: 'Немного', 2: 'Сильно', 3: 'Невыносимо'}
-        if not self.light or self.torchDice != 4:
+        self.stink_levels = s_room_stink_levels
+        if not self.light or dice(1, s_room_torch_is_on_dice) != 4:
             self.torch = False
         else:
             self.torch = True
-        self.secret_dict = [
-            'унитаз',
-            'аквариум',
-            'бак',
-            'камин',
-            'хлам'
-        ]
+        self.secret_dict = s_room_secrets_dictionary
         self.secret_word = ''
         for i in self.secret_dict:
             if self.description.find(i) > -1:
@@ -191,7 +185,8 @@ class Room:
         string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
         string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
         if self.light:
-            pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4, 100, 120)
+            pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
+                   s_room_plan_picture_width, s_room_plan_picture_height)
             return True
         else:
             return False

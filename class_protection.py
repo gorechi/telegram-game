@@ -1,5 +1,6 @@
 ﻿from constants import *
 from functions import *
+from settings import *
 
 
 class Protection:
@@ -24,8 +25,8 @@ class Protection:
     def realname(self):
         names = []
         if self.element() != 0:
-            names.append(self.name + ' ' + elementDictionary[self.element()])
-            names.append(self.name1 + ' ' + elementDictionary[self.element()])
+            names.append(self.name + ' ' + s_elements_dictionary[self.element()])
+            names.append(self.name1 + ' ' + s_elements_dictionary[self.element()])
         else:
             names.append(self.name)
             names.append(self.name1)
@@ -58,15 +59,15 @@ class Protection:
             element = 0
             for i in self.runes:
                 element += int(i.element)
-            return ' ' + elementDictionary[element]
+            return ' ' + s_elements_dictionary[element]
 
     def protect(self, who):
         multiplier = 1
         if not who.weapon.empty and who.weapon.element() != 0 and self.element() != 0:
-            if who.weapon.element() in weakness[self.element()]:
-                multiplier = 1.5
-            elif self.element() in weakness[who.weapon.element()]:
-                multiplier = 0.67
+            if who.weapon.element() in s_weakness_dictionary[self.element()]:
+                multiplier = s_protection_strong_weapon_multiplier
+            elif self.element() in s_weakness_dictionary[who.weapon.element()]:
+                multiplier = s_protection_weak_weapon_multiplier
         if who.hide:
             who.hide = False
             return self.protection + self.permprotection()
@@ -192,11 +193,7 @@ class Shield (Protection):
         return True
 
     def show(self):
-        damage_dict = {1: 'поцарапанный',
-                       2: 'потрепанный',
-                       3: 'почти сломанный',
-                       4: 'еле живой',
-                       }
+        damage_dict = s_shield_states_dictionary
         damage = damage_dict.get(self.accumulated_damage//1)
         protectionString = str(self.protection)
         text = ''
@@ -208,11 +205,7 @@ class Shield (Protection):
         return text
 
     def realname(self):
-        damage_dict = {1: 'поцарапанный',
-                       2: 'потрепанный',
-                       3: 'почти сломанный',
-                       4: 'еле живой',
-                       }
+        damage_dict = s_shield_states_dictionary
         damage = damage_dict.get(self.accumulated_damage // 1)
         names = []
         if damage:
@@ -222,8 +215,8 @@ class Shield (Protection):
             name = self.name
             name1 = self.name1
         if self.element() != 0:
-            names.append(name + ' ' + elementDictionary[self.element()])
-            names.append(name1 + ' ' + elementDictionary[self.element()])
+            names.append(name + ' ' + s_elements_dictionary[self.element()])
+            names.append(name1 + ' ' + s_elements_dictionary[self.element()])
         else:
             names.append(name)
             names.append(name1)

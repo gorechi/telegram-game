@@ -17,7 +17,7 @@ class Hero:
                  health=20,
                  weapon='',
                  shield='',
-                 actions='бьет',
+                 actions=['бьет'],
                  pockets=[],
                  armor=''):
         self.game = game
@@ -31,7 +31,7 @@ class Hero:
         self.intel = int(intel)
         self.startIntel = self.intel
         self.health = int(health)
-        self.actions = actions.split(',')
+        self.actions = actions
         if weapon == '':
             print(self.game)
             self.weapon = self.game.noWeapon
@@ -514,8 +514,8 @@ class Hero:
                 tprint(game, newCastle.plan[self.directionsDict[a]].showThroughKeyHole(self))
         if newCastle.plan[self.currentPosition].center != '':
             if (a == newCastle.plan[self.currentPosition].center.name or a == newCastle.plan[
-                self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[
-                0]) and newCastle.plan[self.currentPosition].monster():
+                self.currentPosition].center.name1 or a == newCastle.plan[self.currentPosition].center.name[0]) and \
+                    newCastle.plan[self.currentPosition].monster():
                 tprint(game, showsides(self, newCastle.plan[self.currentPosition].center, newCastle))
         if not self.weapon.empty and (a == self.weapon.name or a == self.weapon.name1 or a == 'оружие'):
             tprint(game, self.weapon.show())

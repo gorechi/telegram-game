@@ -3,10 +3,21 @@ from class_basic import Loot, Money
 from class_weapon import Weapon
 from class_protection import Shield, Armor
 from class_items import Rune
+from settings import *
 
 class Monster:
-    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=False,
-                 carryweapon=True, carryshield=True, wearArmor=True):
+    def __init__(self,
+                 game,
+                 name=s_monster_name,
+                 name1=s_monster_name1,
+                 stren=s_monster_strength,
+                 health=s_monster_health,
+                 actions=s_monster_actions,
+                 state=s_monster_state,
+                 agressive=s_is_monster_agressive,
+                 carryweapon=s_is_monster_carry_weapon,
+                 carryshield=s_is_monster_carry_shield,
+                 wearArmor=s_is_monster_wear_armor):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -18,7 +29,7 @@ class Monster:
         self.shield = self.game.noShield
         self.removed_shield = self.game.noShield
         self.armor = self.game.noArmor
-        self.money = 5
+        self.money = s_monster_money
         self.currentPosition = 0
         self.startHealth = self.health
         self.loot = Loot(self.game)
@@ -26,7 +37,7 @@ class Monster:
         self.hide = False
         self.run = False
         self.wounded = False
-        self.keyHole = 'видит какую-то неясную фигуру.'
+        self.keyHole = s_monster_see_through_keyhole
         if carryweapon == 'False':
             self.carryweapon = False
         else:
@@ -43,7 +54,7 @@ class Monster:
             self.agressive = True
         else:
             self.agressive = False
-        self.exp = self.stren * dice(1, 10) + dice(1, self.health)
+        self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
 
     def on_create(self):
         return True
@@ -110,8 +121,8 @@ class Monster:
             selfName = self.name
             selfName1 = self.name1
         else:
-            selfName = 'Кто-то страшный'
-            selfName1 = 'черт знает кого'
+            selfName = s_monster_name_in_darkness
+            selfName1 = s_monster_name1_in_darkness
         text = []
         meleAttack = self.mele()
         if not self.weapon.empty:
@@ -133,7 +144,7 @@ class Monster:
             text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
         if not target.shield.empty:
             shield = target.shield
-            rand = dice(1, 100)
+            rand = dice(1, s_shield_crushed_upper_limit)
             dam = totalAttack * target.shield.accumulated_damage
             print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
@@ -155,11 +166,11 @@ class Monster:
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
-                dice_result = dice(50, 75)/100
+                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max)/100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
             else:
-                dice_result = dice(10, 25) / 100
+                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
@@ -190,8 +201,8 @@ class Monster:
         else:
             self.wounded = True
             aliveString = self.name + ' остается вживых и '
-            weaknessAmount = ceil(self.stren * 0.4)
-            illAmount = ceil(self.startHealth * 0.4)
+            weaknessAmount = ceil(self.stren * s_wounded_monster_strength_coefficient)
+            illAmount = ceil(self.startHealth * s_wounded_monster_health_coefficient)
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
@@ -239,13 +250,13 @@ class Monster:
     def win(self, loser):
         self.health = self.startHealth
 
-    def place(self, castle, roomr_to_place = None, old_place = None):
+    def place(self, castle, roomr_to_place=None, old_place=None):
         if roomr_to_place:
             room = roomr_to_place
         else:
             emptyRooms = [a for a in castle.plan if (a.center == '' and a.ambush == '' and a != old_place)]
             room = randomitem(emptyRooms, False)
-        if dice(1, 5) == 1:
+        if dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:
                 if i.can_hide:
@@ -265,8 +276,17 @@ class Monster:
 
 
 class Plant(Monster):
-    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='растёт', agressive=False,
-                 carryweapon=False, carryshield=False):
+    def __init__(self,
+                 game,
+                 name=s_monster_name,
+                 name1=s_monster_name1,
+                 stren=s_monster_strength,
+                 health=s_monster_health,
+                 actions=s_monster_actions,
+                 state='растёт',
+                 agressive=False,
+                 carryweapon=False,
+                 carryshield=False):
         super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
         self.carryshield = False
         self.carryweapon = False
@@ -323,21 +343,61 @@ class Plant(Monster):
         self.currentPosition = room.position
 
 class Walker(Monster):
-    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
-                 carryweapon=True, carryshield=True):
-        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+    def __init__(self,
+                 game,
+                 name=s_monster_name,
+                 name1=s_monster_name1,
+                 stren=s_monster_strength,
+                 health=s_monster_health,
+                 actions=s_monster_actions,
+                 state=s_monster_state,
+                 agressive=s_is_monster_agressive,
+                 carryweapon=s_is_monster_carry_weapon,
+                 carryshield=s_is_monster_carry_shield,
+                 weararmor=s_is_monster_wear_armor):
+        super().__init__(game,
+                         name,
+                         name1,
+                         stren,
+                         health,
+                         actions,
+                         state,
+                         agressive,
+                         carryweapon,
+                         carryshield,
+                         weararmor)
 
 class Berserk(Monster):
-    def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
-                 carryweapon=True, carryshield=True):
-        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+    def __init__(self,
+                 game,
+                 name=s_monster_name,
+                 name1=s_monster_name1,
+                 stren=s_monster_strength,
+                 health=s_monster_health,
+                 actions=s_monster_actions,
+                 state=s_monster_state,
+                 agressive=s_is_monster_agressive,
+                 carryweapon=s_is_monster_carry_weapon,
+                 carryshield=s_is_monster_carry_shield,
+                 weararmor=s_is_monster_wear_armor):
+        super().__init__(game,
+                         name,
+                         name1,
+                         stren,
+                         health,
+                         actions,
+                         state,
+                         agressive,
+                         carryweapon,
+                         carryshield,
+                         weararmor)
         self.agressive = True
         self.carryshield = False
         self.rage = 0
         self.base_health = health
 
     def mele(self):
-        self.rage = (int(self.base_health) - int(self.health)) // 3
+        self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
         return dice(1, (self.stren + self.rage))
 
     def place(self, castle, roomr_to_place = None):
@@ -351,8 +411,9 @@ class Berserk(Monster):
 
 class Shapeshifter(Monster):
     def __init__(self, game, name='', name1='', stren=10, health=20, actions='бьет', state='стоит', agressive=True,
-                 carryweapon=False, carryshield=True):
-        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield)
+                 carryweapon=False, carryshield=True, weararmor=True):
+        super().__init__(game, name, name1, stren, health, actions, state, agressive, carryweapon, carryshield,
+                         weararmor)
         self.shifted = False
         self.agressive = True
 
@@ -375,11 +436,11 @@ class Shapeshifter(Monster):
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
-                dice_result = dice(50, 75) / 100
+                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
             else:
-                dice_result = dice(10, 25) / 100
+                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
                 print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
@@ -457,7 +518,7 @@ class Vampire(Monster):
                         '. ' +
                         selfName +
                         ' высасывает ' +
-                        str(totalDamage // 2) +
+                        str(totalDamage // s_vampire_suck_coefficient) +
                         ' себе.')
         else:
             text.append(target.name +
@@ -468,7 +529,7 @@ class Vampire(Monster):
                         '.' +
                         selfName +
                         ' высасывает ' +
-                        str(totalDamage // 2) +
+                        str(totalDamage // s_vampire_suck_coefficient) +
                         ' себе.')
         if not target.shield.empty:
             shield = target.shield
@@ -480,7 +541,7 @@ class Vampire(Monster):
                 game.allShields.remove(shield)
                 target.shield = self.game.noShield
         target.health -= totalDamage
-        self.health += totalDamage // 2
+        self.health += totalDamage // s_vampire_suck_coefficient
         if target.health <= 0:
             game.state = 0
             target.lose(self)

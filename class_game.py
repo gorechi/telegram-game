@@ -1,4 +1,5 @@
 from functions import *
+from settings import *
 from class_castle import Castle
 from class_hero import Hero
 from class_weapon import Weapon
@@ -45,19 +46,21 @@ class Game():
         self.noArmor = Armor(self, empty=True)
         self.newCastle = Castle(self, 5, 5)  # Генерируем замок
         if howMany == 0:
-            self.howMany = {'монстры': 10,
-                            'оружие': 10,
-                            'щит': 5,
-                            'доспех': 5,
-                            'зелье': 10,
-                            'мебель': 10,
-                            'книга': 5,
-                            'руна': 10}  # Количество всяких штук, которые разбрасываются по замку
+            self.howMany = s_how_many
         else:
             self.howMany = howMany
         if not hero:
-            self.player = Hero(self, 'Артур', 'Артура', 'male', 10, 2, 1, 25, '', '',
-                                'бьет,калечит,терзает,протыкает')  # Создаем персонажа
+            self.player = Hero(self,
+                               s_hero_name,
+                               s_hero_name1,
+                               s_hero_gender,
+                               s_hero_strength,
+                               s_hero_dexterity,
+                               s_hero_intelligence,
+                               s_hero_health,
+                               '',
+                               '',
+                               s_hero_actions)  # Создаем персонажа
         else:
             self.player = hero
         # Создаем мебель и разбрасываем по замку

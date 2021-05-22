@@ -1,6 +1,7 @@
 from functions import *
 from class_basic import *
 from constants import *
+from settings import *
 
 class Item:
     def __init__(self, game):
@@ -36,10 +37,10 @@ class Rune:
         self.canUseInFight = False
         self.name = 'руна'
         self.name1 = 'руну'
-        self.description = self.name + ' ' + elementDictionary[self.element]
+        self.description = self.name + ' ' + s_elements_dictionary[self.element]
 
     def __str__(self):
-        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+        return self.name + ' ' + s_elements_dictionary[self.element] + ' - урон + ' + str(self.damage) + \
                ' или защита + ' + str(self.defence)
 
     def on_create(self):
@@ -69,7 +70,7 @@ class Rune:
         tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
 
     def show(self):
-        return self.name + ' ' + elementDictionary[self.element] + ' - урон + ' + str(self.damage) + \
+        return self.name + ' ' + s_elements_dictionary[self.element] + ' - урон + ' + str(self.damage) + \
                ' или защита + ' + str(self.defence)
 
     def use(self, whoisusing, inaction=False):
@@ -239,37 +240,21 @@ class Potion():
     def __init__(self, game, name='', effect=0, type=0, canUseInFight=True):
         self.game = game
         self.name = name
-        potions = [['Зелье исцеления', 10, 0, True,
-                    'Лечебное зелье восстанавливает некоторое количество единиц здоровья.'],
-                   ['Зелье здоровья', 1, 1, False,
-                    'Зелье здоровья увеличивает максимальный запас здоровья персонажа.'],
-                   ['Зелье силы', 1, 2, False,
-                    'Зелье силы увеличивает максимальное значение силы персонажа.'],
-                   ['Зелье усиления', 5, 3, True,
-                    'Зелье усиления временно добавляет персонажу силы.'],
-                   ['Зелье ловкости', 1, 4, False,
-                    'Зелье ловкости увеличивает максимальное значение ловкости персонажа.'],
-                   ['Зелье увертливости', 5, 5, True,
-                    'Зелье увертливости временно добавляет персонажу ловкости.'],
-                   ['Зелье ума', 1, 6, False,
-                    'Зелье ума увеличивает максимальное значение силы интеллекта.'],
-                   ['Зелье просветления', 5, 7, True,
-                    'Зелье просветления временно добавляет персонажу интеллекта.']]
         if self.name != 0:
             self.name = name
             self.name1 = self.name
             self.effect = int(effect)
             self.type = int(type)
             self.canUseInFight = canUseInFight
-            self.description = potions[self.type][4]
+            self.description = s_potion_types[self.type][4]
         elif self.name == 0:
             n = dice (0, 5)
-            self.name = potions[n][0]
+            self.name = s_potion_types[n][0]
             self.name1 = self.name
-            self.effect = potions[n][1]
-            self.type = potions[n][2]
-            self.canUseInFight = potions[n][3]
-            self.description = potions[n][4]
+            self.effect = s_potion_types[n][1]
+            self.type = s_potion_types[n][2]
+            self.canUseInFight = s_potion_types[n][3]
+            self.description = s_potion_types[n][4]
 
     def on_create(self):
         return True

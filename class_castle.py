@@ -2,6 +2,7 @@ from functions import *
 from class_room import Room
 from class_items import Key
 from class_basic import Loot, Money
+from settings import *
 
 
 class Castle:
@@ -77,18 +78,18 @@ class Castle:
             print(floor)
 
     def lights_off(self):
-        self.how_many_dark_rooms = len(self.plan) // 8
+        self.how_many_dark_rooms = len(self.plan) // s_dark_rooms_ratio
         darkRooms = randomitem(self.plan, False, self.how_many_dark_rooms)
         for room in darkRooms:
             room.light = False
 
     def lockDoors(self):
-        howManyLockedRooms = len(self.plan) // 8
+        howManyLockedRooms = len(self.plan) // s_locked_rooms_ratio
         for i in range(howManyLockedRooms):
             while True:
                 a = randomitem(self.plan)
                 if a != self.plan[0]:
-                    newMoney = Money(self.game, dice(25, 75))
+                    newMoney = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
                     a.lock(2)
                     if a.center == '':
                         a.loot.pile.append(newMoney)
@@ -118,7 +119,7 @@ class Castle:
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
-        pprint(game, text, r*72, f*90)
+        pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
         roomsWithMonsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
