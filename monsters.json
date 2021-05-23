@@ -12,6 +12,7 @@
       "шарахает"
       ],
     "state": "стоит",
+    "frightening": false,
     "agressive": false,
     "carryweapon": true,
     "carryshield": true,
@@ -30,6 +31,7 @@
       "шарахает"
       ],
     "state": "стоит и воняет",
+    "frightening": true,
     "agressive": false,
     "stink": true,
     "hide": false,
@@ -50,6 +52,7 @@
       "стукает"
       ],
     "state": "стоит",
+    "frightening": false,
     "agressive": false,
     "carryweapon": true,
     "carryshield": true,
@@ -68,6 +71,7 @@
       "стукает"
       ],
     "state": "притаился",
+    "frightening": false,
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
@@ -86,6 +90,7 @@
       "шарахает"
       ],
     "state": "прячется",
+    "frightening": false,
     "agressive": true,
     "carryweapon": true,
     "carryshield": true,
@@ -104,6 +109,7 @@
       "зажевывает"
       ],
     "state": "стоит",
+    "frightening": false,
     "agressive": true,
     "carryweapon": true,
     "carryshield": true,
@@ -122,6 +128,7 @@
       "шарахает"
       ],
     "state": "прячется",
+    "frightening": false,
     "agressive": true,
     "carryweapon": false,
     "carryshield": true,
@@ -140,6 +147,7 @@
       "шарахает"
       ],
     "state": "рычит",
+    "frightening": true,
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
@@ -158,6 +166,7 @@
       "жалит"
       ],
     "state": "растет",
+    "frightening": false,
     "agressive": false,
     "carryweapon": false,
     "carryshield": false,
@@ -176,6 +185,7 @@
       "жалит"
       ],
     "state": "растет",
+    "frightening": false,
     "agressive": false,
     "carryweapon": false,
     "carryshield": false,
@@ -194,6 +204,7 @@
       "рвет"
       ],
     "state": "парит",
+    "frightening": true,
     "agressive": false,
     "carryweapon": false,
     "carryshield": true,
@@ -212,6 +223,7 @@
       "рвет"
       ],
     "state": "ревет",
+    "frightening": false,
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,

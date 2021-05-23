@@ -57,6 +57,8 @@ class Hero:
         self.run = False
         self.level = 1
         self.exp = 0
+        self.fear = 0
+        self.drunk = 0
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.elementLevels = {'1': 2, '2': 4, '3': 7, '4': 10}
@@ -603,7 +605,6 @@ class Hero:
         newCastle = self.game.newCastle
         room = newCastle.plan[self.currentPosition]
         message = []
-        print ('room.center: ', room.center)
         enemyinroom = False
         if room.center != '':
             if isinstance(room.center, Monster):
@@ -617,7 +618,7 @@ class Hero:
             tprint(game, message)
             return True
         if enemyinroom:
-            message.append(enemyinroom.name + " мешает толком осмотреть комнату.")
+            message.append(f'{enemyinroom.name} мешает толком осмотреть комнату.')
             tprint(game, message)
             return True
         if enemyinambush and not item:
@@ -625,7 +626,10 @@ class Hero:
             room.ambush = ''
             enemyinambush = False
             enemyinroom = room.center
-            message.append('Неожиданно из засады выскакивает ' + enemyinroom.name + ' и нападает на ' + self.name1)
+            message.append(f'Неожиданно из засады выскакивает {enemyinroom.name} и нападает на {self.name1}.')
+            if enemyinroom.frightening:
+                message.append(f'{enemyinroom} очень страшный и {self.name} пугается до икоты.')
+                self.fear += 1
             tprint(game, message)
             self.fight(enemyinroom.name, True)
             return True
