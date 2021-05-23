@@ -149,6 +149,10 @@ class Matches():
             room.light = True
             room.torch = True
             message = [whoIsUsing.name + ' зажигает факел и комната озаряется светом']
+            if room.center != '':
+                if room.center.frightening:
+                    message.append(f'{whoIsUsing.name} замирает от ужаса глядя на чудовище перед собой.')
+                    whoIsUsing.fear += 1
             tprint(game, message)
             room.show(whoIsUsing)
             room.map()
