@@ -665,20 +665,20 @@ class Hero:
             if not whatToSearch:
                 message.append('В комнате нет такой вещи.')
             elif whatToSearch.locked:
-                message.append('Нельзя обыскать ' + whatToSearch.name1 + '. Там заперто.')
+                message.append(f'Нельзя обыскать {whatToSearch.name1}. Там заперто.')
             elif whatToSearch.ambush:
                 room.center = whatToSearch.ambush
                 whatToSearch.ambush = False
                 enemyinroom = room.center
-                message.append('Неожиданно из засады выскакивает ' +
-                                   enemyinroom.name +
-                                   ' и нападает на ' +
-                                   self.name1)
+                message.append(f'Неожиданно из засады выскакивает {enemyinroom.name} и нападает на {self.name1}')
+                if enemyinroom.frightening:
+                    message.append(f'{enemyinroom} очень страшный и {self.name} пугается до икоты.')
+                    self.fear += 1
                 tprint(game, message)
                 self.fight(enemyinroom.name, True)
                 return True
             elif len(whatToSearch.loot.pile) > 0:
-                message.append(self.name + ' осматривает ' + whatToSearch.name1 + ' и находит:')
+                message.append(f'{self.name} осматривает {whatToSearch.name1} и находит:')
                 for i in whatToSearch.loot.pile:
                     message.append(i.name)
                     room.loot.pile.append(i)
