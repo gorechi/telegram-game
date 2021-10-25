@@ -114,8 +114,8 @@ class Castle:
             line2 = ''
             for j in range(r):
                 a = game.player.name[0] if game.player.currentPosition == i * r + j else self.plan[i*r+j].visited
-                line1 += '  {0}  {1}'.format(a, doorsVertical[str(self.allDoors[i * r + j][1])])
-                line2 += '==={0}=='.format(doorsHorizontal[str(self.allDoors[i * r + j][2])])
+                line1 += f'  {a}  {doorsVertical[str(self.allDoors[i * r + j][1])]}'
+                line2 += f'==={doorsHorizontal[str(self.allDoors[i * r + j][2])]}=='
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')

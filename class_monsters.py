@@ -127,35 +127,34 @@ class Monster:
         meleAttack = self.mele()
         if not self.weapon.empty:
             weaponAttack = self.weapon.attack()
-            text.append(selfName + ' ' + self.action() + ' ' + target.name1 + ' используя ' + self.weapon.name1 \
-                      + ' и наносит ' + str(meleAttack) + '+' \
-                      + howmany(weaponAttack, 'единицу,единицы,единиц') + ' урона. ')
+            text.append(f'{selfName} {self.action()} {target.name1} используя {self.weapon.name1} и '
+                        f'наносит {str(meleAttack)} {howmany(weaponAttack, "единицу,единицы,единиц")} урона. ')
         else:
             weaponAttack = 0
-            text.append(selfName + ' бьет ' + target.name1 + ' не используя оружия и наносит ' + howmany(
-                meleAttack, 'единицу,единицы,единиц') + ' урона. ')
+            text.append(f'{selfName} бьет {target.name1} не используя оружия и '
+                        f'наносит {howmany(meleAttack, "единицу,единицы,единиц")} урона. ')
         totalAttack = weaponAttack + meleAttack
         targetDefence = target.defence(self)
         if (totalAttack - targetDefence) > 0:
             totalDamage = weaponAttack + meleAttack - targetDefence
-            text.append(target.name + ' теряет ' + howmany(totalDamage, 'жизнь,жизни,жизней') + '.')
+            text.append(f'{target.name} теряет {howmany(totalDamage, "жизнь,жизни,жизней")}.')
         else:
             totalDamage = 0
-            text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
+            text.append(f'{selfName} не смог пробить защиту {target.name1}.')
         if not target.shield.empty:
             shield = target.shield
             rand = dice(1, s_shield_crushed_upper_limit)
             dam = totalAttack * target.shield.accumulated_damage
             print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
-                text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
+                text.append(f'{selfName} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 target.shield = self.game.noShield
         target.health -= totalDamage
         if target.health <= 0:
             game.state = 0
             target.lose(self)
             self.win(target)
-            text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
+            text.append(f'{target.name} терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
         else:
             tprint(game, text)
@@ -200,49 +199,49 @@ class Monster:
             where.center = ''
         else:
             self.wounded = True
-            aliveString = self.name + ' остается вживых и '
+            aliveString = f'{self.name} остается в живых и '
             weaknessAmount = ceil(self.stren * s_wounded_monster_strength_coefficient)
             illAmount = ceil(self.startHealth * s_wounded_monster_health_coefficient)
             if result < 10:
                 if result == 6:
                     aliveString += 'получает легкое ранение в руку. '
                     if not self.weapon.empty:
-                        aliveString += 'На пол падает ' + self.weapon.name + '. '
+                        aliveString += f'На пол падает {self.weapon.name}. '
                         where.loot.pile.append(self.weapon)
                         self.weapon = self.game.noWeapon
                     elif not self.shield.empty:
-                        aliveString += 'На пол падает ' + self.shield.neme + '. '
+                        aliveString += f'На пол падает {self.shield.neme}. '
                         where.loot.pile.append(self.shield)
                         self.shield = self.game.noShield
                 elif result == 7:
-                    aliveString += 'истекает кровью, теряя при этом ' \
-                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы. '
+                    aliveString += f'истекает кровью, теряя при ' \
+                                   f'этом {howmany(weaknessAmount, "единицу,единицы,единиц")} силы. '
                     self.stren -= weaknessAmount
                     self.health = self.startHealth
                 elif result == 8:
-                    aliveString += 'приходит в ярость, получая при этом ' \
-                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и теряя ' \
-                                   + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                    aliveString += f'приходит в ярость, получая при ' \
+                                   f'этом {howmany(weaknessAmount, "единицу,единицы,единиц")} силы и ' \
+                                   f'теряя {howmany(illAmount, "жизнь,жизни,жизней")}. '
                     self.stren += weaknessAmount
                     self.health = self.startHealth - illAmount
                 else:
-                    aliveString += 'получает контузию, теряя при этом ' \
-                                   + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и получая ' \
-                                   + howmany(illAmount, 'жизнь,жизни,жизней') + '. '
+                    aliveString += f'получает контузию, теряя при ' \
+                                   f'этом {howmany(weaknessAmount, "единицу,единицы,единиц")} силы и ' \
+                                   f'получая {howmany(illAmount, "жизнь,жизни,жизней")}. '
                     self.stren -= weaknessAmount
                     self.health = self.startHealth + illAmount
                 if self.place(newCastle, old_place = where):
-                    aliveString += self.name + ' убегает из комнаты.'
+                    aliveString += f'{self.name} убегает из комнаты.'
                     tprint(game, aliveString)
                     where.center = ''
                 else:
-                    aliveString += 'Пытаясь убежать ' + self.name + ' на всей скорости врезается в стену и умирает.'
+                    aliveString += f'Пытаясь убежать {self.name} на всей скорости врезается в стену и умирает.'
                     tprint(game, aliveString)
                     where.center = ''
             else:
-                aliveString += 'получает ранение в ногу и не может двигаться, теряя при этом '  \
-                               + howmany(weaknessAmount, 'единицу,единицы,единиц') + ' силы и ' \
-                               + howmany(illAmount, 'жизнь,жизни,жизней') + '.'
+                aliveString += f'получает ранение в ногу и не может двигаться, теряя при ' \
+                               f'этом {howmany(weaknessAmount, "единицу,единицы,единиц")} силы ' \
+                               f'и {howmany(illAmount, "жизнь,жизни,жизней")}.'
                 self.stren -= weaknessAmount
                 self.health = self.startHealth - illAmount
                 tprint(game, aliveString)
@@ -423,15 +422,11 @@ class Shapeshifter(Monster):
             self.stren = attacker.stren
             if not attacker.weapon.empty and self.weapon.empty:
                 self.weapon = attacker.weapon
-                weaponString = ' и ' + self.weapon.name + ' в руках.'
+                weaponString = f' и {self.weapon.name} в руках.'
             else:
                 weaponString = ''
-            tprint(self.game, self.name +
-                   ' меняет форму и становится точь в точь как ' +
-                   attacker.name +
-                   '. У него теперь сила ' +
-                   str(self.stren) +
-                   weaponString)
+            tprint(self.game, f'{self.name} меняет форму и становится точь в точь как {attacker.name}. '
+                              f'У него теперь сила {str(self.stren)}{weaponString}')
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
@@ -482,28 +477,12 @@ class Vampire(Monster):
         meleAttack = self.mele()
         if not self.weapon.empty:
             weaponAttack = self.weapon.attack()
-            text.append(selfName +
-                        ' ' +
-                        self.action() +
-                        ' ' +
-                        target.name1 +
-                        ' используя ' +
-                        self.weapon.name +
-                        ' и наносит ' +
-                        str(meleAttack) +
-                        '+' +
-                        str(weaponAttack) +
-                        ' единиц урона. ')
+            text.append(f'{selfName} {self.action()} {target.name1} используя {self.weapon.name} и '
+                        f'наносит {str(meleAttack)}+{str(weaponAttack)} единиц урона. ')
         else:
             weaponAttack = 0
-            text.append(selfName +
-                        ' ' +
-                        self.action() +
-                        ' ' +
-                        target.name1 +
-                        ' не используя оружия и наносит ' +
-                        howmany(meleAttack, 'единицу,единицы,единиц') +
-                        ' урона. ')
+            text.append(f'{selfName} {self.action()} {target.name1} не используя оружия и '
+                        f'наносит {howmany(meleAttack, "единицу,единицы,единиц")} урона. ')
         targetDefence = target.defence(self)
         totalAttack = weaponAttack + meleAttack
         if (totalAttack - targetDefence) > 0:
@@ -511,33 +490,21 @@ class Vampire(Monster):
         else:
             totalDamage = 0
         if totalDamage == 0:
-            text.append(selfName + ' не смог пробить защиту ' + target.name1 + '.')
+            text.append(f'{selfName} не смог пробить защиту {target.name1}.')
         elif targetDefence == 0:
-            text.append(target.name + ' беззащитен и теряет ' +
-                        howmany(totalDamage, 'жизнь,жизни,жизней') +
-                        '. ' +
-                        selfName +
-                        ' высасывает ' +
-                        str(totalDamage // s_vampire_suck_coefficient) +
-                        ' себе.')
+            text.append(f'{target.name} беззащитен и теряет {howmany(totalDamage, "жизнь,жизни,жизней")}. {selfName} '
+                        f'высасывает {str(totalDamage // s_vampire_suck_coefficient)} себе.')
         else:
-            text.append(target.name +
-                        ' использует для защиты ' +
-                        target.shield.name +
-                        ' и теряет ' +
-                        howmany(totalDamage, 'жизнь,жизни,жизней') +
-                        '.' +
-                        selfName +
-                        ' высасывает ' +
-                        str(totalDamage // s_vampire_suck_coefficient) +
-                        ' себе.')
+            text.append(f'{target.name} использует для защиты {target.shield.name} и '
+                        f'теряет {howmany(totalDamage, "жизнь,жизни,жизней")}. {selfName} '
+                        f'высасывает {str(totalDamage // s_vampire_suck_coefficient)} себе.')
         if not target.shield.empty:
             shield = target.shield
             rand = dice(1, 100)
             dam = totalAttack * target.shield.accumulated_damage
             print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
-                text.append(selfName + ' наносит настолько сокрушительный удар, что ломает щит соперника.')
+                text.append(f'{selfName} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 game.allShields.remove(shield)
                 target.shield = self.game.noShield
         target.health -= totalDamage
@@ -545,7 +512,7 @@ class Vampire(Monster):
         if target.health <= 0:
             game.state = 0
             target.lose(self)
-            text.append(target.name + ' терпит сокрушительное поражение и позорно убегает ко входу в замок.')
+            text.append(f'{target.name} терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
         else:
             tprint(game, text)

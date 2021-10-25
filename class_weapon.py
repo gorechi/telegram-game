@@ -50,7 +50,7 @@ class Weapon:
         damageString = str(self.damage)
         if self.permdamage() != 0:
             damageString += '+' + str(self.permdamage())
-        return self.name + self.enchantment() + ' (' + damageString + ')'
+        return f'{self.name}{self.enchantment()} ({damageString})'
 
     def realname(self):
         names = []
@@ -105,14 +105,11 @@ class Weapon:
                 shield = who.shield
                 who.shield = self.game.noShield
                 who.removed_shield = shield
-                message.append('Из-за того, что герой взял двуручное оружие, ему пришлось убрать ' +
-                               shield.realname()[1] +
-                               ' за спину.')
+                message.append(f'Из-за того, что герой взял двуручное оружие, '
+                               f'ему пришлось убрать {shield.realname()[1]} за спину.')
         else:
             if not second_weapon.empty:
-                message.append('В рюкзаке для нового оружия нет места, поэтому приходится бросить ' +
-                               who.weapon.name +
-                               '.')
+                message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
                 who.drop(who.weapon)
                 who.weapon = self
             else:
@@ -147,9 +144,8 @@ class Weapon:
                 shield = whoUsing.removed_shield
                 whoUsing.shield = shield
                 whoUsing.removed_shield = self.game.noShield
-                message.append('Из-за того, что новое оружие одноручное, герой теперь держит во второй руке' +
-                               shield.realname()[1] +
-                               '.')
+                message.append(f'Из-за того, что новое оружие одноручное, '
+                               f'герой теперь держит во второй руке {shield.realname()[1]}.')
         tprint(self.game, message)
 
     def place(self, castle, room_to_place = None):

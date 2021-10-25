@@ -80,7 +80,7 @@ class Room:
         self.decoration3 = decor3[a]
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
-        self.description = self.decoration1 + ' комнату ' + self.decoration2 + '. ' + self.decoration4
+        self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
         self.center = center
         self.money = 0
         self.loot = loot
@@ -108,18 +108,17 @@ class Room:
     def show(self, player):
         game = self.game
         if self.stink > 0:
-            stink_text = self.stink_levels[self.stink] + ' воняет чем-то очень неприятным.'
+            stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
             if self.torch:
-                self.decoration1 = 'освещенную факелом ' + self.decoration1
+                self.decoration1 = f'освещенную факелом {self.decoration1}'
             if self.center == '':
                 whoIsHere = 'Не видно ничего интересного.'
             else:
                 whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
             message = []
-            message.append(player.name + ' попадает в {0} комнату {1}. {2}'.format(self.decoration1,
-                                                                          self.decoration2,
-                                                                          self.decoration4))
+            message.append(f'{player.name} попадает в {self.decoration1} '
+                           f'комнату {self.decoration2}. {self.decoration4}')
             for furniture in self.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             message.append(whoIsHere)
@@ -137,13 +136,11 @@ class Room:
     def showThroughKeyHole(self, who):
         message = []
         if self.center == '':
-            message.append(who.name + 'заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
+            message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            message.append(who.name + ' заглядывает в замочную скважину двери и ' + self.center.keyHole)
+            message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.keyHole}')
         if self.stink > 0:
-            message.append('Из замочной скважины ' +
-                           self.stink_levels[self.stink].lower() +
-                           ' воняет чем-то омерзительным.')
+            message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message
 
     def furniture_types(self):

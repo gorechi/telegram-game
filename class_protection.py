@@ -80,16 +80,16 @@ class Protection:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            tprint(self.game, who.name + ' использует ' + self.name1 + ' как защиту.')
+            tprint(self.game, f'{who.name} использует {self.name1} как защиту.')
         else:
             self.game.player.pockets.append(self)
-            tprint(self.game, who.name + ' забирает ' + self.name1 + ' себе.')
+            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     def show(self):
         protectionString = str(self.protection)
         if self.permprotection() != 0:
             protectionString += '+' + str(self.permprotection())
-        return self.name + self.enchantment() + ' (' + protectionString + ')'
+        return f'{self.name}{self.enchantment()} ({protectionString})'
 
     def use(self, whoUsing, inaction=False):
         if whoUsing.shield == '':
@@ -98,7 +98,7 @@ class Protection:
             whoUsing.pockets.append(whoUsing.shield)
             whoUsing.shield = self
             whoUsing.pockets.remove(self)
-        tprint(self.game, whoUsing.name + ' теперь использует ' + self.name1 + ' в качестве защиты!')
+        tprint(self.game, f'{whoUsing.name} теперь использует {self.name1} в качестве защиты!')
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
@@ -157,9 +157,9 @@ class Armor(Protection):
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
         oldArmor = who.armor
-        message = [who.name + ' использует ' + self.name1 + ' как защиту.']
+        message = [f'{who.name} использует {self.name1} как защиту.']
         if not oldArmor.empty:
-            message.append('При этом он снимает ' + oldArmor.name1 + ' и оставляет валяться на полу.')
+            message.append(f'При этом он снимает {oldArmor.name1} и оставляет валяться на полу.')
             who.drop(oldArmor)
         who.armor = self
         tprint(self.game, message)
@@ -255,11 +255,11 @@ class Shield (Protection):
             oldShield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
-            message = [who.name + ' помещает ' + self.name1 + ' за спину.']
+            message = [f'{who.name} помещает {self.name1} за спину.']
         else:
             who.shield = self
-            message = [who.name + ' берет ' + self.name1 + ' в руку.']
+            message = [f'{who.name} берет {self.name1} в руку.']
         if oldShield:
-            message.append('При этом он бросает ' + oldShield.realname()[1] + ' и оставляет валяться на полу.')
+            message.append(f'При этом он бросает {oldShield.realname()[1]} и оставляет валяться на полу.')
             who.drop(oldShield)
         tprint(self.game, message)

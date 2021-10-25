@@ -119,8 +119,8 @@ class Game():
         self.player.pockets.append(newKey)  # Отдаем ключ игроку
         self.gameIsOn = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
         shield = self.readobjects(file='shields.json',
-                                           howmany=1,
-                                           object_class=Shield)
+                                  howmany=1,
+                                  object_class=Shield)
         self.allShields.append(shield)
         self.player.shield = shield[0]
 
