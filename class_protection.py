@@ -1,5 +1,5 @@
 ﻿from constants import *
-from functions import *
+from functions import randomitem, tprint
 from settings import *
 
 

@@ -1,4 +1,4 @@
-from functions import *
+from functions import randomitem, pprint
 from class_room import Room
 from class_items import Key
 from class_basic import Loot, Money

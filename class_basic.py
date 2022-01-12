@@ -1,4 +1,4 @@
-from functions import *
+from functions import howmany, tprint
 from settings import *
 
 class Loot:
@@ -36,9 +36,9 @@ class Money:
     def __str__(self):
         return self.name + ' (' + self.howmuchmoney + ')'
 
-    def take(self, luckyOne):
-        luckyOne.money.howmuchmoney += self.howmuchmoney
-        tprint(self.game, f'{luckyOne.name} забрал {howmany(self.howmuchmoney, "монету,монеты,монет")}')
+    def take(self, lucky_one):
+        lucky_one.money.howmuchmoney += self.howmuchmoney
+        tprint(self.game, f'{lucky_one.name} забрал {howmany(self.howmuchmoney, "монету,монеты,монет")}')
 
     def show(self):
         if self.howmuchmoney > 0:

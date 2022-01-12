@@ -1,4 +1,4 @@
-from functions import *
+from functions import showsides, randomitem, howmany, tprint, normal_count
 from constants import *
 from class_items import Money, Potion, Key, Rune, Book
 from class_weapon import Weapon

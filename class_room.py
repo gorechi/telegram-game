@@ -1,4 +1,4 @@
-from functions import *
+from functions import readfile, randomitem, tprint, pprint
 from class_monsters import Monster
 from class_basic import Loot, Money
 from class_items import Key
@@ -113,15 +113,15 @@ class Room:
             if self.torch:
                 self.decoration1 = f'освещенную факелом {self.decoration1}'
             if self.center == '':
-                whoIsHere = 'Не видно ничего интересного.'
+                who_is_here = 'Не видно ничего интересного.'
             else:
-                whoIsHere = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
+                who_is_here = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
             message = []
             message.append(f'{player.name} попадает в {self.decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
             for furniture in self.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
-            message.append(whoIsHere)
+            message.append(who_is_here)
             if self.stink > 0:
                 message.append(stink_text)
             tprint(game, message, state = 'direction')
@@ -170,17 +170,17 @@ class Room:
 
     def map(self):
         game=self.game
-        doorsHorizontal = {'0': '=', '1': ' ', '2': '-'}
-        doorsVertical = {'0': '║', '1': ' ', '2': '|'}
-        string1 = '=={0}=='.format(doorsHorizontal[str(self.doors[0])])
+        doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
+        doors_vertical = {'0': '║', '1': ' ', '2': '|'}
+        string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
         string2 = '║   ║'
-        string3 = '{0} '.format(doorsVertical[str(self.doors[3])])
+        string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
         if self.center != '':
             string3 += self.center.name[0]
         else:
             string3 += ' '
-        string3 += ' {0}'.format(doorsVertical[str(self.doors[1])])
-        string4 = '=={0}=='.format(doorsHorizontal[str(self.doors[2])])
+        string3 += ' {0}'.format(doors_vertical[str(self.doors[1])])
+        string4 = '=={0}=='.format(doors_horizontal[str(self.doors[2])])
         if self.light:
             pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
                    s_room_plan_picture_width, s_room_plan_picture_height)
@@ -188,13 +188,13 @@ class Room:
         else:
             return False
 
-    def lock(self, lockOrNot=2):
+    def lock(self, locked_or_not=2):
         game=self.game
         a = [-game.newCastle.rooms, 1, game.newCastle.rooms, -1]
         for i in range(4):
             if self.doors[i] == 1:
-                self.doors[i] = lockOrNot
+                self.doors[i] = locked_or_not
                 j = i + 2 if (i + 2) < 4 else i - 2
-                game.newCastle.plan[self.position + a[i]].doors[j] = lockOrNot
+                game.newCastle.plan[self.position + a[i]].doors[j] = locked_or_not
         self.locked = True
         return None

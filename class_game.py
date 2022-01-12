@@ -1,4 +1,4 @@
-from functions import *
+from functions import randomitem
 from settings import *
 from class_castle import Castle
 from class_hero import Hero

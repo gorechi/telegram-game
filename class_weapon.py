@@ -1,4 +1,4 @@
-from functions import *
+from functions import randomitem, tprint
 from constants import *
 from settings import *
 
@@ -47,10 +47,10 @@ class Weapon:
         return True
 
     def __str__(self):
-        damageString = str(self.damage)
+        damage_string = str(self.damage)
         if self.permdamage() != 0:
-            damageString += '+' + str(self.permdamage())
-        return f'{self.name}{self.enchantment()} ({damageString})'
+            damage_string += '+' + str(self.permdamage())
+        return f'{self.name}{self.enchantment()} ({damage_string})'
 
     def realname(self):
         names = []
@@ -63,10 +63,10 @@ class Weapon:
         return names
 
     def element(self):
-        elementSum = 0
+        element_sum = 0
         for rune in self.runes:
-            elementSum += rune.element
-        return elementSum
+            element_sum += rune.element
+        return element_sum
 
     def enchant(self, rune):
         if len(self.runes) > 1 or self.empty:
@@ -118,35 +118,36 @@ class Weapon:
         tprint(game, message)
 
     def show(self):
-        damageString = str(self.damage)
+        damage_string = str(self.damage)
         if self.permdamage() != 0:
-            damageString += '+' + str(self.permdamage())
+            damage_string += '+' + str(self.permdamage())
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name
         else:
             name = self.name + self.enchantment()
-        return f'{name} ({damageString})'
+        return f'{name} ({damage_string})'
 
-    def use(self, whoUsing, inaction=False):
-        if whoUsing.weapon.empty:
-            whoUsing.weapon = self
+    def use(self, who_using, inaction=False):
+        game = self.game
+        if who_using.weapon.empty:
+            who_using.weapon = self
         else:
-            whoUsing.pockets.append(whoUsing.weapon)
-            whoUsing.weapon = self
-            whoUsing.pockets.remove(self)
-            message = [f'{whoUsing.name} теперь использует {self.name1} в качестве оружия.']
-            if not whoUsing.shield.empty and self.twohanded:
-                shield = whoUsing.shield
-                whoUsing.removed_shield = shield
-                whoUsing.shield = self.game.noShield
+            who_using.pockets.append(who_using.weapon)
+            who_using.weapon = self
+            who_using.pockets.remove(self)
+            message = [f'{who_using.name} теперь использует {self.name1} в качестве оружия.']
+            if not who_using.shield.empty and self.twohanded:
+                shield = who_using.shield
+                who_using.removed_shield = shield
+                who_using.shield = game.noShield
                 message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
-            if not whoUsing.removed_shield.empty and not self.twohanded:
-                shield = whoUsing.removed_shield
-                whoUsing.shield = shield
-                whoUsing.removed_shield = self.game.noShield
+            if not who_using.removed_shield.empty and not self.twohanded:
+                shield = who_using.removed_shield
+                who_using.shield = shield
+                who_using.removed_shield = game.noShield
                 message.append(f'Из-за того, что новое оружие одноручное, '
                                f'герой теперь держит во второй руке {shield.realname()[1]}.')
-        tprint(self.game, message)
+        tprint(game, message)
 
     def place(self, castle, room_to_place = None):
         if room_to_place:

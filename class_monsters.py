@@ -1,4 +1,4 @@
-from functions import *
+from functions import randomitem, howmany, tprint
 from class_basic import Loot, Money
 from class_weapon import Weapon
 from class_protection import Shield, Armor
@@ -471,8 +471,8 @@ class Vampire(Monster):
             selfName = self.name
             selfName1 = self.name1
         else:
-            selfName = 'Кто-то страшный'
-            selfName1 = 'черт знает кого'
+            selfName = s_monster_name_in_darkness
+            selfName1 = s_monster_name1_in_darkness
         text = []
         meleAttack = self.mele()
         if not self.weapon.empty:

@@ -1,4 +1,4 @@
-from functions import *
+from functions import randomitem, howmany, tprint
 from class_basic import *
 from constants import *
 from settings import *

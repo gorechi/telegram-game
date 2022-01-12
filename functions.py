@@ -10,6 +10,7 @@ from math import sqrt
 from math import floor
 import json
 
+
 # Функции
 
 def readfile(filename, divide, divider='|'):
@@ -23,51 +24,38 @@ def readfile(filename, divide, divider='|'):
     newfile.close()
     return filelines
 
+
 # Функция генерирует описание сторон схватки.
 # На вход получает объекты сторон (например, героя и монстра), а также замок, в котором происходит схватка.
-# Возвращает список, ссстоящий из строк, описывающих стороны схватки.
+# Возвращает список, состоящий из строк, описывающих стороны схватки.
 def showsides(side1, side2, castle):
     room = castle.plan[side1.currentPosition]
     message = []
-    line = side1.name + ': сила - d' + str(side1.stren)
+    line = f'{side1.name}: сила - d{str(side1.stren)}'
     if not side1.weapon.empty:
-        line += '+d' + str(side1.weapon.damage) + '+' + str(side1.weapon.permdamage())
+        line += f'+d{str(side1.weapon.damage)}+{str(side1.weapon.permdamage())}'
     if not side1.shield.empty and side1.armor.empty:
-        line += ', защита - d' + str(side1.shield.protection) + '+' + str(side1.shield.permprotection())
+        line += f', защита - d{str(side1.shield.protection)}+{str(side1.shield.permprotection())}'
     elif side1.shield.empty and not side1.armor.empty:
-        line += ', защита - d' + str(side1.armor.protection) + '+' + str(side1.armor.permprotection())
+        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permprotection())}'
     elif not side1.shield.empty and not side1.armor.empty:
-        line += ', защита - d' + \
-                str(side1.armor.protection) + \
-                '+' + \
-                str(side1.armor.permprotection()) + \
-                ' + d' + \
-                str(side1.shield.protection) + \
-                '+' + \
-                str(side1.shield.permprotection())
-    line += ', жизней - ' + str(side1.health) + '. '
+        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permprotection())} + d{str(side1.shield.protection)}+{str(side1.shield.permprotection())}'
+    line += f', жизней - {str(side1.health)}. '
     message.append(line)
     if room.light:
-        line = side2.name + ': сила - d' + str(side2.stren)
+        line = f'{side2.name}: сила - d{str(side2.stren)}'
         if not side2.weapon.empty:
-            line += '+d' + str(side2.weapon.damage) + '+' + str(side2.weapon.permdamage())
+            line += f'+d{str(side2.weapon.damage)}+{str(side2.weapon.permdamage())}'
         if not side2.shield.empty and side2.armor.empty:
-            line += ', защита - d' + str(side2.shield.protection) + '+' + str(side2.shield.permprotection())
+            line += f', защита - d{str(side2.shield.protection)}+{str(side2.shield.permprotection())}'
         elif side2.shield.empty and not side2.armor.empty:
-            line += ', защита - d' + str(side2.armor.protection) + '+' + str(side2.armor.permprotection())
+            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.permprotection())}'
         elif not side2.shield.empty and not side2.armor.empty:
-            line += ', защита - d' + \
-                    str(side2.armor.protection) + \
-                    '+' + \
-                    str(side2.armor.permprotection()) + \
-                    ' + d' + \
-                    str(side2.shield.protection) + \
-                    '+' + \
-                    str(side2.shield.permprotection())
-        line += ', жизней - ' + str(side2.health) + '.'
+            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.permprotection())} + d{str(side2.shield.protection)}+{str(side2.shield.permprotection())}'
+        line += f', жизней - {str(side2.health)}.'
         message.append(line)
     else:
-        message.append('В темноте кто-то есть, но ' + side1.name + ' не понимает кто это.')
+        message.append(f'В темноте кто-то есть, но {side1.name} не понимает кто это.')
     return message
 
 
@@ -76,8 +64,8 @@ def showsides(side1, side2, castle):
 # neednumber (boolean) - признак того, что кроме самого элемента нужно вернуть и его номер в списке
 # howMany (integer) - число случайных элементов списка, которые нужно вернуть
 # Если howMany > 1, возвращается список из howMany случайных элементов списка list. Элементы не повторяются.
-def randomitem(list, neednumber=False, howMany=1):
-    if not howMany or int(howMany) < 2:
+def randomitem(list, neednumber=False, how_many=1):
+    if not how_many or int(how_many) < 2:
         a = dice(0, len(list) - 1)
         if not neednumber:
             return list[a]
@@ -85,11 +73,11 @@ def randomitem(list, neednumber=False, howMany=1):
             return list[a], a
     else:
         result = []
-        while howMany > 0:
+        while how_many > 0:
             a = dice(0, len(list) - 1)
             if list[a] not in result:
                 result.append(list[a])
-                howMany -= 1
+                how_many -= 1
         return result
 
 
@@ -118,20 +106,20 @@ def readspells(classes):
     return spellslist
 
 
-def readitems(whatkind, howMany, classes):
+def readitems(what_kind, how_many, classes):
     allItems = readfile('items', True, '\\')
     itemsList = []
     for i in allItems:
-        if i[0] == whatkind:
+        if i[0] == what_kind:
             item = classes[i[0]](i[1], i[2], i[3], i[4])
             itemsList.append(item)
-    while len(itemsList) < howMany[whatkind]:
-        new = classes[whatkind](0)
+    while len(itemsList) < how_many[what_kind]:
+        new = classes[what_kind](0)
         itemsList.append(new)
     return itemsList
 
 
-def tprint (game, text, state=''):
+def tprint(game, text, state=''):
     if state == 'off':
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
@@ -181,8 +169,8 @@ def tprint (game, text, state=''):
         game.bot.send_message(game.chat_id, final_text.rstrip('\n'), reply_markup=markup)
 
 
-def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
-    pic = Image.new('RGB', (width,height), color=(color))
+def pprint(game, text, width=200, height=200, color='#FFFFFF'):
+    pic = Image.new('RGB', (width, height), color=color)
     font = ImageFont.truetype('PTMono-Regular.ttf', size=18)
     draw_text = ImageDraw.Draw(pic)
     if isinstance(text, str):
@@ -190,7 +178,7 @@ def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
             (10, 10),
             text,
             font=font,
-            fill=('#000000')
+            fill='#000000'
         )
         game.bot.send_photo(game.chat_id, pic)
     elif isinstance(text, list):
@@ -201,21 +189,22 @@ def pprint (game, text, width = 200, height = 200, color = '#FFFFFF'):
             (10, 10),
             final_text,
             font=font,
-            fill=('#000000')
+            fill='#000000'
         )
         game.bot.send_photo(game.chat_id, pic)
 
+
 # Функция принимает на вход нормальную строку текста, слова разделены пробелами.
-# Пдразумевается, что строка будет перечислением чего-либо.
+# Подразумевается, что строка будет перечислением чего-либо.
 # На выход выдается преобразованная строка, где все слова разделены запятыми, а последнее отделяется союзом "и".
 # В параметр exclude передается символ, перед которым не надо ставить запятую. Это может быть, например, скобка.
 # Таким образом, строка 'один два три (четыре) пять (шесть)'
-# может быть приобразована в 'один, два, три (четыре) и пять (шесть)'.
+# может быть преобразована в 'один, два, три (четыре) и пять (шесть)'.
 
 def normal_count(input_string, exclude=None):
     input_string = input_string.replace(' ', ' и ')
     if exclude:
         input_string = input_string.replace(' и ' + str(exclude), ' ' + str(exclude))
     count = input_string.count(' и ')
-    input_string = input_string.replace(' и ', ', ', count-1)
+    input_string = input_string.replace(' и ', ', ', count - 1)
     return input_string
