@@ -3,6 +3,7 @@ from class_monsters import Monster
 from class_basic import Loot, Money
 from class_items import Key
 from settings import *
+from random import randint as dice
 
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)
@@ -13,9 +14,9 @@ decor4 = readfile('decorate4', False)
 class Furniture:
     def __init__(self, game, name=''):
         self.game = game
-        newloot = Loot(self.game)
+        new_loot = Loot(self.game)
         self.ambush = False
-        self.loot = newloot
+        self.loot = new_loot
         self.locked = False
         self.lockable = False
         self.opened = True
@@ -60,11 +61,11 @@ class Furniture:
         room.furniture.append(self)
         if dice(1, s_furniture_locked_possibility) == 1 and self.lockable:
             self.locked = True
-            veryNewKey = Key(self.game)
-            veryNewKey.place(castle)
+            very_new_key = Key(self.game)
+            very_new_key.place(castle)
         if dice(1, 100) <= 50:
-            newMoney = Money(self.game, dice(1, s_furniture_initial_money_maximum))
-            self.loot.pile.append(newMoney)
+            new_money = Money(self.game, dice(1, s_furniture_initial_money_maximum))
+            self.loot.pile.append(new_money)
         return True
 
 
@@ -89,7 +90,7 @@ class Room:
         self.position = -1
         self.visited = ' '
         self.ambush = ''
-        self.runePlace = ''
+        self.rune_place = ''
         self.light = True
         self.morgue = None
         self.furniture = []
@@ -133,12 +134,12 @@ class Room:
                 message.append(stink_text)
             tprint(game, message, state = 'direction')
 
-    def showThroughKeyHole(self, who):
+    def show_through_key_hole(self, who):
         message = []
         if self.center == '':
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.keyHole}')
+            message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.key_hole}')
         if self.stink > 0:
             message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message

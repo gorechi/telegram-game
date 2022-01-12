@@ -17,34 +17,34 @@ class Loot:
 
 
 class Money:
-    def __init__(self, game, howmuchmoney):
+    def __init__(self, game, how_much_money):
         self.game = game
-        self.howmuchmoney = howmuchmoney
-        if 0 < self.howmuchmoney <= money_groups[0]:
+        self.how_much_money = how_much_money
+        if 0 < self.how_much_money <= money_groups[0]:
             self.name = 'Несколько монет'
             self.name1 = 'Несколько монет'
-        elif money_groups[0] < self.howmuchmoney <= money_groups[1]:
+        elif money_groups[0] < self.how_much_money <= money_groups[1]:
             self.name = 'Кучка монет'
             self.name1 = 'Кучку монет'
-        elif money_groups[1] < self.howmuchmoney <= money_groups[2]:
+        elif money_groups[1] < self.how_much_money <= money_groups[2]:
             self.name = 'Груда монет'
             self.name1 = 'Груду монет'
-        elif money_groups[2] < self.howmuchmoney:
+        elif money_groups[2] < self.how_much_money:
             self.name = 'Много монет'
             self.name1 = 'Много монет'
 
     def __str__(self):
-        return self.name + ' (' + self.howmuchmoney + ')'
+        return self.name + ' (' + self.how_much_money + ')'
 
     def take(self, lucky_one):
-        lucky_one.money.howmuchmoney += self.howmuchmoney
-        tprint(self.game, f'{lucky_one.name} забрал {howmany(self.howmuchmoney, "монету,монеты,монет")}')
+        lucky_one.money.how_much_money += self.how_much_money
+        tprint(self.game, f'{lucky_one.name} забрал {howmany(self.how_much_money, "монету,монеты,монет")}')
 
     def show(self):
-        if self.howmuchmoney > 0:
-            return howmany(self.howmuchmoney, 'монету,монеты,монет')
+        if self.how_much_money > 0:
+            return howmany(self.how_much_money, 'монету,монеты,монет')
         else:
             return 'Денег нет'
 
     def __add__(self, other):
-        self.howmuchmoney += other.howmuchmoney
+        self.how_much_money += other.how_much_money

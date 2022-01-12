@@ -1,7 +1,6 @@
 from functions import randomitem, tprint
-from constants import *
 from settings import *
-
+from random import randint as dice
 class Weapon:
     def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
         self.game = game
@@ -38,7 +37,7 @@ class Weapon:
             self.twohanded = n2[a2][4]
             self.gender = n2[a2][1]
         self.actions = actions.split(',')
-        self.canUseInFight = True
+        self.can_use_in_fight = True
         self.runes = []
         self.twohanded_dict = ['двуручный', 'двуручная', 'двуручное']
         self.empty = empty
@@ -48,11 +47,11 @@ class Weapon:
 
     def __str__(self):
         damage_string = str(self.damage)
-        if self.permdamage() != 0:
-            damage_string += '+' + str(self.permdamage())
+        if self.perm_damage() != 0:
+            damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
 
-    def realname(self):
+    def real_name(self):
         names = []
         if self.element() != 0:
             names.append(self.name + ' ' + s_elements_dictionary[self.element()])
@@ -84,7 +83,7 @@ class Weapon:
                 element += int(i.element)
             return ' ' + s_elements_dictionary[element]
 
-    def permdamage(self):
+    def perm_damage(self):
         damage = 0
         if len(self.runes) in [1, 2]:
             for rune in self.runes:
@@ -92,7 +91,7 @@ class Weapon:
         return damage
 
     def attack(self):
-        return dice(1, int(self.damage)) + self.permdamage()
+        return dice(1, int(self.damage)) + self.perm_damage()
 
     def take(self, who):
         game = self.game
@@ -103,10 +102,10 @@ class Weapon:
             message.append(f'{who.name} теперь использует {self.name1} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
-                who.shield = self.game.noShield
+                who.shield = self.game.no_shield
                 who.removed_shield = shield
                 message.append(f'Из-за того, что герой взял двуручное оружие, '
-                               f'ему пришлось убрать {shield.realname()[1]} за спину.')
+                               f'ему пришлось убрать {shield.real_name()[1]} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -119,15 +118,15 @@ class Weapon:
 
     def show(self):
         damage_string = str(self.damage)
-        if self.permdamage() != 0:
-            damage_string += '+' + str(self.permdamage())
+        if self.perm_damage() != 0:
+            damage_string += '+' + str(self.perm_damage())
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name
         else:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string})'
 
-    def use(self, who_using, inaction=False):
+    def use(self, who_using, in_action=False):
         game = self.game
         if who_using.weapon.empty:
             who_using.weapon = self
@@ -139,14 +138,14 @@ class Weapon:
             if not who_using.shield.empty and self.twohanded:
                 shield = who_using.shield
                 who_using.removed_shield = shield
-                who_using.shield = game.noShield
+                who_using.shield = game.no_shield
                 message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
             if not who_using.removed_shield.empty and not self.twohanded:
                 shield = who_using.removed_shield
                 who_using.shield = shield
-                who_using.removed_shield = game.noShield
+                who_using.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'герой теперь держит во второй руке {shield.realname()[1]}.')
+                               f'герой теперь держит во второй руке {shield.real_name()[1]}.')
         tprint(game, message)
 
     def place(self, castle, room_to_place = None):
@@ -157,12 +156,12 @@ class Weapon:
             room = randomitem(rooms, False)
         if room.monster():
             monster = room.monster()
-            if monster.carryweapon:
+            if monster.carry_weapon:
                 monster.give(self)
                 return True
         elif room.ambush != '':
             monster = room.ambush
-            if monster.carryweapon:
+            if monster.carry_weapon:
                 monster.give(self)
                 return True
         elif len(room.furniture) > 0:

@@ -1,6 +1,7 @@
-﻿from constants import *
-from functions import randomitem, tprint
+﻿from functions import randomitem, tprint
 from settings import *
+from math import ceil
+from random import randint as dice
 
 
 class Protection:
@@ -9,15 +10,16 @@ class Protection:
         self.name = name
         self.name1 = name1
         self.actions = actions.split(',')
-        self.canUseInFight = True
+        self.can_use_in_fight = True
         self.empty = empty
         self.runes = []
+        self.protection = int(protection)
 
     def __str__(self):
-        protectionString = str(self.protection)
-        if self.permprotection() != 0:
-            protectionString += '+' + str(self.permprotection())
-        return self.name + self.enchantment() + ' (' + protectionString + ')'
+        protection_string = str(self.protection)
+        if self.perm_protection() != 0:
+            protection_string += '+' + str(self.perm_protection())
+        return self.name + self.enchantment() + ' (' + protection_string + ')'
 
     def on_create(self):
         return True
@@ -33,12 +35,12 @@ class Protection:
         return names
 
     def element(self):
-        elementSum = 0
+        element_sum = 0
         for rune in self.runes:
-            elementSum += rune.element
-        return elementSum
+            element_sum += rune.element
+        return element_sum
 
-    def permprotection(self):
+    def perm_protection(self):
         protection = 0
         if len(self.runes) in [1, 2]:
             for rune in self.runes:
@@ -70,10 +72,10 @@ class Protection:
                 multiplier = s_protection_weak_weapon_multiplier
         if who.hide:
             who.hide = False
-            return self.protection + self.permprotection()
+            return self.protection + self.perm_protection()
         else:
             if self.protection > 0:
-                return ceil((dice(1, self.protection) + self.permprotection())*multiplier)
+                return ceil((dice(1, self.protection) + self.perm_protection())*multiplier)
             else:
                 return 0
 
@@ -86,19 +88,19 @@ class Protection:
             tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     def show(self):
-        protectionString = str(self.protection)
-        if self.permprotection() != 0:
-            protectionString += '+' + str(self.permprotection())
-        return f'{self.name}{self.enchantment()} ({protectionString})'
+        protection_string = str(self.protection)
+        if self.perm_protection() != 0:
+            protection_string += '+' + str(self.perm_protection())
+        return f'{self.name}{self.enchantment()} ({protection_string})'
 
-    def use(self, whoUsing, inaction=False):
-        if whoUsing.shield == '':
-            whoUsing.shield = self
+    def use(self, who_using, in_action=False):
+        if who_using.shield == '':
+            who_using.shield = self
         else:
-            whoUsing.pockets.append(whoUsing.shield)
-            whoUsing.shield = self
-            whoUsing.pockets.remove(self)
-        tprint(self.game, f'{whoUsing.name} теперь использует {self.name1} в качестве защиты!')
+            who_using.pockets.append(who_using.shield)
+            who_using.shield = self
+            who_using.pockets.remove(self)
+        tprint(self.game, f'{who_using.name} теперь использует {self.name1} в качестве защиты!')
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
@@ -124,7 +126,7 @@ class Armor(Protection):
             self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
             self.protection = dice(1, 3)
         self.actions = actions.split(',')
-        self.canUseInFight = True
+        self.can_use_in_fight = True
         self.empty = empty
         self.runes = []
 
@@ -139,12 +141,12 @@ class Armor(Protection):
             room = randomitem(rooms, False)
         if room.monster():
             monster = room.monster()
-            if monster.wearArmor:
+            if monster.wear_armor:
                 monster.give(self)
                 return True
         elif room.ambush != '':
             monster = room.ambush
-            if monster.wearArmor:
+            if monster.wear_armor:
                 monster.give(self)
                 return True
             elif len(room.furniture) > 0:
@@ -156,11 +158,11 @@ class Armor(Protection):
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
-        oldArmor = who.armor
+        old_armor = who.armor
         message = [f'{who.name} использует {self.name1} как защиту.']
-        if not oldArmor.empty:
-            message.append(f'При этом он снимает {oldArmor.name1} и оставляет валяться на полу.')
-            who.drop(oldArmor)
+        if not old_armor.empty:
+            message.append(f'При этом он снимает {old_armor.name1} и оставляет валяться на полу.')
+            who.drop(old_armor)
         who.armor = self
         tprint(self.game, message)
 
@@ -184,7 +186,7 @@ class Shield (Protection):
             self.name1 = self.name
             self.protection = dice(1, 3)
         self.actions = actions.split(',')
-        self.canUseInFight = True
+        self.can_use_in_fight = True
         self.empty = empty
         self.runes = []
         self.accumulated_damage = 0
@@ -195,16 +197,16 @@ class Shield (Protection):
     def show(self):
         damage_dict = s_shield_states_dictionary
         damage = damage_dict.get(self.accumulated_damage//1)
-        protectionString = str(self.protection)
+        protection_string = str(self.protection)
         text = ''
-        if self.permprotection() != 0:
-            protectionString += '+' + str(self.permprotection())
+        if self.perm_protection() != 0:
+            protection_string += '+' + str(self.perm_protection())
         if damage:
             text += (damage + ' ')
-        text += self.name + self.enchantment() + ' (' + protectionString + ')'
+        text += self.name + self.enchantment() + ' (' + protection_string + ')'
         return text
 
-    def realname(self):
+    def real_name(self):
         damage_dict = s_shield_states_dictionary
         damage = damage_dict.get(self.accumulated_damage // 1)
         names = []
@@ -230,12 +232,12 @@ class Shield (Protection):
             room = randomitem(rooms, False)
         if room.monster():
             monster = room.monster()
-            if monster.carryshield:
+            if monster.carry_shield:
                 monster.give(self)
                 return True
         elif room.ambush != '':
             monster = room.ambush
-            if monster.carryshield:
+            if monster.carry_shield:
                 monster.give(self)
                 return True
             elif len(room.furniture) > 0:
@@ -248,18 +250,18 @@ class Shield (Protection):
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
-        oldShield = None
+        old_shield = None
         if not who.shield.empty:
-            oldShield = who.shield
+            old_shield = who.shield
         if not who.removed_shield.empty:
-            oldShield = who.removed_shield
+            old_shield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
             message = [f'{who.name} помещает {self.name1} за спину.']
         else:
             who.shield = self
             message = [f'{who.name} берет {self.name1} в руку.']
-        if oldShield:
-            message.append(f'При этом он бросает {oldShield.realname()[1]} и оставляет валяться на полу.')
-            who.drop(oldShield)
+        if old_shield:
+            message.append(f'При этом он бросает {old_shield.realname()[1]} и оставляет валяться на полу.')
+            who.drop(old_shield)
         tprint(self.game, message)
