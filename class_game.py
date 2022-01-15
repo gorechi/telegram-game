@@ -59,8 +59,6 @@ class Game():
                                s_hero_dexterity,
                                s_hero_intelligence,
                                s_hero_health,
-                               '',
-                               '',
                                s_hero_actions)  # Создаем персонажа
         else:
             self.player = hero

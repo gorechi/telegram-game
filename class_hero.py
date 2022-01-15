@@ -16,9 +16,9 @@ class Hero:
                  dext=2,
                  intel=0,
                  health=20,
+                 actions=None,
                  weapon=None,
                  shield=None,
-                 actions=None,
                  pockets=None,
                  armor=None):
         if actions is None:
@@ -41,7 +41,6 @@ class Hero:
         self.start_intel = self.intel
         self.health = int(health)
         if weapon is None:
-            print(self.game)
             self.weapon = self.game.no_weapon
         else:
             self.weapon = weapon
@@ -56,7 +55,7 @@ class Hero:
         self.removed_shield = self.game.no_shield
         self.money = Money(self.game, 0)
         self.current_position = 0
-        self.game_over = False
+        self.game_is_over = False
         self.start_health = self.health
         self.wins = 0
         self.rage = 0
@@ -309,11 +308,11 @@ class Hero:
                     target.shield = ''
             target.health -= total_damage
             return string1 + string2
-        elif action == 'з' or action == 'защититься' or action == 'защита':
+        elif action in ['з', 'защититься', 'защита']:
             result = self.use_shield(target)
             if result:
                 return result
-        elif action == 'б' or action == 'бежать' or action == 'убежать':
+        elif action in ['б', 'бежать', 'убежать']:
             self.rage = 0
             self.hide = False
             result = self.run_away(target)
@@ -321,7 +320,7 @@ class Hero:
                 return f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.'
             else:
                 return result
-        elif (action == 'и' or action == 'использовать') and len(can_use) > 0:
+        elif action in ['и', 'использовать'] and len(can_use) > 0:
             tprint(game, f'Во время боя {self.name} может использовать:')
             for i in self.pockets:
                 if i.can_use_in_fight:
@@ -366,9 +365,9 @@ class Hero:
 
     def show(self):
         message = []
-        if self.money.howmuchmoney > 1:
-            money_text = f'В кошельке звенят {howmany(self.money.howmuchmoney, "монета,монеты,монет")}.'
-        elif self.money.howmuchmoney == 1:
+        if self.money.how_much_money > 1:
+            money_text = f'В кошельке звенят {howmany(self.money.how_much_money, "монета,монеты,монет")}.'
+        elif self.money.how_much_money == 1:
             money_text = 'Одна-единственная монета оттягивает карман героя.'
         else:
             money_text = 'Герой беден, как церковная мышь.'
@@ -376,8 +375,8 @@ class Hero:
                        f' у него {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         if not self.weapon.empty:
-            weapon_text = f'{self.weapon.realname()[0]} в руке героя добавляет к его силе ' \
-                          f'{str(self.weapon.damage)} + {str(self.weapon.permdamage())}.'
+            weapon_text = f'{self.weapon.real_name()[0]} в руке героя добавляет к его силе ' \
+                          f'{str(self.weapon.damage)} + {str(self.weapon.perm_damage())}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
         message.append(weapon_text)
@@ -390,13 +389,13 @@ class Hero:
                 protect = 'защищает '
                 and_text = ''
             if not self.shield.empty:
-                shield_text = f'{self.shield.realname()[0]} ' \
-                              f'({str(self.shield.protection)}+{str(self.shield.permprotection())})'
+                shield_text = f'{self.shield.real_name()[0]} ' \
+                              f'({str(self.shield.protection)}+{str(self.shield.perm_protection())})'
             else:
                 shield_text = ''
             if not self.armor.empty:
-                armor_text = f'{self.armor.realname()[0]} ' \
-                             f'({str(self.armor.protection)}+{str(self.armor.permprotection())})'
+                armor_text = f'{self.armor.real_name()[0]} ' \
+                             f'({str(self.armor.protection)}+{str(self.armor.perm_protection())})'
             else:
                 armor_text = ''
             protection_text += protect + shield_text + and_text + armor_text
@@ -459,8 +458,8 @@ class Hero:
         self.level += 1
         return True
 
-    def game_over(self, goaltype, goal):
-        if goaltype == 'killall':
+    def game_over(self, goal_type, goal=None):
+        if goal_type == 'killall':
             if self.game.new_castle.monsters() == 0:
                 tprint(self.game, f'{self.name} убил всех монстров в замке и выиграл в этой игре!')
                 return True

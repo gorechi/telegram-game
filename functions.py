@@ -15,13 +15,12 @@ import json
 
 def readfile(filename, divide, divider='|'):
     filelines = []
-    newfile = open(filename, encoding='utf-8')
-    for line in newfile:
-        if divide:
-            filelines.append(line.rstrip('\n').split(divider))
-        else:
-            filelines.append(line.rstrip('\n'))
-    newfile.close()
+    with open(filename, encoding='utf-8') as new_file:
+        for line in new_file:
+            if divide:
+                filelines.append(line.rstrip('\n').split(divider))
+            else:
+                filelines.append(line.rstrip('\n'))
     return filelines
 
 

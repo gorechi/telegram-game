@@ -24,7 +24,7 @@ def welcome(message):
     itembtn1 = types.KeyboardButton('Новая игра')
     itembtn2 = types.KeyboardButton('Отмена')
     if game:
-        if game.gameIsOn:
+        if game.game_is_on:
             markup.add(itembtn1, itembtn2)
             bot.reply_to(message, "Игра уже запущена.\nТы точно хочешь начать новую игру?\n", reply_markup=markup)
         else:
@@ -79,7 +79,7 @@ def all_commands(message):
         if command in common_commands and game.state == 0:
             chat_id = message.chat.id
             game = game_sessions[chat_id]
-            if not game.player.game_over('killall', game.how_many['монстры']):
+            if not game.player.game_over('killall'):
                 game.player.do(message.text.lower())
         elif command in level_up_commands and game.state == 3:
             if command == 'здоровье':

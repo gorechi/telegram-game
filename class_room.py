@@ -191,11 +191,11 @@ class Room:
 
     def lock(self, locked_or_not=2):
         game=self.game
-        a = [-game.newCastle.rooms, 1, game.newCastle.rooms, -1]
+        a = [-game.new_castle.rooms, 1, game.new_castle.rooms, -1]
         for i in range(4):
             if self.doors[i] == 1:
                 self.doors[i] = locked_or_not
                 j = i + 2 if (i + 2) < 4 else i - 2
-                game.newCastle.plan[self.position + a[i]].doors[j] = locked_or_not
+                game.new_castle.plan[self.position + a[i]].doors[j] = locked_or_not
         self.locked = True
         return None
