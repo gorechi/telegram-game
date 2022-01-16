@@ -4,7 +4,7 @@
 import telebot
 from telebot import types
 from functions import tprint
-from constants import *
+from constants import TOKEN
 from class_game import Game
 from class_items import Rune
 
