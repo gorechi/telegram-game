@@ -3,12 +3,6 @@
 from random import randint as dice
 from telebot import types
 from PIL import Image, ImageDraw, ImageFont
-from random import sample as toss
-from time import sleep as pause
-from math import ceil
-from math import sqrt
-from math import floor
-import json
 
 
 # Функции

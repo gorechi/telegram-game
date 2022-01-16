@@ -24,7 +24,7 @@ class Protection:
     def on_create(self):
         return True
 
-    def realname(self):
+    def real_name(self):
         names = []
         if self.element() != 0:
             names.append(self.name + ' ' + s_elements_dictionary[self.element()])

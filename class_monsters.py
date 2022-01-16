@@ -5,6 +5,7 @@ from class_protection import Shield, Armor
 from class_items import Rune
 from settings import *
 from random import randint as dice
+from math import ceil
 
 class Monster:
     def __init__(self,
@@ -66,8 +67,7 @@ class Monster:
 
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon.empty and self.carry_weapon:
-            if item.twohanded:
-                if not self.shield.empty:
+            if item.twohanded and not self.shield.empty:
                     shield = self.shield
                     self.shield = self.game.no_shield
                     self.game.new_castle.plan[self.current_position].loot.pile.append(shield)
@@ -158,7 +158,6 @@ class Monster:
         if not target.shield.empty:
             rand = dice(1, s_shield_crushed_upper_limit)
             dam = total_attack * target.shield.accumulated_damage
-            print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
                 text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 target.shield = self.game.no_shield
@@ -178,22 +177,19 @@ class Monster:
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
-                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max)/100
-                print('dice result: ', dice_result)
+                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
                 self.shield.accumulated_damage += dice_result
             else:
                 dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
 
-    def lose(self, winner):
+    def lose(self, winner=None):
         game = self.game
         new_castle = self.game.new_castle
         result = dice(1, 10)
-        print('result: ', result)
         where = new_castle.plan[self.current_position]
         if where.loot == '':
             b = Loot(game)
@@ -259,7 +255,7 @@ class Monster:
                 self.health = self.start_health - ill_amount
                 tprint(game, alive_string)
 
-    def win(self, loser):
+    def win(self, loser=None):
         self.health = self.start_health
 
     def place(self, castle, roomr_to_place=None, old_place=None):
@@ -309,7 +305,7 @@ class Plant(Monster):
         new_plant = Plant(self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
         return new_plant
 
-    def win(self, loser):
+    def win(self, loser=None):
         new_castle = self.game.new_castle
         self.health = self.start_health
         for i in range(4):
@@ -331,7 +327,7 @@ class Plant(Monster):
                     new_castle.plan[self.current_position - 1].center = copy
                     copy.current_position = self.current_position - 1
 
-    def lose(self, winner):
+    def lose(self, winner=None):
         game = self.game
         new_castle = game.new_castle
         where = new_castle.plan[self.current_position]
@@ -344,7 +340,7 @@ class Plant(Monster):
             where.loot.pile.extend(self.loot.pile)
         where.center = ''
 
-    def place(self, castle, roomr_to_place = None):
+    def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
@@ -411,7 +407,7 @@ class Berserk(Monster):
         self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
         return dice(1, (self.stren + self.rage))
 
-    def place(self, castle, roomr_to_place = None):
+    def place(self, castle, roomr_to_place=None, old_place=None):
         if roomr_to_place:
             room = roomr_to_place
         else:
@@ -463,17 +459,15 @@ class Shapeshifter(Monster):
             result += self.shield.protect(attacker)
             if self.hide:
                 dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-                print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
             else:
                 dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
 
-    def lose(self, winner):
+    def lose(self, winner=None):
         where = self.game.new_castle.plan[self.current_position]
         if where.loot == '':
             b = Loot(self.game)
@@ -551,7 +545,6 @@ class Vampire(Monster):
             shield = target.shield
             rand = dice(1, 100)
             dam = total_attack * target.shield.accumulated_damage
-            print ('shield acc damage: ', target.shield.accumulated_damage, 'rand: ', rand, 'dam: ', dam)
             if rand < dam:
                 text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 game.all_shields.remove(shield)

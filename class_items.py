@@ -285,25 +285,25 @@ class Potion():
         game = self.game
         if not in_action:
             if self.type == 1:
-                who_using.startHealth += self.effect
+                who_using.start_health += self.effect
                 who_using.health += self.effect
                 tprint(game, f'{who_using.name} увеличивает свое максимальное здоровье '
                              f'на {str(self.effect)} до {str(who_using.health)}.')
                 return True
             elif self.type == 2:
                 who_using.stren += self.effect
-                who_using.startStren += self.effect
+                who_using.start_stren += self.effect
                 tprint(game, f'{who_using.name} увеличивает свою силу на {str(self.effect)} до {str(who_using.stren)}.')
                 return True
             elif self.type == 4:
                 who_using.dext += self.effect
-                who_using.startDext += self.effect
+                who_using.start_dext += self.effect
                 tprint(game, f'{who_using.name} увеличивает свою ловкость '
                              f'на {str(self.effect)} до {str(who_using.dext)}.')
                 return True
             elif self.type == 6:
                 who_using.intel += self.effect
-                who_using.startIntel += self.effect
+                who_using.start_intel += self.effect
                 tprint(game, f'{who_sing.name} увеличивает свой интеллект '
                              f'на {str(self.effect)} до {str(who_using.intel)}.')
                 return True
@@ -312,8 +312,8 @@ class Potion():
                 return False
         else:
             if self.type == 0:
-                if (who_using.startHealth - who_using.health) < self.effect:
-                    heal = dice(1, (who_using.startHealth - who_using.health))
+                if (who_using.start_health - who_using.health) < self.effect:
+                    heal = dice(1, (who_using.start_health - who_using.health))
                 else:
                     heal = dice(1, self.effect)
                 who_using.health += heal
@@ -349,7 +349,7 @@ class Potion():
 
 
 class Book():
-    def __init__(self, game, name=''):
+    def __init__(self, game, name=None):
         self.game = game
         self.name = name
 
@@ -358,6 +358,7 @@ class Book():
         description = randomitem(self.descriptions, False)
         self.name = description[0] + ' ' + self.name + ' ' + self.decorations[self.type]
         self.name1 = description[1] + ' ' + self.name1 + ' ' + self.decorations[self.type]
+        self.description = self.name
         available_texts = []
         for i in self.texts:
             if i[0] == self.type:

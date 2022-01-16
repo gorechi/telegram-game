@@ -705,7 +705,7 @@ class Hero:
             for i in current_loot.pile:
                 if i.name.lower() == item or i.name1.lower() == item:
                     i.take(self)
-                    currentLoot.pile.remove(i)
+                    current_loot.pile.remove(i)
                     return True
         tprint(game, 'Такой вещи здесь нет.')
         return False
