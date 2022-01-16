@@ -28,29 +28,29 @@ def readfile(filename, divide, divider='|'):
 # На вход получает объекты сторон (например, героя и монстра), а также замок, в котором происходит схватка.
 # Возвращает список, состоящий из строк, описывающих стороны схватки.
 def showsides(side1, side2, castle):
-    room = castle.plan[side1.currentPosition]
+    room = castle.plan[side1.current_position]
     message = []
     line = f'{side1.name}: сила - d{str(side1.stren)}'
     if not side1.weapon.empty:
-        line += f'+d{str(side1.weapon.damage)}+{str(side1.weapon.permdamage())}'
+        line += f'+d{str(side1.weapon.damage)}+{str(side1.weapon.perm_damage())}'
     if not side1.shield.empty and side1.armor.empty:
-        line += f', защита - d{str(side1.shield.protection)}+{str(side1.shield.permprotection())}'
+        line += f', защита - d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
     elif side1.shield.empty and not side1.armor.empty:
-        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permprotection())}'
+        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.perm_protection())}'
     elif not side1.shield.empty and not side1.armor.empty:
-        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permprotection())} + d{str(side1.shield.protection)}+{str(side1.shield.permprotection())}'
+        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permp_rotection())} + d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
     line += f', жизней - {str(side1.health)}. '
     message.append(line)
     if room.light:
         line = f'{side2.name}: сила - d{str(side2.stren)}'
         if not side2.weapon.empty:
-            line += f'+d{str(side2.weapon.damage)}+{str(side2.weapon.permdamage())}'
+            line += f'+d{str(side2.weapon.damage)}+{str(side2.weapon.perm_damage())}'
         if not side2.shield.empty and side2.armor.empty:
-            line += f', защита - d{str(side2.shield.protection)}+{str(side2.shield.permprotection())}'
+            line += f', защита - d{str(side2.shield.protection)}+{str(side2.shield.perm_protection())}'
         elif side2.shield.empty and not side2.armor.empty:
-            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.permprotection())}'
+            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.perm_protection())}'
         elif not side2.shield.empty and not side2.armor.empty:
-            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.permprotection())} + d{str(side2.shield.protection)}+{str(side2.shield.permprotection())}'
+            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.perm_protection())} + d{str(side2.shield.protection)}+{str(side2.shield.perm_protection())}'
         line += f', жизней - {str(side2.health)}.'
         message.append(line)
     else:
@@ -106,26 +106,26 @@ def readspells(classes):
 
 
 def readitems(what_kind, how_many, classes):
-    allItems = readfile('items', True, '\\')
-    itemsList = []
-    for i in allItems:
+    all_items = readfile('items', True, '\\')
+    items_list = []
+    for i in all_items:
         if i[0] == what_kind:
             item = classes[i[0]](i[1], i[2], i[3], i[4])
-            itemsList.append(item)
-    while len(itemsList) < how_many[what_kind]:
+            items_list.append(item)
+    while len(items_list) < how_many[what_kind]:
         new = classes[what_kind](0)
-        itemsList.append(new)
-    return itemsList
+        items_list.append(new)
+    return items_list
 
 
 def tprint(game, text, state=''):
     if state == 'off':
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
-        canUse = []
+        can_use = []
         for i in game.player.pockets:
-            if i.canUseInFight:
-                canUse.append(i)
+            if i.can_use_in_fight:
+                can_use.append(i)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
         item1 = types.KeyboardButton('ударить')
         item2 = types.KeyboardButton('')
@@ -133,7 +133,7 @@ def tprint(game, text, state=''):
         item5 = types.KeyboardButton('')
         if game.player.shield != '':
             item2 = types.KeyboardButton('защититься')
-        if len(canUse) > 0:
+        if len(can_use) > 0:
             item3 = types.KeyboardButton('использовать')
         item4 = types.KeyboardButton('бежать')
         if game.player.weapon != '' and game.player.second_weapon():

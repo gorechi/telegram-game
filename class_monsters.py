@@ -38,6 +38,7 @@ class Monster:
         self.hide = False
         self.run = False
         self.wounded = False
+        self.weakness = []
         self.key_hole = s_monster_see_through_keyhole
         if carry_weapon == 'False':
             self.carry_weapon = False
@@ -105,6 +106,22 @@ class Monster:
     def action(self):
         return randomitem(self.weapon.actions)
 
+    def get_weakness(self, weapons=None): # weapons - массив оружий, 0 или более элементов
+        if weapons:
+            weaknesses = []
+            for weapon in weapons:
+                element = weapon.element()
+                found = False
+                for w in self.weakness:
+                    if w[0] == element:
+                        weaknesses.append(w[1])
+                        found = True
+                if not found:
+                    weaknesses.append(1)
+            return weaknesses
+        else:
+            return self.weakness
+    
     def mele(self):
         room = self.game.new_castle.plan[self.current_position]
         if room.light:
