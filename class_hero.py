@@ -587,7 +587,8 @@ class Hero:
                 if self.fear >=s_fear_limit:
                     message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
                 else:
-                    message = new_castle.plan[self.directions_dict[what]].show_through_key_hole(self)
+                    what_position = room.position + self.directions_dict[what]
+                    message = new_castle.plan[what_position].show_through_key_hole(self)
                 tprint(game, message)
                 return True
         if not room.center.empty and (what == room.center.name or what == room.center.name1 or what == room.center.name[0]) and room.monster():
