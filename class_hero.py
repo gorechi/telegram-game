@@ -99,14 +99,21 @@ class Hero:
         self.command_dict = {'осмотреть': self.lookaround,
                             'идти': self.go,
                             'атаковать': self.fight,
+                            'напасть': self.fight,
                             'взять': self.take,
+                            'забрать': self.take,
+                            'подобрать': self.take,
                             'обыскать': self.search,
                             'открыть': self.open,
                             'использовать': self.use,
+                            'применить': self.use,
                             'читать': self.read,
+                            'прочитать': self.read,
                             'убрать': self.remove,
                             'чинить': self.repair,
+                            'починить': self.repair,
                             'отдохнуть': self.rest,
+                            'отдыхать': self.rest,
                             'улучшить': self.enchant}
 
     def __str__(self):
@@ -134,45 +141,49 @@ class Hero:
         else:
             c(full_command[1])
 
-    def rest(self):
-        return True
-    
-    def remove(self, what):
+    def rest(self, what=None):
+        game=self.game
+        room = game.new_castle.plan[self.current_position]
+        can_rest = room.can_rest()
         message = []
-        if self.shield != '':
-            if what.lower == 'щит' or what.lower == self.shield.name or what.lower == self.shield.name1:
-                item = self.shield
+        if len(can_rest) > 0:
+            message.append('В этой комнате нельзя отдыхать.')
+            message.append(randomitem(can_rest))
+            tprint(game, message)
+            return False
+        else:
+            return True
+    
+    def remove(self, what=None):
+        message = []
+        item = None
+        if not self.shield.empty and (what.lower == 'щит' or what.lower == self.shield.name or what.lower == self.shield.name1):
+            item = self.shield
         if not what:
-            message.append(self.name + ' оглядывается по сторонам, находит какой-то мусор и '
-                                       'закидывает его в самый темный угол комнаты.')
+            message.append(f'{self.name} оглядывается по сторонам, находит какой-то мусор и закидывает его в самый темный угол комнаты.')
         elif not item:
             message.append(f'{self.name} не понимает, как это можно убрать.')
-        elif item == '':
-            message.append('Эта вещь, возможно, уже убрана.')
         else:
             if isinstance(item, Shield):
                 shield = self.shield
                 self.removed_shield = shield
-                self.shield = ''
+                self.shield = self.game.no_shield
                 message.append(f'{self.name} убирает {shield.realname()[1]} за спину.')
         tprint(self.game, message)
-
+        return True
+        
     def repair(self, what=None):
         message = []
-        if self.shield != '':
-            if what.lower == 'щит' or what.lower == self.shield.name or what.lower == self.shield.name1:
+        if not self.shield.empty and (what.lower == 'щит' or what.lower == self.shield.name or what.lower == self.shield.name1):
                 item = self.shield
-        elif self.removed_shield != '':
-            if what.lower == 'щит' or what.lower == self.removed_shield.name or what.lower == self.removed_shield.name1:
+        elif not self.removed_shield.empty and (what.lower == 'щит' or what.lower == self.removed_shield.name or what.lower == self.removed_shield.name1):
                 item = self.removed_shield
         else:
             item = None
         if not what:
-            message.append(self.name + ' не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
+            message.append(f'{self.name} не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
         elif not item:
-            message.append(self.name + ' не умеет чинить такие штуки.')
-        elif item == '':
-            message.append(self.name + ' осматривает свой рюкзак и не находит такой штуки.')
+            message.append(f'{self.name} не умеет чинить такие штуки.')
         else:
             need_money = item.accumulated_damage * 10 // 1
             if need_money == 0:
@@ -184,6 +195,7 @@ class Hero:
             else:
                 message.append(f'{self.name} и рад бы починить {item.name1}, но ему не хватает денег на запчасти.')
         tprint(self.game, message)
+        return True
 
     def inpockets(self, item_type):
         """Функция возвращает список всех предметов определенного типа в рюкзаке героя
