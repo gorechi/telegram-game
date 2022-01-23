@@ -263,7 +263,7 @@ class Monster:
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush == '' and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
         if dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
@@ -346,7 +346,7 @@ class Plant(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush == '')]
+            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
             room = randomitem(empty_rooms, False)
         room.center = self
         self.current_position = room.position
@@ -389,7 +389,7 @@ class Berserk(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush == '')]
+            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
             room = randomitem(empty_rooms, False)
         room.center = self
         self.current_position = room.position
@@ -545,7 +545,7 @@ class Vampire(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.ambush == '' and not a.light and not a == old_place)]
+            empty_rooms = [a for a in castle.plan if (a.ambush.empty and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
         places_to_hide = []
         for i in room.furniture:

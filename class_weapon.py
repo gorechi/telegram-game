@@ -166,7 +166,7 @@ class Weapon:
             if monster.carry_weapon:
                 monster.give(self)
                 return True
-        elif room.ambush != '':
+        elif not room.ambush.empty:
             monster = room.ambush
             if monster.carry_weapon:
                 monster.give(self)

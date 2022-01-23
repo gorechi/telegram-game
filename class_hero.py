@@ -672,7 +672,7 @@ class Hero:
         enemy_in_room = False
         if isinstance(room.center, Monster):
             enemy_in_room = room.center
-        if room.ambush != '':
+        if not room.ambush.empty:
             enemy_in_ambush = room.ambush
         else:
             enemy_in_ambush = False
@@ -735,7 +735,7 @@ class Hero:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
             elif what_to_search.ambush:
                 room.center = what_to_search.ambush
-                what_to_search.ambush = False
+                what_to_search.ambush = game.empty_thing
                 enemy_in_room = room.center
                 message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}')
                 if enemy_in_room.frightening:
