@@ -1,10 +1,11 @@
 from functions import howmany, tprint
-from settings import *
+from settings import s_money_groups
 
 class Loot:
     def __init__(self, game):
         self.game = game
         self.pile = []
+        self.empty = False
 
     def __str__(self):
         return 'loot'
@@ -21,16 +22,16 @@ class Money:
         self.game = game
         self.how_much_money = how_much_money
         self.empty = False
-        if 0 < self.how_much_money <= money_groups[0]:
+        if 0 < self.how_much_money <= s_money_groups[0]:
             self.name = 'Несколько монет'
             self.name1 = 'Несколько монет'
-        elif money_groups[0] < self.how_much_money <= money_groups[1]:
+        elif s_money_groups[0] < self.how_much_money <= s_money_groups[1]:
             self.name = 'Кучка монет'
             self.name1 = 'Кучку монет'
-        elif money_groups[1] < self.how_much_money <= money_groups[2]:
+        elif s_money_groups[1] < self.how_much_money <= s_money_groups[2]:
             self.name = 'Груда монет'
             self.name1 = 'Груду монет'
-        elif money_groups[2] < self.how_much_money:
+        elif s_money_groups[2] < self.how_much_money:
             self.name = 'Много монет'
             self.name1 = 'Много монет'
 
