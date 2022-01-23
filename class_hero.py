@@ -945,6 +945,7 @@ class Hero:
         """
         game = self.game
         rune_list = self.inpockets(Rune)
+        game.selected_item = game.empty_thing
         if len(rune_list) == 0:
             tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
             return False
@@ -972,10 +973,7 @@ class Hero:
                 else:
                     tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
                     return False
-        if game.selected_item != '' and \
-                (isinstance(game.selected_item, Weapon) or
-                 isinstance(game.selected_item, Shield) or
-                 isinstance(game.selected_item, Armor)):
+        if isinstance(game.selected_item, Weapon) or isinstance(game.selected_item, Shield) or isinstance(game.selected_item, Armor):
             text = []
             text.append(f'{self.name} может использовать следующие руны:')
             for rune in rune_list:
