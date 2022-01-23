@@ -70,7 +70,7 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, doors, center='', loot=''):
+    def __init__(self, game, doors, center=None, loot=None):
         self.game = game
         self.doors = doors
         a = dice(0, len(decor1) - 1)
@@ -82,12 +82,12 @@ class Room:
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
-        if center == '':
+        if center == '' or not center:
             self.center = self.game.empty_thing
         else:
             self.center = center
         self.money = 0
-        if loot == '':
+        if loot == '' or not loot:
             self.loot = self.game.empty_thing
         else:
             self.loot = loot
@@ -115,9 +115,23 @@ class Room:
                 self.secret_word = i
 
     def can_rest(self):
+        """Функция проверяет, можно ли отдыхать в комнате.
+
+        Returns: 
+            list:
+            Если в комнате по какой-то причине нельзя отдыхать, возвращается массив строк с причиной.\n
+            Если в комнате можно отдыхать, возвращается пустой массив.
+        """
+        message = []
         if not self.rest_place:
-            return False
-        return True
+            message.append('В комнате нет места для отдыха.')
+        if not self.center.empty:
+            message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
+        if self.stink > 0:
+            message.append('В комнате слишком сильно воняет чтобы уснуть.')
+        if not self.light:
+            message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
+        return message
     
     def show(self, player):
         game = self.game
