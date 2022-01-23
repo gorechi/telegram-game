@@ -29,6 +29,10 @@ classes = { 'монстр': Monster,
             }
 
 
+class Empty():
+    def __init__(self):
+        self.empty = True
+
 class Game():
     def __init__(self, chat_id, bot, how_many=0, hero=None):
         self.state = 0
@@ -41,6 +45,7 @@ class Game():
         self.game_is_on = False
         self.chat_id = chat_id
         self.bot = bot
+        self.empty_thing = Empty()
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
