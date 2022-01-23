@@ -209,18 +209,26 @@ class Monster:
             where.center = game.empty_thing
         else:
             self.wounded = True
-            alive_string = f'{self.name} остается в живых и '
+            if where.light:
+                name = self.name
+                lost_weapon = f'На пол падает {self.weapon.name}. '
+                lost_shield = f'На пол падает {self.shield.name}. '
+            else:
+                name = 'Противник'
+                lost_weapon = 'Слышно, что какое-то оружие ударилось об пол комнаты. '
+                lost_shield = 'В темноте можно услышать, что что-то большое упало в углу. '
+            alive_string = f'{name} остается в живых и '
             weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
             ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
             if result < 10:
                 if result == 6:
                     alive_string += 'получает легкое ранение в руку. '
                     if not self.weapon.empty:
-                        alive_string += f'На пол падает {self.weapon.name}. '
+                        alive_string += lost_weapon
                         where.loot.pile.append(self.weapon)
                         self.weapon = self.game.no_weapon
                     elif not self.shield.empty:
-                        alive_string += f'На пол падает {self.shield.neme}. '
+                        alive_string += lost_shield
                         where.loot.pile.append(self.shield)
                         self.shield = self.game.no_shield
                 elif result == 7:
@@ -241,11 +249,11 @@ class Monster:
                     self.stren -= weakness_amount
                     self.health = self.start_health + ill_amount
                 if self.place(new_castle, old_place = where):
-                    alive_string += f'{self.name} убегает из комнаты.'
+                    alive_string += f'{name} убегает из комнаты.'
                     tprint(game, alive_string)
                     where.center = game.empty_thing
                 else:
-                    alive_string += f'Пытаясь убежать {self.name} на всей скорости врезается в стену и умирает.'
+                    alive_string += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
                     tprint(game, alive_string)
                     where.center = game.empty_thing
             else:
