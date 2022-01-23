@@ -283,8 +283,7 @@ class Hero:
         room.visited = '+'
         game.state = 0
         self.lookaround()
-        if room.center != '':
-            if room.center.agressive and room.light:
+        if isinstance(room.center, Monster) and room.center.agressive and room.light:
                 self.fight(room.center, True)
                 return False
         return f'{self.name} еле стоит на ногах.'
@@ -568,7 +567,7 @@ class Hero:
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():
-            if new_castle.plan[self.current_position].doors[self.doors_dict[what]] == 0:
+            if room.doors[self.doors_dict[what]] == 0:
                 tprint(game, f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.')
                 return True
             else:
@@ -578,12 +577,9 @@ class Hero:
                     message = new_castle.plan[self.directions_dict[what]].show_through_key_hole(self)
                 tprint(game, message)
                 return True
-        if new_castle.plan[self.current_position].center != '':
-            if (what == new_castle.plan[self.current_position].center.name or what == new_castle.plan[
-                self.current_position].center.name1 or what == new_castle.plan[self.current_position].center.name[0]) and \
-                    new_castle.plan[self.current_position].monster():
-                tprint(game, showsides(self, new_castle.plan[self.current_position].center, new_castle))
-                return True
+        if not room.center.empty and (what == room.center.name or what == room.center.name1 or what == room.center.name[0]) and room.monster():
+            tprint(game, showsides(self, room.center, new_castle))
+            return True
         if not self.weapon.empty and (what == self.weapon.name or what == self.weapon.name1 or what == 'оружие'):
             tprint(game, self.weapon.show())
             return True
@@ -674,10 +670,9 @@ class Hero:
         room = new_castle.plan[self.current_position]
         message = []
         enemy_in_room = False
-        if room.center != '':
-            if isinstance(room.center, Monster):
-                enemy_in_room = room.center
-        if room.ambush != '':
+        if isinstance(room.center, Monster):
+            enemy_in_room = room.center
+        if not room.ambush.empty:
             enemy_in_ambush = room.ambush
         else:
             enemy_in_ambush = False
@@ -692,7 +687,7 @@ class Hero:
         if not item:
             if enemy_in_ambush:
                 room.center = enemy_in_ambush
-                room.ambush = ''
+                room.ambush = game.empty_thing
                 enemy_in_ambush = False
                 enemy_in_room = room.center
                 message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}.')
@@ -704,7 +699,7 @@ class Hero:
                 return True
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
-            if room.loot != '' and len(room.loot.pile) > 0:
+            if not room.loot.empty and len(room.loot.pile) > 0:
                 message.append('В комнате есть:')
                 for i in room.loot.pile:
                     message.append(i.name)
@@ -740,7 +735,7 @@ class Hero:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
             elif what_to_search.ambush:
                 room.center = what_to_search.ambush
-                what_to_search.ambush = False
+                what_to_search.ambush = game.empty_thing
                 enemy_in_room = room.center
                 message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}')
                 if enemy_in_room.frightening:
@@ -776,7 +771,7 @@ class Hero:
         for i in current_loot.pile:
             print(i.name)
         print("+" * 40)
-        if current_loot == '':
+        if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
         elif item == 'все' or item == 'всё' or item == '':
@@ -945,6 +940,7 @@ class Hero:
         """
         game = self.game
         rune_list = self.inpockets(Rune)
+        game.selected_item = game.empty_thing
         if len(rune_list) == 0:
             tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
             return False
@@ -972,10 +968,7 @@ class Hero:
                 else:
                     tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
                     return False
-        if game.selected_item != '' and \
-                (isinstance(game.selected_item, Weapon) or
-                 isinstance(game.selected_item, Shield) or
-                 isinstance(game.selected_item, Armor)):
+        if isinstance(game.selected_item, Weapon) or isinstance(game.selected_item, Shield) or isinstance(game.selected_item, Armor):
             text = []
             text.append(f'{self.name} может использовать следующие руны:')
             for rune in rune_list:

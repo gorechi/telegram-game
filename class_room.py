@@ -15,7 +15,7 @@ class Furniture:
     def __init__(self, game, name=''):
         self.game = game
         new_loot = Loot(self.game)
-        self.ambush = False
+        self.ambush = self.game.empty_thing
         self.loot = new_loot
         self.locked = False
         self.lockable = False
@@ -40,7 +40,7 @@ class Furniture:
     def show(self):
         message = []
         message.append(self.where + ' ' + self.state + ' ' + self.name + '.')
-        if self.can_hide and self.ambush:
+        if self.can_hide and not self.ambush.empty:
             message.append('Внутри слышится какая-то возня.')
         return message
 
@@ -70,7 +70,7 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, doors, center='', loot=''):
+    def __init__(self, game, doors, center=None, loot=None):
         self.game = game
         self.doors = doors
         a = dice(0, len(decor1) - 1)
@@ -82,15 +82,21 @@ class Room:
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
-        self.center = center
+        if center == '' or not center:
+            self.center = self.game.empty_thing
+        else:
+            self.center = center
         self.money = 0
-        self.loot = loot
+        if loot == '' or not loot:
+            self.loot = self.game.empty_thing
+        else:
+            self.loot = loot
         self.secret_loot = Loot(self.game)
         self.locked = False
         self.position = -1
         self.visited = ' '
-        self.ambush = ''
-        self.rune_place = ''
+        self.ambush = self.game.empty_thing
+        self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
         self.rest_place = None
@@ -109,9 +115,23 @@ class Room:
                 self.secret_word = i
 
     def can_rest(self):
+        """Функция проверяет, можно ли отдыхать в комнате.
+
+        Returns: 
+            list:
+            Если в комнате по какой-то причине нельзя отдыхать, возвращается массив строк с причиной.\n
+            Если в комнате можно отдыхать, возвращается пустой массив.
+        """
+        message = []
         if not self.rest_place:
-            return False
-        return True
+            message.append('В комнате нет места для отдыха.')
+        if not self.center.empty:
+            message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
+        if self.stink > 0:
+            message.append('В комнате слишком сильно воняет чтобы уснуть.')
+        if not self.light:
+            message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
+        return message
     
     def show(self, player):
         game = self.game
@@ -120,7 +140,7 @@ class Room:
         if self.light:
             if self.torch:
                 self.decoration1 = f'освещенную факелом {self.decoration1}'
-            if self.center == '':
+            if self.center.empty:
                 who_is_here = 'Не видно ничего интересного.'
             else:
                 who_is_here = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
@@ -143,7 +163,7 @@ class Room:
 
     def show_through_key_hole(self, who):
         message = []
-        if self.center == '':
+        if self.center.empty:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
             message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.key_hole}')
@@ -159,20 +179,14 @@ class Room:
         return types
 
     def monster(self):
-        if self.center != '':
-            if isinstance(self.center, Monster):
-                return self.center
-            else:
-                return False
+        if isinstance(self.center, Monster):
+            return self.center
         else:
             return False
 
     def monster_in_ambush(self):
-        if self.ambush != '':
-            if isinstance(self.ambush, Monster):
-                return self.ambush
-            else:
-                return False
+        if isinstance(self.ambush, Monster):
+            return self.ambush
         else:
             return False
 
@@ -183,7 +197,7 @@ class Room:
         string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
         string2 = '║   ║'
         string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
-        if self.center != '':
+        if not self.center.empty:
             string3 += self.center.name[0]
         else:
             string3 += ' '

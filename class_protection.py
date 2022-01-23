@@ -144,7 +144,7 @@ class Armor(Protection):
             if monster.wear_armor:
                 monster.give(self)
                 return True
-        elif room.ambush != '':
+        elif not room.ambush.empty:
             monster = room.ambush
             if monster.wear_armor:
                 monster.give(self)
@@ -235,7 +235,7 @@ class Shield (Protection):
             if monster.carry_shield:
                 monster.give(self)
                 return True
-        elif room.ambush != '':
+        elif not room.ambush.empty:
             monster = room.ambush
             if monster.carry_shield:
                 monster.give(self)

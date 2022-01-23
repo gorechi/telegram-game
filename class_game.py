@@ -29,15 +29,22 @@ classes = { 'монстр': Monster,
             }
 
 
+class Empty():
+    def __init__(self):
+        self.empty = True
+        self.frightening = False
+        self.agressive = False
+
 class Game():
     def __init__(self, chat_id, bot, how_many=0, hero=None):
+        self.empty_thing = Empty()
         self.state = 0
         # state - текущее состояние игры.
         # 0 - обычное состояние. Персонаж ходит, исследует и т.п.
         # 1 - происходит бой
         # 2 - персонаж что-то улучшает
         # 3 - персонаж поднимает уровень
-        self.selected_item = ''
+        self.selected_item = self.empty_thing
         self.game_is_on = False
         self.chat_id = chat_id
         self.bot = bot

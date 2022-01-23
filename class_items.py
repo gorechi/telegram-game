@@ -13,6 +13,7 @@ class Item:
         self.name1 = 'штуку'
         self.can_use_in_fight = False
         self.description = self.name
+        self.empty = False
 
     def __str__(self):
         return self.name
@@ -41,6 +42,7 @@ class Rune:
         self.name = 'руна'
         self.name1 = 'руну'
         self.description = self.name + ' ' + s_elements_dictionary[self.element]
+        self.empty = False
 
     def __str__(self):
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
@@ -93,6 +95,7 @@ class Spell:
         self.actions = actions
         self.max_damage = max_damage
         self.min_damage = min_damage
+        self.empty = False
 
     def __str__(self):
         return self.name
@@ -112,6 +115,7 @@ class Matches():
         self.name1 = 'спички'
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
+        self.empty = False
 
     def show(self):
         return self.description
@@ -152,17 +156,14 @@ class Matches():
             room.light = True
             room.torch = True
             message = [f'{who_is_using.name} зажигает факел и комната озаряется светом']
-            if room.center != '':
-                if room.center.frightening:
+            if not room.center.empty and room.center.frightening:
                     message.append(f'{who_is_using.name} замирает от ужаса глядя на чудовище перед собой.')
                     who_is_using.fear += 1
             tprint(game, message)
             room.show(who_is_using)
             room.map()
-            if room.center != '':
-                if room.center.agressive:
+            if not room.center.empty and room.center.agressive:
                     player.fight(room.center, True)
-
 
 class Map():
     def __init__(self, game):
@@ -170,6 +171,7 @@ class Map():
         self.can_use_in_fight = False
         self.name = 'карта'
         self.name1 = 'карту'
+        self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
     def place(self, castle, room_to_place=None):
@@ -222,6 +224,7 @@ class Key():
         self.name = 'ключ'
         self.name1 = 'ключ'
         self.description = 'Ключ, пригодный для дверей и сундуков'
+        self.empty = False
 
     def __str__(self):
         return self.description
@@ -259,6 +262,7 @@ class Potion():
     def __init__(self, game, name='', effect=0, type=0, can_use_in_fight=True):
         self.game = game
         self.name = name
+        self.empty = False
         if self.name != 0:
             self.name = name
             self.name1 = self.name
@@ -364,6 +368,7 @@ class Book():
     def __init__(self, game, name=None):
         self.game = game
         self.name = name
+        self.empty = False
 
     def on_create(self):
         self.type = dice(0, 2)
