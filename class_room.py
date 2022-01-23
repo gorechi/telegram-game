@@ -23,7 +23,8 @@ class Furniture:
         self.can_contain_weapon = True
         self.can_hide = False
         self.name = name
-        self.empty = 'пусто'
+        self.empty = False
+        self.empty_text = 'пусто'
         self.state = 'стоит'
         self.where = 'в углу'
         self.name1 = 'мебель'

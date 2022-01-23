@@ -145,6 +145,7 @@ class Hero:
         game=self.game
         room = game.new_castle.plan[self.current_position]
         can_rest = room.can_rest()
+        print(can_rest)
         message = []
         if len(can_rest) > 0:
             message.append('В этой комнате нельзя отдыхать.')
@@ -333,7 +334,7 @@ class Hero:
                     weapon_attack = weapon_attack * 2
                     damage_text = ' критического урона. '
                 string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name} и наносит' \
-                          f' {str(mele_attack)} + {howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
+                          f' {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
             else:
                 weapon_attack = 0
                 string1 = f'{self.name} бьет {target_name1} не используя оружие и ' \
@@ -430,7 +431,7 @@ class Hero:
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         if not self.weapon.empty:
             weapon_text = f'{self.weapon.real_name()[0]} в руке героя добавляет к его силе ' \
-                          f'{str(self.weapon.damage)} + {str(self.weapon.perm_damage())}.'
+                          f'{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
         message.append(weapon_text)
@@ -745,7 +746,7 @@ class Hero:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
-            elif what_to_search.ambush:
+            elif not what_to_search.ambush.empty:
                 room.center = what_to_search.ambush
                 what_to_search.ambush = game.empty_thing
                 enemy_in_room = room.center
@@ -764,7 +765,7 @@ class Hero:
                 if len(what_to_search.loot.pile) > 0:
                     message.append('Все, что было спрятано, теперь лежит на виду.')
             elif len(what_to_search.loot.pile) == 0:
-                message.append(what_to_search.name + ' ' + what_to_search.empty)
+                message.append(what_to_search.name + ' ' + what_to_search.empty_text)
             tprint(game, message)
             return True
 

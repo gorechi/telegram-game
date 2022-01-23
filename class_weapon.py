@@ -131,7 +131,7 @@ class Weapon:
             name = self.twohanded_dict[self.gender] + ' ' + self.name
         else:
             name = self.name + self.enchantment()
-        return f'{name} ({damage_string})'
+        return f'{name} ({damage_string}), {self.type}'
 
     def use(self, who_using, in_action=False):
         game = self.game
