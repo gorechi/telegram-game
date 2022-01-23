@@ -32,6 +32,8 @@ classes = { 'монстр': Monster,
 class Empty():
     def __init__(self):
         self.empty = True
+        self.frightening = False
+        self.agressive = False
 
 class Game():
     def __init__(self, chat_id, bot, how_many=0, hero=None):

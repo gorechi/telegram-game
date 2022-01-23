@@ -20,6 +20,7 @@ class Money:
     def __init__(self, game, how_much_money):
         self.game = game
         self.how_much_money = how_much_money
+        self.empty = False
         if 0 < self.how_much_money <= money_groups[0]:
             self.name = 'Несколько монет'
             self.name1 = 'Несколько монет'

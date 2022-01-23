@@ -82,7 +82,10 @@ class Room:
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
-        self.center = center
+        if center == '':
+            self.center = self.game.empty_thing
+        else:
+            self.center = center
         self.money = 0
         self.loot = loot
         self.secret_loot = Loot(self.game)
@@ -120,7 +123,7 @@ class Room:
         if self.light:
             if self.torch:
                 self.decoration1 = f'освещенную факелом {self.decoration1}'
-            if self.center == '':
+            if self.center.empty:
                 who_is_here = 'Не видно ничего интересного.'
             else:
                 who_is_here = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
@@ -143,7 +146,7 @@ class Room:
 
     def show_through_key_hole(self, who):
         message = []
-        if self.center == '':
+        if self.center.empty:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
             message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.key_hole}')
@@ -159,11 +162,8 @@ class Room:
         return types
 
     def monster(self):
-        if self.center != '':
-            if isinstance(self.center, Monster):
-                return self.center
-            else:
-                return False
+        if isinstance(self.center, Monster):
+            return self.center
         else:
             return False
 
@@ -183,7 +183,7 @@ class Room:
         string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
         string2 = '║   ║'
         string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
-        if self.center != '':
+        if not self.center.empty:
             string3 += self.center.name[0]
         else:
             string3 += ' '

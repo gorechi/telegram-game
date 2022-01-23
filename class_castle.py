@@ -96,7 +96,7 @@ class Castle:
                 if a != self.plan[0]:
                     new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
                     a.lock(2)
-                    if a.center == '':
+                    if a.center.empty:
                         a.loot.pile.append(new_money)
                     else:
                         a.center.loot.pile.append(new_money)
