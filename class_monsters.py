@@ -192,9 +192,9 @@ class Monster:
         new_castle = self.game.new_castle
         result = dice(1, 10)
         where = new_castle.plan[self.current_position]
-        if where.loot == '':
-            b = Loot(game)
-            where.loot = b
+        if where.loot.empty:
+            new_loot = Loot(game)
+            where.loot = new_loot
         if result < 6 or self.wounded:
             if self.money > 0:
                 a = Money(game, self.money)
@@ -333,9 +333,9 @@ class Plant(Monster):
         game = self.game
         new_castle = game.new_castle
         where = new_castle.plan[self.current_position]
-        if where.loot == '':
-            b = Loot()
-            where.loot = b
+        if where.loot.empty:
+            new_loot = Loot()
+            where.loot = new_loot
         if self.money > 0:
             a = Money(game, self.money)
             where.loot.pile.append(a)
@@ -449,9 +449,9 @@ class Shapeshifter(Monster):
     def lose(self, winner=None):
         game = self.game
         where = self.game.new_castle.plan[self.current_position]
-        if where.loot == '':
-            b = Loot(self.game)
-            where.loot = b
+        if where.loot.empty:
+            new_loot = Loot(self.game)
+            where.loot = new_loot
         if self.money > 0:
             a = Money(self.game, self.money)
             where.loot.pile.append(a)

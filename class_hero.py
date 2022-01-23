@@ -699,7 +699,7 @@ class Hero:
                 return True
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
-            if room.loot != '' and len(room.loot.pile) > 0:
+            if not room.loot.empty and len(room.loot.pile) > 0:
                 message.append('В комнате есть:')
                 for i in room.loot.pile:
                     message.append(i.name)
@@ -771,7 +771,7 @@ class Hero:
         for i in current_loot.pile:
             print(i.name)
         print("+" * 40)
-        if current_loot == '':
+        if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
         elif item == 'все' or item == 'всё' or item == '':

@@ -87,13 +87,16 @@ class Room:
         else:
             self.center = center
         self.money = 0
-        self.loot = loot
+        if loot == '':
+            self.loot = self.game.empty_thing
+        else:
+            self.loot = loot
         self.secret_loot = Loot(self.game)
         self.locked = False
         self.position = -1
         self.visited = ' '
         self.ambush = self.game.empty_thing
-        self.rune_place = ''
+        self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
         self.rest_place = None
