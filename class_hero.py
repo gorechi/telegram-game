@@ -4,6 +4,7 @@ from class_weapon import Weapon
 from class_protection import Shield, Armor
 from class_monsters import Monster
 from random import randint as dice
+from settings import *
 
 
 class Hero:
@@ -105,6 +106,7 @@ class Hero:
                             'читать': self.read,
                             'убрать': self.remove,
                             'чинить': self.repair,
+                            'отдохнуть': self.rest,
                             'улучшить': self.enchant}
 
     def __str__(self):
@@ -132,6 +134,9 @@ class Hero:
         else:
             c(full_command[1])
 
+    def rest(self):
+        return True
+    
     def remove(self, what):
         message = []
         if self.shield != '':
@@ -181,6 +186,14 @@ class Hero:
         tprint(self.game, message)
 
     def inpockets(self, item_type):
+        """Функция возвращает список всех предметов определенного типа в рюкзаке героя
+
+        Args:
+            item_type (class): Класс предмета, который нужно найти (Например - Potion)
+
+        Returns:
+            list: Список всех найденных предметов
+        """
         item_list = []
         for item in self.pockets:
             if isinstance(item, item_type):
@@ -188,21 +201,48 @@ class Hero:
         return item_list
 
     def action(self):
+        """Функция возвращает случайное действие, которое герой может сделать оружием, которое держит в руках
+
+        Returns:
+            string: Строка действия. Например - "бьет".
+        """
         return randomitem(self.weapon.actions)
 
     def second_weapon(self):
+        """Функция ищет в рюкзаке героя оружие. 
+        Если оружие найдено, функция возвращает его. Если оружие не найдено, возвращается объект "Пустое оружие".
+
+        Returns:
+            Weapon object: Объект класса Weapon
+        """
         for i in self.pockets:
             if isinstance(i, Weapon):
                 return i
-        return False
+        return self.game.no_weapon
 
     def run_away(self, target):
+        """Функция "Убежать". Запускается когда герой сбегает из боя.
+
+        Args:
+            target (object Monster): Монстр, от которого убегает герой
+
+        Returns:
+            boolean: Возвращает False если по какой-то причине герой не смог сбежать
+        """
         game = self.game
         room = game.new_castle.plan[self.current_position]
         if room.light:
-            tprint(game, f'{self.name} сбегает с поля боя.')
+            if target.frightening:
+                tprint(game, f'{self.name} в ужасе сбегает с поля боя.')
+                self.fear += 1
+            else:
+                tprint(game, f'{self.name} сбегает с поля боя.')
         else:
-            tprint(game, f'{self.name} в кромешной тьме пытается убежать хоть куда-нибудь.')
+            if target.frightening:
+                tprint(game, f'{self.name} в кромешной тьме закрыв глаза от ужаса пытается убежать хоть куда-нибудь.')
+                self.fear += 1
+            else:
+                tprint(game, f'{self.name} в кромешной тьме пытается убежать хоть куда-нибудь.')
         a = dice(1, 2)
         if a == 1 and not self.weapon.empty:
             tprint(game, f'Убегая {self.name} роняет из рук {self.weapon.name1}')
@@ -246,6 +286,7 @@ class Hero:
         if room.center != '':
             if room.center.agressive and room.light:
                 self.fight(room.center, True)
+                return False
         return f'{self.name} еле стоит на ногах.'
 
     def attack(self, target, action):
@@ -274,7 +315,7 @@ class Hero:
             self.rage = 0
             self.hide = False
             if not self.weapon.empty:
-                weapon_attack = self.weapon.attack()
+                weapon_attack = self.weapon.attack(target)
                 critical_probability = self.weapon_mastery[self.weapon.type] * 5
                 damage_text = ' урона. '
                 if dice(1, 100) <= critical_probability:
@@ -364,6 +405,8 @@ class Hero:
             return f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.'
 
     def show(self):
+        """Функция генерирует и выводит на экран описание персонажа
+        """
         message = []
         if self.money.how_much_money > 1:
             money_text = f'В кошельке звенят {howmany(self.money.how_much_money, "монета,монеты,монет")}.'
@@ -415,6 +458,14 @@ class Hero:
         tprint(self.game, message)
 
     def defence(self, attacker):
+        """Функция рассчитывает сумму защиты героя против атаки монстра
+
+        Args:
+            attacker (object, class Monster, обязательный): Объект атакующего монстра
+
+        Returns:
+            integer: Значение защиты с учетом доспехов и щита.
+        """
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
@@ -431,7 +482,12 @@ class Hero:
             result += self.armor.protect(attacker)
         return result
 
-    def lose(self, winner):
+    def lose(self, winner=None):
+        """Функция сбрасывает состояние героя при его проигрыше в бою
+
+        Args:
+            winner (object, class Monster, optional): Объект атакующего монстра. Defaults to None.
+        """
         self.health = self.start_health
         self.stren = self.start_stren
         self.dext = self.start_dext
@@ -450,6 +506,9 @@ class Hero:
             self.levelup()
 
     def levelup(self):
+        """Функция вызывается если герой получает новый уровень.
+        Функция переводит игру в режим прокачки и выводит на экран инструкцию по прокачке.
+        """
         self.game.state = 3
         level_up_message = []
         level_up_message.append(f'{self.name} получает новый уровень!')
@@ -459,6 +518,17 @@ class Hero:
         return True
 
     def game_over(self, goal_type, goal=None):
+        """Функция производит проверку на выполнение условия окончания игры.
+
+        Args:
+            goal_type (string): Тип завершения игры. Сейчас поддерживаются следующие типы:
+                                - 'killall': игра завершается если в замке убиты все монстры\n
+            goal (string, optional): Вспомогательный параметр для типа завершения игры. Defaults to None.
+
+        Returns:
+            boolean:    True - если условие завершения игры выполнено
+                        False - если условие завершение игры не выполнено
+        """
         if goal_type == 'killall':
             if self.game.new_castle.monsters() == 0:
                 tprint(self.game, f'{self.name} убил всех монстров в замке и выиграл в этой игре!')
@@ -467,17 +537,19 @@ class Hero:
                 return False
         return False
 
-    def lookaround(self, a=''):
+    def lookaround(self, what=None):
         game = self.game
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         furniture_list = room.furniture
-        if a == '':
+        if not what:
             room.show(game.player)
             room.map()
-        elif a == 'себя':
+            return True
+        elif what == 'себя':
             self.show()
-        elif a == 'рюкзак':
+            return True
+        elif what == 'рюкзак':
             text = []
             if len(self.pockets) == 0 and self.money.howmuchmoney == 0:
                 text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
@@ -494,33 +566,44 @@ class Hero:
             if not self.removed_shield.empty:
                 text.append(f'За спиной у героя висит {self.removed_shield.realname()[0]}')
             tprint(game, text)
-        elif a in self.directions_dict.keys():
-            if new_castle.plan[self.current_position].doors[self.doors_dict[a]] == 0:
+            return True
+        elif what in self.directions_dict.keys():
+            if new_castle.plan[self.current_position].doors[self.doors_dict[what]] == 0:
                 tprint(game, f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.')
+                return True
             else:
-                tprint(game, new_castle.plan[self.directions_dict[a]].show_through_key_hole(self))
+                if self.fear >=s_fear_limit:
+                    message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
+                else:
+                    message = new_castle.plan[self.directions_dict[what]].show_through_key_hole(self)
+                tprint(game, message)
+                return True
         if new_castle.plan[self.current_position].center != '':
-            if (a == new_castle.plan[self.current_position].center.name or a == new_castle.plan[
-                self.current_position].center.name1 or a == new_castle.plan[self.current_position].center.name[0]) and \
+            if (what == new_castle.plan[self.current_position].center.name or what == new_castle.plan[
+                self.current_position].center.name1 or what == new_castle.plan[self.current_position].center.name[0]) and \
                     new_castle.plan[self.current_position].monster():
                 tprint(game, showsides(self, new_castle.plan[self.current_position].center, new_castle))
-        if not self.weapon.empty and (a == self.weapon.name or a == self.weapon.name1 or a == 'оружие'):
+                return True
+        if not self.weapon.empty and (what == self.weapon.name or what == self.weapon.name1 or what == 'оружие'):
             tprint(game, self.weapon.show())
-        if not self.shield.empty and (a == self.shield.name or a == self.shield.name1 or a == 'защиту'):
+            return True
+        if not self.shield.empty and (what == self.shield.name or what == self.shield.name1 or what == 'защиту'):
             tprint(game, self.shield.show())
+            return True
         if len(furniture_list) > 0:
             text = []
             for i in furniture_list:
-                if i.name1 == a:
+                if i.name1 == what:
                     text.extend(i.show())
             if len(text) > 0:
                 tprint(game, text)
         if len(self.pockets) > 0:
             text = []
             for i in self.pockets:
-                if a == i.name or a == i.name1:
+                if what == i.name or what == i.name1:
                     text.append(i.show())
             tprint(game, text)
+        return True
 
     def go(self, direction):
         game = self.game
@@ -606,19 +689,19 @@ class Hero:
             message.append(f'{enemy_in_room.name} мешает толком осмотреть комнату.')
             tprint(game, message)
             return True
-        if enemy_in_ambush and not item:
-            room.center = enemy_in_ambush
-            room.ambush = ''
-            enemy_in_ambush = False
-            enemy_in_room = room.center
-            message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}.')
-            if enemy_in_room.frightening:
-                message.append(f'{enemy_in_room} очень страшный и {self.name} пугается до икоты.')
-                self.fear += 1
-            tprint(game, message)
-            self.fight(enemy_in_room.name, True)
-            return True
         if not item:
+            if enemy_in_ambush:
+                room.center = enemy_in_ambush
+                room.ambush = ''
+                enemy_in_ambush = False
+                enemy_in_room = room.center
+                message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}.')
+                if enemy_in_room.frightening:
+                    message.append(f'{enemy_in_room} очень страшный и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(enemy_in_room.name, True)
+                return True
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             if room.loot != '' and len(room.loot.pile) > 0:
@@ -630,6 +713,10 @@ class Hero:
             tprint(game, message)
             return True
         else:
+            if self.fear >= s_fear_limit:
+                message = f'{self.name} не хочет заглядывать в неизвестные места. Страх сковал героя по рукам и ногам.'
+                tprint(game, message)
+                return True
             if room.secret_word.lower() == item.lower():
                 if len(room.secret_loot.pile) == 0:
                     message.append(f'{self.name} осматривает {item} и ничего не находит.')
@@ -731,6 +818,10 @@ class Hero:
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         key = False
+        if self.fear >= s_fear_limit:
+            message = [f'{self.name} Не может ничего сделать из-за того, что руки дрожат от страха.']
+            tprint(game, message)
+            return False
         for i in self.pockets:
             if isinstance(i, Key):
                 key = i
@@ -843,13 +934,25 @@ class Hero:
             tprint(game, f'{self.name} не нашел такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
+        """Функция улучшения вещей рунами.
+
+        Args:
+            item (str, optional): Наименование предмета, который нужно улучшить.\n
+            Поддерживаются следующие значения: \n
+            - 'оружие'\n
+            - 'щит'\n
+            - 'доспех' или 'доспехи'
+        """
         game = self.game
         rune_list = self.inpockets(Rune)
         if len(rune_list) == 0:
-            tprint(game, f'{self.name} не может ничего улучшать. В карманах не нашлось ни одной руны.')
+            tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
             return False
         if item == '':
             tprint(game, f'{self.name} не понимает, что ему надо улучшить.')
+            return False
+        if self.fear >= s_fear_limit:
+            tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, но ничего не получается.')
             return False
         elif item == 'оружие' and not self.weapon.empty:
             game.selected_item = self.weapon
@@ -867,7 +970,7 @@ class Hero:
                 if i.name.lower() == item.lower() or i.name1.lower() == item.lower():
                     game.selected_item = i
                 else:
-                    tprint(game, f'{self.name} не нашел такой вещи у себя в карманах.')
+                    tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
                     return False
         if game.selected_item != '' and \
                 (isinstance(game.selected_item, Weapon) or
@@ -886,6 +989,10 @@ class Hero:
             return False
 
     def read(self, what):
+        if self.fear >= s_fear_limit:
+            message = f'{self.name} не может читать - от страха буквы плывут перед глазами.'
+            tprint(self.game, message)
+            return False
         books = []
         message = []
         for i in self.pockets:

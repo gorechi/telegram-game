@@ -93,6 +93,7 @@ class Room:
         self.rune_place = ''
         self.light = True
         self.morgue = None
+        self.rest_place = None
         self.monsters = []
         self.furniture = []
         self.stink = 0
@@ -107,6 +108,11 @@ class Room:
             if self.description.find(i) > -1:
                 self.secret_word = i
 
+    def can_rest(self):
+        if not self.rest_place:
+            return False
+        return True
+    
     def show(self, player):
         game = self.game
         if self.stink > 0:

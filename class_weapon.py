@@ -1,6 +1,7 @@
 from functions import randomitem, tprint
 from settings import *
 from random import randint as dice
+from math import ceil
 class Weapon:
     def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
         self.game = game
@@ -10,24 +11,8 @@ class Weapon:
             self.name1 = name1
             self.twohanded = False
         else:
-            n1 = [[['Большой', 'Большой'], ['Большая', 'Большую'], ['Большое', 'Большое']],
-                       [['Малый', 'Малый'], ['Малая', 'Малую'], ['Малое', 'Малое']],
-                       [['Старый', 'Старый'], ['Старая', 'Старую'], ['Старое', 'Старое']],
-                       [['Тяжелый', 'Тяжелый'], ['Тяжелая', 'Тяжелую'], ['Тяжелое', 'Тяжелое']],
-                       [['Новый', 'Новый'], ['Новая', 'Новую'], ['Новое', 'Новое']]]
-            n2 = [['меч', 0, 'меч', 'рубящее', False],
-                        ['сабля', 1, 'саблю', 'рубящее', False],
-                        ['катана', 1, 'катану', 'рубящее', False],
-                        ['рапира', 1, 'рапиру', 'колющее', False],
-                        ['пика', 1, 'пику', 'колющее', True],
-                        ['копье', 2, 'копье', 'колющее', True],
-                        ['топор', 0, 'топор', 'рубящее', False],
-                        ['кинжал', 0, 'кинжал', 'колющее', False],
-                        ['дубина', 1, 'дубину', 'ударное', False],
-                        ['палица', 1, 'палицу', 'ударное', False],
-                        ['булава', 1, 'булаву', 'ударное', False],
-                        ['молот', 0, 'молот', 'ударное', True],
-                        ['шпага', 1, 'шпагу', 'колющее', False]]
+            n1 = s_weapon_first_words_dictionary
+            n2 = s_weapon_types_dictionary
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]][0] + ' ' + n2[a2][0]
@@ -39,7 +24,7 @@ class Weapon:
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.runes = []
-        self.twohanded_dict = ['двуручный', 'двуручная', 'двуручное']
+        self.twohanded_dict = s_weapon_twohanded_dictionary
         self.empty = empty
 
     def on_create(self):
@@ -75,6 +60,13 @@ class Weapon:
             return True
 
     def enchantment(self):
+        """Функция генерирует название элемента оружия. 
+        Элемент складывается из сочетания рун, прикрепленных к оружию.
+
+        Returns:
+            string: Строка элемента для добавления к названию оружия.\n
+            Пример: " огня" для формирования названия "Большой топор огня".
+        """
         if len(self.runes) not in [1, 2]:
             return ''
         else:
@@ -90,8 +82,23 @@ class Weapon:
                 damage += rune.damage
         return damage
 
-    def attack(self):
-        return dice(1, int(self.damage)) + self.perm_damage()
+    def attack(self, who=None):
+        """Функция рассчитывает урон, который наносит оружие конкретному монстру
+
+        Args:
+            who (object Monster, optional): Монстр, которого атакуют оружием. Defaults to None.
+
+        Returns:
+            integer: Значение нанесенного урона
+        """
+        damage = dice(1, int(self.damage))
+        big_damage = damage + self.perm_damage()
+        if who:
+            damage_multiplier = who.get_weakness([self])[0]
+        else:
+            damage_multiplier = 1
+        full_damage = ceil(big_damage * damage_multiplier)
+        return full_damage
 
     def take(self, who):
         game = self.game

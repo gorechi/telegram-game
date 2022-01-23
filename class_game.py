@@ -5,7 +5,7 @@ from class_hero import Hero
 from class_weapon import Weapon
 from class_protection import Shield, Armor
 from class_items import Potion, Rune, Book, Matches, Map, Key, Spell
-from class_monsters import Monster, Shapeshifter, Vampire, Berserk, Walker, Plant
+from class_monsters import Monster, Shapeshifter, Vampire, Berserk, Plant
 from class_room import Furniture
 import json
 
@@ -18,7 +18,6 @@ classes = { 'монстр': Monster,
             'мебель': Furniture,
             'вампир': Vampire,
             'берсерк': Berserk,
-            'ходок': Walker,
             'растение': Plant,
             'ключ': Key,
             'карта': Map,

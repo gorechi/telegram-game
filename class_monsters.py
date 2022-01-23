@@ -142,7 +142,7 @@ class Monster:
         if not self.weapon.empty:
             weapon_attack = self.weapon.attack()
             text.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name1} и '
-                        f'наносит {str(mele_attack)} {howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
+                        f'наносит {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
         else:
             weapon_attack = 0
             text.append(f'{self_name} бьет {target.name1} не используя оружия и '
@@ -258,11 +258,11 @@ class Monster:
     def win(self, loser=None):
         self.health = self.start_health
 
-    def place(self, castle, roomr_to_place=None, old_place=None):
-        if roomr_to_place:
-            room = roomr_to_place
+    def place(self, castle, room_to_place=None, old_place=None):
+        if room_to_place:
+            room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center == '' and a.ambush == '' and a != old_place)]
+            empty_rooms = [a for a in castle.plan if (a.center == '' and a.ambush == '' and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
         if dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
@@ -348,31 +348,6 @@ class Plant(Monster):
             room = randomitem(empty_rooms, False)
         room.center = self
         self.current_position = room.position
-
-class Walker(Monster):
-    def __init__(self,
-                 game,
-                 name=s_monster_name,
-                 name1=s_monster_name1,
-                 stren=s_monster_strength,
-                 health=s_monster_health,
-                 actions=s_monster_actions,
-                 state=s_monster_state,
-                 agressive=s_is_monster_agressive,
-                 carry_weapon=s_is_monster_carry_weapon,
-                 carry_shield=s_is_monster_carry_shield,
-                 wear_armor=s_is_monster_wear_armor):
-        super().__init__(game,
-                         name,
-                         name1,
-                         stren,
-                         health,
-                         actions,
-                         state,
-                         agressive,
-                         carry_weapon,
-                         carry_shield,
-                         wear_armor)
 
 class Berserk(Monster):
     def __init__(self,

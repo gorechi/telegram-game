@@ -188,10 +188,22 @@ class Map():
         return self.description
 
     def use(self, who_is_using, in_action=False):
+        """Функция использования карты. Если вызывается в бою, то ничего не происходит. 
+        В мирное время выводит на экран карту замка.
+
+        Args:
+            who_is_using (oject Hero): Герой, который использует карту
+            in_action (bool, optional): Признак того, что предмет используется в бою. По умолчанию False.
+
+        """
         if not in_action:
-            tprint(self.game, f'{who_is_using.name} смотрит на карту замка.')
-            self.game.new_castle.map()
-            return True
+            if who_is_using.fear >= s_fear_limit:
+                tprint(self.game, f'{who_is_using.name} от страха не может сосредоточиться и что-то разобрать на карте.')
+                return False
+            else:    
+                tprint(self.game, f'{who_is_using.name} смотрит на карту замка.')
+                self.game.new_castle.map()
+                return True
         else:
             tprint(self.game, 'Во время боя это совершенно неуместно!')
             return False
@@ -304,7 +316,7 @@ class Potion():
             elif self.type == 6:
                 who_using.intel += self.effect
                 who_using.start_intel += self.effect
-                tprint(game, f'{who_sing.name} увеличивает свой интеллект '
+                tprint(game, f'{who_using.name} увеличивает свой интеллект '
                              f'на {str(self.effect)} до {str(who_using.intel)}.')
                 return True
             else:
