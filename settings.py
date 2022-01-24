@@ -13,7 +13,8 @@ s_how_many = {'монстры': 10,
 # Параметры героя по умолчанию
 s_hero_name = 'Артур'
 s_hero_name1 = 'Артура'
-s_hero_gender = 'male'
+# Пол героя: 0 - мужской, 1 - женский (сделано так для удобства работы с этой информацией)
+s_hero_gender = 0
 s_hero_strength = 10
 s_hero_dexterity = 2
 s_hero_intelligence = 1

@@ -147,7 +147,8 @@ class Hero:
         game = self.game
         room = game.new_castle.plan[self.current_position]
         if not item or item in ['все', 'всё']:
-            tprint(game, f'{self.name} хочет бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
+            gender_string = ['хотел бы', 'хотела бы'][self.gender]
+            tprint(game, f'{self.name} {gender_string} бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
