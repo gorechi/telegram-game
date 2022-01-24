@@ -143,12 +143,14 @@ class Hero:
         else:
             c(full_command[1])
 
+    def g(self, words_list):
+        return words_list[self.gender]
+    
     def drop(self, item=None):
         game = self.game
         room = game.new_castle.plan[self.current_position]
         if not item or item in ['все', 'всё']:
-            gender_string = ['хотел бы', 'хотела бы'][self.gender]
-            tprint(game, f'{self.name} {gender_string} бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
+            tprint(game, f'{self.name} {self.g(["хотел", "хотела"])} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
@@ -157,7 +159,7 @@ class Hero:
                 tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
                 return True
             else:
-                tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
+                tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
                 return False
         else:
             if not self.shield.empty and item.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
@@ -242,7 +244,7 @@ class Hero:
                 self.money.howmuchmoney -= need_money
                 message.append(f'{self.name} успешно чинит {item.name1}')
             else:
-                message.append(f'{self.name} и рад бы починить {item.name1}, но ему не хватает денег на запчасти.')
+                message.append(f'{self.name} и {self.g(["рад", "рада"])} бы починить {item.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
         tprint(self.game, message)
         return True
 
@@ -394,7 +396,7 @@ class Hero:
             else:
                 total_damage = 0
             if total_damage == 0:
-                string2 = f'{self.name} не смог пробить защиту {target_name1}.'
+                string2 = f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.'
             elif target_defence == 0:
                 string2 = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
             else:
@@ -473,18 +475,18 @@ class Hero:
         elif self.money.how_much_money == 1:
             money_text = 'Одна-единственная монета оттягивает карман героя.'
         else:
-            money_text = 'Герой беден, как церковная мышь.'
-        message.append(f'{self.name} - это смелый герой {str(self.level)} уровня. Его сила - {str(self.stren)} и сейчас'
-                       f' у него {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
+            money_text = '{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
+        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. {self.g(["Его", "Ее"])} сила - {str(self.stren)} и сейчас'
+                       f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         if not self.weapon.empty:
-            weapon_text = f'{self.weapon.real_name()[0]} в руке героя добавляет к его силе ' \
+            weapon_text = f'{self.weapon.real_name()[0]} в руке {self.g(["героя", "героини"])} добавляет к {self.g(["его", "ее"])} силе ' \
                           f'{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
         message.append(weapon_text)
         if not self.shield.empty or not self.armor.empty:
-            protection_text = 'Героя '
+            protection_text = f'{self.g(["Героя", "Героиню"])} '
             if not self.shield.empty and not self.armor.empty:
                 protect = 'защищают '
                 and_text = ' и '
@@ -503,7 +505,7 @@ class Hero:
                 armor_text = ''
             protection_text += protect + shield_text + and_text + armor_text
         else:
-            protection_text = 'У героя нет ни щита, ни доспехов.'
+            protection_text = f'У {self.g(["героя", "героини"])} нет ни щита, ни доспехов.'
         message.append(protection_text)
         mastery_text = None
         for mastery in self.weapon_mastery:
@@ -513,7 +515,7 @@ class Hero:
                 else:
                     mastery_text += f' {mastery} ({self.weapon_mastery[mastery]})'
         if mastery_text:
-            text = f'Герой обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
+            text = f'{self.g(["Герой", "Героиня"])} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
             message.append(text)
         tprint(self.game, message)
 
@@ -560,7 +562,7 @@ class Hero:
         self.dext = self.start_dext
         self.intel = self.start_intel
         self.wins += 1
-        tprint(self.game, f'{self.name} получает {howmany(loser.exp, "единицу,единицы,единиц")}  опыта!')
+        tprint(self.game, f'{self.name} получает {howmany(loser.exp, "единицу,единицы,единиц")} опыта!')
         self.exp += loser.exp
         if self.exp > self.levels[self.level]:
             self.levelup()
@@ -591,7 +593,7 @@ class Hero:
         """
         if goal_type == 'killall':
             if self.game.new_castle.monsters() == 0:
-                tprint(self.game, f'{self.name} убил всех монстров в замке и выиграл в этой игре!')
+                tprint(self.game, f'{self.name} {self.g(["убил", "убила"])} всех монстров в замке и {self.g(["выиграл", "выиграла"])} в этой игре!')
                 return True
             else:
                 return False
@@ -624,7 +626,7 @@ class Hero:
                     text.append(description)
                 text.append(self.money.show())
             if not self.removed_shield.empty:
-                text.append(f'За спиной у героя висит {self.removed_shield.realname()[0]}')
+                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.realname()[0]}')
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():
@@ -771,7 +773,7 @@ class Hero:
             return True
         else:
             if self.fear >= s_fear_limit:
-                message = f'{self.name} не хочет заглядывать в неизвестные места. Страх сковал героя по рукам и ногам.'
+                message = f'{self.name} не хочет заглядывать в неизвестные места. Страх сковал {self.g(["его", "ее"])} по рукам и ногам.'
                 tprint(game, message)
                 return True
             if room.secret_word.lower() == item.lower():
@@ -904,7 +906,7 @@ class Hero:
             elif item == '' and len(what_is_in_room) > 1:
                 if room.light:
                     message = [f'В комнате слишком много запертых '
-                               f'вещей. {self.name} не понимает, что ему нужно открыть.']
+                               f'вещей. {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.']
                 else:
                     message = [f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного']
                 tprint(game, message)
@@ -954,7 +956,7 @@ class Hero:
     def use(self, item=None, infight=False):
         game = self.game
         if not item:
-            tprint(game, f'{self.name} не понимает, что ему надо использовать.')
+            tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо использовать.')
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
@@ -964,7 +966,7 @@ class Hero:
                     i.use(self, False)
                 return True
             else:
-                tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
+                tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
                 return False
         else:
             if not self.removed_shield.empty and item.lower() in [self.removed_shield.name.lower(), self.removed_shield.name1.lower(), 'щит']:
@@ -985,7 +987,7 @@ class Hero:
                     else:
                         i.use(self, inaction=False)
                     return True
-            tprint(game, f'{self.name} не нашел такой вещи у себя в карманах.')
+            tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в карманах.')
 
     def enchant(self, item=''):
         """Функция улучшения вещей рунами.
@@ -1004,7 +1006,7 @@ class Hero:
             tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
             return False
         if item == '':
-            tprint(game, f'{self.name} не понимает, что ему надо улучшить.')
+            tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
             return False
         if self.fear >= s_fear_limit:
             tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, но ничего не получается.')
@@ -1025,7 +1027,7 @@ class Hero:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     game.selected_item = i
                 else:
-                    tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
+                    tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
                     return False
         if isinstance(game.selected_item, Weapon) or isinstance(game.selected_item, Shield) or isinstance(game.selected_item, Armor):
             text = []
@@ -1065,7 +1067,7 @@ class Hero:
             if book:
                 message.append(book.text)
                 message += book.print_mastery(self)
-                message.append('Он решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+                message.append('{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
                 self.weapon_mastery[book.weapon_type] += 1
                 self.pockets.remove(book)
         else:
