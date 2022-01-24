@@ -159,7 +159,34 @@ class Hero:
                 tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
                 return False
         else:
-            return True
+            if not self.shield.empty and item.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
+                room.loot.append(self.shield)
+                tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
+                self.shield = game.no_shield
+                return True
+            elif not self.removed_shield.empty and item.lower() in ['щит', self.removed_shield.name.lower(), self.removed_shield.name1.lower()]:
+                room.loot.append(self.removed_shield)
+                tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
+                self.removed_shield = game.no_shield
+                return True
+            elif not self.weapon.empty and item.lower() in ['оружие', self.weapon.name.lower(), self.weapon.name1.lower()]:
+                room.loot.append(self.weapon)
+                tprint(game, f'{self.name} бросает {self.shield.name} в угол комнаты.')
+                self.weapon = game.no_weapon
+                return True
+            else:
+                item_to_drop = None
+                for i in self.pockets:
+                    if item.lower() in [i.name.lower(), i.name1.lower()]:
+                        item_to_drop = i
+                if item_to_drop:
+                    self.pockets.remove(item_to_drop)
+                    tprint(game, f'{self.name} бросает {item_to_drop.name} на пол комнаты.')
+                    return True
+                else:
+                    tprint(game, f'{self.name} роется в рюкзаке, но не находит ничего такого.')
+                    return False
+
     
     def rest(self, what=None):
         game=self.game
@@ -178,7 +205,7 @@ class Hero:
     def remove(self, what=None):
         message = []
         item = None
-        if not self.shield.empty and what.lower() in ['щит', self.shield.name, self.shield.name1]:
+        if not self.shield.empty and what.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
             item = self.shield
         if not what:
             message.append(f'{self.name} оглядывается по сторонам, находит какой-то мусор и закидывает его в самый темный угол комнаты.')
@@ -195,9 +222,9 @@ class Hero:
         
     def repair(self, what=None):
         message = []
-        if not self.shield.empty and what.lower() in ['щит', self.shield.name, self.shield.name1]:
+        if not self.shield.empty and what.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
                 item = self.shield
-        elif not self.removed_shield.empty and what.lower() in ['щит', self.removed_shield.name, self.removed_shield.name1]:
+        elif not self.removed_shield.empty and what.lower() in ['щит', self.removed_shield.name.lower(), self.removed_shield.name1.lower()]:
                 item = self.removed_shield
         else:
             item = None
