@@ -63,6 +63,26 @@
   },
   {
     "class": "монстр",
+    "name": "Разбойница",
+    "name1": "Разбойницу",
+    "stren": 8,
+    "health": 33,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "стоит",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "gender": 1,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
     "name": "Бандит",
     "name1": "Бандита",
     "stren": 8,
@@ -79,6 +99,26 @@
     "carryweapon": true,
     "carryshield": false,
     "gender": 0,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Бандитка",
+    "name1": "Бандитку",
+    "stren": 8,
+    "health": 28,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "притаилась",
+    "frightening": false,
+    "agressive": true,
+    "carryweapon": true,
+    "carryshield": false,
+    "gender": 1,
     "wearArmor": true
   },
   {
