@@ -65,6 +65,9 @@ class Monster:
 
     def __str__(self):
         return self.name
+    
+    def g(self, words_list):
+        return words_list[self.gender]
 
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon.empty and self.carry_weapon:
@@ -155,7 +158,7 @@ class Monster:
             text.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
         else:
             total_damage = 0
-            text.append(f'{self_name} не смог пробить защиту {target.name1}.')
+            text.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
         if not target.shield.empty:
             rand = dice(1, s_shield_crushed_upper_limit)
             dam = total_attack * target.shield.accumulated_damage
@@ -434,13 +437,14 @@ class Shapeshifter(Monster):
         if not self.shifted:
             self.shifted = True
             self.stren = attacker.stren
+            self.gender = attacker.gender
             if not attacker.weapon.empty and self.weapon.empty:
                 self.weapon = attacker.weapon
                 weapon_string = f' и {self.weapon.name} в руках.'
             else:
                 weapon_string = ''
             tprint(self.game, f'{self.name} меняет форму и становится точь в точь как {attacker.name}. '
-                              f'У него теперь сила {str(self.stren)}{weapon_string}')
+                              f'У {self.g(["него", "нее"])} теперь сила {str(self.stren)}{weapon_string}')
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
@@ -522,9 +526,9 @@ class Vampire(Monster):
         else:
             total_damage = 0
         if total_damage == 0:
-            text.append(f'{self_name} не смог пробить защиту {target.name1}.')
+            text.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
         elif target_defence == 0:
-            text.append(f'{target.name} беззащитен и теряет {howmany(total_damage, "жизнь,жизни,жизней")}. {self_name} '
+            text.append(f'{target.name} {self.g(["беззащитен", "беззащитна"])} и теряет {howmany(total_damage, "жизнь,жизни,жизней")}. {self_name} '
                         f'высасывает {str(total_damage // s_vampire_suck_coefficient)} себе.')
         else:
             text.append(f'{target.name} использует для защиты {target.shield.name} и '
