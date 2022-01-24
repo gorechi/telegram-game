@@ -22,6 +22,7 @@ class Furniture:
         self.opened = True
         self.can_contain_weapon = True
         self.can_hide = False
+        self.can_rest = False
         self.name = name
         self.empty = False
         self.empty_text = 'пусто'
@@ -100,7 +101,6 @@ class Room:
         self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
-        self.rest_place = None
         self.monsters = []
         self.furniture = []
         self.stink = 0

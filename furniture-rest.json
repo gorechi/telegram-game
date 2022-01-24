@@ -1,0 +1,31 @@
+[
+    {
+      "class": "мебель",
+      "type": 4,
+      "name": "очаг",
+      "name1": "очаг",
+      "empty_text": "пуст",
+      "lockable": false,
+      "can_hide": false,
+      "can_contain_weapon": false,
+      "can_rest": true,
+      "states":
+      [
+          "расположен",
+          "тлеет",
+          "светится"
+      ],
+      "wheres":
+      [
+          "У стены",
+          "В углу",
+          "В центре комнаты"
+      ],
+      "descriptions":
+      [
+          "старый",
+          "теплый",
+          "уютный"
+      ]
+    }
+  ]

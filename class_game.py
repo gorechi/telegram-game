@@ -9,7 +9,15 @@ from class_monsters import Monster, Shapeshifter, Vampire, Berserk, Plant
 from class_room import Furniture
 import json
 
-classes = { 'монстр': Monster,
+class Empty():
+    def __init__(self):
+        self.empty = True
+        self.frightening = False
+        self.agressive = False
+
+class Game():
+    def __init__(self, chat_id, bot, how_many=0, hero=None):
+        self.classes = { 'монстр': Monster,
             'герой': Hero,
             'оружие': Weapon,
             'щит': Shield,
@@ -27,16 +35,6 @@ classes = { 'монстр': Monster,
             'руна': Rune,
             'заклинание': Spell,
             }
-
-
-class Empty():
-    def __init__(self):
-        self.empty = True
-        self.frightening = False
-        self.agressive = False
-
-class Game():
-    def __init__(self, chat_id, bot, how_many=0, hero=None):
         self.empty_thing = Empty()
         self.state = 0
         # state - текущее состояние игры.
@@ -74,6 +72,13 @@ class Game():
                                         random=True)
         for furniture in self.all_furniture:
             furniture.place(castle=self.new_castle)
+        # Создаем очаги и разбрасываем по замку
+        self.all_furniture = self.readobjects(file='furniture-rest.json',
+                                        howmany=self.how_many['очаг'],
+                                        random=False)
+        self.all_furniture[0].place(castle=self.new_castle, room_to_place=self.new_castle.plan[0])
+        #for furniture in self.all_furniture:
+        #    furniture.place(castle=self.new_castle)
         # Читаем монстров из файла и разбрасываем по замку
         self.all_monsters = self.readobjects(file='monsters.json',
                                        howmany=self.how_many['монстры'])
@@ -136,7 +141,7 @@ class Game():
                 parsed_data = json.load(read_data)
             if not random:
                 for i in parsed_data:
-                    new_object = classes[i['class']](self)
+                    new_object = self.classes[i['class']](self)
                     for param in i:
                         vars(new_object)[param] = i[param]
                     new_object.on_create()
@@ -144,7 +149,7 @@ class Game():
             else:
                 for n in range(howmany):
                     i = randomitem(parsed_data, False)
-                    new_object = classes[i['class']](self)
+                    new_object = self.classes[i['class']](self)
                     for param in i:
                         vars(new_object)[param] = i[param]
                     new_object.on_create()
