@@ -756,7 +756,7 @@ class Hero:
                 enemy_in_room = room.center
                 message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}.')
                 if enemy_in_room.frightening:
-                    message.append(f'{enemy_in_room} очень страшный и {self.name} пугается до икоты.')
+                    message.append(f'{enemy_in_room} очень {enemy_in_room.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
                     self.fear += 1
                 tprint(game, message)
                 self.fight(enemy_in_room.name, True)
@@ -803,7 +803,7 @@ class Hero:
                 enemy_in_room = room.center
                 message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}')
                 if enemy_in_room.frightening:
-                    message.append(f'{enemy_in_room} очень страшный и {self.name} пугается до икоты.')
+                    message.append(f'{enemy_in_room} очень {enemy_in_room.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
                     self.fear += 1
                 tprint(game, message)
                 self.fight(enemy_in_room.name, True)
