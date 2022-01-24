@@ -32,6 +32,8 @@ class Furniture:
 
     def on_create(self):
         self.name = randomitem(self.descriptions, False) + ' ' + self.name
+        if self.can_rest:
+            self.name = self.name + randomitem(self.rest_strings, False)
         self.state = randomitem(self.states, False)
         self.where = randomitem(self.wheres, False)
         return True
@@ -124,14 +126,18 @@ class Room:
             Если в комнате можно отдыхать, возвращается пустой массив.
         """
         message = []
-        if not self.rest_place:
-            message.append('В комнате нет места для отдыха.')
         if not self.center.empty:
             message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
         if not self.light:
             message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
+        place = False
+        for furniture in self.furniture:
+            if furniture.can_rest:
+                place = True
+        if not place:
+            message.append('В комнате нет места, где можно было бы отдохнеть.')
         return message
     
     def show(self, player):
