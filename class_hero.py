@@ -114,6 +114,8 @@ class Hero:
                             'починить': self.repair,
                             'отдохнуть': self.rest,
                             'отдыхать': self.rest,
+                            'бросить': self.drop,
+                            'выбросить': self.drop,
                             'улучшить': self.enchant}
 
     def __str__(self):
@@ -141,6 +143,24 @@ class Hero:
         else:
             c(full_command[1])
 
+    def drop(self, item=None):
+        game = self.game
+        room = game.new_castle.plan[self.current_position]
+        if not item:
+            tprint(game, f'{self.name} хочет бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
+        elif item.isdigit():
+            if int(item) - 1 < len(self.pockets):
+                i = self.pockets[int(item) - 1]
+                room.loot.append(i)
+                self.pockets.remove(i)
+                tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
+                return True
+            else:
+                tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
+                return False
+        else:
+            return True
+    
     def rest(self, what=None):
         game=self.game
         room = game.new_castle.plan[self.current_position]
@@ -903,9 +923,9 @@ class Hero:
                 new_castle.plan[self.current_position + self.directions_dict[item]].doors[j] = 1
                 tprint(game, f'{self.name} открывает дверь.')
 
-    def use(self, item='', infight=False):
+    def use(self, item=None, infight=False):
         game = self.game
-        if item == '':
+        if not item:
             tprint(game, f'{self.name} не понимает, что ему надо использовать.')
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
@@ -916,7 +936,7 @@ class Hero:
                     i.use(self, False)
                 return True
             else:
-                tprint(game, f'{self.name} не нашел такой вещи у себя в карманах.')
+                tprint(game, f'{self.name} не нашел такой вещи у себя в рюкзаке.')
                 return False
         else:
             if not self.removed_shield.empty and \
