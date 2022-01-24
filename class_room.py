@@ -128,16 +128,20 @@ class Room:
         message = []
         if not self.center.empty:
             message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
+            print(1)
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
+            print(2)
         if not self.light:
             message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
+            print(3)
         place = False
         for furniture in self.furniture:
             if furniture.can_rest:
                 place = True
         if not place:
-            message.append('В комнате нет места, где можно было бы отдохнеть.')
+            message.append('В комнате нет места, где можно было бы отдохнуть.')
+            print(4)
         return message
     
     def show(self, player):

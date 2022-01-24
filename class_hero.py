@@ -122,6 +122,7 @@ class Hero:
         return 'hero'
 
     def do(self, command):
+        print('Команда: ', command)
         a = command.find(' ')
         full_command = []
         if a < 0:
@@ -189,9 +190,9 @@ class Hero:
                 else:
                     tprint(game, f'{self.name} роется в рюкзаке, но не находит ничего такого.')
                     return False
-
-    
+   
     def rest(self, what=None):
+        print('отдыхаем')
         game=self.game
         room = game.new_castle.plan[self.current_position]
         can_rest = room.can_rest()
