@@ -122,7 +122,6 @@ class Hero:
         return 'hero'
 
     def do(self, command):
-        print('Команда: ', command)
         a = command.find(' ')
         full_command = []
         if a < 0:
@@ -192,18 +191,18 @@ class Hero:
                     return False
    
     def rest(self, what=None):
-        print('отдыхаем')
         game=self.game
         room = game.new_castle.plan[self.current_position]
-        can_rest = room.can_rest()
-        print(can_rest)
+        cant_rest, rest_place = room.can_rest()
         message = []
-        if len(can_rest) > 0:
+        if not rest_place:
             message.append('В этой комнате нельзя отдыхать.')
-            message.append(randomitem(can_rest))
+            message.append(randomitem(cant_rest))
             tprint(game, message)
             return False
         else:
+            if room.get_ambush(self):
+                return False
             return True
     
     def remove(self, what=None):
@@ -706,10 +705,7 @@ class Hero:
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
-        if (who_is_fighting.name != enemy
-            and who_is_fighting.name1 != enemy
-            and who_is_fighting.name[0] != enemy) \
-                and enemy != '':
+        if not enemy in [who_is_fighting.name, who_is_fighting.name1, who_is_fighting.name[0]] and enemy != '':
             tprint(game, f'{self.name} не может атаковать. В комнате нет такого существа.')
             return False
         game.state = 1
