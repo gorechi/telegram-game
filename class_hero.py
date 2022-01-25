@@ -191,10 +191,11 @@ class Hero:
                     return False
    
     def rest(self, what=None):
-        game=self.game
+        game = self.game
         room = game.new_castle.plan[self.current_position]
         cant_rest, rest_place = room.can_rest()
         message = []
+        shield = None
         if not rest_place:
             message.append('В этой комнате нельзя отдыхать.')
             message.append(randomitem(cant_rest))
@@ -203,6 +204,17 @@ class Hero:
         else:
             if room.get_ambush(self):
                 return False
+            if not self.shield.empty:
+                shield = self.shield
+            if not self.removed_shield.empty:
+                shield = self.removed_shield
+            if shield:
+                need_money = shield.accumulated_damage * 10 // 1
+                if need_money > 0 and self.money.how_much_money >= need_money:
+                    shield.accumulated_damage = 0
+                    self.money.how_much_money -= need_money
+                    message.append(f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
+            tprint(game, message)
             return True
     
     def remove(self, what=None):
@@ -239,9 +251,9 @@ class Hero:
             need_money = item.accumulated_damage * 10 // 1
             if need_money == 0:
                 message.append(f'{item.name1} не нужно ремонтировать.')
-            elif self.money.howmuchmoney >= need_money:
+            elif self.money.hhow_much_money >= need_money:
                 item.accumulated_damage = 0
-                self.money.howmuchmoney -= need_money
+                self.money.how_much_money -= need_money
                 message.append(f'{self.name} успешно чинит {item.name1}')
             else:
                 message.append(f'{self.name} и {self.g(["рад", "рада"])} бы починить {item.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
@@ -613,7 +625,7 @@ class Hero:
             return True
         elif what == 'рюкзак':
             text = []
-            if len(self.pockets) == 0 and self.money.howmuchmoney == 0:
+            if len(self.pockets) == 0 and self.money.how_much_money == 0:
                 text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
             else:
                 text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')

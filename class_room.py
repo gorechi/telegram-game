@@ -51,10 +51,10 @@ class Furniture:
             room.center = enemy_in_ambush
             self.ambush = game.empty_thing
             if room.center.frightening:
-                message.append(f'{self.center} очень {self.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
+                message.append(f'{room.center} очень {room.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
                 hero.fear += 1
             else:
-                message.append(f'Неожиданно из засады выскакивает {self.center.name} и нападает на {hero.name1}.')
+                message.append(f'Неожиданно из засады выскакивает {room.center.name} и нападает на {hero.name1}.')
             tprint(game, message)
             hero.fight(room.center.name, True)
             return True
