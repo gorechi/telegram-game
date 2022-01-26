@@ -761,10 +761,6 @@ class Hero:
         enemy_in_room = False
         if isinstance(room.center, Monster):
             enemy_in_room = room.center
-        if not room.ambush.empty:
-            enemy_in_ambush = room.ambush
-        else:
-            enemy_in_ambush = False
         if not room.light:
             message.append('В комнате настолько темно, что невозможно что-то отыскать.')
             tprint(game, message)
@@ -774,18 +770,8 @@ class Hero:
             tprint(game, message)
             return True
         if not item:
-            if enemy_in_ambush:
-                room.center = enemy_in_ambush
-                room.ambush = game.empty_thing
-                enemy_in_ambush = False
-                enemy_in_room = room.center
-                message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}.')
-                if enemy_in_room.frightening:
-                    message.append(f'{enemy_in_room} очень {enemy_in_room.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
-                    self.fear += 1
-                tprint(game, message)
-                self.fight(enemy_in_room.name, True)
-                return True
+            if room.get_ambush(self):
+                return False
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
             if not room.loot.empty and len(room.loot.pile) > 0:
@@ -822,17 +808,8 @@ class Hero:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
-            elif not what_to_search.ambush.empty:
-                room.center = what_to_search.ambush
-                what_to_search.ambush = game.empty_thing
-                enemy_in_room = room.center
-                message.append(f'Неожиданно из засады выскакивает {enemy_in_room.name} и нападает на {self.name1}')
-                if enemy_in_room.frightening:
-                    message.append(f'{enemy_in_room} очень {enemy_in_room.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
-                    self.fear += 1
-                tprint(game, message)
-                self.fight(enemy_in_room.name, True)
-                return True
+            elif what_to_search.get_ambush(self):
+                return False
             elif len(what_to_search.loot.pile) > 0:
                 message.append(f'{self.name} осматривает {what_to_search.name1} и находит:')
                 for i in what_to_search.loot.pile:
