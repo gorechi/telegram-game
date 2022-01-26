@@ -189,20 +189,48 @@ class Hero:
                 else:
                     tprint(game, f'{self.name} роется в рюкзаке, но не находит ничего такого.')
                     return False
-
-    
+   
     def rest(self, what=None):
-        game=self.game
+        game = self.game
         room = game.new_castle.plan[self.current_position]
-        can_rest = room.can_rest()
-        print(can_rest)
+        cant_rest, rest_place = room.can_rest()
         message = []
-        if len(can_rest) > 0:
+        shield = None
+        if not rest_place:
             message.append('В этой комнате нельзя отдыхать.')
-            message.append(randomitem(can_rest))
+            message.append(randomitem(cant_rest))
             tprint(game, message)
             return False
         else:
+            if room.get_ambush(self):
+                return False
+            if not self.shield.empty:
+                shield = self.shield
+            if not self.removed_shield.empty:
+                shield = self.removed_shield
+            if shield:
+                need_money = shield.accumulated_damage * 10 // 1
+                if need_money > 0 and self.money.how_much_money >= need_money:
+                    shield.accumulated_damage = 0
+                    self.money.how_much_money -= need_money
+                    message.append(f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
+            dream_count = dice(1, s_nightmare_probability)
+            steal_count = dice(1, s_steal_probability)
+            if dream_count == 1:
+                message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
+                self.fear = self.fear // 2
+            else:
+                message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
+                self.fear = 0
+            if steal_count == 1 and len(self.pockets) > 0:
+                all_monsters = [monster for monster in game.all_monsters if (not monster.stink and monster.can_steal)]
+                stealing_monster = randomitem(all_monsters)
+                all_items = [item for item in self.pockets if (not isinstance(item, Key))]
+                item = randomitem(all_items)
+                self.pockets.remove(item)
+                stealing_monster.give(item)
+                message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
+            tprint(game, message)
             return True
     
     def remove(self, what=None):
@@ -239,9 +267,9 @@ class Hero:
             need_money = item.accumulated_damage * 10 // 1
             if need_money == 0:
                 message.append(f'{item.name1} не нужно ремонтировать.')
-            elif self.money.howmuchmoney >= need_money:
+            elif self.money.hhow_much_money >= need_money:
                 item.accumulated_damage = 0
-                self.money.howmuchmoney -= need_money
+                self.money.how_much_money -= need_money
                 message.append(f'{self.name} успешно чинит {item.name1}')
             else:
                 message.append(f'{self.name} и {self.g(["рад", "рада"])} бы починить {item.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
@@ -613,7 +641,7 @@ class Hero:
             return True
         elif what == 'рюкзак':
             text = []
-            if len(self.pockets) == 0 and self.money.howmuchmoney == 0:
+            if len(self.pockets) == 0 and self.money.how_much_money == 0:
                 text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
             else:
                 text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
@@ -705,10 +733,7 @@ class Hero:
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
-        if (who_is_fighting.name != enemy
-            and who_is_fighting.name1 != enemy
-            and who_is_fighting.name[0] != enemy) \
-                and enemy != '':
+        if not enemy in [who_is_fighting.name, who_is_fighting.name1, who_is_fighting.name[0]] and enemy != '':
             tprint(game, f'{self.name} не может атаковать. В комнате нет такого существа.')
             return False
         game.state = 1

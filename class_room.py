@@ -22,21 +22,44 @@ class Furniture:
         self.opened = True
         self.can_contain_weapon = True
         self.can_hide = False
+        self.can_rest = False
         self.name = name
         self.empty = False
         self.empty_text = 'пусто'
         self.state = 'стоит'
         self.where = 'в углу'
         self.name1 = 'мебель'
+        self.room = None
 
     def on_create(self):
         self.name = randomitem(self.descriptions, False) + ' ' + self.name
+        if self.can_rest:
+            self.name = self.name + randomitem(self.rest_strings, False)
         self.state = randomitem(self.states, False)
         self.where = randomitem(self.wheres, False)
         return True
 
     def put(self, item):
         self.loot.pile.append(item)
+   
+    def get_ambush(self, hero):
+        if isinstance(self.ambush, Monster):
+            message = []
+            game = self.game
+            enemy_in_ambush = self.ambush
+            room = self.room
+            room.center = enemy_in_ambush
+            self.ambush = game.empty_thing
+            if room.center.frightening:
+                message.append(f'{room.center} очень {room.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
+                hero.fear += 1
+            else:
+                message.append(f'Неожиданно из засады выскакивает {room.center.name} и нападает на {hero.name1}.')
+            tprint(game, message)
+            hero.fight(room.center.name, True)
+            return True
+        else:
+            return False
 
     def show(self):
         message = []
@@ -45,12 +68,11 @@ class Furniture:
             message.append('Внутри слышится какая-то возня.')
         return message
 
-    def place(self, castle = None, room_to_place = None):
+    def place(self, castle=None, room_to_place=None):
         if room_to_place:
-            print(room_to_place.furniture_types(), self.type)
             if self.type not in room_to_place.furniture_types():
                 room_to_place.furniture.append(self)
-                return True
+                self.room = room_to_place
             else:
                 return False
         else:
@@ -59,7 +81,8 @@ class Furniture:
                 room = randomitem(castle.plan, False)
                 if self.type not in room.furniture_types():
                     can_place = True
-        room.furniture.append(self)
+            room.furniture.append(self)
+            self.room = room
         if dice(1, s_furniture_locked_possibility) == 1 and self.lockable:
             self.locked = True
             very_new_key = Key(self.game)
@@ -100,7 +123,6 @@ class Room:
         self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
-        self.rest_place = None
         self.monsters = []
         self.furniture = []
         self.stink = 0
@@ -116,23 +138,26 @@ class Room:
                 self.secret_word = i
 
     def can_rest(self):
-        """Функция проверяет, можно ли отдыхать в комнате.
+        """Функция проверяет, можно ли отдыхать в комнате
 
-        Returns: 
-            list:
-            Если в комнате по какой-то причине нельзя отдыхать, возвращается массив строк с причиной.\n
-            Если в комнате можно отдыхать, возвращается пустой массив.
+        Returns:
+            list: Список причин, почему нельзя отдыхать в комнате
+            obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
-        if not self.rest_place:
-            message.append('В комнате нет места для отдыха.')
         if not self.center.empty:
             message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
         if not self.light:
             message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
-        return message
+        place = False
+        for furniture in self.furniture:
+            if furniture.can_rest:
+                place = furniture
+        if not place:
+            message.append('В комнате нет места, где можно было бы отдохнуть.')
+        return message, place
     
     def show(self, player):
         game = self.game
@@ -188,6 +213,24 @@ class Room:
     def monster_in_ambush(self):
         if isinstance(self.ambush, Monster):
             return self.ambush
+        else:
+            return False
+    
+    def get_ambush(self, hero):
+        if isinstance(self.ambush, Monster):
+            message = []
+            game = self.game
+            enemy_in_ambush = self.ambush
+            self.center = enemy_in_ambush
+            self.ambush = game.empty_thing
+            if self.center.frightening:
+                message.append(f'{self.center} очень {self.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
+                hero.fear += 1
+            else:
+                message.append(f'Неожиданно из засады выскакивает {self.center.name} и нападает на {hero.name1}.')
+            tprint(game, message)
+            hero.fight(self.center.name, True)
+            return True
         else:
             return False
 
