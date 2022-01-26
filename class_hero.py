@@ -214,6 +214,13 @@ class Hero:
                     shield.accumulated_damage = 0
                     self.money.how_much_money -= need_money
                     message.append(f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
+            dream_count = dice(1, s_nightmare_probability)
+            if dream_count == 1:
+                message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
+                self.fear = self.fear // 2
+            else:
+                message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
+                self.fear = 0
             tprint(game, message)
             return True
     
