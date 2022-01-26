@@ -116,6 +116,8 @@ class Hero:
                             'отдыхать': self.rest,
                             'бросить': self.drop,
                             'выбросить': self.drop,
+                            'сменить': self.change,
+                            'поменять': self.change,
                             'улучшить': self.enchant}
 
     def __str__(self):
@@ -143,6 +145,38 @@ class Hero:
         else:
             c(full_command[1])
 
+    def change(self, what=None):
+        message = []
+        if what == 'оружие':
+            second_weapon = self.second_weapon()
+            if not self.weapon.empty and not second_weapon.empty:
+                message.append(f'{self.name} убирает {self.weapon.name1} в рюкзак и берет в руки {second_weapon.name1}.')
+                if second_weapon.twohanded and not self.shield.empty:
+                    self.removed_shield = self.shield
+                    self.shield = self.game.no_shield
+                    message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
+                elif not second_weapon.twohanded and not self.removed_shield.empty:
+                    message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
+                self.pockets.remove(second_weapon)
+                self.pockets.append(self.weapon)
+                self.weapon = second_weapon
+            elif self.weapon.empty and not second_weapon.empty:
+                message.append(f'{self.name} достает из рюкзака {second_weapon.name1} и берет в руку.')
+                if second_weapon.twohanded and not self.shield.empty:
+                    self.removed_shield = self.shield
+                    self.shield = self.game.no_shield
+                    message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
+                self.pockets.remove(second_weapon)
+                self.weapon = second_weapon
+            elif not self.weapon.empty and second_weapon.empty:
+                message.append(f'{self.name} не может сменить оружие из-за того, что оно у него одно.')
+            else:
+                message.append(f'{self.name} не может сменить оружие. У {self.g(["него", "нее"])} и оружия-то нет.')
+        else:
+            message.append(f'{self.name} не знает, зачем нужно это менять.')
+        tprint(self.game, message)
+        return True
+    
     def g(self, words_list):
         return words_list[self.gender]
     
@@ -859,22 +893,6 @@ class Hero:
                     return True
         tprint(game, 'Такой вещи здесь нет.')
         return False
-
-    def drop(self, object):
-        game = self.game
-        new_castle = self.game.new_castle
-        current_loot = new_castle.plan[self.current_position].loot
-        current_loot.pile.append(object)
-        if self.armor == object:
-            self.armor = game.no_armor
-        if self.shield == object:
-            self.shield = game.no_shield
-        if self.removed_shield == object:
-            self.removed_shield = game.no_shield
-        if self.weapon == object:
-            self.weapon = game.no_weapon
-        if object in self.pockets:
-            self.pockets.remove(object)
 
     def open(self, item=''):
         game = self.game

@@ -58,6 +58,8 @@ def all_commands(message):
                        'отдохнуть',
                        'отдыхать',
                        'бросить',
+                       'сменить',
+                       'поменять',
                        'выбросить']
     level_up_commands = ['здоровье',
                        '?',
@@ -70,6 +72,7 @@ def all_commands(message):
                       'бежать',
                       'сменить оружие',
                       'сменить',
+                      'поменять',
                       'использовать']
     text = message.text
     chat_id = message.chat.id
