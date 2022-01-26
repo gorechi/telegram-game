@@ -215,12 +215,21 @@ class Hero:
                     self.money.how_much_money -= need_money
                     message.append(f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
             dream_count = dice(1, s_nightmare_probability)
+            steal_count = dice(1, s_steal_probability)
             if dream_count == 1:
                 message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
                 self.fear = self.fear // 2
             else:
                 message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
                 self.fear = 0
+            if steal_count == 1 and len(self.pockets) > 0:
+                all_monsters = [monster for monster in game.all_monsters if (not monster.stink and monster.can_steal)]
+                stealing_monster = randomitem(all_monsters)
+                all_items = [item for item in self.pockets if (not isinstance(item, Key))]
+                item = randomitem(all_items)
+                self.pockets.remove(item)
+                stealing_monster.give(item)
+                message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
             tprint(game, message)
             return True
     

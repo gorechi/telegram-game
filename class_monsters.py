@@ -35,6 +35,7 @@ class Monster:
         self.current_position = 0
         self.start_health = self.health
         self.loot = Loot(self.game)
+        self.can_steal = True
         self.stink = False
         self.hide = False
         self.run = False
@@ -313,6 +314,8 @@ class Plant(Monster):
         self.wear_armor = False
         self.agressive = False
         self.empty = False
+        self.can_steal = False
+
 
     def grow(self):
         new_plant = Plant(self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
