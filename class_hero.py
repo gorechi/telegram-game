@@ -808,6 +808,8 @@ class Hero:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
+                tprint(game, message)
+                return False
             elif what_to_search.get_ambush(self):
                 return False
             elif len(what_to_search.loot.pile) > 0:
