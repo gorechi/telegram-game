@@ -146,7 +146,7 @@ class Room:
         """
         message = []
         if not self.center.empty:
-            message.append('Монстр, который находится в комнате, точно не даст отдохнуть.')
+            message.append('Враг, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
         if not self.light:

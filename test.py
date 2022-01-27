@@ -1,1 +1,5 @@
-print(['000000', '1111111'][0])
+from functions import randomitem
+
+a = []
+for i in range(100):
+    print(randomitem(a))

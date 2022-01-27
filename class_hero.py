@@ -228,9 +228,10 @@ class Hero:
         game = self.game
         room = game.new_castle.plan[self.current_position]
         cant_rest, rest_place = room.can_rest()
+        print(cant_rest, rest_place)
         message = []
         shield = None
-        if not rest_place:
+        if not rest_place or len(cant_rest) > 0:
             message.append('В этой комнате нельзя отдыхать.')
             message.append(randomitem(cant_rest))
             tprint(game, message)
@@ -260,10 +261,11 @@ class Hero:
                 all_monsters = [monster for monster in game.all_monsters if (not monster.stink and monster.can_steal)]
                 stealing_monster = randomitem(all_monsters)
                 all_items = [item for item in self.pockets if (not isinstance(item, Key))]
-                item = randomitem(all_items)
-                self.pockets.remove(item)
-                stealing_monster.give(item)
-                message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
+                if len(all_items) > 0:
+                    item = randomitem(all_items)
+                    self.pockets.remove(item)
+                    stealing_monster.give(item)
+                    message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
             tprint(game, message)
             return True
     
@@ -450,7 +452,7 @@ class Hero:
             else:
                 weapon_attack = 0
                 string1 = f'{self.name} бьет {target_name1} не используя оружие и ' \
-                          f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона.'
+                          f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. '
             target_defence = target.defence(self)
             total_attack = weapon_attack + mele_attack
             if (total_attack - target_defence) > 0:
@@ -535,9 +537,9 @@ class Hero:
         if self.money.how_much_money > 1:
             money_text = f'В кошельке звенят {howmany(self.money.how_much_money, "монета,монеты,монет")}.'
         elif self.money.how_much_money == 1:
-            money_text = 'Одна-единственная монета оттягивает карман героя.'
+            money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
-            money_text = '{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
+            money_text = f'{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
         message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. {self.g(["Его", "Ее"])} сила - {str(self.stren)} и сейчас'
                        f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
@@ -1004,10 +1006,10 @@ class Hero:
                 return True
             for i in self.pockets:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
-                    if isinstance(i, Potion) and i.use(self, inaction=False):
+                    if isinstance(i, Potion) and i.use(self, in_action=False):
                         self.pockets.remove(i)
                     else:
-                        i.use(self, inaction=False)
+                        i.use(self, in_action=False)
                     return True
             tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в карманах.')
 

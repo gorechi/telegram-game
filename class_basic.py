@@ -40,7 +40,7 @@ class Money:
 
     def take(self, lucky_one):
         lucky_one.money.how_much_money += self.how_much_money
-        tprint(self.game, f'{lucky_one.name} забрал {howmany(self.how_much_money, "монету,монеты,монет")}')
+        tprint(self.game, f'{lucky_one.name} {lucky_one.g(["забрал", "забрала"])} {howmany(self.how_much_money, "монету,монеты,монет")}')
 
     def show(self):
         if self.how_much_money > 0:
