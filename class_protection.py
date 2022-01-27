@@ -244,7 +244,6 @@ class Shield (Protection):
                 furniture = randomitem(room.furniture, False)
                 if furniture.can_contain_weapon:
                     furniture.put(self)
-                    print('Положен в мебель: ' + furniture.name)
                     return True
         room.loot.pile.append(self)
 

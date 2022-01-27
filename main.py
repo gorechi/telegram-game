@@ -78,13 +78,10 @@ def all_commands(message):
     chat_id = message.chat.id
     game = game_sessions.get(chat_id)
     command = message.text.lower().split(' ')[0]
-    print (text, chat_id, command)
     if text == "Новая игра":
         new_game = Game(chat_id, bot)
         game_sessions[chat_id] = new_game
         player = new_game.player
-        print('=' * 40)
-        print(game_sessions)
         new_game.game_is_on = True
         new_game.new_castle.plan[player.current_position].show(player)
         new_game.new_castle.plan[player.current_position].map()

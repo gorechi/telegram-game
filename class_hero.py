@@ -228,7 +228,6 @@ class Hero:
         game = self.game
         room = game.new_castle.plan[self.current_position]
         cant_rest, rest_place = room.can_rest()
-        print(cant_rest, rest_place)
         message = []
         shield = None
         if not rest_place or len(cant_rest) > 0:
@@ -595,14 +594,11 @@ class Hero:
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
-            print('hero hide: ', self.hide)
             if self.hide:
                 dice_result = dice(50, 75) / 100
-                print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
             else:
                 dice_result = dice(10, 25) / 100
-                print('dice result: ', dice_result)
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
@@ -871,10 +867,6 @@ class Hero:
         game = self.game
         castle = self.game.new_castle
         current_loot = castle.plan[self.current_position].loot
-        print("+" * 40)
-        for i in current_loot.pile:
-            print(i.name)
-        print("+" * 40)
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
@@ -917,8 +909,6 @@ class Hero:
             for furniture in room.furniture:
                 if furniture.locked:
                     what_is_in_room.append(furniture)
-        print(what_is_in_room)
-        print('item: ', item)
         if item == '' or (not self.doors_dict.get(item, False) and self.doors_dict.get(item, True) != 0):
             if len(what_is_in_room) == 0:
                 if room.light:
