@@ -539,7 +539,8 @@ class Hero:
             money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
             money_text = f'{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
-        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. {self.g(["Его", "Ее"])} сила - {str(self.stren)} и сейчас'
+        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. ' 
+                       f'{self.g(["Его", "Ее"])} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
                        f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         if not self.weapon.empty:
@@ -592,6 +593,7 @@ class Hero:
             integer: Значение защиты с учетом доспехов и щита.
         """
         result = 0
+        weapon = attacker.weapon
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
@@ -602,6 +604,11 @@ class Hero:
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
+        parry_chance = self.dext + self.weapon_mastery[weapon.type]
+        parry_dice = dice(1, parry_chance)
+        hit_dice = dice(1, (weapon.hit_chance + attacker.hit_chance))
+        if parry_dice > hit_dice:
+            result = -1
         return result
 
     def lose(self, winner=None):

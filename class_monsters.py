@@ -19,7 +19,8 @@ class Monster:
                  agressive=s_is_monster_agressive,
                  carry_weapon=s_is_monster_carry_weapon,
                  carry_shield=s_is_monster_carry_shield,
-                 wear_armor=s_is_monster_wear_armor):
+                 wear_armor=s_is_monster_wear_armor,
+                 hit_chance=s_monster_hit_chance):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -27,6 +28,7 @@ class Monster:
         self.health = int(health)
         self.actions = actions.split(',')
         self.state = state
+        self.hit_chance = hit_chance
         self.weapon = self.game.no_weapon
         self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
@@ -70,6 +72,9 @@ class Monster:
     def g(self, words_list):
         return words_list[self.gender]
 
+    def vampire_suck(self, total_damage):
+        return False
+    
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon.empty and self.carry_weapon:
             if item.twohanded and not self.shield.empty:
@@ -154,6 +159,11 @@ class Monster:
                         f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
         total_attack = weapon_attack + mele_attack
         target_defence = target.defence(self)
+        if target_defence < 0:
+            total_damage = 0
+            text.append(f'{target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
+            tprint(game, text)
+            return True
         if (total_attack - target_defence) > 0:
             total_damage = weapon_attack + mele_attack - target_defence
             text.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
@@ -167,6 +177,9 @@ class Monster:
                 text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 target.shield = self.game.no_shield
         target.health -= total_damage
+        vampire_suck = self.vampire_suck(total_damage)
+        if vampire_suck:
+            text.append(vampire_suck)
         if target.health <= 0:
             game.state = 0
             target.lose(self)
@@ -504,58 +517,11 @@ class Vampire(Monster):
                          wear_armor)
         self.empty = False
 
-    def attack(self, target):
-        game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
-        if room.light:
-            self_name = self.name
-        else:
-            self_name = s_monster_name_in_darkness
-        text = []
-        mele_attack = self.mele()
-        if not self.weapon.empty:
-            weapon_attack = self.weapon.attack()
-            text.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name} и '
-                        f'наносит {str(mele_attack)}+{str(weapon_attack)} единиц урона. ')
-        else:
-            weapon_attack = 0
-            text.append(f'{self_name} {self.action()} {target.name1} не используя оружия и '
-                        f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
-        target_defence = target.defence(self)
-        total_attack = weapon_attack + mele_attack
-        if (total_attack - target_defence) > 0:
-            total_damage = weapon_attack + mele_attack - target_defence
-        else:
-            total_damage = 0
-        if total_damage == 0:
-            text.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
-        elif target_defence == 0:
-            text.append(f'{target.name} {self.g(["беззащитен", "беззащитна"])} и теряет {howmany(total_damage, "жизнь,жизни,жизней")}. {self_name} '
-                        f'высасывает {str(total_damage // s_vampire_suck_coefficient)} себе.')
-        else:
-            text.append(f'{target.name} использует для защиты {target.shield.name} и '
-                        f'теряет {howmany(total_damage, "жизнь,жизни,жизней")}. {self_name} '
-                        f'высасывает {str(total_damage // s_vampire_suck_coefficient)} себе.')
-        if not target.shield.empty:
-            shield = target.shield
-            rand = dice(1, 100)
-            dam = total_attack * target.shield.accumulated_damage
-            if rand < dam:
-                text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
-                game.all_shields.remove(shield)
-                target.shield = self.game.no_shield
-        target.health -= total_damage
-        self.health += total_damage // s_vampire_suck_coefficient
-        if target.health <= 0:
-            game.state = 0
-            target.lose(self)
-            text.append(f'{target.name} терпит сокрушительное поражение и позорно убегает ко входу в замок.')
-            tprint(game, text, 'off')
-        else:
-            tprint(game, text)
-        return True
-
+    def vampire_suck(self, total_damage):
+        sucked = total_damage // s_vampire_suck_coefficient
+        self.health += sucked
+        return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, "жизнь,жизни,жизней")}.'
+    
     def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place

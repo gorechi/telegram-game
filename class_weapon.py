@@ -21,6 +21,7 @@ class Weapon:
             self.type = n2[a2][3]
             self.twohanded = n2[a2][4]
             self.gender = n2[a2][1]
+            self.hit_chance = n2[a2][5]
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.runes = []
