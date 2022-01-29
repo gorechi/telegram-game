@@ -69,7 +69,7 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
-        self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0}
+        self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0, "": 0}
         self.directions_dict = {0: (0 - self.game.new_castle.rooms),
                                1: 1,
                                2: self.game.new_castle.rooms,
@@ -446,7 +446,7 @@ class Hero:
                 if dice(1, 100) <= critical_probability:
                     weapon_attack = weapon_attack * 2
                     damage_text = ' критического урона. '
-                string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name} и наносит' \
+                string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
                           f' {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
             else:
                 weapon_attack = 0
@@ -538,7 +538,7 @@ class Hero:
         elif self.money.how_much_money == 1:
             money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
-            money_text = f'{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
+            money_text = f'{self.name} {self.g(["беден", "бедна"])}, как церковная мышь.'
         message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. ' 
                        f'{self.g(["Его", "Ее"])} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
                        f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
@@ -693,7 +693,7 @@ class Hero:
                     text.append(description)
                 text.append(self.money.show())
             if not self.removed_shield.empty:
-                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.realname()[0]}')
+                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():

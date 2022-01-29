@@ -10,6 +10,8 @@ class Weapon:
             self.damage = int(damage)
             self.name1 = name1
             self.twohanded = False
+            self.type = ''
+            self.hit_chance = 0
         else:
             n1 = s_weapon_first_words_dictionary
             n2 = s_weapon_types_dictionary
