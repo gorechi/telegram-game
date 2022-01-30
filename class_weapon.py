@@ -119,7 +119,7 @@ class Weapon:
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
-                who.drop(who.weapon)
+                who.drop(who.weapon.name)
                 who.weapon = self
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
@@ -131,7 +131,7 @@ class Weapon:
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         if self.twohanded:
-            name = self.twohanded_dict[self.gender] + ' ' + self.name
+            name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
         else:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string}), {self.type}'

@@ -998,7 +998,7 @@ class Hero:
                 shield = self.removed_shield
                 self.shield = shield
                 self.removed_shield = self.game.no_shield
-                message = [f'{self.name} достает {shield.realname()[0]} из-за спины и берет его в руку.']
+                message = [f'{self.name} достает {shield.real_name()[0]} из-за спины и берет его в руку.']
                 tprint(game, message)
                 return True
             for i in self.pockets:
