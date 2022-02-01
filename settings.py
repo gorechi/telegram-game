@@ -44,6 +44,7 @@ s_is_monster_wear_armor = True
 s_monster_money = 5
 s_monster_see_through_keyhole = 'видит какую-то неясную фигуру.'
 s_monster_hit_chance = 5
+s_monster_parry_chance = 2
 
 # Прочие параметры логики монстров
 # Верхняя граница значения множителя, на который умножается сила монстра при рассчете полученного за него опыта

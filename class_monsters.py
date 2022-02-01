@@ -20,7 +20,8 @@ class Monster:
                  carry_weapon=s_is_monster_carry_weapon,
                  carry_shield=s_is_monster_carry_shield,
                  wear_armor=s_is_monster_wear_armor,
-                 hit_chance=s_monster_hit_chance):
+                 hit_chance=s_monster_hit_chance,
+                 parry_chance = s_monster_parry_chance):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -29,6 +30,7 @@ class Monster:
         self.actions = actions.split(',')
         self.state = state
         self.hit_chance = hit_chance
+        self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon
         self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
@@ -190,8 +192,12 @@ class Monster:
             tprint(game, text)
         return True
 
+    def hit_chance(self):
+        return self.hit_chance
+    
     def defence(self, attacker):
         result = 0
+        weapon = attacker.weapon
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
@@ -202,6 +208,14 @@ class Monster:
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
+        parry_chance = self.parry_chance
+        if parry_chance > 0:
+            parry_dice = dice(1, parry_chance)
+        else:
+            parry_dice = 0
+        hit_dice = dice(1, (weapon.hit_chance + attacker.hit_chance()))
+        if parry_dice > hit_dice:
+            result = -1
         return result
 
     def lose(self, winner=None):

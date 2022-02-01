@@ -6,6 +6,7 @@
     "stren": 9,
     "health": 18,
     "hit_chance": 4,
+    "parry_chance": 2,
     "actions":
       [
       "крушит",
@@ -27,6 +28,7 @@
     "stren": 13,
     "health": 40,
     "hit_chance": 4,
+    "parry_chance": 0,
     "actions":
       [
       "крушит",
@@ -50,6 +52,7 @@
     "stren": 9,
     "health": 30,
     "hit_chance": 6,
+    "parry_chance": 3,
     "actions":
       [
       "режет",
@@ -71,6 +74,7 @@
     "stren": 8,
     "health": 33,
     "hit_chance": 6,
+    "parry_chance": 3,
     "actions":
       [
       "режет",
@@ -92,6 +96,7 @@
     "stren": 8,
     "health": 23,
     "hit_chance": 5,
+    "parry_chance": 3,
     "actions":
       [
       "режет",
@@ -113,6 +118,7 @@
     "stren": 8,
     "health": 28,
     "hit_chance": 5,
+    "parry_chance": 3,
     "actions":
       [
       "режет",
@@ -134,6 +140,7 @@
     "stren": 10,
     "health": 29,
     "hit_chance": 5,
+    "parry_chance": 2,
     "actions":
       [
       "крушит",
@@ -155,6 +162,7 @@
     "stren": 10,
     "health": 15,
     "hit_chance": 4,
+    "parry_chance": 0,
     "actions":
       [
       "клацает",
@@ -176,6 +184,7 @@
     "stren": 10,
     "health": 18,
     "hit_chance": 5,
+    "parry_chance": 4,
     "actions":
       [
       "крушит",
@@ -197,6 +206,7 @@
     "stren": 8,
     "health": 30,
     "hit_chance": 4,
+    "parry_chance": 1,
     "actions":
       [
       "крушит",
@@ -218,6 +228,7 @@
     "stren": 7,
     "health": 28,
     "hit_chance": 5,
+    "parry_chance": 0,
     "actions":
       [
       "атакует",
@@ -266,6 +277,7 @@
     "stren": 10,
     "health": 35,
     "hit_chance": 5,
+    "parry_chance": 1,
     "actions":
       [
       "атакует",
@@ -314,6 +326,7 @@
     "stren": 8,
     "health": 30,
     "hit_chance": 7,
+    "parry_chance": 2,
     "actions":
       [
       "царапает",
@@ -333,6 +346,8 @@
     "name1": "Берсерка",
     "stren": 10,
     "health": 25,
+    "hit_chance": 7,
+    "parry_chance": 0,
     "actions":
       [
       "сокрушает",

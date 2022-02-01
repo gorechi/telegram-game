@@ -145,6 +145,9 @@ class Hero:
         else:
             c(full_command[1])
 
+    def hit_chance(self):
+        return self.dext + self.weapon_mastery[self.weapon.type]
+    
     def change(self, what=None):
         message = []
         if what == 'оружие':
@@ -188,7 +191,7 @@ class Hero:
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
-                room.loot.append(i)
+                room.loot.add(i)
                 self.pockets.remove(i)
                 tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
                 return True
@@ -197,18 +200,18 @@ class Hero:
                 return False
         else:
             if not self.shield.empty and item.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
-                room.loot.append(self.shield)
+                room.loot.add(self.shield)
                 tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
                 self.shield = game.no_shield
                 return True
             elif not self.removed_shield.empty and item.lower() in ['щит', self.removed_shield.name.lower(), self.removed_shield.name1.lower()]:
-                room.loot.append(self.removed_shield)
+                room.loot.add(self.removed_shield)
                 tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
                 self.removed_shield = game.no_shield
                 return True
             elif not self.weapon.empty and item.lower() in ['оружие', self.weapon.name.lower(), self.weapon.name1.lower()]:
-                room.loot.append(self.weapon)
-                tprint(game, f'{self.name} бросает {self.shield.name} в угол комнаты.')
+                room.loot.add(self.weapon)
+                tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
                 self.weapon = game.no_weapon
                 return True
             else:
@@ -453,6 +456,10 @@ class Hero:
                 string1 = f'{self.name} бьет {target_name1} не используя оружие и ' \
                           f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. '
             target_defence = target.defence(self)
+            if target_defence < 0:
+                total_damage = 0
+                string1 += f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.'
+                return string1
             total_attack = weapon_attack + mele_attack
             if (total_attack - target_defence) > 0:
                 total_damage = weapon_attack + mele_attack - target_defence
