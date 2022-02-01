@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from random import randint as dice
-from telebot import types
-from PIL import Image, ImageDraw, ImageFont
 
+from PIL import Image, ImageDraw, ImageFont
+from telebot import types
 
 # Функции
 
@@ -90,20 +90,6 @@ def howmany(a, string):
         return str(a) + ' ' + b[1]
     else:
         return str(a) + ' ' + b[2]
-
-
-def readspells(classes):
-    spellslist = readfile('spells', True, '\\')
-    for i in range(len(spellslist)):
-        spellslist[i] = classes[spellslist[i][0]](spellslist[i][1],
-                                                  spellslist[i][2],
-                                                  spellslist[i][3],
-                                                  spellslist[i][4],
-                                                  spellslist[i][5],
-                                                  spellslist[i][6],
-                                                  spellslist[i][7],
-                                                  spellslist[i][8])
-    return spellslist
 
 
 def readitems(what_kind, how_many, classes):

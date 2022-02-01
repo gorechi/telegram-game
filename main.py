@@ -3,10 +3,11 @@
 # Импортируем необходимые модули
 import telebot
 from telebot import types
-from functions import tprint
-from constants import TOKEN
+
 from class_game import Game
 from class_items import Rune
+from constants import TOKEN
+from functions import tprint
 
 # Константы и настройки
 game_sessions = {}

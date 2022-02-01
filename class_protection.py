@@ -1,7 +1,8 @@
-﻿from functions import randomitem, tprint
-from settings import *
-from math import ceil
+﻿from math import ceil
 from random import randint as dice
+
+from functions import randomitem, tprint
+from settings import *
 
 
 class Protection:

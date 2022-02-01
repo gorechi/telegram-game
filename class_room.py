@@ -1,9 +1,10 @@
-from functions import readfile, randomitem, tprint, pprint
-from class_monsters import Monster
+from random import randint as dice
+
 from class_basic import Loot, Money
 from class_items import Key
+from class_monsters import Monster
+from functions import pprint, randomitem, readfile, tprint
 from settings import *
-from random import randint as dice
 
 decor1 = readfile('decorate1', False)
 decor2 = readfile('decorate2', False)

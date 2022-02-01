@@ -1,13 +1,15 @@
-from functions import randomitem
-from settings import *
+import json
+
 from class_castle import Castle
 from class_hero import Hero
-from class_weapon import Weapon
-from class_protection import Shield, Armor
-from class_items import Potion, Rune, Book, Matches, Map, Key, Spell
-from class_monsters import Monster, Shapeshifter, Vampire, Berserk, Plant
+from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
+from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire
+from class_protection import Armor, Shield
 from class_room import Furniture
-import json
+from class_weapon import Weapon
+from functions import randomitem
+from settings import *
+
 
 class Empty():
     def __init__(self):

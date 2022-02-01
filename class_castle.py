@@ -1,8 +1,9 @@
-from functions import randomitem, pprint
 from random import randint as dice
-from class_room import Room
-from class_items import Key
+
 from class_basic import Loot, Money
+from class_items import Key
+from class_room import Room
+from functions import pprint, randomitem
 from settings import *
 
 

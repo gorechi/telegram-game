@@ -1,7 +1,10 @@
+from math import ceil
+from random import randint as dice
+
 from functions import randomitem, tprint
 from settings import *
-from random import randint as dice
-from math import ceil
+
+
 class Weapon:
     def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
         self.game = game

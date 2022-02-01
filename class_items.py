@@ -1,9 +1,9 @@
-from functions import randomitem, howmany, tprint
-from class_basic import *
-from settings import *
-from math import sqrt
-from math import floor
+from math import floor, sqrt
 from random import randint as dice
+
+from class_basic import *
+from functions import howmany, randomitem, tprint
+from settings import *
 
 
 class Item:

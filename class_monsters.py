@@ -1,11 +1,13 @@
-from functions import randomitem, howmany, tprint
-from class_basic import Loot, Money
-from class_weapon import Weapon
-from class_protection import Shield, Armor
-from class_items import Rune
-from settings import *
-from random import randint as dice
 from math import ceil
+from random import randint as dice
+
+from class_basic import Loot, Money
+from class_items import Rune
+from class_protection import Armor, Shield
+from class_weapon import Weapon
+from functions import howmany, randomitem, tprint
+from settings import *
+
 
 class Monster:
     def __init__(self,

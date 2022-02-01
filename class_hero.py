@@ -1,9 +1,10 @@
-from functions import showsides, randomitem, howmany, tprint, normal_count
-from class_items import Money, Potion, Key, Rune, Book
-from class_weapon import Weapon
-from class_protection import Shield, Armor
-from class_monsters import Monster
 from random import randint as dice
+
+from class_items import Book, Key, Money, Potion, Rune
+from class_monsters import Monster
+from class_protection import Armor, Shield
+from class_weapon import Weapon
+from functions import howmany, normal_count, randomitem, showsides, tprint
 from settings import *
 
 

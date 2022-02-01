@@ -1,6 +1,7 @@
 from functions import howmany, tprint
 from settings import s_money_groups
 
+
 class Loot:
     def __init__(self, game):
         self.game = game
