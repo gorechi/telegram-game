@@ -32,7 +32,7 @@ def showsides(side1, side2, castle):
     elif side1.shield.empty and not side1.armor.empty:
         line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.perm_protection())}'
     elif not side1.shield.empty and not side1.armor.empty:
-        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.permp_rotection())} + d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
+        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.perm_protection())} + d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
     line += f', жизней - {str(side1.health)}. '
     message.append(line)
     if room.light:

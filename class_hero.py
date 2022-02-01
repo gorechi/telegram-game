@@ -69,7 +69,7 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
-        self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0}
+        self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0, "": 0}
         self.directions_dict = {0: (0 - self.game.new_castle.rooms),
                                1: 1,
                                2: self.game.new_castle.rooms,
@@ -145,6 +145,9 @@ class Hero:
         else:
             c(full_command[1])
 
+    def hit_chance(self):
+        return self.dext + self.weapon_mastery[self.weapon.type]
+    
     def change(self, what=None):
         message = []
         if what == 'оружие':
@@ -188,7 +191,7 @@ class Hero:
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
-                room.loot.append(i)
+                room.loot.add(i)
                 self.pockets.remove(i)
                 tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
                 return True
@@ -197,18 +200,18 @@ class Hero:
                 return False
         else:
             if not self.shield.empty and item.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
-                room.loot.append(self.shield)
+                room.loot.add(self.shield)
                 tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
                 self.shield = game.no_shield
                 return True
             elif not self.removed_shield.empty and item.lower() in ['щит', self.removed_shield.name.lower(), self.removed_shield.name1.lower()]:
-                room.loot.append(self.removed_shield)
+                room.loot.add(self.removed_shield)
                 tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
                 self.removed_shield = game.no_shield
                 return True
             elif not self.weapon.empty and item.lower() in ['оружие', self.weapon.name.lower(), self.weapon.name1.lower()]:
-                room.loot.append(self.weapon)
-                tprint(game, f'{self.name} бросает {self.shield.name} в угол комнаты.')
+                room.loot.add(self.weapon)
+                tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
                 self.weapon = game.no_weapon
                 return True
             else:
@@ -446,13 +449,17 @@ class Hero:
                 if dice(1, 100) <= critical_probability:
                     weapon_attack = weapon_attack * 2
                     damage_text = ' критического урона. '
-                string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name} и наносит' \
+                string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
                           f' {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
             else:
                 weapon_attack = 0
                 string1 = f'{self.name} бьет {target_name1} не используя оружие и ' \
                           f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. '
             target_defence = target.defence(self)
+            if target_defence < 0:
+                total_damage = 0
+                string1 += f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.'
+                return string1
             total_attack = weapon_attack + mele_attack
             if (total_attack - target_defence) > 0:
                 total_damage = weapon_attack + mele_attack - target_defence
@@ -538,8 +545,9 @@ class Hero:
         elif self.money.how_much_money == 1:
             money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
-            money_text = f'{self.g(["Герой беден", "Героиня бедна"])}, как церковная мышь.'
-        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. {self.g(["Его", "Ее"])} сила - {str(self.stren)} и сейчас'
+            money_text = f'{self.name} {self.g(["беден", "бедна"])}, как церковная мышь.'
+        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. ' 
+                       f'{self.g(["Его", "Ее"])} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
                        f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         if not self.weapon.empty:
@@ -592,6 +600,7 @@ class Hero:
             integer: Значение защиты с учетом доспехов и щита.
         """
         result = 0
+        weapon = attacker.weapon
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
@@ -602,6 +611,11 @@ class Hero:
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
+        parry_chance = self.dext + self.weapon_mastery[weapon.type]
+        parry_dice = dice(1, parry_chance)
+        hit_dice = dice(1, (weapon.hit_chance + attacker.hit_chance))
+        if parry_dice > hit_dice:
+            result = -1
         return result
 
     def lose(self, winner=None):
@@ -686,7 +700,7 @@ class Hero:
                     text.append(description)
                 text.append(self.money.show())
             if not self.removed_shield.empty:
-                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.realname()[0]}')
+                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():
@@ -991,7 +1005,7 @@ class Hero:
                 shield = self.removed_shield
                 self.shield = shield
                 self.removed_shield = self.game.no_shield
-                message = [f'{self.name} достает {shield.realname()[0]} из-за спины и берет его в руку.']
+                message = [f'{self.name} достает {shield.real_name()[0]} из-за спины и берет его в руку.']
                 tprint(game, message)
                 return True
             for i in self.pockets:

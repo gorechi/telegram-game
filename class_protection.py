@@ -162,7 +162,7 @@ class Armor(Protection):
         message = [f'{who.name} использует {self.name1} как защиту.']
         if not old_armor.empty:
             message.append(f'При этом он снимает {old_armor.name1} и оставляет валяться на полу.')
-            who.drop(old_armor)
+            who.drop(old_armor.name)
         who.armor = self
         tprint(self.game, message)
 
@@ -262,5 +262,5 @@ class Shield (Protection):
             message = [f'{who.name} берет {self.name1} в руку.']
         if old_shield:
             message.append(f'При этом он бросает {old_shield.realname()[1]} и оставляет валяться на полу.')
-            who.drop(old_shield)
+            who.drop(old_shield.name)
         tprint(self.game, message)

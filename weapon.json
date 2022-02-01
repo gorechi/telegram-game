@@ -7,6 +7,7 @@
     "gender": 0,
     "twohanded": true,
     "type": "рубящее",
+    "hit_chance": 7,
     "actions":
       [
       "крушит",
@@ -22,6 +23,7 @@
     "damage": 12,
     "twohanded": true,
     "type": "рубящее",
+    "hit_chance": 5,
     "actions":
       [
       "крушит",
@@ -36,6 +38,7 @@
     "damage": 11,
     "twohanded": true,
     "type": "ударное",
+    "hit_chance": 4,
     "actions":
       [
       "крушит",

@@ -10,6 +10,8 @@ class Weapon:
             self.damage = int(damage)
             self.name1 = name1
             self.twohanded = False
+            self.type = ''
+            self.hit_chance = 0
         else:
             n1 = s_weapon_first_words_dictionary
             n2 = s_weapon_types_dictionary
@@ -21,6 +23,7 @@ class Weapon:
             self.type = n2[a2][3]
             self.twohanded = n2[a2][4]
             self.gender = n2[a2][1]
+            self.hit_chance = n2[a2][5]
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.runes = []
@@ -116,7 +119,7 @@ class Weapon:
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
-                who.drop(who.weapon)
+                who.drop(who.weapon.name)
                 who.weapon = self
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
@@ -128,7 +131,7 @@ class Weapon:
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         if self.twohanded:
-            name = self.twohanded_dict[self.gender] + ' ' + self.name
+            name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
         else:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string}), {self.type}'
