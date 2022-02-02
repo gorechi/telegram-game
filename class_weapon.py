@@ -6,7 +6,7 @@ from settings import *
 
 
 class Weapon:
-    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False):
+    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None):
         self.game = game
         if name != 0:
             self.name = name
@@ -18,6 +18,10 @@ class Weapon:
         else:
             n1 = s_weapon_first_words_dictionary
             n2 = s_weapon_types_dictionary
+            n2 = []
+            for i in s_weapon_types_dictionary:
+                if not weapon_type or i[3] == weapon_type:
+                    n2.append(i)
             a1 = dice(0, len(n1) - 1)
             a2 = dice(0, len(n2) - 1)
             self.name = n1[a1][n2[a2][1]][0] + ' ' + n2[a2][0]

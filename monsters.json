@@ -42,6 +42,7 @@
     "hide": false,
     "carryweapon": true,
     "carryshield": true,
+    "prefered_weapon": "ударное",
     "gender": 0,
     "wearArmor": true
   },
@@ -64,6 +65,7 @@
     "agressive": false,
     "carryweapon": true,
     "carryshield": true,
+    "prefered_weapon": "колющее",
     "gender": 0,
     "wearArmor": true
   },
@@ -86,6 +88,7 @@
     "agressive": false,
     "carryweapon": true,
     "carryshield": true,
+    "prefered_weapon": "колющее",
     "gender": 1,
     "wearArmor": true
   },
