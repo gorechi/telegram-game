@@ -131,12 +131,14 @@ class Game():
         self.player.pockets.append(new_key)  # Отдаем ключ игроку
         self.game_is_on = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
 
+    
     def __del__ (self):
         print("="*40)
         print('Игра удалена')
         print("=" * 40)
 
-    def readobjects(self, file=None, howmany=None, object_class=None, random=False):
+    
+    def readobjects(self, file=None, howmany=None, object_class=None, random=False, object_type=None):
         objects = []
         if file:
             with open(file, encoding='utf-8') as read_data:
@@ -156,13 +158,20 @@ class Game():
                         vars(new_object)[param] = i[param]
                     new_object.on_create()
                     objects.append(new_object)
+        if object_type:
+            for obj in objects:
+                if obj.type != object_type:
+                    objects.remove(obj)
         if howmany:
             while len(objects) > howmany:
                 spare_object = randomitem(objects, False)
                 objects.remove(spare_object)
             if object_class:
                 while len(objects) < howmany:
-                    new_object = object_class(self, 0)
+                    if object_type:
+                        new_object = object_class(self, 0, weapon_type=object_type)
+                    else:
+                        new_object = object_class(self, 0)
                     objects.append(new_object)
         if len(objects)>0:
             return objects

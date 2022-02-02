@@ -49,6 +49,7 @@ class Monster:
         self.weakness = []
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
+        self.prefered_weapon = None
         if carry_weapon == 'False':
             self.carry_weapon = False
         else:
@@ -68,6 +69,10 @@ class Monster:
         self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
 
     def on_create(self):
+        if self.prefered_weapon:
+            print(self.name, 'prefered_weapon - ', self.prefered_weapon)
+            self.weapon = self.game.readobjects(howmany=1, object_class=Weapon, random=True, object_type=self.prefered_weapon)[0]
+            print(self.name, self.weapon.name)
         return True
 
     def __str__(self):
