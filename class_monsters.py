@@ -70,8 +70,8 @@ class Monster:
 
     def on_create(self):
         if self.prefered_weapon:
-            print(self.name, 'prefered_weapon - ', self.prefered_weapon)
             self.weapon = self.game.readobjects(howmany=1, object_class=Weapon, random=True, object_type=self.prefered_weapon)[0]
+            self.game.all_weapon.append(self.weapon)
             print(self.name, self.weapon.name)
         return True
 
