@@ -214,7 +214,7 @@ class Map():
         if who == '':
             return False
         who.pockets.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name} себе.')
+        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
 
 class Key():

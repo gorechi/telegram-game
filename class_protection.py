@@ -262,6 +262,6 @@ class Shield (Protection):
             who.shield = self
             message = [f'{who.name} берет {self.name1} в руку.']
         if old_shield:
-            message.append(f'При этом он бросает {old_shield.realname()[1]} и оставляет валяться на полу.')
+            message.append(f'При этом он бросает {old_shield.real_name()[1]} и оставляет валяться на полу.')
             who.drop(old_shield.name)
         tprint(self.game, message)
