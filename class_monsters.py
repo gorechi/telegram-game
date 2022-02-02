@@ -86,6 +86,9 @@ class Monster:
     
     def give(self, item):
         if isinstance(item, Weapon) and self.weapon.empty and self.carry_weapon:
+            if self.prefered_weapon and self.prefered_weapon != item.type:
+                self.loot.pile.append(item)
+                return False
             if item.twohanded and not self.shield.empty:
                     shield = self.shield
                     self.shield = self.game.no_shield
