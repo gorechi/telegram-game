@@ -494,26 +494,8 @@ class Hero:
                 return f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.'
             else:
                 return result
-        elif action in ['и', 'использовать'] and len(can_use) > 0:
-            tprint(game, f'Во время боя {self.name} может использовать:')
-            for i in self.pockets:
-                if i.can_use_in_fight:
-                    tprint(game, i.name)
-            while True:
-                a = input('Что нужно использовать?')
-                if a == 'ничего' or a == '':
-                    break
-                else:
-                    item_used = False
-                    for i in can_use:
-                        if i.name == a or i.name1 == a:
-                            if i.use(self, inaction=True) and isinstance(i, Potion):
-                                self.pockets.remove(i)
-                            item_used = True
-                            break
-                    if item_used:
-                        break
-                    tprint(game, 'Что-то не выходит')
+        elif action in ['и', 'использовать']:
+            self.use_in_fight()
         elif action in ['с', 'сменить оружие', 'сменить']:
             weapon = self.weapon
             spare_weapon = False
@@ -527,6 +509,29 @@ class Hero:
             tprint(game, message)
         return True
 
+    def use_in_fight(self):
+        """Функция использования вещей в бою.
+
+        Args:
+            item (str, optional): Наименование предмета, который нужно использовать.\n
+        """
+        game = self.game
+        can_use = []
+        for i in self.pockets:
+            if i.can_use_in_fight:
+                can_use.append(i)
+        if len(can_use) == 0:
+            tprint(game, f'{self.name} не может ничего использовать. В рюкзаке нет вещей, которые были бы полезны в бою.')
+            return False
+        text = []
+        text.append(f'{self.name} может использовать следующие предметы:')
+        for item in can_use:
+            text.append(f'{str(can_use.index(item) + 1)}: {item.name1}')
+        text.append('Выберите номер предмета или скажите "отмена" для прекращения.')
+        game.selected_item = can_use
+        game.state = 4
+        tprint(game, text, 'use_in_fight')
+    
     def use_shield(self, target):
         game = self.game
         if self.shield == '':
