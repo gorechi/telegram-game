@@ -96,24 +96,24 @@ def all_commands(message):
             if command == 'здоровье':
                 game.player.health += 3
                 game.player.start_health += 3
-                tprint(game, game.player.name + ' получает 3 единицы здоровья.', 'off')
+                tprint(game, f'{game.player.name} получает 3 единицы здоровья.', 'off')
                 game.state = 0
             elif command == 'силу':
                 game.player.stren += 1
                 game.player.start_stren += 1
-                tprint(game, game.player.name + ' увеличивает свою силу на 1.', 'off')
+                tprint(game, f'{game.player.name} увеличивает свою силу на 1.', 'off')
                 game.state = 0
             elif command == 'ловкость':
                 game.player.dext += 1
                 game.player.start_dext += 1
-                tprint(game, game.player.name + ' увеличивает свою ловкость на 1.', 'off')
+                tprint(game, f'{game.player.name} увеличивает свою ловкость на 1.', 'off')
                 game.state = 0
             elif command == 'интеллект':
                 game.player.intel += 1
                 game.player.start_intel += 1
-                tprint(game, game.player.name + ' увеличивает свой интеллект на 1.', 'off')
+                tprint(game, f'{game.player.name} увеличивает свой интеллект на 1.', 'off')
                 game.state = 0
-        elif command and game.state ==2:
+        elif command and game.state == 2:
             answer = text.lower()
             rune_list = game.player.inpockets(Rune)
             if answer == 'отмена':
@@ -121,20 +121,35 @@ def all_commands(message):
                 return True
             elif answer.isdigit() and int(answer) - 1 < len(rune_list):
                 if game.selected_item.enchant(rune_list[int(answer) - 1]):
-                    tprint(game, game.player.name + ' улучшает ' + game.selected_item.name1 + ' новой руной.', 'off')
+                    tprint(game, f'{game.player.name} улучшает {game.selected_item.name1} новой руной.', state='direction')
                     game.player.pockets.remove(rune_list[int(answer) - 1])
                     game.state = 0
                     return True
                 else:
-                    tprint(game, 'Похоже, что ' +
-                           game.player.name +
-                           'не может вставить руну в ' +
-                           game.selected_item.name1 +
-                           '.', 'off')
+                    tprint(game, f'Похоже, что {game.player.name} не может вставить руну в {game.selected_item.name1}.', state='direction')
                     game.state = 0
                     return False
             else:
-                tprint(game, game.player.name + ' не находит такую руну у себя в карманах.', 'off')
+                tprint(game, f'{game.player.name} не находит такую руну у себя в карманах.', 'off')
+        elif command and game.state == 4:
+            answer = text.lower()
+            can_use = game.selected_item
+            if answer == 'отмена':
+                game.state = 1
+                tprint(game, f'{game.player.name} продолжает бой.', 'fight')
+                return True
+            elif answer.isdigit() and int(answer) - 1 < len(can_use):
+                item = can_use[int(answer) - 1]
+                if item.use(who_using=game.player, in_action=True):
+                    game.selected_item.remove(item)
+                    return True
+                else:
+                    tprint(game, f'Похоже, что {game.player.name} не может использовать {item.name1}.', 'fight')
+                    game.state = 1
+                    return False
+            else:
+                tprint(game, f'{game.player.name} не находит такую вкщь у себя в карманах.', 'fight')
+
         elif command in fight_commands and game.state == 1:
             enemy = game.new_castle.plan[game.player.current_position].center
             tprint(game, game.player.attack(enemy, message.text))
@@ -144,7 +159,7 @@ def all_commands(message):
                 elif enemy.health > 0:
                     enemy.attack(game.player)
                 else:
-                    tprint(game, game.player.name + ' побеждает в бою!', 'off')
+                    tprint(game, f'{game.player.name} побеждает в бою!', 'off')
                     game.state = 0
                     game.player.win(enemy)
                     enemy.lose(game.player)

@@ -341,6 +341,7 @@
     "agressive": false,
     "carryweapon": false,
     "carryshield": true,
+    "gender": 0,
     "wearArmor": true
   },
   {
