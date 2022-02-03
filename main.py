@@ -121,12 +121,12 @@ def all_commands(message):
                 return True
             elif answer.isdigit() and int(answer) - 1 < len(rune_list):
                 if game.selected_item.enchant(rune_list[int(answer) - 1]):
-                    tprint(game, f'{game.player.name} улучшает {game.selected_item.name1} новой руной.', 'off')
+                    tprint(game, f'{game.player.name} улучшает {game.selected_item.name1} новой руной.', state='direction')
                     game.player.pockets.remove(rune_list[int(answer) - 1])
                     game.state = 0
                     return True
                 else:
-                    tprint(game, f'Похоже, что {game.player.name} не может вставить руну в {game.selected_item.name1}.', 'off')
+                    tprint(game, f'Похоже, что {game.player.name} не может вставить руну в {game.selected_item.name1}.', state='direction')
                     game.state = 0
                     return False
             else:
@@ -135,19 +135,20 @@ def all_commands(message):
             answer = text.lower()
             can_use = game.selected_item
             if answer == 'отмена':
-                game.state = 0
+                game.state = 1
+                tprint(game, f'{game.player.name} продолжает бой.', 'fight')
                 return True
             elif answer.isdigit() and int(answer) - 1 < len(can_use):
                 item = can_use[int(answer) - 1]
-                if item.use():
-                    game.state = 0
+                if item.use(who_using=game.player, in_action=True):
+                    game.selected_item.remove(item)
                     return True
                 else:
-                    tprint(game, f'Похоже, что {game.player.name} не может использовать {item.name1}.', 'off')
-                    game.state = 0
+                    tprint(game, f'Похоже, что {game.player.name} не может использовать {item.name1}.', 'fight')
+                    game.state = 1
                     return False
             else:
-                tprint(game, f'{game.player.name} не находит такую вкщь у себя в карманах.', 'off')
+                tprint(game, f'{game.player.name} не находит такую вкщь у себя в карманах.', 'fight')
 
         elif command in fight_commands and game.state == 1:
             enemy = game.new_castle.plan[game.player.current_position].center

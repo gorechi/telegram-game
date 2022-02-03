@@ -496,7 +496,6 @@ class Hero:
                 return result
         elif action in ['и', 'использовать']:
             self.use_in_fight()
-            return f'{self.name} продолжает бой.'
         elif action in ['с', 'сменить оружие', 'сменить']:
             weapon = self.weapon
             spare_weapon = False
