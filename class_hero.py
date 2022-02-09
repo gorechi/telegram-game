@@ -86,17 +86,6 @@ class Hero:
                                'вверх': (0 - self.game.new_castle.rooms),
                                'верх': (0 - self.game.new_castle.rooms),
                                'право': 1}
-        self.doors_dict = {'наверх': 0,
-                          'направо': 1,
-                          'вправо': 1,
-                          'право': 1,
-                          'налево': 3,
-                          'влево': 3,
-                          'лево': 3,
-                          'вниз': 2,
-                          'низ': 2,
-                          'вверх': 0,
-                          'верх': 0}
         self.command_dict = {'осмотреть': self.lookaround,
                             'идти': self.go,
                             'атаковать': self.fight,
@@ -125,6 +114,11 @@ class Hero:
         return 'hero'
 
     def do(self, command):
+        """Функция обрабатывает команды, переданные герою и передает управление соответствующей команде функции
+
+        Args:
+            command (str): команда от пользователя, полученная из чата игры
+        """
         a = command.find(' ')
         full_command = []
         if a < 0:
@@ -247,7 +241,7 @@ class Hero:
             if not self.removed_shield.empty:
                 shield = self.removed_shield
             if shield:
-                need_money = shield.accumulated_damage * 10 // 1
+                need_money = shield.accumulated_damage * s_shield_repair_multiplier // 1
                 if need_money > 0 and self.money.how_much_money >= need_money:
                     shield.accumulated_damage = 0
                     self.money.how_much_money -= need_money
@@ -256,7 +250,7 @@ class Hero:
             steal_count = dice(1, s_steal_probability)
             if dream_count == 1:
                 message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
-                self.fear = self.fear // 2
+                self.fear = self.fear // s_nightmare_divider
             else:
                 message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
                 self.fear = 0
@@ -303,7 +297,7 @@ class Hero:
         elif not item:
             message.append(f'{self.name} не умеет чинить такие штуки.')
         else:
-            need_money = item.accumulated_damage * 10 // 1
+            need_money = item.accumulated_damage * s_shield_repair_multiplier // 1
             if need_money == 0:
                 message.append(f'{item.name1} не нужно ремонтировать.')
             elif self.money.hhow_much_money >= need_money:
@@ -433,7 +427,7 @@ class Hero:
             target_name = 'Неизвестная тварь из темноты'
             target_name1 = 'черт знает кого'
             rage = 1
-            mele_attack = dice(1, self.stren) // dice(1, 3)
+            mele_attack = dice(1, self.stren) // dice(1, s_dark_damage_divider_dice)
         self.run = False
         can_use = []
         for i in self.pockets:
@@ -445,10 +439,10 @@ class Hero:
             self.hide = False
             if not self.weapon.empty:
                 weapon_attack = self.weapon.attack(target)
-                critical_probability = self.weapon_mastery[self.weapon.type] * 5
+                critical_probability = self.weapon_mastery[self.weapon.type] * s_critical_step
                 damage_text = ' урона. '
                 if dice(1, 100) <= critical_probability:
-                    weapon_attack = weapon_attack * 2
+                    weapon_attack = weapon_attack * s_critical_multiplier
                     damage_text = ' критического урона. '
                 string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
                           f' {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
@@ -611,10 +605,10 @@ class Hero:
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             if self.hide:
-                dice_result = dice(50, 75) / 100
+                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
                 self.shield.accumulated_damage += dice_result
             else:
-                dice_result = dice(10, 25) / 100
+                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
                 self.shield.accumulated_damage += dice_result
         if not self.armor.empty:
             result += self.armor.protect(attacker)
@@ -711,7 +705,7 @@ class Hero:
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():
-            if room.doors[self.doors_dict[what]] == 0:
+            if room.doors[s_hero_doors_dict[what]] == 0:
                 tprint(game, f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.')
                 return True
             else:
@@ -753,14 +747,14 @@ class Hero:
         if direction not in self.directions_dict.keys():
             tprint(game, f'{self.name} не знает такого направления!')
             return False
-        elif room.doors[self.doors_dict[direction]] == 0:
+        elif room.doors[s_hero_doors_dict[direction]] == 0:
             if room.light:
                 message = [f'Там нет двери. {self.name} не может туда пройти!']
             else:
                 message = [f'В темноте {self.name} врезается во что-то носом.']
             tprint(game, message)
             return False
-        elif room.doors[self.doors_dict[direction]] == 2:
+        elif room.doors[s_hero_doors_dict[direction]] == 2:
             if room.light:
                 message = [f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!']
             else:
@@ -873,7 +867,7 @@ class Hero:
                 if len(what_to_search.loot.pile) > 0:
                     message.append('Все, что было спрятано, теперь лежит на виду.')
             elif len(what_to_search.loot.pile) == 0:
-                message.append(what_to_search.name + ' ' + what_to_search.empty_text)
+                message.append(f'{what_to_search.name} {what_to_search.empty_text}')
             tprint(game, message)
             return True
 
@@ -930,7 +924,7 @@ class Hero:
             for furniture in room.furniture:
                 if furniture.locked:
                     what_is_in_room.append(furniture)
-        if item == '' or (not self.doors_dict.get(item, False) and self.doors_dict.get(item, True) != 0):
+        if item == '' or (not s_hero_doors_dict.get(item, False) and s_hero_doors_dict.get(item, True) != 0):
             if len(what_is_in_room) == 0:
                 if room.light:
                     message = ['В комнате нет вещей, которые можно открыть.']
@@ -975,16 +969,16 @@ class Hero:
                 message = [f'{self.name} ничего не видит и не может нащупать замочную скважину.']
                 tprint(game, message)
                 return False
-            if not self.doors_dict.get(item, False) and self.doors_dict.get(item, True) != 0:
+            if not s_hero_doors_dict.get(item, False) and s_hero_doors_dict.get(item, True) != 0:
                 tprint(game, f'{self.name} не может это открыть.')
                 return False
-            elif new_castle.plan[self.current_position].doors[self.doors_dict[item]] != 2:
+            elif new_castle.plan[self.current_position].doors[s_hero_doors_dict[item]] != 2:
                 tprint(game, 'В той стороне нечего открывать.')
                 return False
             else:
                 self.pockets.remove(key)
-                room.doors[self.doors_dict[item]] = 1
-                j = self.doors_dict[item] + 2 if (self.doors_dict[item] + 2) < 4 else self.doors_dict[item] - 2
+                room.doors[s_hero_doors_dict[item]] = 1
+                j = s_hero_doors_dict[item] + 2 if (s_hero_doors_dict[item] + 2) < 4 else s_hero_doors_dict[item] - 2
                 new_castle.plan[self.current_position + self.directions_dict[item]].doors[j] = 1
                 tprint(game, f'{self.name} открывает дверь.')
 
