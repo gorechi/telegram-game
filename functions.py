@@ -1,11 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from random import randint as dice
+from random import randint
 
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
 # Функции
+
+def roll(dice):
+    """Функция имитирует бросок нескольких кубиков сразу
+
+    Args:
+        dice (list of integers): Список, состоящий из целочисленных значений размера кубиков
+
+    Returns:
+        int: Результат броска всех кубиков
+    """
+    result = 0 
+    for i in dice:
+        result += randint(1, int(i))
+    return result
 
 def readfile(filename, divide, divider='|'):
     filelines = []
@@ -66,7 +80,7 @@ def randomitem(list, neednumber=False, how_many=1):
     if len(list) == 0:
         return []
     if not how_many or int(how_many) < 2:
-        a = dice(0, len(list) - 1)
+        a = randint(0, len(list) - 1)
         if not neednumber:
             return list[a]
         else:
@@ -74,7 +88,7 @@ def randomitem(list, neednumber=False, how_many=1):
     else:
         result = []
         while how_many > 0:
-            a = dice(0, len(list) - 1)
+            a = randint(0, len(list) - 1)
             if list[a] not in result:
                 result.append(list[a])
                 how_many -= 1
