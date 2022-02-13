@@ -264,6 +264,7 @@ class Hero:
                     self.pockets.remove(item)
                     stealing_monster.give(item)
                     message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
+            self.poisoned = False
             tprint(game, message)
             return True
     
