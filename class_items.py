@@ -43,6 +43,10 @@ class Rune:
         self.name1 = 'руну'
         self.description = self.name + ' ' + s_elements_dictionary[self.element]
         self.empty = False
+        if dice (1, s_rune_poison_probability) == 1:
+            self.poison = True
+        else:
+            self.poison = False
 
     def __str__(self):
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
