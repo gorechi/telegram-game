@@ -18,6 +18,7 @@
     "agressive": false,
     "carryweapon": true,
     "carryshield": true,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -43,6 +44,7 @@
     "carryweapon": true,
     "carryshield": true,
     "prefered_weapon": "ударное",
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -66,6 +68,7 @@
     "carryweapon": true,
     "carryshield": true,
     "prefered_weapon": "колющее",
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -89,6 +92,7 @@
     "carryweapon": true,
     "carryshield": true,
     "prefered_weapon": "колющее",
+    "venomous": 0,
     "gender": 1,
     "wearArmor": true
   },
@@ -111,6 +115,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -133,6 +138,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
+    "venomous": 0,
     "gender": 1,
     "wearArmor": true
   },
@@ -155,6 +161,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": true,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -177,6 +184,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": true,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -199,6 +207,7 @@
     "agressive": true,
     "carryweapon": false,
     "carryshield": true,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -221,6 +230,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
+    "venomous": 2,
     "gender": 0,
     "wearArmor": true
   },
@@ -270,6 +280,7 @@
     "agressive": false,
     "carryweapon": false,
     "carryshield": false,
+    "venomous": 4,
     "gender": 1,
     "wearArmor": false
   },
@@ -319,6 +330,7 @@
     "agressive": false,
     "carryweapon": false,
     "carryshield": false,
+    "venomous": 5,
     "gender": 1,
     "wearArmor": false
   },
@@ -341,6 +353,7 @@
     "agressive": false,
     "carryweapon": false,
     "carryshield": true,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   },
@@ -363,6 +376,7 @@
     "agressive": true,
     "carryweapon": true,
     "carryshield": false,
+    "venomous": 0,
     "gender": 0,
     "wearArmor": true
   }

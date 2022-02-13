@@ -35,6 +35,7 @@ class Hero:
         self.name = name
         self.name1 = name1
         self.gender = gender
+        self.poisoned = False
         self.stren = int(stren)
         self.start_stren = self.stren
         self.dext = int(dext)

@@ -27,8 +27,8 @@ class Monster:
         self.game = game
         self.name = name
         self.name1 = name1
-        self.stren = int(stren)
-        self.health = int(health)
+        self.stren = stren
+        self.health = health
         self.actions = actions.split(',')
         self.state = state
         self.hit_chance = hit_chance
@@ -46,6 +46,7 @@ class Monster:
         self.hide = False
         self.run = False
         self.wounded = False
+        self.venomous = 0
         self.weakness = []
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
@@ -80,6 +81,11 @@ class Monster:
     def g(self, words_list):
         return words_list[self.gender]
 
+    def poison(self, who):
+        if dice(1, 10) <= self.venomous and not who.poisoned:
+            return True
+        return False
+    
     def vampire_suck(self, total_damage):
         return False
     
@@ -187,6 +193,9 @@ class Monster:
             if rand < dam:
                 text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
                 target.shield = self.game.no_shield
+        if self.poison(target):
+            target.poisoned = True
+            text.append(f'{target.name} получает отравление, {target.g(["ему", "ей"])} совсем нехорошо.')
         target.health -= total_damage
         vampire_suck = self.vampire_suck(total_damage)
         if vampire_suck:
