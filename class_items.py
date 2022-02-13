@@ -45,6 +45,7 @@ class Rune:
         self.empty = False
         if dice (1, s_rune_poison_probability) == 1:
             self.poison = True
+            self.description = 'ядовитая ' + self.description
         else:
             self.poison = False
 
