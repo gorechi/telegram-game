@@ -416,6 +416,10 @@ class Hero:
     def attack(self, target, action):
         game = self.game
         room = game.new_castle.plan[self.current_position]
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
+        else:
+            poison_stren = 0
         if room.light:
             target_name = target.name
             target_name1 = target.name1
@@ -423,12 +427,12 @@ class Hero:
                 rage = dice(2, self.rage)
             else:
                 rage = 1
-            mele_attack = dice(1, self.stren) * rage
+            mele_attack = dice(1, self.stren - poison_stren) * rage
         else:
             target_name = 'Неизвестная тварь из темноты'
             target_name1 = 'черт знает кого'
             rage = 1
-            mele_attack = dice(1, self.stren) // dice(1, s_dark_damage_divider_dice)
+            mele_attack = dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
         self.run = False
         can_use = []
         for i in self.pockets:
@@ -442,7 +446,7 @@ class Hero:
                 weapon_attack = self.weapon.attack(target)
                 critical_probability = self.weapon_mastery[self.weapon.type] * s_critical_step
                 damage_text = ' урона. '
-                if dice(1, 100) <= critical_probability:
+                if dice(1, 100) <= critical_probability and not self.poisoned:
                     weapon_attack = weapon_attack * s_critical_multiplier
                     damage_text = ' критического урона. '
                 string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
