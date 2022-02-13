@@ -618,9 +618,11 @@ class Hero:
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.dext + self.weapon_mastery[weapon.type]
-        parry_dice = dice(1, parry_chance)
-        hit_dice = dice(1, (weapon.hit_chance + attacker.hit_chance))
-        if parry_dice > hit_dice:
+        if self.poisoned:
+            parry_chance -= self.dext // 2
+        parry_die = dice(1, parry_chance)
+        hit_die = dice(1, (weapon.hit_chance + attacker.hit_chance))
+        if parry_die > hit_die:
             result = -1
         return result
 
