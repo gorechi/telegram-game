@@ -88,7 +88,11 @@ class Monster:
             poison = s_weapon_poison_level
         else:
             poison = 0
-        if dice(1, 10) <= poison and not who.poisoned:
+        if who.armor.is_poisoned() or who.shield.is_poisoned():
+            poison_die = poison + s_monster_add_poison_level
+        else:
+            poison_die = s_monster_default_poison_die
+        if dice(1, poison_die) > poison and not who.poisoned:
             return True
         return False
     
