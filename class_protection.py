@@ -35,6 +35,12 @@ class Protection:
             names.append(self.name1)
         return names
 
+    def is_poisoned(self):
+        for i in self.runes:
+            if i.poison:
+                return True
+        return False
+    
     def element(self):
         element_sum = 0
         for rune in self.runes:
