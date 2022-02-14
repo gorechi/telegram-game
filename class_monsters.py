@@ -82,7 +82,13 @@ class Monster:
         return words_list[self.gender]
 
     def poison(self, who):
-        if dice(1, 10) <= self.venomous and not who.poisoned:
+        if self.venomous > 0:
+            poison = self.venomous
+        elif self.weapon.is_poisoned():
+            poison = s_weapon_poison_level
+        else:
+            poison = 0
+        if dice(1, 10) <= poison and not who.poisoned:
             return True
         return False
     
