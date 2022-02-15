@@ -304,6 +304,14 @@ class Potion():
 
     def use(self, who_using, in_action=False):
         game = self.game
+        if self.type == 8:
+            if who_using.poisoned:
+                who_using.poisoned = False
+                tprint(game, f'{who_using.name} излевивается от отравления и теперь прекрасно себя чувствует.')
+                return True
+            else:
+                tprint(game, f'{who_using.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
+                return False
         if not in_action:
             if self.type == 1:
                 who_using.start_health += self.effect
@@ -338,6 +346,7 @@ class Potion():
             if self.type == 0:
                 if (who_using.start_health - who_using.health) < self.effect:
                     heal = dice(1, (who_using.start_health - who_using.health))
+                    who_using.poisoned = False
                 else:
                     heal = dice(1, self.effect)
                 who_using.health += heal
