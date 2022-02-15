@@ -141,6 +141,27 @@ class Hero:
         else:
             c(full_command[1])
 
+    def poison(self, who):
+        """Функция проводит проверку, отравил герой противника при атаке, или нет
+
+        Args:
+            who (obj Monster): Монстр, которого атакует герой
+
+        Returns:
+            boolean: Признак, отравил герой монстра, или нет
+        """
+        if self.weapon.is_poisoned():
+            poison = s_weapon_poison_level
+        else:
+            poison = s_hero_default_poison_die
+        if who.armor.is_poisoned() or who.shield.is_poisoned() and poison > 0:
+            poison_die = poison + s_hero_add_poison_level
+        else:
+            poison_die = s_hero_default_poison_die
+        if dice(1, poison_die) > poison and not who.poisoned and not who.venomous:
+            return True
+        return False
+    
     def hit_chance(self):
         return self.dext + self.weapon_mastery[self.weapon.type]
     

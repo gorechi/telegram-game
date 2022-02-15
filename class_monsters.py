@@ -47,6 +47,7 @@ class Monster:
         self.run = False
         self.wounded = False
         self.venomous = 0
+        self.poisoned = False
         self.weakness = []
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
@@ -82,13 +83,21 @@ class Monster:
         return words_list[self.gender]
 
     def poison(self, who):
+        """Функция проводит проверку, отравил монстр противника при атаке, или нет
+
+        Args:
+            who (obj Hero): Герой, которого атакует монстр
+
+        Returns:
+            boolean: Признак, отравил монстр героя, или нет
+        """
         if self.venomous > 0:
             poison = self.venomous
         elif self.weapon.is_poisoned():
             poison = s_weapon_poison_level
         else:
-            poison = 0
-        if who.armor.is_poisoned() or who.shield.is_poisoned():
+            poison = s_monster_default_poison_die
+        if (who.armor.is_poisoned() or who.shield.is_poisoned()) and poison > 0:
             poison_die = poison + s_monster_add_poison_level
         else:
             poison_die = s_monster_default_poison_die
