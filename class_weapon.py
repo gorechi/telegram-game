@@ -62,6 +62,12 @@ class Weapon:
             element_sum += rune.element
         return element_sum
 
+    def is_poisoned(self):
+        for i in self.runes:
+            if i.poison:
+                return True
+        return False
+    
     def enchant(self, rune):
         if len(self.runes) > 1 or self.empty:
             return False

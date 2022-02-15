@@ -141,6 +141,27 @@ class Hero:
         else:
             c(full_command[1])
 
+    def poison(self, who):
+        """Функция проводит проверку, отравил герой противника при атаке, или нет
+
+        Args:
+            who (obj Monster): Монстр, которого атакует герой
+
+        Returns:
+            boolean: Признак, отравил герой монстра, или нет
+        """
+        if self.weapon.is_poisoned():
+            poison = s_weapon_poison_level
+        else:
+            poison = s_hero_default_poison_die
+        if who.armor.is_poisoned() or who.shield.is_poisoned() and poison > 0:
+            poison_die = poison + s_hero_add_poison_level
+        else:
+            poison_die = s_hero_default_poison_die
+        if dice(1, poison_die) > poison and not who.poisoned and not who.venomous:
+            return True
+        return False
+    
     def hit_chance(self):
         return self.dext + self.weapon_mastery[self.weapon.type]
     
@@ -264,6 +285,7 @@ class Hero:
                     self.pockets.remove(item)
                     stealing_monster.give(item)
                     message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
+            self.poisoned = False
             tprint(game, message)
             return True
     
@@ -416,6 +438,10 @@ class Hero:
     def attack(self, target, action):
         game = self.game
         room = game.new_castle.plan[self.current_position]
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
+        else:
+            poison_stren = 0
         if room.light:
             target_name = target.name
             target_name1 = target.name1
@@ -423,12 +449,12 @@ class Hero:
                 rage = dice(2, self.rage)
             else:
                 rage = 1
-            mele_attack = dice(1, self.stren) * rage
+            mele_attack = dice(1, self.stren - poison_stren) * rage
         else:
             target_name = 'Неизвестная тварь из темноты'
             target_name1 = 'черт знает кого'
             rage = 1
-            mele_attack = dice(1, self.stren) // dice(1, s_dark_damage_divider_dice)
+            mele_attack = dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
         self.run = False
         can_use = []
         for i in self.pockets:
@@ -442,7 +468,7 @@ class Hero:
                 weapon_attack = self.weapon.attack(target)
                 critical_probability = self.weapon_mastery[self.weapon.type] * s_critical_step
                 damage_text = ' урона. '
-                if dice(1, 100) <= critical_probability:
+                if dice(1, 100) <= critical_probability and not self.poisoned:
                     weapon_attack = weapon_attack * s_critical_multiplier
                     damage_text = ' критического урона. '
                 string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
@@ -475,6 +501,9 @@ class Hero:
                     string1 += f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
                     game.all_shields.remove(shield)
                     target.shield = ''
+            if self.poison(target):
+                target.poisoned = True
+                string1 += f' {target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
             target.health -= total_damage
             return string1 + string2
         elif action in ['з', 'защититься', 'защита']:
@@ -614,9 +643,11 @@ class Hero:
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.dext + self.weapon_mastery[weapon.type]
-        parry_dice = dice(1, parry_chance)
-        hit_dice = dice(1, (weapon.hit_chance + attacker.hit_chance))
-        if parry_dice > hit_dice:
+        if self.poisoned:
+            parry_chance -= self.dext // 2
+        parry_die = dice(1, parry_chance)
+        hit_die = dice(1, (weapon.hit_chance + attacker.hit_chance))
+        if parry_die > hit_die:
             result = -1
         return result
 

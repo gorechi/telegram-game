@@ -47,6 +47,7 @@ class Monster:
         self.run = False
         self.wounded = False
         self.venomous = 0
+        self.poisoned = False
         self.weakness = []
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
@@ -82,7 +83,25 @@ class Monster:
         return words_list[self.gender]
 
     def poison(self, who):
-        if dice(1, 10) <= self.venomous and not who.poisoned:
+        """Функция проводит проверку, отравил монстр противника при атаке, или нет
+
+        Args:
+            who (obj Hero): Герой, которого атакует монстр
+
+        Returns:
+            boolean: Признак, отравил монстр героя, или нет
+        """
+        if self.venomous > 0:
+            poison = self.venomous
+        elif self.weapon.is_poisoned():
+            poison = s_weapon_poison_level
+        else:
+            poison = s_monster_default_poison_die
+        if (who.armor.is_poisoned() or who.shield.is_poisoned()) and poison > 0:
+            poison_die = poison + s_monster_add_poison_level
+        else:
+            poison_die = s_monster_default_poison_die
+        if dice(1, poison_die) > poison and not who.poisoned:
             return True
         return False
     
@@ -151,10 +170,14 @@ class Monster:
     
     def mele(self):
         room = self.game.new_castle.plan[self.current_position]
-        if room.light:
-            return dice(1, self.stren)
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
         else:
-            return dice(1, self.stren) // dice(1, 3)
+            poison_stren = 0
+        if room.light:
+            return dice(1, self.stren - poison_stren)
+        else:
+            return dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
 
     def attack(self, target):
         game = self.game
@@ -227,6 +250,8 @@ class Monster:
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.parry_chance
+        if self.poisoned:
+            parry_chance -= self.parry_chance // 2
         if parry_chance > 0:
             parry_dice = dice(1, parry_chance)
         else:
