@@ -388,7 +388,7 @@ class Plant(Monster):
 
 
     def grow(self):
-        new_plant = Plant(self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
+        new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
         return new_plant
 
     def win(self, loser=None):
