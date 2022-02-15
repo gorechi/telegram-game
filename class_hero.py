@@ -501,6 +501,9 @@ class Hero:
                     string1 += f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
                     game.all_shields.remove(shield)
                     target.shield = ''
+            if self.poison(target):
+                target.poisoned = True
+                string1 += f' {target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
             target.health -= total_damage
             return string1 + string2
         elif action in ['з', 'защититься', 'защита']:

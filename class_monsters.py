@@ -170,10 +170,14 @@ class Monster:
     
     def mele(self):
         room = self.game.new_castle.plan[self.current_position]
-        if room.light:
-            return dice(1, self.stren)
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
         else:
-            return dice(1, self.stren) // dice(1, 3)
+            poison_stren = 0
+        if room.light:
+            return dice(1, self.stren - poison_stren)
+        else:
+            return dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
 
     def attack(self, target):
         game = self.game
@@ -246,6 +250,8 @@ class Monster:
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.parry_chance
+        if self.poisoned:
+            parry_chance -= self.parry_chance // 2
         if parry_chance > 0:
             parry_dice = dice(1, parry_chance)
         else:
