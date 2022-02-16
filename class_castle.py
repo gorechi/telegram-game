@@ -18,7 +18,7 @@ class Castle:
         if f > 2: self.all_rooms += ([2] + [3] * (r - 2) + [2]) * (f - 2)
         if f > 1: self.all_rooms += [2] * r
         self.all_doors = []
-        for j in range(f * r):
+        for _ in range(f * r):
             self.all_doors.append([0, 0, 0, 0])
         for i in range(f * r):
             floor = i // r
@@ -91,7 +91,7 @@ class Castle:
 
     def lock_doors(self):
         how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
-        for i in range(how_many_locked_rooms):
+        for _ in range(how_many_locked_rooms):
             while True:
                 a = randomitem(self.plan)
                 if a != self.plan[0]:

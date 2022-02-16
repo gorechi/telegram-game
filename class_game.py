@@ -118,7 +118,7 @@ class Game():
             potion.place(self.new_castle)
         
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
         # Создаем книги и разбрасываем по замку
@@ -158,7 +158,7 @@ class Game():
                     new_object.on_create()
                     objects.append(new_object)
             else:
-                for n in range(howmany):
+                for _ in range(howmany):
                     i = randomitem(parsed_data, False)
                     new_object = self.classes[i['class']](self)
                     for param in i:
