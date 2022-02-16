@@ -119,7 +119,14 @@ class Castle:
             line1 = '║'
             line2 = ''
             for j in range(r):
-                a = game.player.name[0] if game.player.current_position == i * r + j else self.plan[i*r+j].visited
+                room = self.plan[i*r+j]
+                cant_rest, rest_place = room.can_rest()
+                if game.player.current_position == i * r + j:    
+                    a = game.player.name[0]
+                elif rest_place and not room.visited == ' ':
+                    a = '#'
+                else: 
+                    a = room.visited
                 line1 += f'  {a}  {doors_vertical[str(self.all_doors[i * r + j][1])]}'
                 line2 += f'==={doors_horizontal[str(self.all_doors[i * r + j][2])]}=='
             text.append(line1)
@@ -128,5 +135,5 @@ class Castle:
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
-        roomsWithMonsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
-        return len(roomsWithMonsters)
+        rooms_with_monsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
+        return len(rooms_with_monsters)
