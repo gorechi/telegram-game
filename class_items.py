@@ -1,6 +1,8 @@
 from math import floor, sqrt
 from random import randint as dice
 
+from numpy import who
+
 from class_basic import *
 from functions import howmany, randomitem, tprint
 from settings import *
@@ -305,9 +307,10 @@ class Potion():
     def use(self, who_using, in_action=False):
         game = self.game
         if self.type == 8:
-            if who_using.poisoned:
+            if who_using.poisoned or who_using.fear > 0:
                 who_using.poisoned = False
-                tprint(game, f'{who_using.name} излевивается от отравления и теперь прекрасно себя чувствует.')
+                who_using.fear = 0
+                tprint(game, f'{who_using.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
                 return True
             else:
                 tprint(game, f'{who_using.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
