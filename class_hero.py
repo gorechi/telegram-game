@@ -68,6 +68,7 @@ class Hero:
         self.exp = 0
         self.fear = 0
         self.drunk = 0
+        self.save_room = None
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
@@ -286,6 +287,7 @@ class Hero:
                     stealing_monster.give(item)
                     message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
             self.poisoned = False
+            self.save_room = room
             tprint(game, message)
             return True
     
@@ -661,7 +663,10 @@ class Hero:
         self.stren = self.start_stren
         self.dext = self.start_dext
         self.intel = self.start_intel
-        self.current_position = 0
+        if not self.save_room:
+            self.current_position = 0
+        else:
+            self.current_position = self.save_room.position
 
     def win(self, loser):
         self.health = self.start_health
