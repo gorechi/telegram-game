@@ -311,37 +311,34 @@ class Potion():
                 who_using.poisoned = False
                 who_using.fear = 0
                 tprint(game, f'{who_using.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
+                who_using.pockets.remove(self)
                 return True
             else:
                 tprint(game, f'{who_using.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
                 return False
         if not in_action:
+            if not self.type in [1, 2, 4, 6]:
+                tprint(game, 'Это зелье можно использовать только в бою!')
+                return False
             if self.type == 1:
                 who_using.start_health += self.effect
                 who_using.health += self.effect
                 tprint(game, f'{who_using.name} увеличивает свое максимальное здоровье '
                              f'на {str(self.effect)} до {str(who_using.health)}.')
-                return True
             elif self.type == 2:
                 who_using.stren += self.effect
                 who_using.start_stren += self.effect
                 tprint(game, f'{who_using.name} увеличивает свою силу на {str(self.effect)} до {str(who_using.stren)}.')
-                return True
             elif self.type == 4:
                 who_using.dext += self.effect
                 who_using.start_dext += self.effect
                 tprint(game, f'{who_using.name} увеличивает свою ловкость '
                              f'на {str(self.effect)} до {str(who_using.dext)}.')
-                return True
             elif self.type == 6:
                 who_using.intel += self.effect
                 who_using.start_intel += self.effect
                 tprint(game, f'{who_using.name} увеличивает свой интеллект '
                              f'на {str(self.effect)} до {str(who_using.intel)}.')
-                return True
-            else:
-                tprint(game, 'Это зелье можно использовать только в бою!')
-                return False
         else:
             if not self.type in [0, 3, 5, 7]:
                 tprint(game, 'Это зелье нельзя использовать в бою!')
@@ -349,11 +346,14 @@ class Potion():
             if self.type == 0:
                 if (who_using.start_health - who_using.health) < self.effect:
                     heal = dice(1, (who_using.start_health - who_using.health))
-                    who_using.poisoned = False
                 else:
                     heal = dice(1, self.effect)
                 who_using.health += heal
-                tprint(game, f'{who_using.name} восполняет {howmany(heal, "единицу жизни,единицы жизни,единиц жизни")}')
+                text = f'{who_using.name} восполняет {howmany(heal, "единицу жизни,единицы жизни,единиц жизни")}'
+                if who_using.poisoned:
+                    who_using.poisoned = False
+                    text += ' и излечивается от отравления'
+                tprint(game, text)
             elif self.type == 3:
                 who_using.stren += self.effect
                 tprint(game, f'На время боя {who_using.name} увеличивает свою силу '
@@ -366,8 +366,8 @@ class Potion():
                 who_using.intel += self.effect
                 tprint(game, f'На время боя {who_using.name} увеличивает свой интеллект '
                              f'на {str(self.effect)} до {str(who_using.intel)}.')
-            who_using.pockets.remove(self)
-            return True
+        who_using.pockets.remove(self)
+        return True
 
     def __str__(self):
         return self.description
