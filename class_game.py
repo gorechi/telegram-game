@@ -118,7 +118,7 @@ class Game():
             potion.place(self.new_castle)
         
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
         # Создаем книги и разбрасываем по замку
