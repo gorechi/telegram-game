@@ -74,44 +74,51 @@ class Game():
                                         random=True)
         for furniture in self.all_furniture:
             furniture.place(castle=self.new_castle)
+        
         # Создаем очаги и разбрасываем по замку
-        self.all_furniture = self.readobjects(file='furniture-rest.json',
+        self.all_rest_places = self.readobjects(file='furniture-rest.json',
                                         howmany=self.how_many['очаг'],
                                         random=False)
-        self.all_furniture[0].place(castle=self.new_castle, room_to_place=self.new_castle.plan[0])
-        #for furniture in self.all_furniture:
-        #    furniture.place(castle=self.new_castle)
+        self.all_rest_places[0].place(castle=self.new_castle, room_to_place=self.new_castle.plan[0])
+        for rest_place in self.all_rest_places[1:]:
+            rest_place.place(self.new_castle)
+        
         # Читаем монстров из файла и разбрасываем по замку
         self.all_monsters = self.readobjects(file='monsters.json',
                                        howmany=self.how_many['монстры'])
         for monster in self.all_monsters:
             monster.place(self.new_castle)
+        
         # Читаем оружие из файла и разбрасываем по замку
         self.all_weapon = self.readobjects(file='weapon.json',
                                      howmany=self.how_many['оружие'],
                                      object_class=Weapon)
         for weapon in self.all_weapon:
             weapon.place(self.new_castle)
+        
         # Читаем щиты из файла и разбрасываем по замку
         self.all_shields = self.readobjects(file='shields.json',
                                       howmany=self.how_many['щит'],
                                       object_class=Shield)
         for shield in self.all_shields:
             shield.place(self.new_castle)
+        
         # Читаем доспехи из файла и разбрасываем по замку
         self.all_armor = self.readobjects(file='armor.json',
                                     howmany=self.how_many['доспех'],
                                     object_class=Armor)
         for armor in self.all_armor:
             armor.place(self.new_castle)
+        
         # Читаем зелья из файла и разбрасываем по замку
         self.all_potions = self.readobjects(file='potions.json',
                                       howmany=self.how_many['зелье'],
                                       object_class=Potion)
         for potion in self.all_potions:
             potion.place(self.new_castle)
+        
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
         # Создаем книги и разбрасываем по замку
@@ -151,7 +158,7 @@ class Game():
                     new_object.on_create()
                     objects.append(new_object)
             else:
-                for n in range(howmany):
+                for _ in range(howmany):
                     i = randomitem(parsed_data, False)
                     new_object = self.classes[i['class']](self)
                     for param in i:
