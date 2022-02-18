@@ -18,6 +18,7 @@ class Weapon:
         else:
             n1 = s_weapon_first_words_dictionary
             n2 = s_weapon_types_dictionary
+            n2 = []
             for i in s_weapon_types_dictionary:
                 if not weapon_type or i[3] == weapon_type:
                     n2.append(i)

@@ -18,7 +18,7 @@ class Castle:
         if f > 2: self.all_rooms += ([2] + [3] * (r - 2) + [2]) * (f - 2)
         if f > 1: self.all_rooms += [2] * r
         self.all_doors = []
-        for _ in range(f * r):
+        for j in range(f * r):
             self.all_doors.append([0, 0, 0, 0])
         for i in range(f * r):
             floor = i // r
@@ -91,7 +91,7 @@ class Castle:
 
     def lock_doors(self):
         how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
-        for _ in range(how_many_locked_rooms):
+        for i in range(how_many_locked_rooms):
             while True:
                 a = randomitem(self.plan)
                 if a != self.plan[0]:
@@ -119,14 +119,7 @@ class Castle:
             line1 = '║'
             line2 = ''
             for j in range(r):
-                room = self.plan[i*r+j]
-                cant_rest, rest_place = room.can_rest()
-                if game.player.current_position == i * r + j:    
-                    a = game.player.name[0]
-                elif rest_place and not room.visited == ' ':
-                    a = '#'
-                else: 
-                    a = room.visited
+                a = game.player.name[0] if game.player.current_position == i * r + j else self.plan[i*r+j].visited
                 line1 += f'  {a}  {doors_vertical[str(self.all_doors[i * r + j][1])]}'
                 line2 += f'==={doors_horizontal[str(self.all_doors[i * r + j][2])]}=='
             text.append(line1)
@@ -135,5 +128,5 @@ class Castle:
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
-        rooms_with_monsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
-        return len(rooms_with_monsters)
+        roomsWithMonsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
+        return len(roomsWithMonsters)

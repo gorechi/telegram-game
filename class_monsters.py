@@ -227,7 +227,7 @@ class Monster:
             game.state = 0
             target.lose(self)
             self.win(target)
-            text.append(f'{target.name} терпит сокрушительное поражение и сбегает к ближайшему очагу.')
+            text.append(f'{target.name} терпит сокрушительное поражение и позорно убегает ко входу в замок.')
             tprint(game, text, 'off')
         else:
             tprint(game, text)
