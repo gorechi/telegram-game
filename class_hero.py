@@ -726,20 +726,23 @@ class Hero:
             return True
         elif what == 'рюкзак':
             text = []
-            if len(self.pockets) == 0 and self.money.how_much_money == 0:
-                text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
+            if not room.light:
+                text.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
             else:
-                text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
-                for i in range(len(self.pockets)):
-                    description = f'{str(i + 1)}: {self.pockets[i].show()}'
-                    if isinstance(self.pockets[i], Weapon):
-                        weapon = self.pockets[i]
-                        if self.weapon_mastery[weapon.type] > 0:
-                            description += f', мастерство - {self.weapon_mastery[weapon.type]}'
-                    text.append(description)
-                text.append(self.money.show())
-            if not self.removed_shield.empty:
-                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
+                if len(self.pockets) == 0 and self.money.how_much_money == 0:
+                    text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
+                else:
+                    text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
+                    for i in range(len(self.pockets)):
+                        description = f'{str(i + 1)}: {self.pockets[i].show()}'
+                        if isinstance(self.pockets[i], Weapon):
+                            weapon = self.pockets[i]
+                            if self.weapon_mastery[weapon.type] > 0:
+                                description += f', мастерство - {self.weapon_mastery[weapon.type]}'
+                        text.append(description)
+                    text.append(self.money.show())
+                if not self.removed_shield.empty:
+                    text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
             tprint(game, text)
             return True
         elif what in self.directions_dict.keys():
@@ -755,14 +758,32 @@ class Hero:
                 tprint(game, message)
                 return True
         if not room.center.empty and what in [room.center.name, room.center.name1, room.center.name[0]] and room.monster():
-            tprint(game, showsides(self, room.center, new_castle))
+            if not room.light:
+                tprint(game, f'Кто-то непонятный прячется в темноте.')
+            else:
+                tprint(game, showsides(self, room.center, new_castle))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
-            tprint(game, self.weapon.show())
+            if not room.light:
+                tprint(game, f'В такой темноте оружие можно только ощупать, но это не даст полезной информации.')
+            else:
+                tprint(game, self.weapon.show())
             return True
-        if not self.shield.empty and what in [self.shield.name, self.shield.name1, 'защиту']:
-            tprint(game, self.shield.show())
+        if not self.shield.empty and what in [self.shield.name, self.shield.name1, 'щит']:
+            if not room.light:
+                tprint(game, f'Из-за темноты нельзя осмотреть даже собственный щит.')
+            else:
+                tprint(game, self.shield.show())
             return True
+        if not self.armor.empty and what in [self.armor.name, self.armor.name1, 'защиту']:
+            if not room.light:
+                tprint(game, f'Так темно, что не видно, что на тебе надето.')
+            else:
+                tprint(game, self.armor.show())
+            return True
+        if not room.light:
+                tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
+                return True
         if len(furniture_list) > 0:
             text = []
             for i in furniture_list:
