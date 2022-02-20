@@ -166,13 +166,15 @@ class Room:
             stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
             if self.torch:
-                self.decoration1 = f'освещенную факелом {self.decoration1}'
+                decoration1 = f'освещенную факелом {self.decoration1}'
+            else:
+                decoration1 = self.decoration1
             if self.center.empty:
                 who_is_here = 'Не видно ничего интересного.'
             else:
-                who_is_here = self.decoration3 + ' ' + self.center.state + ' ' + self.center.name + '.'
+                who_is_here = f'{self.decoration3} {self.center.state} {self.center.name}.'
             message = []
-            message.append(f'{player.name} попадает в {self.decoration1} '
+            message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
             for furniture in self.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
