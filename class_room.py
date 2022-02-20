@@ -34,8 +34,6 @@ class Furniture:
 
     def on_create(self):
         self.name = randomitem(self.descriptions, False) + ' ' + self.name
-        if self.can_rest:
-            self.name = self.name + randomitem(self.rest_strings, False)
         self.state = randomitem(self.states, False)
         self.where = randomitem(self.wheres, False)
         return True
