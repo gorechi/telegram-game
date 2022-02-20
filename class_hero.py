@@ -489,23 +489,28 @@ class Hero:
                 total_damage = weapon_attack + mele_attack - target_defence
             else:
                 total_damage = 0
+            
             if total_damage == 0:
                 string2 = f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.'
-            elif target_defence == 0:
-                string2 = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
             else:
-                string2 = f'{target_name} защищается и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
-            if target.shield != '':
-                shield = target.shield
-                rand = dice(1, 100)
-                dam = total_attack * target.shield.accumulated_damage
-                if rand < dam:
-                    string1 += f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
-                    game.all_shields.remove(shield)
-                    target.shield = ''
-            if self.poison(target):
-                target.poisoned = True
-                string1 += f' {target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
+                if target_defence == 0:
+                    string2 = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
+                else:
+                    string2 = f'{target_name} защищается и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
+                if not target.shield.empty:
+                    shield = target.shield
+                    rand = dice(1, 100)
+                    dam = total_attack * target.shield.accumulated_damage
+                    if rand < dam:
+                        string1 += f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+                        game.all_shields.remove(shield)
+                        target.shield = ''
+                if self.poison(target):
+                    target.poisoned = True
+                    string1 += f' {target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
+                if self.weapon.mastery():
+                    self.weapon_mastery[self.weapon.type] += 1
+                    string1 += f' {self.g(["Герой", "Героиня"])} теперь немного лучше знает, как использовать {self.weapon.type} оружие.'
             target.health -= total_damage
             return string1 + string2
         elif action in ['з', 'защититься', 'защита']:

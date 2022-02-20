@@ -35,6 +35,8 @@ class Weapon:
         self.runes = []
         self.twohanded_dict = s_weapon_twohanded_dictionary
         self.empty = empty
+        self.mastery_level = 1
+        self.mastery_counter = 0
 
     def on_create(self):
         return True
@@ -45,6 +47,16 @@ class Weapon:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
 
+    def mastery(self):
+        if self.empty:
+            return False
+        self.mastery_counter += dice(1, 10)/100
+        if self.mastery_counter > self.mastery_level:
+            self.mastery_counter = 0
+            self.mastery_level += 1
+            return True
+        return False
+    
     def real_name(self):
         names = []
         if self.element() != 0:
