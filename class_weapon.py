@@ -48,6 +48,8 @@ class Weapon:
         return f'{self.name}{self.enchantment()} ({damage_string})'
 
     def mastery(self):
+        if self.empty:
+            return False
         self.mastery_counter += dice(1, 10)/100
         if self.mastery_counter > self.mastery_level:
             self.mastery_counter = 0
