@@ -60,11 +60,13 @@ class Weapon:
     def real_name(self):
         names = []
         if self.element() != 0:
-            names.append(self.name + ' ' + s_elements_dictionary[self.element()])
-            names.append(self.name1 + ' ' + s_elements_dictionary[self.element()])
+            name1 = f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize()
+            name2 = f'{self.name1} {s_elements_dictionary[self.element()]}'.capitalize()
         else:
-            names.append(self.name)
-            names.append(self.name1)
+            name1 = self.name.capitalize()
+            name2 = self.name1.capitalize()
+        names.append(name1)
+        names.append(name2)
         return names
 
     def element(self):
@@ -158,7 +160,7 @@ class Weapon:
             name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
         else:
             name = self.name + self.enchantment()
-        return f'{name} ({damage_string}), {self.type}'
+        return f'{name} ({damage_string}), {self.type}'.capitalize()
 
     def use(self, who_using, in_action=False):
         game = self.game
