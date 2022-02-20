@@ -1,2 +1,3 @@
-a = int('1')
-print(isinstance(a, int))
+a = []
+a.append(2,2)
+print(a)
