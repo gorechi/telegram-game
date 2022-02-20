@@ -474,7 +474,7 @@ class Hero:
                     weapon_attack = weapon_attack * s_critical_multiplier
                     damage_text = ' критического урона. '
                 string1 = f'{self.name} {self.action()} {target_name1} используя {self.weapon.name1} и наносит' \
-                          f' {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
+                          f' {mele_attack}+{howmany(weapon_attack, "единицу,единицы,единиц")} {damage_text}'
             else:
                 weapon_attack = 0
                 string1 = f'{self.name} бьет {target_name1} не используя оружие и ' \
@@ -485,11 +485,10 @@ class Hero:
                 string1 += f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.'
                 return string1
             total_attack = weapon_attack + mele_attack
-            if (total_attack - target_defence) > 0:
-                total_damage = weapon_attack + mele_attack - target_defence
+            if total_attack > target_defence:
+                total_damage = total_attack - target_defence
             else:
                 total_damage = 0
-            
             if total_damage == 0:
                 string2 = f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.'
             else:
