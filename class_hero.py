@@ -1028,10 +1028,7 @@ class Hero:
         elif item.isdigit():
             if int(item) - 1 < len(self.pockets):
                 i = self.pockets[int(item) - 1]
-                if isinstance(i, Potion) and i.use(self, False):
-                    self.pockets.remove(i)
-                elif not isinstance(i, Potion):
-                    i.use(self, False)
+                i.use(self, False)
                 return True
             else:
                 tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
@@ -1050,10 +1047,7 @@ class Hero:
                 return True
             for i in self.pockets:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
-                    if isinstance(i, Potion) and i.use(self, in_action=False):
-                        self.pockets.remove(i)
-                    else:
-                        i.use(self, in_action=False)
+                    i.use(self, in_action=False)
                     return True
             tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в карманах.')
 
