@@ -926,7 +926,7 @@ class Hero:
                 if len(what_to_search.loot.pile) > 0:
                     message.append('Все, что было спрятано, теперь лежит на виду.')
             elif len(what_to_search.loot.pile) == 0:
-                message.append(f'{what_to_search.name} {what_to_search.empty_text}')
+                message.append(f'{what_to_search.name} {what_to_search.empty_text}'.capitalize())
             tprint(game, message)
             return True
 
