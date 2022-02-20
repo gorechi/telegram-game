@@ -400,9 +400,9 @@ class Hero:
             else:
                 room.loot.pile.append(self.weapon)
             self.weapon = self.game.no_weapon
-        elif a == 2 and self.shield.empty:
+        elif a == 2 and not self.shield.empty:
             tprint(game, f'Убегая {self.name} теряет {self.shield.name1}')
-            if target.shield == '' and target.carryshield:
+            if target.shield.empty and target.carryshield:
                 target.shield = self.shield
             else:
                 room.loot.pile.append(self.shield)
