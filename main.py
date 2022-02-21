@@ -155,6 +155,7 @@ def all_commands(message):
             tprint(game, game.player.attack(enemy, message.text))
             if game.player.run:
                 game.player.run = False
+                game.player.lookaround()
                 game.state = 0
                 return True
             elif enemy.run:

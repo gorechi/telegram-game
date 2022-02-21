@@ -429,6 +429,7 @@ class Hero:
                 tprint(game, message)
                 return False
         self.current_position += self.directions_dict[direction]
+        game.new_castle.plan[self.current_position].visited = '+'
         tprint(game, message)
         self.run = True
         return True
