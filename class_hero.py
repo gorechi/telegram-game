@@ -425,11 +425,12 @@ class Hero:
         else:
             direction = dice(0, 3)
             if direction not in available_directions:
-                message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
+                message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону.')
                 tprint(game, message)
                 return False
         self.current_position += self.directions_dict[direction]
         tprint(game, message)
+        self.run = True
         return True
 
     def attack(self, target, action):
@@ -516,9 +517,9 @@ class Hero:
             self.hide = False
             result = self.run_away(target)
             if not result:
-                return f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.'
+                return f'Схватка продолжается.'
             else:
-                return result
+                return f'На этом схватка заканчивается.'
         elif action in ['и', 'использовать']:
             self.use_in_fight()
         elif action in ['с', 'сменить оружие', 'сменить']:
