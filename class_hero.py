@@ -380,28 +380,29 @@ class Hero:
         """
         game = self.game
         room = game.new_castle.plan[self.current_position]
+        message = []
         if room.light:
             if target.frightening:
-                tprint(game, f'{self.name} в ужасе сбегает с поля боя.')
+                message.append(f'{self.name} в ужасе сбегает с поля боя.')
                 self.fear += 1
             else:
-                tprint(game, f'{self.name} сбегает с поля боя.')
+                message.append(f'{self.name} сбегает с поля боя.')
         else:
             if target.frightening:
-                tprint(game, f'{self.name} в кромешной тьме закрыв глаза от ужаса пытается убежать хоть куда-нибудь.')
+                message.append(f'{self.name} в кромешной тьме закрыв глаза от ужаса пытается убежать хоть куда-нибудь.')
                 self.fear += 1
             else:
-                tprint(game, f'{self.name} в кромешной тьме пытается убежать хоть куда-нибудь.')
+                message.append(f'{self.name} в кромешной тьме пытается убежать хоть куда-нибудь.')
         a = dice(1, 2)
         if a == 1 and not self.weapon.empty:
-            tprint(game, f'Убегая {self.name} роняет из рук {self.weapon.name1}')
+            message.append(f'Убегая {self.name} роняет из рук {self.weapon.name1}')
             if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
             else:
                 room.loot.pile.append(self.weapon)
             self.weapon = self.game.no_weapon
         elif a == 2 and not self.shield.empty:
-            tprint(game, f'Убегая {self.name} теряет {self.shield.name1}')
+            message.append(f'Убегая {self.name} теряет {self.shield.name1}')
             if target.shield.empty and target.carryshield:
                 target.shield = self.shield
             else:
@@ -409,14 +410,12 @@ class Hero:
             self.shield = self.game.no_shield
         a = dice(0, len(self.pockets))
         if a > 0:
-            first_line = f'{self.name} бежит настолько быстро, что не замечает, как теряет:'
-            text = [first_line]
+            message.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for i in range(a):
                 b = dice(0, len(self.pockets) - 1)
-                text.append(self.pockets[b].name1)
+                message.append(self.pockets[b].name1)
                 room.loot.pile.append(self.pockets[b])
                 self.pockets.pop(b)
-            tprint(game, text)
         available_directions = []
         for i in range(4):
             if room.doors[i] == 1:
@@ -426,16 +425,14 @@ class Hero:
         else:
             direction = dice(0, 3)
             if direction not in available_directions:
+                message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону.')
+                tprint(game, message)
                 return False
         self.current_position += self.directions_dict[direction]
-        room = game.new_castle.plan[self.current_position]
-        room.visited = '+'
-        game.state = 0
-        self.lookaround()
-        if isinstance(room.center, Monster) and room.center.agressive and room.light:
-                self.fight(room.center, True)
-                return False
-        return f'{self.name} еле стоит на ногах.'
+        game.new_castle.plan[self.current_position].visited = '+'
+        tprint(game, message)
+        self.run = True
+        return True
 
     def attack(self, target, action):
         game = self.game
@@ -521,9 +518,9 @@ class Hero:
             self.hide = False
             result = self.run_away(target)
             if not result:
-                return f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.'
+                return f'Схватка продолжается.'
             else:
-                return result
+                return f'На этом схватка заканчивается.'
         elif action in ['и', 'использовать']:
             self.use_in_fight()
         elif action in ['с', 'сменить оружие', 'сменить']:

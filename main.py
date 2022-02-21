@@ -153,16 +153,20 @@ def all_commands(message):
         elif command in fight_commands and game.state == 1:
             enemy = game.new_castle.plan[game.player.current_position].center
             tprint(game, game.player.attack(enemy, message.text))
-            if game.state == 1:
-                if enemy.run:
-                    game.state = 0
-                elif enemy.health > 0:
-                    enemy.attack(game.player)
-                else:
-                    tprint(game, f'{game.player.name} побеждает в бою!', 'off')
-                    game.state = 0
-                    game.player.win(enemy)
-                    enemy.lose(game.player)
+            if game.player.run:
+                game.player.run = False
+                game.player.lookaround()
+                game.state = 0
+                return True
+            elif enemy.run:
+                game.state = 0
+            elif enemy.health > 0:
+                enemy.attack(game.player)
+            else:
+                tprint(game, f'{game.player.name} побеждает в бою!', 'off')
+                game.state = 0
+                game.player.win(enemy)
+                enemy.lose(game.player)
     return True
 
 bot.polling(none_stop=True, interval=0)
