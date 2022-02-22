@@ -31,6 +31,7 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.room = None
         self.hit_chance = hit_chance
         self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon
@@ -44,6 +45,7 @@ class Monster:
         self.can_steal = True
         self.stink = False
         self.hide = False
+        self.hiding_place = None
         self.run = False
         self.wounded = False
         self.venomous = 0
@@ -353,11 +355,11 @@ class Monster:
                 if i.can_hide:
                     places_to_hide.append(i)
             places_to_hide.append(room)
-            where_to_hide = randomitem(places_to_hide, False)
-            where_to_hide.ambush = self  # Монстр садится в засаду
+            self.hiding_place = randomitem(places_to_hide, False)
+            self.hide = True
         else:
-            room.center = self
-        self.current_position = room.position
+            self.room = room
+            self.hide = False
         if self.stink:
             print('У нас есть вонючка!')
             print(self.name, room.position)
