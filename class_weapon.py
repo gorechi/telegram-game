@@ -188,15 +188,11 @@ class Weapon:
         if room_to_place:
             room = room_to_place
         else:
-            rooms = castle.plan
-            room = randomitem(rooms, False)
-        if room.monster():
-            monster = room.monster()
-            if monster.carry_weapon:
-                monster.give(self)
-                return True
-        elif not room.ambush.empty:
-            monster = room.ambush
+            room = randomitem(castle.plan, False)
+        monster = room.monster()
+        if not monster:
+            monster = room.monster_in_ambush()
+        if monster:
             if monster.carry_weapon:
                 monster.give(self)
                 return True
@@ -205,4 +201,4 @@ class Weapon:
             if furniture.can_contain_weapon:
                 furniture.put(self)
                 return True
-        room.loot.pile.append(self)
+        room.loot.add(self)
