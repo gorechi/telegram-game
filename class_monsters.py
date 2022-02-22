@@ -383,33 +383,35 @@ class Plant(Monster):
         self.agressive = False
         self.empty = False
         self.can_steal = False
+        self.can_hide = False
+        self.can_run = False
+        self.hiding_place = None
 
 
-    def grow(self):
+    def grow(self, room):
         new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
-        return new_plant
+        new_plant.room = room
+        self.game.all_monsters.append(new_plant)
+        return True
 
     def win(self, loser=None):
         new_castle = self.game.new_castle
         self.health = self.start_health
+        room = self.room
+        new_rooms = []
         for i in range(4):
-            if new_castle.plan[self.current_position].doors[i] == 1:
-                if i == 0 and new_castle.plan[self.current_position - new_castle.rooms].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position - new_castle.rooms].center = copy
-                    copy.current_position = self.current_position - new_castle.rooms
-                elif i == 1 and new_castle.plan[self.current_position + 1].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position + 1].center = copy
-                    copy.current_position = self.current_position + 1
-                elif i == 2 and new_castle.plan[self.current_position + new_castle.rooms].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position + new_castle.rooms].center = copy
-                    copy.current_position = self.current_position + new_castle.rooms
-                elif i == 3 and new_castle.plan[self.current_position - 1].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position - 1].center = copy
-                    copy.current_position = self.current_position - 1
+            if room.doors[i] == 1:
+                if i == 0: 
+                    new_rooms.append(new_castle.plan[room.position - new_castle.rooms])
+                elif i == 1: 
+                    new_rooms.append(new_castle.plan[room.position + 1])
+                elif i == 2:
+                    new_rooms.append(new_castle.plan[room.position + new_castle.rooms])
+                elif i == 3:
+                    new_rooms.append(new_castle.plan[room.position - 1])
+        for i in new_rooms:
+            if not i.monster():
+                self.grow(i)
 
     def lose(self, winner=None):
         game = self.game
