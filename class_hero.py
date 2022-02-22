@@ -721,6 +721,7 @@ class Hero:
         game = self.game
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
+        monster = room.monster()
         furniture_list = room.furniture
         if not what:
             room.show(game.player)
@@ -762,11 +763,9 @@ class Hero:
                     message = new_castle.plan[what_position].show_through_key_hole(self)
                 tprint(game, message)
                 return True
-        if not room.center.empty and what in [room.center.name, room.center.name1, room.center.name[0]] and room.monster():
-            if not room.light:
-                tprint(game, f'Кто-то непонятный прячется в темноте.')
-            else:
-                tprint(game, showsides(self, room.center, new_castle))
+        if monster: 
+            if what in [monster.name, monster.name1, monster.name[0]]:
+                tprint(game, showsides(self, monster, new_castle))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
             if not room.light:
@@ -831,9 +830,10 @@ class Hero:
             room.visited = '+'
             room.show(self)
             room.map()
-            if room.monster():
-                if room.center.agressive and room.light:
-                    self.fight(room.center.name, True)
+            monster = room.monster()
+            if monster:
+                if monster.agressive and room.light:
+                    self.fight(monster.name, True)
             return True
 
     def fight(self, enemy, agressive=False):
@@ -869,9 +869,7 @@ class Hero:
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         message = []
-        enemy_in_room = False
-        if isinstance(room.center, Monster):
-            enemy_in_room = room.center
+        enemy_in_room = room.monster()
         if not room.light:
             message.append('В комнате настолько темно, что невозможно что-то отыскать.')
             tprint(game, message)

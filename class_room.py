@@ -125,7 +125,8 @@ class Room:
             obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
-        if not self.center.empty:
+        monster = self.monster()
+        if monster:
             message.append('Враг, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
@@ -141,6 +142,7 @@ class Room:
     
     def show(self, player):
         game = self.game
+        monster = self.monster()
         if self.stink > 0:
             stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
@@ -148,10 +150,10 @@ class Room:
                 decoration1 = f'освещенную факелом {self.decoration1}'
             else:
                 decoration1 = self.decoration1
-            if self.center.empty:
+            if not monster:
                 who_is_here = 'Не видно ничего интересного.'
             else:
-                who_is_here = f'{self.decoration3} {self.center.state} {self.center.name}.'
+                who_is_here = f'{self.decoration3} {monster.state} {monster.name}.'
             message = []
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
@@ -163,18 +165,19 @@ class Room:
             tprint(game, message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
-            if isinstance(self.center, Monster):
+            if monster:
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
             if self.stink > 0:
                 message.append(stink_text)
             tprint(game, message, state = 'direction')
 
     def show_through_key_hole(self, who):
+        monster = self.monster()
         message = []
-        if self.center.empty:
+        if not monster:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.key_hole}')
+            message.append(f'{who.name} заглядывает в замочную скважину двери и {monster.key_hole}')
         if self.stink > 0:
             message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message
@@ -213,13 +216,14 @@ class Room:
     
     def map(self):
         game=self.game
+        monster = self.monster()
         doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
         doors_vertical = {'0': '║', '1': ' ', '2': '|'}
         string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
         string2 = '║   ║'
         string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
-        if not self.center.empty:
-            string3 += self.center.name[0]
+        if monster:
+            string3 += monster.name[0]
         else:
             string3 += ' '
         string3 += ' {0}'.format(doors_vertical[str(self.doors[1])])

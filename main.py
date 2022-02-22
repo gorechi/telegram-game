@@ -151,7 +151,7 @@ def all_commands(message):
                 tprint(game, f'{game.player.name} не находит такую вкщь у себя в карманах.', 'fight')
 
         elif command in fight_commands and game.state == 1:
-            enemy = game.new_castle.plan[game.player.current_position].center
+            enemy = game.new_castle.plan[game.player.current_position].monster()
             tprint(game, game.player.attack(enemy, message.text))
             if game.player.run:
                 game.player.run = False
