@@ -186,6 +186,19 @@ class Room:
                 types.append(furniture.type)
         return types
 
+    def monsters(self, mode=None):
+        all_monsters = []
+        for monster in self.game.all_monsters:
+            if monster.room == self or monster.hiding_place == self:
+                all_monsters.append(monster)
+        if len(all_monsters) > 0:
+            if mode == 'random':
+                return randomitem(all_monsters, False)
+            else:
+                return all_monsters
+        else:
+            return False
+        
     def monster(self):
         for monster in self.game.all_monsters:
             if monster.room == self:
