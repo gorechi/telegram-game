@@ -44,7 +44,7 @@ class Monster:
         self.loot = Loot(self.game)
         self.can_steal = True
         self.stink = False
-        self.hide = False
+        self.can_hide = True
         self.hiding_place = None
         self.run = False
         self.wounded = False
@@ -347,19 +347,16 @@ class Monster:
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
-        if dice(1, s_monster_hide_possibility) == 1:
+        self.room = room
+        if self.can_hide and dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:
                 if i.can_hide:
                     places_to_hide.append(i)
             places_to_hide.append(room)
             self.hiding_place = randomitem(places_to_hide, False)
-            self.hide = True
-        else:
-            self.room = room
-            self.hide = False
         if self.stink:
             print('У нас есть вонючка!')
             print(self.name, room.position)
@@ -432,10 +429,9 @@ class Plant(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
+            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
-        room.center = self
-        self.current_position = room.position
+        self.room = room
 
 class Berserk(Monster):
     def __init__(self,
@@ -470,15 +466,6 @@ class Berserk(Monster):
     def mele(self):
         self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
         return dice(1, (self.stren + self.rage))
-
-    def place(self, castle, roomr_to_place=None, old_place=None):
-        if roomr_to_place:
-            room = roomr_to_place
-        else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
-            room = randomitem(empty_rooms, False)
-        room.center = self
-        self.current_position = room.position
 
 class Shapeshifter(Monster):
     def __init__(self, 
@@ -585,7 +572,7 @@ class Vampire(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.ambush.empty and not a.light and not a == old_place)]
+            empty_rooms = [a for a in castle.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
         places_to_hide = []
         for i in room.furniture:
@@ -593,7 +580,7 @@ class Vampire(Monster):
                 places_to_hide.append(i)
         places_to_hide.append(room)
         where_to_hide = randomitem(places_to_hide, False)
-        where_to_hide.ambush = self  # Монстр садится в засаду
-        self.current_position = room.position
+        self.room = room
+        self.hiding_place = where_to_hide
         return True
 

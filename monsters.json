@@ -7,6 +7,7 @@
     "health": 18,
     "hit_chance": 4,
     "parry_chance": 2,
+    "can_hide": true,
     "actions":
       [
       "крушит",
@@ -30,6 +31,7 @@
     "health": 40,
     "hit_chance": 4,
     "parry_chance": 0,
+    "can_hide": false,
     "actions":
       [
       "крушит",
@@ -56,6 +58,7 @@
     "health": 30,
     "hit_chance": 6,
     "parry_chance": 3,
+    "can_hide": true,
     "actions":
       [
       "режет",
@@ -80,6 +83,7 @@
     "health": 33,
     "hit_chance": 6,
     "parry_chance": 3,
+    "can_hide": true,
     "actions":
       [
       "режет",
@@ -104,6 +108,7 @@
     "health": 23,
     "hit_chance": 5,
     "parry_chance": 3,
+    "can_hide": true,
     "actions":
       [
       "режет",
@@ -127,6 +132,7 @@
     "health": 28,
     "hit_chance": 5,
     "parry_chance": 3,
+    "can_hide": true,
     "actions":
       [
       "режет",
@@ -150,6 +156,7 @@
     "health": 29,
     "hit_chance": 5,
     "parry_chance": 2,
+    "can_hide": false,
     "actions":
       [
       "крушит",
@@ -173,6 +180,7 @@
     "health": 15,
     "hit_chance": 4,
     "parry_chance": 0,
+    "can_hide": false,
     "actions":
       [
       "клацает",
@@ -196,6 +204,7 @@
     "health": 18,
     "hit_chance": 5,
     "parry_chance": 4,
+    "can_hide": true,
     "actions":
       [
       "крушит",
@@ -219,6 +228,7 @@
     "health": 30,
     "hit_chance": 4,
     "parry_chance": 1,
+    "can_hide": true,
     "actions":
       [
       "крушит",
@@ -242,6 +252,7 @@
     "health": 28,
     "hit_chance": 5,
     "parry_chance": 0,
+    "can_hide": false,
     "actions":
       [
       "атакует",
@@ -292,6 +303,7 @@
     "health": 35,
     "hit_chance": 5,
     "parry_chance": 1,
+    "can_hide": false,
     "actions":
       [
       "атакует",
@@ -342,6 +354,7 @@
     "health": 30,
     "hit_chance": 7,
     "parry_chance": 2,
+    "can_hide": true,
     "actions":
       [
       "царапает",
@@ -365,6 +378,7 @@
     "health": 25,
     "hit_chance": 7,
     "parry_chance": 0,
+    "can_hide": false,
     "actions":
       [
       "сокрушает",

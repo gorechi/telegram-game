@@ -873,7 +873,15 @@ class Hero:
             tprint(game, message)
             return True
         if not item:
-            if room.get_ambush(self):
+            monster = room.monster_in_ambush(self)
+            if monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
@@ -904,16 +912,25 @@ class Hero:
                     tprint(game, message)
                     return True
             what_to_search = False
+            monster = None
             for i in room.furniture:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     what_to_search = i
+                    monster = what_to_search.monster_in_ambush(self)
             if not what_to_search:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
                 tprint(game, message)
-                return False
-            elif what_to_search.get_ambush(self):
+                return False         
+            elif monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             elif len(what_to_search.loot.pile) > 0:
                 message.append(f'{self.name} осматривает {what_to_search.name1} и находит:')
