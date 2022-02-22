@@ -42,14 +42,10 @@ class Furniture:
         self.loot.pile.append(item)
    
     def monster_in_ambush(self):
-        hiding_monster = None
         for monster in self.game.all_monsters:
             if monster.hiding_place == self:
-                hiding_monster = monster 
-        if hiding_monster:
-            return hiding_monster
-        else:
-            return False
+                return monster 
+        return False
 
     def show(self):
         message = []
@@ -197,20 +193,16 @@ class Room:
         return types
 
     def monster(self):
-        if isinstance(self.center, Monster):
-            return self.center
-        else:
-            return False
+        for monster in self.game.all_monsters:
+            if monster.room == self:
+                return monster 
+        return False
 
     def monster_in_ambush(self):
-        hiding_monster = None
         for monster in self.game.all_monsters:
             if monster.hiding_place == self:
-                hiding_monster = monster 
-        if hiding_monster:
-            return hiding_monster
-        else:
-            return False
+                return monster 
+        return False
     
     def map(self):
         game=self.game

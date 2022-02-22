@@ -135,5 +135,4 @@ class Castle:
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
-        rooms_with_monsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
-        return len(rooms_with_monsters)
+        return len(self.game.all_monsters)

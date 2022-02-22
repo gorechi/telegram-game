@@ -32,6 +32,7 @@ class Monster:
         self.actions = actions.split(',')
         self.state = state
         self.room = None
+        self.alive = True
         self.hit_chance = hit_chance
         self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon
@@ -46,7 +47,6 @@ class Monster:
         self.stink = False
         self.can_hide = True
         self.hiding_place = None
-        self.run = False
         self.can_run = True
         self.wounded = False
         self.venomous = 0
@@ -283,6 +283,7 @@ class Monster:
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
             game.all_monsters.remove(self)
+            self.alive = False
         else:
             self.wounded = True
             if where.light:

@@ -257,7 +257,15 @@ class Hero:
             tprint(game, message)
             return False
         else:
-            if room.get_ambush(self):
+            monster = room.monster_in_ambush()
+            if monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             if not self.shield.empty:
                 shield = self.shield
@@ -873,7 +881,7 @@ class Hero:
             tprint(game, message)
             return True
         if not item:
-            monster = room.monster_in_ambush(self)
+            monster = room.monster_in_ambush()
             if monster:
                 monster.hiding_place = None
                 message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
@@ -916,7 +924,7 @@ class Hero:
             for i in room.furniture:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     what_to_search = i
-                    monster = what_to_search.monster_in_ambush(self)
+                    monster = what_to_search.monster_in_ambush()
             if not what_to_search:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
