@@ -42,7 +42,7 @@ class Castle:
         self.plan = []
         for i in range(f * r):
             new_loot = Loot(self.game)
-            a = Room(self.game, self.all_doors[i], '', new_loot)
+            a = Room(self.game, self.all_doors[i], new_loot)
             a.position = i
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах

@@ -16,7 +16,6 @@ class Furniture:
     def __init__(self, game, name=''):
         self.game = game
         new_loot = Loot(self.game)
-        self.ambush = self.game.empty_thing
         self.loot = new_loot
         self.locked = False
         self.lockable = False
@@ -50,7 +49,7 @@ class Furniture:
     def show(self):
         message = []
         message.append(self.where + ' ' + self.state + ' ' + self.name + '.')
-        if self.can_hide and not self.ambush.empty:
+        if self.monster_in_ambush():
             message.append('Внутри слышится какая-то возня.')
         return message
 
@@ -80,7 +79,7 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, doors, center=None, loot=None):
+    def __init__(self, game, doors, loot=None):
         self.game = game
         self.doors = doors
         a = dice(0, len(decor1) - 1)
@@ -92,10 +91,6 @@ class Room:
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
-        if center == '' or not center:
-            self.center = self.game.empty_thing
-        else:
-            self.center = center
         self.money = 0
         if loot == '' or not loot:
             self.loot = self.game.empty_thing
@@ -105,7 +100,6 @@ class Room:
         self.locked = False
         self.position = -1
         self.visited = ' '
-        self.ambush = self.game.empty_thing
         self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
