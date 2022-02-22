@@ -42,20 +42,20 @@ class Furniture:
         self.loot.pile.append(item)
    
     def get_ambush(self, hero):
-        if isinstance(self.ambush, Monster):
+        hiding_monster = None
+        for monster in self.game.all_monsters:
+            if monster.hiding_place == self:
+                hiding_monster = monster 
+        if hiding_monster:
             message = []
             game = self.game
-            enemy_in_ambush = self.ambush
-            room = self.room
-            room.center = enemy_in_ambush
-            self.ambush = game.empty_thing
-            if room.center.frightening:
-                message.append(f'{room.center} очень {room.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
+            hiding_monster.hide = False
+            message.append(f'Неожиданно из засады выскакивает {hiding_monster.name} и нападает на {hero.name1}.')
+            if hiding_monster.frightening:
+                message.append(f'{hiding_monster.name} очень {hiding_monster.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
                 hero.fear += 1
-            else:
-                message.append(f'Неожиданно из засады выскакивает {room.center.name} и нападает на {hero.name1}.')
             tprint(game, message)
-            hero.fight(room.center.name, True)
+            hero.fight(hiding_monster.name, True)
             return True
         else:
             return False
@@ -218,19 +218,20 @@ class Room:
             return False
     
     def get_ambush(self, hero):
-        if isinstance(self.ambush, Monster):
+        hiding_monster = None
+        for monster in self.game.all_monsters:
+            if monster.hiding_place == self:
+                hiding_monster = monster 
+        if hiding_monster:
             message = []
             game = self.game
-            enemy_in_ambush = self.ambush
-            self.center = enemy_in_ambush
-            self.ambush = game.empty_thing
-            if self.center.frightening:
-                message.append(f'{self.center} очень {self.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
+            hiding_monster.hide = False
+            message.append(f'Неожиданно из засады выскакивает {hiding_monster.name} и нападает на {hero.name1}.')
+            if hiding_monster.frightening:
+                message.append(f'{hiding_monster.name} очень {hiding_monster.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
                 hero.fear += 1
-            else:
-                message.append(f'Неожиданно из засады выскакивает {self.center.name} и нападает на {hero.name1}.')
             tprint(game, message)
-            hero.fight(self.center.name, True)
+            hero.fight(hiding_monster.name, True)
             return True
         else:
             return False
