@@ -413,19 +413,6 @@ class Plant(Monster):
             if not i.monster():
                 self.grow(i)
 
-    def lose(self, winner=None):
-        game = self.game
-        new_castle = game.new_castle
-        where = new_castle.plan[self.current_position]
-        if where.loot.empty:
-            new_loot = Loot()
-            where.loot = new_loot
-        if self.money > 0:
-            a = Money(game, self.money)
-            where.loot.pile.append(a)
-            where.loot.pile.extend(self.loot.pile)
-        where.center = game.empty_thing
-
     def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
@@ -520,23 +507,6 @@ class Shapeshifter(Monster):
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
-
-    def lose(self, winner=None):
-        game = self.game
-        where = self.game.new_castle.plan[self.current_position]
-        if where.loot.empty:
-            new_loot = Loot(self.game)
-            where.loot = new_loot
-        if self.money > 0:
-            a = Money(self.game, self.money)
-            where.loot.pile.append(a)
-            where.loot.pile.extend(self.loot.pile)
-        if not self.shield.empty:
-            where.loot.pile.append(self.shield)
-        if not self.armor.empty:
-            where.loot.pile.append(self.armor)
-        where.center = game.empty_thing
-
 
 class Vampire(Monster):
     def __init__(self, 
