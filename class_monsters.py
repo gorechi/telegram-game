@@ -47,6 +47,7 @@ class Monster:
         self.can_hide = True
         self.hiding_place = None
         self.run = False
+        self.can_run = True
         self.wounded = False
         self.venomous = 0
         self.poisoned = False
@@ -265,13 +266,12 @@ class Monster:
 
     def lose(self, winner=None):
         game = self.game
-        new_castle = self.game.new_castle
         result = dice(1, 10)
-        where = new_castle.plan[self.current_position]
+        where = self.room
         if where.loot.empty:
             new_loot = Loot(game)
             where.loot = new_loot
-        if result < 6 or self.wounded:
+        if result < 6 or self.wounded or not self.can_run:
             if self.money > 0:
                 a = Money(game, self.money)
                 where.loot.pile.append(a)
@@ -282,7 +282,7 @@ class Monster:
                 where.loot.pile.append(self.armor)
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
-            where.center = game.empty_thing
+            game.all_monsters.remove(self)
         else:
             self.wounded = True
             if where.light:
@@ -324,14 +324,12 @@ class Monster:
                                    f'получая {howmany(ill_amount, "жизнь,жизни,жизней")}. '
                     self.stren -= weakness_amount
                     self.health = self.start_health + ill_amount
-                if self.place(new_castle, old_place = where):
+                if self.place(game.new_castle, old_place = where):
                     alive_string += f'{name} убегает из комнаты.'
                     tprint(game, alive_string)
-                    where.center = game.empty_thing
                 else:
                     alive_string += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
                     tprint(game, alive_string)
-                    where.center = game.empty_thing
             else:
                 alive_string += f'получает ранение в ногу и не может двигаться, теряя при ' \
                                f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \

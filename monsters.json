@@ -8,6 +8,7 @@
     "hit_chance": 4,
     "parry_chance": 2,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "крушит",
@@ -32,6 +33,7 @@
     "hit_chance": 4,
     "parry_chance": 0,
     "can_hide": false,
+    "can_run": true,
     "actions":
       [
       "крушит",
@@ -59,6 +61,7 @@
     "hit_chance": 6,
     "parry_chance": 3,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "режет",
@@ -84,6 +87,7 @@
     "hit_chance": 6,
     "parry_chance": 3,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "режет",
@@ -109,6 +113,7 @@
     "hit_chance": 5,
     "parry_chance": 3,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "режет",
@@ -133,6 +138,7 @@
     "hit_chance": 5,
     "parry_chance": 3,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "режет",
@@ -157,6 +163,7 @@
     "hit_chance": 5,
     "parry_chance": 2,
     "can_hide": false,
+    "can_run": true,
     "actions":
       [
       "крушит",
@@ -181,6 +188,7 @@
     "hit_chance": 4,
     "parry_chance": 0,
     "can_hide": false,
+    "can_run": false,
     "actions":
       [
       "клацает",
@@ -205,6 +213,7 @@
     "hit_chance": 5,
     "parry_chance": 4,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "крушит",
@@ -229,6 +238,7 @@
     "hit_chance": 4,
     "parry_chance": 1,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "крушит",
@@ -253,6 +263,7 @@
     "hit_chance": 5,
     "parry_chance": 0,
     "can_hide": false,
+    "can_run": false,
     "actions":
       [
       "атакует",
@@ -304,6 +315,7 @@
     "hit_chance": 5,
     "parry_chance": 1,
     "can_hide": false,
+    "can_run": false,
     "actions":
       [
       "атакует",
@@ -355,6 +367,7 @@
     "hit_chance": 7,
     "parry_chance": 2,
     "can_hide": true,
+    "can_run": true,
     "actions":
       [
       "царапает",
@@ -379,6 +392,7 @@
     "hit_chance": 7,
     "parry_chance": 0,
     "can_hide": false,
+    "can_run": false,
     "actions":
       [
       "сокрушает",
