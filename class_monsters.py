@@ -31,8 +31,10 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.run = False
         self.room = None
         self.alive = True
+        self.hide = False
         self.hit_chance = hit_chance
         self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon

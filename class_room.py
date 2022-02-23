@@ -103,7 +103,6 @@ class Room:
         self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
-        self.monsters = []
         self.furniture = []
         self.stink = 0
         self.stink_levels = s_room_stink_levels
