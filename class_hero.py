@@ -295,6 +295,7 @@ class Hero:
                     stealing_monster.give(item)
                     message.append(f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.')
             self.poisoned = False
+            self.health = self.start_health
             self.save_room = room
             tprint(game, message)
             return True
