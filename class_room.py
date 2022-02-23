@@ -16,7 +16,6 @@ class Furniture:
     def __init__(self, game, name=''):
         self.game = game
         new_loot = Loot(self.game)
-        self.ambush = self.game.empty_thing
         self.loot = new_loot
         self.locked = False
         self.lockable = False
@@ -41,29 +40,16 @@ class Furniture:
     def put(self, item):
         self.loot.pile.append(item)
    
-    def get_ambush(self, hero):
-        if isinstance(self.ambush, Monster):
-            message = []
-            game = self.game
-            enemy_in_ambush = self.ambush
-            room = self.room
-            room.center = enemy_in_ambush
-            self.ambush = game.empty_thing
-            if room.center.frightening:
-                message.append(f'{room.center} очень {room.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
-                hero.fear += 1
-            else:
-                message.append(f'Неожиданно из засады выскакивает {room.center.name} и нападает на {hero.name1}.')
-            tprint(game, message)
-            hero.fight(room.center.name, True)
-            return True
-        else:
-            return False
+    def monster_in_ambush(self):
+        for monster in self.game.all_monsters:
+            if monster.hiding_place == self:
+                return monster 
+        return False
 
     def show(self):
         message = []
         message.append(self.where + ' ' + self.state + ' ' + self.name + '.')
-        if self.can_hide and not self.ambush.empty:
+        if self.monster_in_ambush():
             message.append('Внутри слышится какая-то возня.')
         return message
 
@@ -93,7 +79,7 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, doors, center=None, loot=None):
+    def __init__(self, game, doors, loot=None):
         self.game = game
         self.doors = doors
         a = dice(0, len(decor1) - 1)
@@ -105,10 +91,6 @@ class Room:
         a = dice(0, len(decor4) - 1)
         self.decoration4 = decor4[a]
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
-        if center == '' or not center:
-            self.center = self.game.empty_thing
-        else:
-            self.center = center
         self.money = 0
         if loot == '' or not loot:
             self.loot = self.game.empty_thing
@@ -118,11 +100,9 @@ class Room:
         self.locked = False
         self.position = -1
         self.visited = ' '
-        self.ambush = self.game.empty_thing
         self.rune_place = self.game.empty_thing
         self.light = True
         self.morgue = None
-        self.monsters = []
         self.furniture = []
         self.stink = 0
         self.stink_levels = s_room_stink_levels
@@ -144,7 +124,8 @@ class Room:
             obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
-        if not self.center.empty:
+        monster = self.monster()
+        if monster:
             message.append('Враг, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
@@ -160,6 +141,7 @@ class Room:
     
     def show(self, player):
         game = self.game
+        monster = self.monster()
         if self.stink > 0:
             stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
@@ -167,10 +149,10 @@ class Room:
                 decoration1 = f'освещенную факелом {self.decoration1}'
             else:
                 decoration1 = self.decoration1
-            if self.center.empty:
+            if not monster:
                 who_is_here = 'Не видно ничего интересного.'
             else:
-                who_is_here = f'{self.decoration3} {self.center.state} {self.center.name}.'
+                who_is_here = f'{self.decoration3} {monster.state} {monster.name}.'
             message = []
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
@@ -182,18 +164,19 @@ class Room:
             tprint(game, message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
-            if isinstance(self.center, Monster):
+            if monster:
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
             if self.stink > 0:
                 message.append(stink_text)
             tprint(game, message, state = 'direction')
 
     def show_through_key_hole(self, who):
+        monster = self.monster()
         message = []
-        if self.center.empty:
+        if not monster:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
-            message.append(f'{who.name} заглядывает в замочную скважину двери и {self.center.key_hole}')
+            message.append(f'{who.name} заглядывает в замочную скважину двери и {monster.key_hole}')
         if self.stink > 0:
             message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message
@@ -205,45 +188,41 @@ class Room:
                 types.append(furniture.type)
         return types
 
-    def monster(self):
-        if isinstance(self.center, Monster):
-            return self.center
+    def monsters(self, mode=None):
+        all_monsters = []
+        for monster in self.game.all_monsters:
+            if monster.room == self or monster.hiding_place == self:
+                all_monsters.append(monster)
+        if len(all_monsters) > 0:
+            if mode == 'random':
+                return randomitem(all_monsters, False)
+            else:
+                return all_monsters
         else:
             return False
+        
+    def monster(self):
+        for monster in self.game.all_monsters:
+            if monster.room == self:
+                return monster 
+        return False
 
     def monster_in_ambush(self):
-        if isinstance(self.ambush, Monster):
-            return self.ambush
-        else:
-            return False
+        for monster in self.game.all_monsters:
+            if monster.hiding_place == self:
+                return monster 
+        return False
     
-    def get_ambush(self, hero):
-        if isinstance(self.ambush, Monster):
-            message = []
-            game = self.game
-            enemy_in_ambush = self.ambush
-            self.center = enemy_in_ambush
-            self.ambush = game.empty_thing
-            if self.center.frightening:
-                message.append(f'{self.center} очень {self.center.g(["страшный", "страшная"])} и {hero.name} пугается до икоты.')
-                hero.fear += 1
-            else:
-                message.append(f'Неожиданно из засады выскакивает {self.center.name} и нападает на {hero.name1}.')
-            tprint(game, message)
-            hero.fight(self.center.name, True)
-            return True
-        else:
-            return False
-
     def map(self):
         game=self.game
+        monster = self.monster()
         doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
         doors_vertical = {'0': '║', '1': ' ', '2': '|'}
         string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
         string2 = '║   ║'
         string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
-        if not self.center.empty:
-            string3 += self.center.name[0]
+        if monster:
+            string3 += monster.name[0]
         else:
             string3 += ' '
         string3 += ' {0}'.format(doors_vertical[str(self.doors[1])])

@@ -156,6 +156,7 @@ class Matches():
         if not who_is_using:
             who_is_using = player
         room = game.new_castle.plan[who_is_using.current_position]
+        monster = room.monster()
         if room.light:
             message = ['Незачем тратить спички, здесь и так светло.']
             tprint(game, message)
@@ -163,14 +164,16 @@ class Matches():
             room.light = True
             room.torch = True
             message = [f'{who_is_using.name} зажигает факел и комната озаряется светом']
-            if not room.center.empty and room.center.frightening:
+            if monster:
+                if monster.frightening:
                     message.append(f'{who_is_using.name} замирает от ужаса глядя на чудовище перед собой.')
                     who_is_using.fear += 1
             tprint(game, message)
             room.show(who_is_using)
             room.map()
-            if not room.center.empty and room.center.agressive:
-                    player.fight(room.center, True)
+            if monster:
+                if monster.agressive:
+                    player.fight(monster.name, True)
 
 class Map():
     def __init__(self, game):

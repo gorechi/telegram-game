@@ -257,7 +257,15 @@ class Hero:
             tprint(game, message)
             return False
         else:
-            if room.get_ambush(self):
+            monster = room.monster_in_ambush()
+            if monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             if not self.shield.empty:
                 shield = self.shield
@@ -713,6 +721,7 @@ class Hero:
         game = self.game
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
+        monster = room.monster()
         furniture_list = room.furniture
         if not what:
             room.show(game.player)
@@ -754,11 +763,9 @@ class Hero:
                     message = new_castle.plan[what_position].show_through_key_hole(self)
                 tprint(game, message)
                 return True
-        if not room.center.empty and what in [room.center.name, room.center.name1, room.center.name[0]] and room.monster():
-            if not room.light:
-                tprint(game, f'Кто-то непонятный прячется в темноте.')
-            else:
-                tprint(game, showsides(self, room.center, new_castle))
+        if monster: 
+            if what in [monster.name, monster.name1, monster.name[0]]:
+                tprint(game, showsides(self, monster, new_castle))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
             if not room.light:
@@ -823,9 +830,10 @@ class Hero:
             room.visited = '+'
             room.show(self)
             room.map()
-            if room.monster():
-                if room.center.agressive and room.light:
-                    self.fight(room.center.name, True)
+            monster = room.monster()
+            if monster:
+                if monster.agressive and room.light:
+                    self.fight(monster.name, True)
             return True
 
     def fight(self, enemy, agressive=False):
@@ -861,9 +869,7 @@ class Hero:
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         message = []
-        enemy_in_room = False
-        if isinstance(room.center, Monster):
-            enemy_in_room = room.center
+        enemy_in_room = room.monster()
         if not room.light:
             message.append('В комнате настолько темно, что невозможно что-то отыскать.')
             tprint(game, message)
@@ -873,7 +879,15 @@ class Hero:
             tprint(game, message)
             return True
         if not item:
-            if room.get_ambush(self):
+            monster = room.monster_in_ambush()
+            if monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             for furniture in room.furniture:
                 message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
@@ -904,16 +918,25 @@ class Hero:
                     tprint(game, message)
                     return True
             what_to_search = False
+            monster = None
             for i in room.furniture:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     what_to_search = i
+                    monster = what_to_search.monster_in_ambush()
             if not what_to_search:
                 message.append('В комнате нет такой вещи.')
             elif what_to_search.locked:
                 message.append(f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
                 tprint(game, message)
-                return False
-            elif what_to_search.get_ambush(self):
+                return False         
+            elif monster:
+                monster.hiding_place = None
+                message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+                if monster.frightening:
+                    message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                    self.fear += 1
+                tprint(game, message)
+                self.fight(monster.name, True)
                 return False
             elif len(what_to_search.loot.pile) > 0:
                 message.append(f'{self.name} осматривает {what_to_search.name1} и находит:')

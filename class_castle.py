@@ -42,7 +42,7 @@ class Castle:
         self.plan = []
         for i in range(f * r):
             new_loot = Loot(self.game)
-            a = Room(self.game, self.all_doors[i], '', new_loot)
+            a = Room(self.game, self.all_doors[i], new_loot)
             a.position = i
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах
@@ -93,14 +93,15 @@ class Castle:
         how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
         for i in range(how_many_locked_rooms):
             while True:
-                a = randomitem(self.plan)
-                if a != self.plan[0]:
+                room = randomitem(self.plan)
+                if room != self.plan[0]:
                     new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
-                    a.lock(2)
-                    if a.center.empty:
-                        a.loot.pile.append(new_money)
+                    room.lock(2)
+                    monster = room.monsters('random')
+                    if not monster:
+                        room.loot.add(new_money)
                     else:
-                        a.center.loot.pile.append(new_money)
+                        monster.give(new_money)
                     new_key = Key(self.game)
                     new_key.place(self)
                     break
@@ -135,5 +136,4 @@ class Castle:
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
 
     def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
-        rooms_with_monsters = [a for a in self.plan if (a.monster() or a.monster_in_ambush())]
-        return len(rooms_with_monsters)
+        return len(self.game.all_monsters)

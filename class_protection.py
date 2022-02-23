@@ -144,24 +144,20 @@ class Armor(Protection):
         if room_to_place:
             room = room_to_place
         else:
-            rooms = castle.plan
-            room = randomitem(rooms, False)
-        if room.monster():
-            monster = room.monster()
+            room = randomitem(castle.plan, False)
+        monster = room.monster()
+        if not monster:
+            monster = room.monster_in_ambush()
+        if monster:
             if monster.wear_armor:
                 monster.give(self)
                 return True
-        elif not room.ambush.empty:
-            monster = room.ambush
-            if monster.wear_armor:
-                monster.give(self)
+        elif len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            if furniture.can_contain_weapon:
+                furniture.put(self)
                 return True
-            elif len(room.furniture) > 0:
-                furniture = randomitem(room.furniture, False)
-                if furniture.can_contain_weapon:
-                    furniture.put(self)
-                    return True
-        room.loot.pile.append(self)
+        room.loot.add(self)
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
@@ -235,24 +231,20 @@ class Shield (Protection):
         if room_to_place:
             room = room_to_place
         else:
-            rooms = castle.plan
-            room = randomitem(rooms, False)
-        if room.monster():
-            monster = room.monster()
+            room = randomitem(castle.plan, False)
+        monster = room.monster()
+        if not monster:
+            monster = room.monster_in_ambush()
+        if monster:
             if monster.carry_shield:
                 monster.give(self)
                 return True
-        elif not room.ambush.empty:
-            monster = room.ambush
-            if monster.carry_shield:
-                monster.give(self)
+        elif len(room.furniture) > 0:
+            furniture = randomitem(room.furniture, False)
+            if furniture.can_contain_weapon:
+                furniture.put(self)
                 return True
-            elif len(room.furniture) > 0:
-                furniture = randomitem(room.furniture, False)
-                if furniture.can_contain_weapon:
-                    furniture.put(self)
-                    return True
-        room.loot.pile.append(self)
+        room.loot.add(self)
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):

@@ -31,6 +31,10 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.run = False
+        self.room = None
+        self.alive = True
+        self.hide = False
         self.hit_chance = hit_chance
         self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon
@@ -43,8 +47,9 @@ class Monster:
         self.loot = Loot(self.game)
         self.can_steal = True
         self.stink = False
-        self.hide = False
-        self.run = False
+        self.can_hide = True
+        self.hiding_place = None
+        self.can_run = True
         self.wounded = False
         self.venomous = 0
         self.poisoned = False
@@ -263,13 +268,12 @@ class Monster:
 
     def lose(self, winner=None):
         game = self.game
-        new_castle = self.game.new_castle
         result = dice(1, 10)
-        where = new_castle.plan[self.current_position]
+        where = self.room
         if where.loot.empty:
             new_loot = Loot(game)
             where.loot = new_loot
-        if result < 6 or self.wounded:
+        if result < 6 or self.wounded or not self.can_run:
             if self.money > 0:
                 a = Money(game, self.money)
                 where.loot.pile.append(a)
@@ -280,7 +284,8 @@ class Monster:
                 where.loot.pile.append(self.armor)
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
-            where.center = game.empty_thing
+            game.all_monsters.remove(self)
+            self.alive = False
         else:
             self.wounded = True
             if where.light:
@@ -322,14 +327,12 @@ class Monster:
                                    f'получая {howmany(ill_amount, "жизнь,жизни,жизней")}. '
                     self.stren -= weakness_amount
                     self.health = self.start_health + ill_amount
-                if self.place(new_castle, old_place = where):
+                if self.place(game.new_castle, old_place = where):
                     alive_string += f'{name} убегает из комнаты.'
                     tprint(game, alive_string)
-                    where.center = game.empty_thing
                 else:
                     alive_string += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
                     tprint(game, alive_string)
-                    where.center = game.empty_thing
             else:
                 alive_string += f'получает ранение в ногу и не может двигаться, теряя при ' \
                                f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \
@@ -345,19 +348,16 @@ class Monster:
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
-        if dice(1, s_monster_hide_possibility) == 1:
+        self.room = room
+        if self.can_hide and dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:
                 if i.can_hide:
                     places_to_hide.append(i)
             places_to_hide.append(room)
-            where_to_hide = randomitem(places_to_hide, False)
-            where_to_hide.ambush = self  # Монстр садится в засаду
-        else:
-            room.center = self
-        self.current_position = room.position
+            self.hiding_place = randomitem(places_to_hide, False)
         if self.stink:
             print('У нас есть вонючка!')
             print(self.name, room.position)
@@ -385,55 +385,43 @@ class Plant(Monster):
         self.agressive = False
         self.empty = False
         self.can_steal = False
+        self.can_hide = False
+        self.can_run = False
+        self.hiding_place = None
 
 
-    def grow(self):
+    def grow(self, room):
         new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
-        return new_plant
+        new_plant.room = room
+        self.game.all_monsters.append(new_plant)
+        return True
 
     def win(self, loser=None):
         new_castle = self.game.new_castle
         self.health = self.start_health
+        room = self.room
+        new_rooms = []
         for i in range(4):
-            if new_castle.plan[self.current_position].doors[i] == 1:
-                if i == 0 and new_castle.plan[self.current_position - new_castle.rooms].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position - new_castle.rooms].center = copy
-                    copy.current_position = self.current_position - new_castle.rooms
-                elif i == 1 and new_castle.plan[self.current_position + 1].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position + 1].center = copy
-                    copy.current_position = self.current_position + 1
-                elif i == 2 and new_castle.plan[self.current_position + new_castle.rooms].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position + new_castle.rooms].center = copy
-                    copy.current_position = self.current_position + new_castle.rooms
-                elif i == 3 and new_castle.plan[self.current_position - 1].center.empty:
-                    copy = self.grow()
-                    new_castle.plan[self.current_position - 1].center = copy
-                    copy.current_position = self.current_position - 1
-
-    def lose(self, winner=None):
-        game = self.game
-        new_castle = game.new_castle
-        where = new_castle.plan[self.current_position]
-        if where.loot.empty:
-            new_loot = Loot()
-            where.loot = new_loot
-        if self.money > 0:
-            a = Money(game, self.money)
-            where.loot.pile.append(a)
-            where.loot.pile.extend(self.loot.pile)
-        where.center = game.empty_thing
+            if room.doors[i] == 1:
+                if i == 0: 
+                    new_rooms.append(new_castle.plan[room.position - new_castle.rooms])
+                elif i == 1: 
+                    new_rooms.append(new_castle.plan[room.position + 1])
+                elif i == 2:
+                    new_rooms.append(new_castle.plan[room.position + new_castle.rooms])
+                elif i == 3:
+                    new_rooms.append(new_castle.plan[room.position - 1])
+        for i in new_rooms:
+            if not i.monster():
+                self.grow(i)
 
     def place(self, castle, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
+            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
-        room.center = self
-        self.current_position = room.position
+        self.room = room
 
 class Berserk(Monster):
     def __init__(self,
@@ -468,15 +456,6 @@ class Berserk(Monster):
     def mele(self):
         self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
         return dice(1, (self.stren + self.rage))
-
-    def place(self, castle, roomr_to_place=None, old_place=None):
-        if roomr_to_place:
-            room = roomr_to_place
-        else:
-            empty_rooms = [a for a in castle.plan if (a.center.empty and a.ambush.empty)]
-            room = randomitem(empty_rooms, False)
-        room.center = self
-        self.current_position = room.position
 
 class Shapeshifter(Monster):
     def __init__(self, 
@@ -531,23 +510,6 @@ class Shapeshifter(Monster):
             result += self.armor.protect(attacker)
         return result
 
-    def lose(self, winner=None):
-        game = self.game
-        where = self.game.new_castle.plan[self.current_position]
-        if where.loot.empty:
-            new_loot = Loot(self.game)
-            where.loot = new_loot
-        if self.money > 0:
-            a = Money(self.game, self.money)
-            where.loot.pile.append(a)
-            where.loot.pile.extend(self.loot.pile)
-        if not self.shield.empty:
-            where.loot.pile.append(self.shield)
-        if not self.armor.empty:
-            where.loot.pile.append(self.armor)
-        where.center = game.empty_thing
-
-
 class Vampire(Monster):
     def __init__(self, 
                  game, 
@@ -583,7 +545,7 @@ class Vampire(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (a.ambush.empty and not a.light and not a == old_place)]
+            empty_rooms = [a for a in castle.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
         places_to_hide = []
         for i in room.furniture:
@@ -591,7 +553,7 @@ class Vampire(Monster):
                 places_to_hide.append(i)
         places_to_hide.append(room)
         where_to_hide = randomitem(places_to_hide, False)
-        where_to_hide.ambush = self  # Монстр садится в засаду
-        self.current_position = room.position
+        self.room = room
+        self.hiding_place = where_to_hide
         return True
 
