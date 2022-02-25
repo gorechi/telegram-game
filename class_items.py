@@ -8,31 +8,6 @@ from functions import howmany, randomitem, tprint
 from settings import *
 
 
-class Item:
-    def __init__(self, game):
-        self.game = game
-        self.name = 'штука'
-        self.name1 = 'штуку'
-        self.can_use_in_fight = False
-        self.description = self.name
-        self.empty = False
-
-    def __str__(self):
-        return self.name
-
-    def take(self, who=''):
-        if who == '':
-            return False
-        who.pockets.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
-
-    def use(self, who_is_using, in_action=False):
-        tprint(self.game, f'{who_is_using.name} не знает, как использовать такие штуки.')
-
-    def show(self):
-        return self.description
-
-
 class Rune:
     def __init__(self, game):
         self.game = game
@@ -58,26 +33,24 @@ class Rune:
     def on_create(self):
         return True
 
-    def place(self, castle, room_to_place=None):
+    def place(self, castle, room=None):
         rooms_with_secrets = [i for i in castle.plan if i.secret_word]
-        if room_to_place:
-            room = room_to_place
-        else:
+        if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
         if room in rooms_with_secrets:
             room.secret_loot.pile.append(self)
-            return True
-        if len(room.furniture) > 0:
+        elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
-            return True
-        room.loot.pile.append(self)
+        else:
+            room.loot.pile.append(self)
+        return True
 
     def element(self):
         return int(self.element)
 
-    def take(self, who=''):
+    def take(self, who):
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
@@ -113,7 +86,7 @@ class Spell:
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
 
 
-class Matches():
+class Matches:
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -174,7 +147,7 @@ class Matches():
                 if monster.agressive:
                     player.fight(monster.name, True)
 
-class Map():
+class Map:
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -183,22 +156,21 @@ class Map():
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
-    def place(self, castle, room_to_place=None):
-        if room_to_place:
-            room = room_to_place
-        else:
+    def place(self, castle, room=None):
+        if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
         if len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
-            return True
-        room.loot.pile.append(self)
+        else:
+            room.loot.pile.append(self)
+        return True
 
     def show(self):
         return self.description
 
-    def use(self, who_is_using, in_action=False):
+    def use(self, who, in_action=False):
         """Функция использования карты. Если вызывается в бою, то ничего не происходит. 
         В мирное время выводит на экран карту замка.
 
@@ -207,26 +179,29 @@ class Map():
             in_action (bool, optional): Признак того, что предмет используется в бою. По умолчанию False.
 
         """
+        game = self.game
+        room = game.new_castle.plan[who.current_position]
         if not in_action:
-            if who_is_using.fear >= s_fear_limit:
-                tprint(self.game, f'{who_is_using.name} от страха не может сосредоточиться и что-то разобрать на карте.')
+            if who.fear >= s_fear_limit:
+                tprint(game, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.')
+                return False
+            elif not room.light:
+                tprint(game, f'В комнате слишком темно чтобы разглядывать карту')
                 return False
             else:    
-                tprint(self.game, f'{who_is_using.name} смотрит на карту замка.')
-                self.game.new_castle.map()
+                tprint(game, f'{who.name} смотрит на карту замка.')
+                game.new_castle.map()
                 return True
         else:
-            tprint(self.game, 'Во время боя это совершенно неуместно!')
+            tprint(game, 'Во время боя это совершенно неуместно!')
             return False
 
-    def take(self, who=''):
-        if who == '':
-            return False
+    def take(self, who):
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
 
-class Key():
+class Key:
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -244,30 +219,28 @@ class Key():
     def on_create(self):
         return True
 
-    def place(self, castle, room_to_place=None):
-        furniture = False
-        if room_to_place:
-            room = room_to_place
-        else:
+    def place(self, castle, room=None):
+        furniture = None
+        if not room:
             unlocked_rooms = [a for a in castle.plan if (not a.locked)]
             room = randomitem(unlocked_rooms, False)
         if len(room.furniture) > 0:
             for i in room.furniture:
                 if not i.locked:
                     furniture = i
-            if furniture:
-                furniture.put(self)
-                return True
-        room.loot.pile.append(self)
+        if furniture:
+            furniture.put(self)
+        else:
+            room.loot.add(self)
+        return True
 
-    def take(self, who=''):
-        if who == '':
-            return False
+    def take(self, who):
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
+        return True
 
 
-class Potion():
+class Potion:
     def __init__(self, game, name='', effect=0, type=0, can_use_in_fight=True):
         self.game = game
         self.name = name
@@ -294,17 +267,16 @@ class Potion():
     def show(self):
         return self.description
 
-    def place(self, castle, room_to_place=None):
-        if room_to_place:
-            room = room_to_place
-        else:
+    def place(self, castle, room=None):
+        if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
         if len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
-            return True
-        room.loot.pile.append(self)
+        else:
+            room.loot.add(self)
+        return True
 
     def use(self, who_using, in_action=False):
         game = self.game
@@ -374,14 +346,13 @@ class Potion():
     def __str__(self):
         return self.description
 
-    def take(self, who=''):
-        if who == '':
-            return False
+    def take(self, who):
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
+        return True
 
 
-class Book():
+class Book:
     def __init__(self, game, name=None):
         self.game = game
         self.name = name
@@ -407,20 +378,16 @@ class Book():
         message = [f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.']
         return message
 
-    def place(self, castle, room_to_place=None):
-        if room_to_place:
-            room = room_to_place
-        else:
+    def place(self, castle, room=None):
+        if not room:
             rooms = []
             for i in castle.plan:
                 if len(i.furniture) > 0:
                     rooms.append(i)
             room = randomitem(rooms, False)
-        if len(room.furniture) > 0:
-            furniture = randomitem(room.furniture, False)
-            furniture.put(self)
-            return True
-        room.loot.pile.append(self)
+        furniture = randomitem(room.furniture, False)
+        furniture.put(self)
+        return True
 
     def show(self):
         return self.description
@@ -435,8 +402,7 @@ class Book():
     def __str__(self):
         return self.name
 
-    def take(self, who=''):
-        if who == '':
-            return False
+    def take(self, who):
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+        return True
