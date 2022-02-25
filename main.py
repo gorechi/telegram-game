@@ -165,8 +165,9 @@ def all_commands(message):
             else:
                 tprint(game, f'{game.player.name} побеждает в бою!', 'off')
                 game.state = 0
-                game.player.win(enemy)
                 enemy.lose(game.player)
+                game.player.win(enemy)
+    
     return True
 
 bot.polling(none_stop=True, interval=0)
