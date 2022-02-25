@@ -780,7 +780,7 @@ class Hero:
             else:
                 tprint(game, self.shield.show())
             return True
-        if not self.armor.empty and what in [self.armor.name, self.armor.name1, 'защиту']:
+        if not self.armor.empty and what in [self.armor.name, self.armor.name1, 'защиту', 'доспехи', 'доспех']:
             if not room.light:
                 tprint(game, f'Так темно, что не видно, что на тебе надето.')
             else:
@@ -895,7 +895,7 @@ class Hero:
             if not room.loot.empty and len(room.loot.pile) > 0:
                 message.append('В комнате есть:')
                 for i in room.loot.pile:
-                    message.append(i.name)
+                    message.append(i.name.capitalize())
             else:
                 message.append('В комнате нет ничего интересного.')
             tprint(game, message)
@@ -913,7 +913,7 @@ class Hero:
                 else:
                     message.append(f'{self.name} осматривает {item} и находит:')
                     for i in room.secret_loot.pile:
-                        message.append(i.name)
+                        message.append(i.name.capitalize())
                         room.loot.pile.append(i)
                         message.append('Все, что было спрятано, теперь лежит на виду.')
                     tprint(game, message)
@@ -942,7 +942,7 @@ class Hero:
             elif len(what_to_search.loot.pile) > 0:
                 message.append(f'{self.name} осматривает {what_to_search.name1} и находит:')
                 for i in what_to_search.loot.pile:
-                    message.append(i.name)
+                    message.append(i.name.capitalize())
                     room.loot.pile.append(i)
                 if len(what_to_search.loot.pile) > 0:
                     message.append('Все, что было спрятано, теперь лежит на виду.')

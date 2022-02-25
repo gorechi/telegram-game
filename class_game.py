@@ -121,6 +121,7 @@ class Game():
         self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
+            print(rune.poison)
         # Создаем книги и разбрасываем по замку
         self.all_books = self.readobjects(file='books.json',
                                     howmany=self.how_many['книга'],
