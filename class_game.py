@@ -123,6 +123,7 @@ class Game():
             rune.place(self.new_castle)
             print(rune.poison)
         # Создаем книги и разбрасываем по замку
+        
         self.all_books = self.readobjects(file='books.json',
                                     howmany=self.how_many['книга'],
                                     random=True,

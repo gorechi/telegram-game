@@ -140,8 +140,8 @@ class Weapon:
                 shield = who.shield
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
-                message.append(f'Из-за того, что герой взял двуручное оружие, '
-                               f'ему пришлось убрать {shield.real_name()[1]} за спину.')
+                message.append(f'Из-за того, что {who.g(["герой взял", "героиня взяла"])} двуручное оружие, '
+                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.real_name()[1]} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -162,26 +162,26 @@ class Weapon:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string}), {self.type}'.capitalize()
 
-    def use(self, who_using, in_action=False):
+    def use(self, who, in_action=False):
         game = self.game
-        if who_using.weapon.empty:
-            who_using.weapon = self
+        if who.weapon.empty:
+            who.weapon = self
         else:
-            who_using.pockets.append(who_using.weapon)
-            who_using.weapon = self
-            who_using.pockets.remove(self)
-            message = [f'{who_using.name} теперь использует {self.name1} в качестве оружия.']
-            if not who_using.shield.empty and self.twohanded:
-                shield = who_using.shield
-                who_using.removed_shield = shield
-                who_using.shield = game.no_shield
+            who.pockets.append(who.weapon)
+            who.weapon = self
+            who.pockets.remove(self)
+            message = [f'{who.name} теперь использует {self.name1} в качестве оружия.']
+            if not who.shield.empty and self.twohanded:
+                shield = who.shield
+                who.removed_shield = shield
+                who.shield = game.no_shield
                 message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
-            if not who_using.removed_shield.empty and not self.twohanded:
-                shield = who_using.removed_shield
-                who_using.shield = shield
-                who_using.removed_shield = game.no_shield
+            if not who.removed_shield.empty and not self.twohanded:
+                shield = who.removed_shield
+                who.shield = shield
+                who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'герой теперь держит во второй руке {shield.real_name()[1]}.')
+                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.real_name()[1]}.')
         tprint(game, message)
 
     def place(self, castle, room_to_place = None):

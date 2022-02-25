@@ -43,11 +43,11 @@ class Rune:
         self.can_use_in_fight = False
         self.name = 'руна'
         self.name1 = 'руну'
-        self.description = self.name + ' ' + s_elements_dictionary[self.element]
+        self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
         if dice (1, s_rune_poison_probability) == 1:
             self.poison = True
-            self.description = 'ядовитая ' + self.description
+            self.description = f'ядовитая {self.description}'
         else:
             self.poison = False
 
@@ -82,8 +82,7 @@ class Rune:
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     def show(self):
-        return f'{self.name} {s_elements_dictionary[self.element]} - ' \
-               f'урон + {str(self.damage)} или защита + {str(self.defence)}'
+        return f'{self.description} - урон + {str(self.damage)} или защита + {str(self.defence)}'.capitalize()
 
     def use(self, who_is_using, inaction=False):
         tprint(self.game, f'{who_is_using.name} не знает, как использовать такие штуки.')
