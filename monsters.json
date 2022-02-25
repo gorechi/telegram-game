@@ -198,11 +198,11 @@
     "state": "стоит",
     "frightening": false,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": true,
+    "carryweapon": false,
+    "carryshield": false,
     "venomous": 0,
     "gender": 0,
-    "wearArmor": true
+    "wearArmor": false
   },
   {
     "class": "притворщик",
