@@ -110,9 +110,8 @@ class Room:
             self.torch = False
         else:
             self.torch = True
-        self.secret_dict = s_room_secrets_dictionary
         self.secret_word = ''
-        for i in self.secret_dict:
+        for i in s_room_secrets_dictionary:
             if self.description.find(i) > -1:
                 self.secret_word = i
 
