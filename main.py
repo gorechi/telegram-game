@@ -5,9 +5,7 @@ import telebot
 from telebot import types
 
 from class_game import Game
-from class_items import Rune
 from constants import TOKEN
-from functions import tprint
 
 # Константы и настройки
 game_sessions = {}

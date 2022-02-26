@@ -44,6 +44,7 @@ class Game():
         # 1 - происходит бой
         # 2 - персонаж что-то улучшает
         # 3 - персонаж поднимает уровень
+        # 4 - персонадж использует вещь во время боя
         self.selected_item = self.empty_thing
         self.game_is_on = False
         self.chat_id = chat_id
@@ -118,7 +119,7 @@ class Game():
             potion.place(self.new_castle)
         
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
             print(rune.poison)
@@ -235,7 +236,7 @@ class Game():
             return True
         elif command in s_game_fight_commands and self.state == 1:
             enemy = self.new_castle.plan[self.player.current_position].monster()
-            tprint(self, player.attack(enemy, message.text))
+            tprint(self, player.attack(enemy, message))
             if player.run:
                 player.run = False
                 player.lookaround()
