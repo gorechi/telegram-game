@@ -7,7 +7,7 @@ from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
-from functions import randomitem
+from functions import randomitem, tprint
 from settings import *
 
 
@@ -44,6 +44,7 @@ class Game():
         # 1 - происходит бой
         # 2 - персонаж что-то улучшает
         # 3 - персонаж поднимает уровень
+        # 4 - персонадж использует вещь во время боя
         self.selected_item = self.empty_thing
         self.game_is_on = False
         self.chat_id = chat_id
@@ -118,7 +119,7 @@ class Game():
             potion.place(self.new_castle)
         
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for i in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self.new_castle)
             print(rune.poison)
@@ -186,3 +187,69 @@ class Game():
             return objects
         else:
             return False
+
+    def action(self, command, message):
+        answer = message.lower()
+        player = self.player
+        if command in s_game_common_commands and self.state == 0:
+            if not player.game_over('killall'):
+                player.do(message.lower())
+            return True
+        elif command in s_game_level_up_commands and self.state == 3:
+            player.levelup(command)
+            return True
+        elif self.state == 2:
+            rune_list = self.player.inpockets(Rune)
+            if answer == 'отмена':
+                self.state = 0
+                return True
+            elif answer.isdigit() and int(answer) - 1 < len(rune_list):
+                if self.selected_item.enchant(rune_list[int(answer) - 1]):
+                    tprint(self, f'{player.name} улучшает {self.selected_item.name1} новой руной.', 'direction')
+                    player.pockets.remove(rune_list[int(answer) - 1])
+                    self.state = 0
+                    return True
+                else:
+                    tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.name1}.', 'direction')
+                    self.state = 0
+                    return False
+            else:
+                tprint(self, f'{player.name} не находит такую руну у себя в карманах.', 'direction')
+            return True
+        elif self.state == 4:
+            can_use = self.selected_item
+            if answer == 'отмена':
+                self.state = 1
+                tprint(self, f'{player.name} продолжает бой.', 'fight')
+                return True
+            elif answer.isdigit() and int(answer) - 1 < len(can_use):
+                item = can_use[int(answer) - 1]
+                if item.use(who_using=self.player, in_action=True):
+                    self.selected_item.remove(item)
+                    return True
+                else:
+                    tprint(self, f'Похоже, что {player.name} не может использовать {item.name1}.', 'fight')
+                    self.state = 1
+                    return False
+            else:
+                tprint(self, f'{player.name} не находит такую вкщь у себя в карманах.', 'fight')
+            return True
+        elif command in s_game_fight_commands and self.state == 1:
+            enemy = self.new_castle.plan[self.player.current_position].monster()
+            tprint(self, player.attack(enemy, message))
+            if player.run:
+                player.run = False
+                player.lookaround()
+                self.state = 0
+                return True
+            elif enemy.run:
+                self.state = 0
+            elif enemy.health > 0 and self.state == 1:
+                enemy.attack(player)
+            else:
+                tprint(self, f'{player.name} побеждает в бою!', 'off')
+                self.state = 0
+                enemy.lose(player)
+                player.win(enemy)
+            return True
+        tprint (self, f'{player.name} такого не умеет.', 'direction')
