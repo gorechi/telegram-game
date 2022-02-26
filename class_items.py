@@ -180,13 +180,13 @@ class Map:
         room = game.new_castle.plan[who.current_position]
         if not in_action:
             if who.fear >= s_fear_limit:
-                tprint(game, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.')
+                tprint(game, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.', 'direction')
                 return False
             elif not room.light:
-                tprint(game, f'В комнате слишком темно чтобы разглядывать карту')
+                tprint(game, f'В комнате слишком темно чтобы разглядывать карту', 'direction')
                 return False
             else:    
-                tprint(game, f'{who.name} смотрит на карту замка.')
+                tprint(game, f'{who.name} смотрит на карту замка.', 'direction')
                 game.new_castle.map()
                 return True
         else:
