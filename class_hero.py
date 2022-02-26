@@ -686,16 +686,35 @@ class Hero:
         if self.exp > self.levels[self.level]:
             self.levelup()
 
-    def levelup(self):
+    def levelup(self, message=None):
         """Функция вызывается если герой получает новый уровень.
         Функция переводит игру в режим прокачки и выводит на экран инструкцию по прокачке.
         """
-        self.game.state = 3
-        level_up_message = []
-        level_up_message.append(f'{self.name} получает новый уровень!')
-        level_up_message.append('Что необходимо прокачать: здоровье, силу, ловкость или интеллект?')
-        tprint(self.game, level_up_message, 'levelup')
-        self.level += 1
+        if not message:
+            self.game.state = 3
+            level_up_message = []
+            level_up_message.append(f'{self.name} получает новый уровень!')
+            level_up_message.append('Что необходимо прокачать: здоровье, силу, ловкость или интеллект?')
+            tprint(self.game, level_up_message, 'levelup')
+            self.level += 1
+        else:
+            if message == 'здоровье':
+                self.health += 3
+                self.start_health += 3
+                tprint(self, f'{self.name} получает 3 единицы здоровья.', 'direction')
+            elif message == 'силу':
+                self.stren += 1
+                self.start_stren += 1
+                tprint(self.game, f'{self.name} увеличивает свою силу на 1.', 'direction')
+            elif message == 'ловкость':
+                self.dext += 1
+                self.start_dext += 1
+                tprint(self.game, f'{self.name} увеличивает свою ловкость на 1.', 'direction')
+            elif message == 'интеллект':
+                self.intel += 1
+                self.start_intel += 1
+                tprint(self.game, f'{self.name} увеличивает свой интеллект на 1.', 'direction')
+            self.game.state = 0
         return True
 
     def game_over(self, goal_type, goal=None):

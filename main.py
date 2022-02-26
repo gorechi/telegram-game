@@ -38,43 +38,6 @@ def welcome(message):
 @bot.message_handler(func=lambda message: True)
 def all_commands(message):
     global game_sessions
-    common_commands = ['?',
-                       'осмотреть',
-                       'идти',
-                       'атаковать',
-                       'напасть',
-                       'взять',
-                       'забрать',
-                       'подобрать',
-                       'обыскать',
-                       'открыть',
-                       'использовать',
-                       'применить',
-                       'читать',
-                       'прочитать',
-                       'чинить',
-                       'починить',
-                       'убрать',
-                       'улучшить',
-                       'отдохнуть',
-                       'отдыхать',
-                       'бросить',
-                       'сменить',
-                       'поменять',
-                       'выбросить']
-    level_up_commands = ['здоровье',
-                       '?',
-                       'силу',
-                       'ловкость',
-                       'интеллект']
-    fight_commands = ['ударить',
-                      '?',
-                      'защититься',
-                      'бежать',
-                      'сменить оружие',
-                      'сменить',
-                      'поменять',
-                      'использовать']
     text = message.text
     chat_id = message.chat.id
     game = game_sessions.get(chat_id)
@@ -87,87 +50,8 @@ def all_commands(message):
         new_game.new_castle.plan[player.current_position].show(player)
         new_game.new_castle.plan[player.current_position].map()
     if game:
-        if command in common_commands and game.state == 0:
-            chat_id = message.chat.id
-            game = game_sessions[chat_id]
-            if not game.player.game_over('killall'):
-                game.player.do(message.text.lower())
-        elif command in level_up_commands and game.state == 3:
-            if command == 'здоровье':
-                game.player.health += 3
-                game.player.start_health += 3
-                tprint(game, f'{game.player.name} получает 3 единицы здоровья.', 'off')
-                game.state = 0
-            elif command == 'силу':
-                game.player.stren += 1
-                game.player.start_stren += 1
-                tprint(game, f'{game.player.name} увеличивает свою силу на 1.', 'off')
-                game.state = 0
-            elif command == 'ловкость':
-                game.player.dext += 1
-                game.player.start_dext += 1
-                tprint(game, f'{game.player.name} увеличивает свою ловкость на 1.', 'off')
-                game.state = 0
-            elif command == 'интеллект':
-                game.player.intel += 1
-                game.player.start_intel += 1
-                tprint(game, f'{game.player.name} увеличивает свой интеллект на 1.', 'off')
-                game.state = 0
-        elif command and game.state == 2:
-            answer = text.lower()
-            rune_list = game.player.inpockets(Rune)
-            if answer == 'отмена':
-                game.state = 0
-                return True
-            elif answer.isdigit() and int(answer) - 1 < len(rune_list):
-                if game.selected_item.enchant(rune_list[int(answer) - 1]):
-                    tprint(game, f'{game.player.name} улучшает {game.selected_item.name1} новой руной.', state='direction')
-                    game.player.pockets.remove(rune_list[int(answer) - 1])
-                    game.state = 0
-                    return True
-                else:
-                    tprint(game, f'Похоже, что {game.player.name} не может вставить руну в {game.selected_item.name1}.', state='direction')
-                    game.state = 0
-                    return False
-            else:
-                tprint(game, f'{game.player.name} не находит такую руну у себя в карманах.', 'off')
-        elif command and game.state == 4:
-            answer = text.lower()
-            can_use = game.selected_item
-            if answer == 'отмена':
-                game.state = 1
-                tprint(game, f'{game.player.name} продолжает бой.', 'fight')
-                return True
-            elif answer.isdigit() and int(answer) - 1 < len(can_use):
-                item = can_use[int(answer) - 1]
-                if item.use(who_using=game.player, in_action=True):
-                    game.selected_item.remove(item)
-                    return True
-                else:
-                    tprint(game, f'Похоже, что {game.player.name} не может использовать {item.name1}.', 'fight')
-                    game.state = 1
-                    return False
-            else:
-                tprint(game, f'{game.player.name} не находит такую вкщь у себя в карманах.', 'fight')
-
-        elif command in fight_commands and game.state == 1:
-            enemy = game.new_castle.plan[game.player.current_position].monster()
-            tprint(game, game.player.attack(enemy, message.text))
-            if game.player.run:
-                game.player.run = False
-                game.player.lookaround()
-                game.state = 0
-                return True
-            elif enemy.run:
-                game.state = 0
-            elif enemy.health > 0:
-                enemy.attack(game.player)
-            else:
-                tprint(game, f'{game.player.name} побеждает в бою!', 'off')
-                game.state = 0
-                enemy.lose(game.player)
-                game.player.win(enemy)
-    
+        game.action(command, text)
     return True
 
-bot.polling(none_stop=True, interval=0)
+if __name__ == "__main__":
+    bot.polling(none_stop=True, interval=0)
