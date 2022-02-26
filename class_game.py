@@ -244,7 +244,7 @@ class Game():
                 return True
             elif enemy.run:
                 self.state = 0
-            elif enemy.health > 0:
+            elif enemy.health > 0 and self.state == 1:
                 enemy.attack(player)
             else:
                 tprint(self, f'{player.name} побеждает в бою!', 'off')
