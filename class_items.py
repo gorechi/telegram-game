@@ -34,17 +34,17 @@ class Rune:
         return True
 
     def place(self, castle, room=None):
-        rooms_with_secrets = [i for i in castle.plan if i.secret_word]
+        rooms_with_secrets = castle.secret_rooms()
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
         if room in rooms_with_secrets:
-            room.secret_loot.pile.append(self)
+            room.secret_loot.add(self)
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
-            room.loot.pile.append(self)
+            room.loot.add(self)
         return True
 
     def element(self):
@@ -100,21 +100,18 @@ class Matches:
         return self.description
 
     def place(self, castle, room_to_place=None):
-        game = self.game
         if room_to_place:
             room = room_to_place
         else:
-            done = False
-            while not done:
-                room = randomitem(game.new_castle.plan, False)
-                if not room.locked and room.light:
-                    done = True
-            self.room = room
+            rooms = [i for i in castle.plan if not i.locked and i.light]
+            room = randomitem(rooms, False)
         if len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
-            return True
-        room.loot.pile.append(self)
+        else:
+            room.loot.add(self)
+        self.room = room
+        return True
 
     def take(self, who=''):
         if who == '':
