@@ -46,7 +46,9 @@ class Castle:
             a.position = i
             self.plan.append(a)
         self.lights_off() #Выключаем свет в некоторых комнатах
-
+    
+    def secret_rooms(self):
+        return [i for i in self.plan if i.secret_word]
     
     def stink(self, room, stink_level):
         """Функция распространения вони по замку.\n
