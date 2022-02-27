@@ -239,7 +239,7 @@ class Game():
             tprint(self, player.attack(enemy, message))
             if player.run:
                 player.run = False
-                player.lookaround()
+                player.look()
                 self.state = 0
                 return True
             elif enemy.run:
