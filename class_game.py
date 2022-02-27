@@ -136,6 +136,9 @@ class Game():
         new_map.place(self.new_castle)  # Создаем и прячем карту
         matches = Matches(self)
         matches.place(self.new_castle)  # Создаем и прячем спички
+        ################################################################
+        print(self.new_castle.monsters_in_rooms)
+        ################################################################
         self.new_castle.plan[0].visited = '+'  # Делаем первую комнату посещенной
         new_key = Key(self)  # Создаем ключ
         self.player.pockets.append(new_key)  # Отдаем ключ игроку
