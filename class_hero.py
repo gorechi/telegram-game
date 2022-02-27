@@ -777,7 +777,8 @@ class Hero:
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         monster = room.monster()
-        print(monster.name)
+        if monster:
+            print(monster.name)
         furniture_list = room.furniture
         if not room.light:
             tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
@@ -796,7 +797,15 @@ class Hero:
             self.key_hole(what)
             return True
         if monster: 
-            if what in [monster.name, monster.name1, monster.name[0], 'монстр', 'врага', 'монстра', 'враг', 'противника', 'противник']:
+            if what.lower() in [monster.name.lower(), 
+                                monster.name1.lower(), 
+                                monster.name[0].lower(), 
+                                'монстр', 
+                                'врага', 
+                                'монстра', 
+                                'враг', 
+                                'противника', 
+                                'противник']:
                 tprint(game, showsides(self, monster, new_castle))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
