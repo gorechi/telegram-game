@@ -41,7 +41,7 @@ class Furniture:
         self.loot.pile.append(item)
    
     def monster_in_ambush(self):
-        for monster in self.game.all_monsters:
+        for monster in self.room.monsters():
             if monster.hiding_place == self:
                 return monster 
         return False
@@ -79,8 +79,9 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, doors, loot=None):
+    def __init__(self, game, castle, doors, loot=None):
         self.game = game
+        self.castle = castle
         self.doors = doors
         a = dice(0, len(decor1) - 1)
         self.decoration1 = decor1[a]
@@ -188,10 +189,7 @@ class Room:
         return types
 
     def monsters(self, mode=None):
-        all_monsters = []
-        for monster in self.game.all_monsters:
-            if monster.room == self or monster.hiding_place == self:
-                all_monsters.append(monster)
+        all_monsters = self.castle.monsters_in_rooms[self]
         if len(all_monsters) > 0:
             if mode == 'random':
                 return randomitem(all_monsters, False)
@@ -200,14 +198,8 @@ class Room:
         else:
             return False
         
-    def monster(self):
-        for monster in self.game.all_monsters:
-            if monster.room == self:
-                return monster 
-        return False
-
     def monster_in_ambush(self):
-        for monster in self.game.all_monsters:
+        for monster in self.monsters():
             if monster.hiding_place == self:
                 return monster 
         return False

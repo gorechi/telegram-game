@@ -285,6 +285,7 @@ class Monster:
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
             game.all_monsters.remove(self)
+            where.castle.monsters_in_rooms[where].remove(self)
             self.alive = False
         else:
             self.wounded = True
@@ -296,50 +297,50 @@ class Monster:
                 name = 'Противник'
                 lost_weapon = 'Слышно, что какое-то оружие ударилось об пол комнаты. '
                 lost_shield = 'В темноте можно услышать, что что-то большое упало в углу. '
-            alive_string = f'{name} остается в живых и '
+            alive_text = f'{name} остается в живых и '
             weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
             ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
             if result < 10:
                 if result == 6:
-                    alive_string += 'получает легкое ранение в руку. '
+                    alive_text += 'получает легкое ранение в руку. '
                     if not self.weapon.empty:
-                        alive_string += lost_weapon
+                        alive_text += lost_weapon
                         where.loot.pile.append(self.weapon)
                         self.weapon = self.game.no_weapon
                     elif not self.shield.empty:
-                        alive_string += lost_shield
+                        alive_text += lost_shield
                         where.loot.pile.append(self.shield)
                         self.shield = self.game.no_shield
                 elif result == 7:
-                    alive_string += f'истекает кровью, теряя при ' \
+                    alive_text += f'истекает кровью, теряя при ' \
                                    f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы. '
                     self.stren -= weakness_amount
                     self.health = self.start_health
                 elif result == 8:
-                    alive_string += f'приходит в ярость, получая при ' \
+                    alive_text += f'приходит в ярость, получая при ' \
                                    f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
                                    f'теряя {howmany(ill_amount, "жизнь,жизни,жизней")}. '
                     self.stren += weakness_amount
                     self.health = self.start_health - ill_amount
                 else:
-                    alive_string += f'получает контузию, теряя при ' \
+                    alive_text += f'получает контузию, теряя при ' \
                                    f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
                                    f'получая {howmany(ill_amount, "жизнь,жизни,жизней")}. '
                     self.stren -= weakness_amount
                     self.health = self.start_health + ill_amount
                 if self.place(game.new_castle, old_place = where):
-                    alive_string += f'{name} убегает из комнаты.'
-                    tprint(game, alive_string)
+                    alive_text += f'{name} убегает из комнаты.'
+                    tprint(game, alive_text)
                 else:
-                    alive_string += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
-                    tprint(game, alive_string)
+                    alive_text += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
+                    tprint(game, alive_text)
             else:
-                alive_string += f'получает ранение в ногу и не может двигаться, теряя при ' \
+                alive_text += f'получает ранение в ногу и не может двигаться, теряя при ' \
                                f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \
                                f'и {howmany(ill_amount, "жизнь,жизни,жизней")}.'
                 self.stren -= weakness_amount
                 self.health = self.start_health - ill_amount
-                tprint(game, alive_string)
+                tprint(game, alive_text)
 
     def win(self, loser=None):
         self.health = self.start_health
@@ -351,6 +352,9 @@ class Monster:
             empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
         self.room = room
+        castle.monsters_in_rooms[room].append(self)
+        if old_place:
+            castle.monsters_in_rooms[old_place].remove(self)
         if self.can_hide and dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:

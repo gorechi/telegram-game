@@ -12,6 +12,7 @@ class Castle:
         self.game = game
         self.floors = floors
         self.rooms = rooms
+        self.monsters_in_rooms = {}
         f = self.floors
         r = self.rooms
         self.all_rooms = [2] * r
@@ -42,9 +43,10 @@ class Castle:
         self.plan = []
         for i in range(f * r):
             new_loot = Loot(self.game)
-            a = Room(self.game, self.all_doors[i], new_loot)
-            a.position = i
-            self.plan.append(a)
+            new_room = Room(self.game, self, self.all_doors[i], new_loot)
+            new_room.position = i
+            self.plan.append(new_room)
+            self.monsters_in_rooms[new_room] = []
         self.lights_off() #Выключаем свет в некоторых комнатах
     
     def secret_rooms(self):
