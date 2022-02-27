@@ -246,7 +246,7 @@ class Game():
                 self.state = 0
             elif enemy.health > 0 and self.state == 1:
                 enemy.attack(player)
-            else:
+            elif self.state == 1:
                 tprint(self, f'{player.name} побеждает в бою!', 'off')
                 self.state = 0
                 enemy.lose(player)
