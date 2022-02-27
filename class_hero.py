@@ -88,7 +88,7 @@ class Hero:
                                'вверх': (0 - self.game.new_castle.rooms),
                                'верх': (0 - self.game.new_castle.rooms),
                                'право': 1}
-        self.command_dict = {'осмотреть': self.lookaround,
+        self.command_dict = {'осмотреть': self.look,
                             'идти': self.go,
                             'атаковать': self.fight,
                             'напасть': self.fight,
@@ -737,12 +737,52 @@ class Hero:
                 return False
         return False
 
-    def lookaround(self, what=None):
+    def backpack(self):
+        room = self.game.new_castle.plan[self.current_position]
+        text = []
+        if not room.light:
+            text.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
+        else:
+            if len(self.pockets) == 0 and self.money.how_much_money == 0:
+                text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
+            else:
+                text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
+                for i in range(len(self.pockets)):
+                    description = f'{str(i + 1)}: {self.pockets[i].show()}'
+                    if isinstance(self.pockets[i], Weapon):
+                        weapon = self.pockets[i]
+                        if self.weapon_mastery[weapon.type] > 0:
+                            description += f', мастерство - {self.weapon_mastery[weapon.type]}'
+                    text.append(description)
+                text.append(self.money.show())
+            if not self.removed_shield.empty:
+                text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
+        tprint(self.game, text)
+        return True
+    
+    def key_hole(self, direction):
+        room = self.game.new_castle.plan[self.current_position]
+        if room.doors[s_hero_doors_dict[direction]] == 0:
+            message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
+        elif self.fear >= s_fear_limit:
+            message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
+        else:
+            what_position = room.position + self.directions_dict[direction]
+            message = self.game.new_castle.plan[what_position].show_through_key_hole(self)
+        tprint(self.game, message)
+        return True
+    
+    def look(self, what=None):
         game = self.game
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         monster = room.monster()
+        if monster:
+            print(monster.name)
         furniture_list = room.furniture
+        if not room.light:
+            tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
+            return True
         if not what:
             room.show(game.player)
             room.map()
@@ -751,40 +791,21 @@ class Hero:
             self.show()
             return True
         elif what == 'рюкзак':
-            text = []
-            if not room.light:
-                text.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
-            else:
-                if len(self.pockets) == 0 and self.money.how_much_money == 0:
-                    text.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
-                else:
-                    text.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
-                    for i in range(len(self.pockets)):
-                        description = f'{str(i + 1)}: {self.pockets[i].show()}'
-                        if isinstance(self.pockets[i], Weapon):
-                            weapon = self.pockets[i]
-                            if self.weapon_mastery[weapon.type] > 0:
-                                description += f', мастерство - {self.weapon_mastery[weapon.type]}'
-                        text.append(description)
-                    text.append(self.money.show())
-                if not self.removed_shield.empty:
-                    text.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
-            tprint(game, text)
+            self.backpack()
             return True
         elif what in self.directions_dict.keys():
-            if room.doors[s_hero_doors_dict[what]] == 0:
-                tprint(game, f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.')
-                return True
-            else:
-                if self.fear >=s_fear_limit:
-                    message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
-                else:
-                    what_position = room.position + self.directions_dict[what]
-                    message = new_castle.plan[what_position].show_through_key_hole(self)
-                tprint(game, message)
-                return True
+            self.key_hole(what)
+            return True
         if monster: 
-            if what in [monster.name, monster.name1, monster.name[0]]:
+            if what.lower() in [monster.name.lower(), 
+                                monster.name1.lower(), 
+                                monster.name[0].lower(), 
+                                'монстр', 
+                                'врага', 
+                                'монстра', 
+                                'враг', 
+                                'противника', 
+                                'противник']:
                 tprint(game, showsides(self, monster, new_castle))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
@@ -805,9 +826,6 @@ class Hero:
             else:
                 tprint(game, self.armor.show())
             return True
-        if not room.light:
-                tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
-                return True
         if len(furniture_list) > 0:
             text = []
             for i in furniture_list:
