@@ -488,13 +488,16 @@ class Shapeshifter(Monster):
         self.shifted = False
         self.agressive = True
         self.empty = False
+        self.start_stren = stren
 
     def defence(self, attacker):
         if not self.shifted:
             self.shifted = True
             self.stren = attacker.stren
+            self.start_gender = attacker.gender
             self.gender = attacker.gender
             if not attacker.weapon.empty and self.weapon.empty:
+                self.weapon_changed = True
                 self.weapon = attacker.weapon
                 weapon_string = f' и {self.weapon.name} в руках.'
             else:
@@ -513,6 +516,16 @@ class Shapeshifter(Monster):
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
+    
+    def win(self, loser=None):
+        self.health = self.start_health
+        self.stren = self.start_stren
+        self.gender = self.start_gender
+        self.shifted = False
+        if self.weapon_changed:
+            self.weapon = self.game.no_weapon
+            self.weapon_changed = False
+        
 
 class Vampire(Monster):
     def __init__(self, 
