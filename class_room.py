@@ -41,9 +41,11 @@ class Furniture:
         self.loot.pile.append(item)
    
     def monster_in_ambush(self):
-        for monster in self.room.monsters():
-            if monster.hiding_place == self:
-                return monster 
+        monsters = self.room.monsters()
+        if monsters:
+            for monster in monsters:
+                if monster.hiding_place == self:
+                    return monster 
         return False
 
     def show(self):
@@ -141,7 +143,11 @@ class Room:
     
     def show(self, player):
         game = self.game
-        monster = self.monster()
+        monsters = self.monsters()
+        if monsters:
+            monster = monsters[0]
+        else:
+            monster = None
         if self.stink > 0:
             stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
@@ -193,20 +199,28 @@ class Room:
         if len(all_monsters) > 0:
             if mode == 'random':
                 return randomitem(all_monsters, False)
+            elif mode == 'first':
+                return all_monsters[0]
             else:
                 return all_monsters
         else:
             return False
         
     def monster_in_ambush(self):
-        for monster in self.monsters():
-            if monster.hiding_place == self:
-                return monster 
+        monsters = self.monsters()
+        if monsters:
+            for monster in self.monsters():
+                if monster.hiding_place == self:
+                    return monster 
         return False
     
     def map(self):
         game=self.game
-        monster = self.monster()
+        monsters = self.monsters()
+        if monsters:
+            monster = monsters[0]
+        else:
+            monster = None
         doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
         doors_vertical = {'0': '║', '1': ' ', '2': '|'}
         string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])

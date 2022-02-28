@@ -349,7 +349,7 @@ class Monster:
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
         self.room = room
         castle.monsters_in_rooms[room].append(self)
@@ -423,7 +423,7 @@ class Plant(Monster):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monster() and not a.monster_in_ambush())]
+            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
         self.room = room
 

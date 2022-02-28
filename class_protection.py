@@ -145,9 +145,7 @@ class Armor(Protection):
             room = room_to_place
         else:
             room = randomitem(castle.plan, False)
-        monster = room.monster()
-        if not monster:
-            monster = room.monster_in_ambush()
+        monster = room.monsters('random')
         if monster:
             if monster.wear_armor:
                 monster.give(self)
@@ -232,9 +230,7 @@ class Shield (Protection):
             room = room_to_place
         else:
             room = randomitem(castle.plan, False)
-        monster = room.monster()
-        if not monster:
-            monster = room.monster_in_ambush()
+        monster = room.monsters('random')
         if monster:
             if monster.carry_shield:
                 monster.give(self)

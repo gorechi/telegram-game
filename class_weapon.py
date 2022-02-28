@@ -189,9 +189,7 @@ class Weapon:
             room = room_to_place
         else:
             room = randomitem(castle.plan, False)
-        monster = room.monster()
-        if not monster:
-            monster = room.monster_in_ambush()
+        monster = room.monsters('random')
         if monster:
             if monster.carry_weapon:
                 monster.give(self)

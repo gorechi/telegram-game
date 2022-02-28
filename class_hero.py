@@ -907,7 +907,7 @@ class Hero:
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
         message = []
-        enemy_in_room = room.monster()
+        enemy_in_room = room.monsters('first')
         if not room.light:
             message.append('В комнате настолько темно, что невозможно что-то отыскать.')
             tprint(game, message)
