@@ -1,6 +1,6 @@
 import json
 
-from class_castle import Castle
+from class_castle import Floor
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
 from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire
@@ -52,7 +52,11 @@ class Game():
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
-        self.new_castle = Castle(self, 5, 5)  # Генерируем замок
+        self.castle_floors = []
+        for i in s_castle_floors_sizes:
+            floor = Floor(self, i[0], i[1], i[2])
+            self.castle_floors.append(floor)
+        self.current_floor = self.castle_floors[0]
         if how_many == 0:
             self.how_many = s_how_many
         else:
@@ -69,77 +73,10 @@ class Game():
                                s_hero_actions)  # Создаем персонажа
         else:
             self.player = hero
-        # Создаем мебель и разбрасываем по замку
-        self.all_furniture = self.readobjects(file='furniture.json',
-                                        howmany=self.how_many['мебель'],
-                                        random=True)
-        for furniture in self.all_furniture:
-            furniture.place(castle=self.new_castle)
-        
-        # Создаем очаги и разбрасываем по замку
-        self.all_rest_places = self.readobjects(file='furniture-rest.json',
-                                        howmany=self.how_many['очаг'],
-                                        random=False)
-        self.all_rest_places[0].place(castle=self.new_castle, room_to_place=self.new_castle.plan[0])
-        for rest_place in self.all_rest_places[1:]:
-            rest_place.place(self.new_castle)
-        
-        # Читаем монстров из файла и разбрасываем по замку
-        self.all_monsters = self.readobjects(file='monsters.json',
-                                       howmany=self.how_many['монстры'])
-        for monster in self.all_monsters:
-            monster.place(self.new_castle)
-        
-        # Читаем оружие из файла и разбрасываем по замку
-        self.all_weapon = self.readobjects(file='weapon.json',
-                                     howmany=self.how_many['оружие'],
-                                     object_class=Weapon)
-        for weapon in self.all_weapon:
-            weapon.place(self.new_castle)
-        
-        # Читаем щиты из файла и разбрасываем по замку
-        self.all_shields = self.readobjects(file='shields.json',
-                                      howmany=self.how_many['щит'],
-                                      object_class=Shield)
-        for shield in self.all_shields:
-            shield.place(self.new_castle)
-        
-        # Читаем доспехи из файла и разбрасываем по замку
-        self.all_armor = self.readobjects(file='armor.json',
-                                    howmany=self.how_many['доспех'],
-                                    object_class=Armor)
-        for armor in self.all_armor:
-            armor.place(self.new_castle)
-        
-        # Читаем зелья из файла и разбрасываем по замку
-        self.all_potions = self.readobjects(file='potions.json',
-                                      howmany=self.how_many['зелье'],
-                                      object_class=Potion)
-        for potion in self.all_potions:
-            potion.place(self.new_castle)
-        
-        # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
-        for rune in self.all_runes:
-            rune.place(self.new_castle)
-            print(rune.poison)
-        # Создаем книги и разбрасываем по замку
-        
-        self.all_books = self.readobjects(file='books.json',
-                                    howmany=self.how_many['книга'],
-                                    random=True,
-                                    object_class=Book)
-        for book in self.all_books:
-            book.place(self.new_castle)
-        self.new_castle.lock_doors()  # Создаем запертые комнаты
-        new_map = Map(self)
-        new_map.place(self.new_castle)  # Создаем и прячем карту
-        matches = Matches(self)
-        matches.place(self.new_castle)  # Создаем и прячем спички
         ################################################################
-        print(self.new_castle.monsters_in_rooms)
+        print(self.current_floor.monsters_in_rooms)
         ################################################################
-        self.new_castle.plan[0].visited = '+'  # Делаем первую комнату посещенной
+        self.current_floor.plan[0].visited = '+'  # Делаем первую комнату посещенной
         new_key = Key(self)  # Создаем ключ
         self.player.pockets.append(new_key)  # Отдаем ключ игроку
         self.game_is_on = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме

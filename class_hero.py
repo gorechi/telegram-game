@@ -68,26 +68,12 @@ class Hero:
         self.exp = 0
         self.fear = 0
         self.drunk = 0
-        self.save_room = self.game.new_castle.plan[0]
+        self.floor = self.game.castle_floors[0]
+        self.save_room = self.floor.plan[0]
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
         self.weapon_mastery = {'рубящее': 0, "колющее": 0, "ударное": 0, "": 0}
-        self.directions_dict = {0: (0 - self.game.new_castle.rooms),
-                               1: 1,
-                               2: self.game.new_castle.rooms,
-                               3: (0 - 1),
-                               'наверх': (0 - self.game.new_castle.rooms),
-                               'направо': 1,
-                               'вправо': 1,
-                               'налево': (0 - 1),
-                               'лево': (0 - 1),
-                               'влево': (0 - 1),
-                               'вниз': self.game.new_castle.rooms,
-                               'низ': self.game.new_castle.rooms,
-                               'вверх': (0 - self.game.new_castle.rooms),
-                               'верх': (0 - self.game.new_castle.rooms),
-                               'право': 1}
         self.command_dict = {'осмотреть': self.look,
                             'идти': self.go,
                             'атаковать': self.fight,
@@ -437,7 +423,7 @@ class Hero:
                 message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону.')
                 tprint(game, message)
                 return False
-        self.current_position += self.directions_dict[direction]
+        self.current_position += self.floor.directions_dict[direction]
         game.new_castle.plan[self.current_position].visited = '+'
         tprint(game, message)
         self.run = True
@@ -767,7 +753,7 @@ class Hero:
         elif self.fear >= s_fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
-            what_position = room.position + self.directions_dict[direction]
+            what_position = room.position + self.floor.directions_dict[direction]
             message = self.game.new_castle.plan[what_position].show_through_key_hole(self)
         tprint(self.game, message)
         return True
@@ -793,7 +779,7 @@ class Hero:
         elif what == 'рюкзак':
             self.backpack()
             return True
-        elif what in self.directions_dict.keys():
+        elif what in self.floor.directions_dict.keys():
             self.key_hole(what)
             return True
         if monster: 
@@ -845,7 +831,7 @@ class Hero:
         game = self.game
         new_castle = self.game.new_castle
         room = new_castle.plan[self.current_position]
-        if direction not in self.directions_dict.keys():
+        if direction not in self.floor.directions_dict.keys():
             tprint(game, f'{self.name} не знает такого направления!')
             return False
         elif room.doors[s_hero_doors_dict[direction]] == 0:
@@ -863,7 +849,7 @@ class Hero:
             tprint(game, message)
             return False
         else:
-            self.current_position += self.directions_dict[direction]
+            self.current_position += self.floor.directions_dict[direction]
             room = new_castle.plan[self.current_position]
             room.visited = '+'
             room.show(self)
@@ -1096,7 +1082,7 @@ class Hero:
                 self.pockets.remove(key)
                 room.doors[s_hero_doors_dict[item]] = 1
                 j = s_hero_doors_dict[item] + 2 if (s_hero_doors_dict[item] + 2) < 4 else s_hero_doors_dict[item] - 2
-                new_castle.plan[self.current_position + self.directions_dict[item]].doors[j] = 1
+                new_castle.plan[self.current_position + self.floor.directions_dict[item]].doors[j] = 1
                 tprint(game, f'{self.name} открывает дверь.')
 
     def use(self, item=None, infight=False):

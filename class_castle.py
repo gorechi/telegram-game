@@ -1,17 +1,36 @@
 from random import randint as dice
 
 from class_basic import Loot, Money
-from class_items import Key
+from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
+from class_protection import Armor, Shield
+from class_room import Furniture
+from class_weapon import Weapon
 from class_room import Room
 from functions import pprint, randomitem
 from settings import *
 
 
-class Castle:
-    def __init__(self, game, floors=5, rooms=5):
+class Floor:
+    def __init__(self, game, floors, rooms, how_many):
         self.game = game
         self.floors = floors
         self.rooms = rooms
+        self.directions_dict = {0: (0 - self.rooms),
+                               1: 1,
+                               2: self.rooms,
+                               3: (0 - 1),
+                               'наверх': (0 - self.rooms),
+                               'направо': 1,
+                               'вправо': 1,
+                               'налево': (0 - 1),
+                               'лево': (0 - 1),
+                               'влево': (0 - 1),
+                               'вниз': self.rooms,
+                               'низ': self.rooms,
+                               'вверх': (0 - self.rooms),
+                               'верх': (0 - self.rooms),
+                               'право': 1}
+        self.how_many = how_many
         self.monsters_in_rooms = {}
         f = self.floors
         r = self.rooms
@@ -47,7 +66,79 @@ class Castle:
             new_room.position = i
             self.plan.append(new_room)
             self.monsters_in_rooms[new_room] = []
-        self.lights_off() #Выключаем свет в некоторых комнатах
+        self.lock_doors()
+        self.lights_off()
+        self.inhabit() 
+    
+    def inhabit(self):
+        game = self.game
+        # Создаем мебель и разбрасываем по замку
+        self.all_furniture = game.readobjects(file='furniture.json',
+                                        howmany=self.how_many['мебель'],
+                                        random=True)
+        for furniture in self.all_furniture:
+            furniture.place(self)
+        print (self.all_furniture)
+        # Создаем очаги и разбрасываем по замку
+        self.all_rest_places = game.readobjects(file='furniture-rest.json',
+                                        howmany=self.how_many['очаг'],
+                                        random=False)
+        self.all_rest_places[0].place(self, room_to_place=self.plan[0])
+        for rest_place in self.all_rest_places[1:]:
+            rest_place.place(self)
+        
+        # Читаем монстров из файла и разбрасываем по замку
+        self.all_monsters = game.readobjects(file='monsters.json',
+                                       howmany=self.how_many['монстры'])
+        for monster in self.all_monsters:
+            monster.place(self)
+        
+        # Читаем оружие из файла и разбрасываем по замку
+        self.all_weapon = game.readobjects(file='weapon.json',
+                                     howmany=self.how_many['оружие'],
+                                     object_class=Weapon)
+        for weapon in self.all_weapon:
+            weapon.place(self)
+        
+        # Читаем щиты из файла и разбрасываем по замку
+        self.all_shields = game.readobjects(file='shields.json',
+                                      howmany=self.how_many['щит'],
+                                      object_class=Shield)
+        for shield in self.all_shields:
+            shield.place(self)
+        
+        # Читаем доспехи из файла и разбрасываем по замку
+        self.all_armor = game.readobjects(file='armor.json',
+                                    howmany=self.how_many['доспех'],
+                                    object_class=Armor)
+        for armor in self.all_armor:
+            armor.place(self)
+        
+        # Читаем зелья из файла и разбрасываем по замку
+        self.all_potions = game.readobjects(file='potions.json',
+                                      howmany=self.how_many['зелье'],
+                                      object_class=Potion)
+        for potion in self.all_potions:
+            potion.place(self)
+        
+        # Создаем руны и разбрасываем по замку
+        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
+        for rune in self.all_runes:
+            rune.place(self)
+            print(rune.poison)
+        
+        # Создаем книги и разбрасываем по замку
+        self.all_books = game.readobjects(file='books.json',
+                                    howmany=self.how_many['книга'],
+                                    random=True,
+                                    object_class=Book)
+        for book in self.all_books:
+            book.place(self)
+        new_map = Map(game)
+        new_map.place(self)  # Создаем и прячем карту
+        matches = Matches(game)
+        matches.place(self)  # Создаем и прячем спички
+
     
     def secret_rooms(self):
         return [i for i in self.plan if i.secret_word]
@@ -62,7 +153,7 @@ class Castle:
             stink_level (int): Начальный уровень вони
 
         """
-        directions_dict = {0: (0 - self.rooms),
+        directions = {0: (0 - self.rooms),
                            1: 1,
                            2: self.rooms,
                            3: (0 - 1)}
@@ -76,7 +167,7 @@ class Castle:
                 available_directions.append(i)
         if stink_level > 1:
             for direction in available_directions:
-                next_room = self.plan[room.position + directions_dict[direction]]
+                next_room = self.plan[room.position + directions[direction]]
                 self.stink(next_room, stink_level - 1)
         return True
 

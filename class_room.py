@@ -81,9 +81,9 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, castle, doors, loot=None):
+    def __init__(self, game, floor, doors, loot=None):
         self.game = game
-        self.castle = castle
+        self.floor = floor
         self.doors = doors
         a = dice(0, len(decor1) - 1)
         self.decoration1 = decor1[a]
@@ -195,7 +195,7 @@ class Room:
         return types
 
     def monsters(self, mode=None):
-        all_monsters = self.castle.monsters_in_rooms[self]
+        all_monsters = self.floor.monsters_in_rooms[self]
         if len(all_monsters) > 0:
             if mode == 'random':
                 return randomitem(all_monsters, False)
@@ -241,11 +241,11 @@ class Room:
 
     def lock(self, locked_or_not=2):
         game=self.game
-        a = [-game.new_castle.rooms, 1, game.new_castle.rooms, -1]
+        a = [-self.floor.rooms, 1, self.floor.rooms, -1]
         for i in range(4):
             if self.doors[i] == 1:
                 self.doors[i] = locked_or_not
                 j = i + 2 if (i + 2) < 4 else i - 2
-                game.new_castle.plan[self.position + a[i]].doors[j] = locked_or_not
+                self.floor.plan[self.position + a[i]].doors[j] = locked_or_not
         self.locked = True
         return None
