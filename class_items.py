@@ -1,5 +1,6 @@
 from math import floor, sqrt
 from random import randint as dice
+from weakref import WeakMethod
 
 from numpy import who
 
@@ -124,7 +125,8 @@ class Matches:
         game = self.game
         if not who_is_using:
             who_is_using = player
-        room = game.new_castle.plan[who_is_using.current_position]
+        floor = who_is_using.floor
+        room = floor.plan[who_is_using.current_position]
         monster = room.monster()
         if room.light:
             message = ['Незачем тратить спички, здесь и так светло.']
@@ -177,7 +179,8 @@ class Map:
 
         """
         game = self.game
-        room = game.new_castle.plan[who.current_position]
+        floor = who.floor
+        room = floor.plan[who.current_position]
         if not in_action:
             if who.fear >= s_fear_limit:
                 tprint(game, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.', 'direction')
@@ -186,8 +189,8 @@ class Map:
                 tprint(game, f'В комнате слишком темно чтобы разглядывать карту', 'direction')
                 return False
             else:    
-                tprint(game, f'{who.name} смотрит на карту замка.', 'direction')
-                game.new_castle.map()
+                tprint(game, f'{who.name} смотрит на карту этажа замка.', 'direction')
+                floor.map()
                 return True
         else:
             tprint(game, 'Во время боя это совершенно неуместно!')

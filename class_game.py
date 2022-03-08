@@ -175,7 +175,7 @@ class Game():
                 tprint(self, f'{player.name} не находит такую вкщь у себя в карманах.', 'fight')
             return True
         elif command in s_game_fight_commands and self.state == 1:
-            enemy = self.new_castle.plan[self.player.current_position].monster()
+            enemy = self.current_floor.plan[self.player.current_position].monsters('first')
             tprint(self, player.attack(enemy, message))
             if player.run:
                 player.run = False

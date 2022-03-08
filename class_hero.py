@@ -189,7 +189,7 @@ class Hero:
     
     def drop(self, item=None):
         game = self.game
-        room = game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if not item or item in ['все', 'всё']:
             tprint(game, f'{self.name} {self.g(["хотел", "хотела"])} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
@@ -233,7 +233,7 @@ class Hero:
    
     def rest(self, what=None):
         game = self.game
-        room = game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         cant_rest, rest_place = room.can_rest()
         message = []
         shield = None
@@ -374,7 +374,7 @@ class Hero:
             boolean: Возвращает False если по какой-то причине герой не смог сбежать
         """
         game = self.game
-        room = game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         message = []
         if room.light:
             if target.frightening:
@@ -424,14 +424,14 @@ class Hero:
                 tprint(game, message)
                 return False
         self.current_position += self.floor.directions_dict[direction]
-        game.new_castle.plan[self.current_position].visited = '+'
+        self.floor.plan[self.current_position].visited = '+'
         tprint(game, message)
         self.run = True
         return True
 
     def attack(self, target, action):
         game = self.game
-        room = game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
@@ -455,7 +455,7 @@ class Hero:
             if i.can_use_in_fight:
                 can_use.append(i)
         if action == '' or action == 'у' or action == 'ударить':
-            tprint(game, showsides(self, target, game.new_castle))
+            tprint(game, showsides(self, target, self.floor))
             self.rage = 0
             self.hide = False
             if not self.weapon.empty:
@@ -560,7 +560,7 @@ class Hero:
         if self.shield == '':
             return False
         else:
-            tprint(game, showsides(self, target, game.new_castle))
+            tprint(game, showsides(self, target, self.floor))
             self.hide = True
             self.rage += 1
             return f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.'
@@ -704,19 +704,8 @@ class Hero:
         return True
 
     def game_over(self, goal_type, goal=None):
-        """Функция производит проверку на выполнение условия окончания игры.
-
-        Args:
-            goal_type (string): Тип завершения игры. Сейчас поддерживаются следующие типы:
-                                - 'killall': игра завершается если в замке убиты все монстры\n
-            goal (string, optional): Вспомогательный параметр для типа завершения игры. Defaults to None.
-
-        Returns:
-            boolean:    True - если условие завершения игры выполнено
-                        False - если условие завершение игры не выполнено
-        """
         if goal_type == 'killall':
-            if self.game.new_castle.monsters() == 0:
+            if self.game.monsters() == 0:
                 tprint(self.game, f'{self.name} {self.g(["убил", "убила"])} всех монстров в замке и {self.g(["выиграл", "выиграла"])} в этой игре!')
                 return True
             else:
@@ -724,7 +713,7 @@ class Hero:
         return False
 
     def backpack(self):
-        room = self.game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         text = []
         if not room.light:
             text.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
@@ -747,21 +736,20 @@ class Hero:
         return True
     
     def key_hole(self, direction):
-        room = self.game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if room.doors[s_hero_doors_dict[direction]] == 0:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
         elif self.fear >= s_fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
             what_position = room.position + self.floor.directions_dict[direction]
-            message = self.game.new_castle.plan[what_position].show_through_key_hole(self)
+            message = self.floor.plan[what_position].show_through_key_hole(self)
         tprint(self.game, message)
         return True
     
     def look(self, what=None):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         monster = room.monster()
         if monster:
             print(monster.name)
@@ -792,7 +780,7 @@ class Hero:
                                 'враг', 
                                 'противника', 
                                 'противник']:
-                tprint(game, showsides(self, monster, new_castle))
+                tprint(game, showsides(self, monster, self.floor))
             return True
         if not self.weapon.empty and what in [self.weapon.name, self.weapon.name1, 'оружие']:
             if not room.light:
@@ -829,8 +817,7 @@ class Hero:
 
     def go(self, direction):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if direction not in self.floor.directions_dict.keys():
             tprint(game, f'{self.name} не знает такого направления!')
             return False
@@ -850,7 +837,7 @@ class Hero:
             return False
         else:
             self.current_position += self.floor.directions_dict[direction]
-            room = new_castle.plan[self.current_position]
+            room = self.floor.plan[self.current_position]
             room.visited = '+'
             room.show(self)
             room.map()
@@ -862,8 +849,7 @@ class Hero:
 
     def fight(self, enemy, agressive=False):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         who_is_fighting = room.monster()
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
@@ -890,8 +876,7 @@ class Hero:
 
     def search(self, item=False):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         message = []
         enemy_in_room = room.monsters('first')
         if not room.light:
@@ -983,8 +968,7 @@ class Hero:
 
     def take(self, item='все'):
         game = self.game
-        castle = self.game.new_castle
-        current_loot = castle.plan[self.current_position].loot
+        current_loot = self.floor.plan[self.current_position].loot
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
@@ -1008,8 +992,7 @@ class Hero:
 
     def open(self, item=''):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         key = False
         if self.fear >= s_fear_limit:
             message = [f'{self.name} Не может ничего сделать из-за того, что руки дрожат от страха.']
@@ -1075,14 +1058,14 @@ class Hero:
             if not s_hero_doors_dict.get(item, False) and s_hero_doors_dict.get(item, True) != 0:
                 tprint(game, f'{self.name} не может это открыть.')
                 return False
-            elif new_castle.plan[self.current_position].doors[s_hero_doors_dict[item]] != 2:
+            elif self.floor.plan[self.current_position].doors[s_hero_doors_dict[item]] != 2:
                 tprint(game, 'В той стороне нечего открывать.')
                 return False
             else:
                 self.pockets.remove(key)
                 room.doors[s_hero_doors_dict[item]] = 1
                 j = s_hero_doors_dict[item] + 2 if (s_hero_doors_dict[item] + 2) < 4 else s_hero_doors_dict[item] - 2
-                new_castle.plan[self.current_position + self.floor.directions_dict[item]].doors[j] = 1
+                self.floor.plan[self.current_position + self.floor.directions_dict[item]].doors[j] = 1
                 tprint(game, f'{self.name} открывает дверь.')
 
     def use(self, item=None, infight=False):

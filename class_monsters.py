@@ -121,7 +121,7 @@ class Monster:
             if item.twohanded and not self.shield.empty:
                     shield = self.shield
                     self.shield = self.game.no_shield
-                    self.game.new_castle.plan[self.current_position].loot.pile.append(shield)
+                    self.floor.plan[self.current_position].loot.pile.append(shield)
             self.weapon = item
         elif isinstance(item, Shield) and self.shield.empty and self.carry_shield:
             if not self.weapon.empty and self.weapon.twohanded:
@@ -174,7 +174,7 @@ class Monster:
             return self.weakness
     
     def mele(self):
-        room = self.game.new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
@@ -186,8 +186,7 @@ class Monster:
 
     def attack(self, target):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
         if room.light:
             self_name = self.name
         else:
@@ -328,7 +327,7 @@ class Monster:
                                    f'получая {howmany(ill_amount, "жизнь,жизни,жизней")}. '
                     self.stren -= weakness_amount
                     self.health = self.start_health + ill_amount
-                if self.place(game.new_castle, old_place = where):
+                if self.place(self.floor, old_place = where):
                     alive_text += f'{name} убегает из комнаты.'
                     tprint(game, alive_text)
                 else:
@@ -401,20 +400,20 @@ class Plant(Monster):
         return True
 
     def win(self, loser=None):
-        new_castle = self.game.new_castle
         self.health = self.start_health
         room = self.room
+        floor = self.floor
         new_rooms = []
         for i in range(4):
             if room.doors[i] == 1:
                 if i == 0: 
-                    new_rooms.append(new_castle.plan[room.position - new_castle.rooms])
+                    new_rooms.append(floor.plan[room.position - floor.rooms])
                 elif i == 1: 
-                    new_rooms.append(new_castle.plan[room.position + 1])
+                    new_rooms.append(floor.plan[room.position + 1])
                 elif i == 2:
-                    new_rooms.append(new_castle.plan[room.position + new_castle.rooms])
+                    new_rooms.append(floor.plan[room.position + floor.rooms])
                 elif i == 3:
-                    new_rooms.append(new_castle.plan[room.position - 1])
+                    new_rooms.append(floor.plan[room.position - 1])
         for i in new_rooms:
             if not i.monster():
                 self.grow(i)
