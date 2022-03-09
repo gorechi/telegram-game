@@ -193,3 +193,9 @@ class Game():
                 player.win(enemy)
             return True
         tprint (self, f'{player.name} такого не умеет.', 'direction')
+
+    def monsters(self):
+        total_monsters = 0
+        for floor in self.castle_floors:
+            total_monsters += len(floor.all_monsters)
+        return total_monsters

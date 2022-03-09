@@ -122,7 +122,7 @@ class Floor:
             potion.place(self)
         
         # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self) for _ in range(self.how_many['руна'])]
+        self.all_runes = [Rune(self.game) for _ in range(self.how_many['руна'])]
         for rune in self.all_runes:
             rune.place(self)
             print(rune.poison)
@@ -229,6 +229,3 @@ class Floor:
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
-
-    def monsters(self): #Возвращает количество живых монстров, обитающих в замке в данный момент
-        return len(self.game.all_monsters)
