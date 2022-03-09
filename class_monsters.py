@@ -31,6 +31,7 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.floor = None
         self.run = False
         self.room = None
         self.alive = True
@@ -283,8 +284,9 @@ class Monster:
                 where.loot.pile.append(self.armor)
             if not self.weapon.empty:
                 where.loot.pile.append(self.weapon)
-            game.all_monsters.remove(self)
-            where.castle.monsters_in_rooms[where].remove(self)
+            self.floor.all_monsters.remove(self)
+            self.floor.monsters_in_rooms[where].remove(self)
+            self.game.how_many_monsters -= 1
             self.alive = False
         else:
             self.wounded = True
@@ -344,16 +346,16 @@ class Monster:
     def win(self, loser=None):
         self.health = self.start_health
 
-    def place(self, castle, room_to_place=None, old_place=None):
+    def place(self, floor, room_to_place=None, old_place=None):
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
             room = randomitem(empty_rooms, False)
         self.room = room
-        castle.monsters_in_rooms[room].append(self)
+        floor.monsters_in_rooms[room].append(self)
         if old_place:
-            castle.monsters_in_rooms[old_place].remove(self)
+            floor.monsters_in_rooms[old_place].remove(self)
         if self.can_hide and dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:
@@ -364,8 +366,9 @@ class Monster:
         if self.stink:
             print('У нас есть вонючка!')
             print(self.name, room.position)
-            castle.stink(room, 3)
-            castle.stink_map()
+            floor.stink(room, 3)
+            floor.stink_map()
+        self.floor = floor
         return True
 
 
@@ -396,7 +399,8 @@ class Plant(Monster):
     def grow(self, room):
         new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
         new_plant.room = room
-        self.game.all_monsters.append(new_plant)
+        self.floor.all_monsters.append(new_plant)
+        self.game.how_many_monsters += 1
         return True
 
     def win(self, loser=None):
@@ -418,13 +422,14 @@ class Plant(Monster):
             if not i.monster():
                 self.grow(i)
 
-    def place(self, castle, roomr_to_place = None, old_place = None):
+    def place(self, floor, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush())]
+            empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
         self.room = room
+        self.floor = floor
 
 class Berserk(Monster):
     def __init__(self,
@@ -557,11 +562,11 @@ class Vampire(Monster):
         self.health += sucked
         return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, "жизнь,жизни,жизней")}.'
     
-    def place(self, castle, roomr_to_place = None, old_place = None):
+    def place(self, floor, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
+            empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
         places_to_hide = []
         for i in room.furniture:
@@ -571,5 +576,6 @@ class Vampire(Monster):
         where_to_hide = randomitem(places_to_hide, False)
         self.room = room
         self.hiding_place = where_to_hide
+        self.floor = floor
         return True
 

@@ -80,6 +80,7 @@ class Game():
         new_key = Key(self)  # Создаем ключ
         self.player.pockets.append(new_key)  # Отдаем ключ игроку
         self.game_is_on = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
+        self.how_many_monsters = 0
 
     
     def __del__ (self):
@@ -195,7 +196,4 @@ class Game():
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
     def monsters(self):
-        total_monsters = 0
-        for floor in self.castle_floors:
-            total_monsters += len(floor.all_monsters)
-        return total_monsters
+        return self.how_many_monsters

@@ -92,6 +92,7 @@ class Floor:
                                        howmany=self.how_many['монстры'])
         for monster in self.all_monsters:
             monster.place(self)
+            self.game.how_many_monsters += 1
         
         # Читаем оружие из файла и разбрасываем по замку
         self.all_weapon = game.readobjects(file='weapon.json',
