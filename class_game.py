@@ -38,6 +38,7 @@ class Game():
             'заклинание': Spell,
             }
         self.empty_thing = Empty()
+        self.how_many_monsters = 0
         self.state = 0
         # state - текущее состояние игры.
         # 0 - обычное состояние. Персонаж ходит, исследует и т.п.
@@ -80,7 +81,7 @@ class Game():
         new_key = Key(self)  # Создаем ключ
         self.player.pockets.append(new_key)  # Отдаем ключ игроку
         self.game_is_on = False  # Выключаем игру для того, чтобы игрок запустил ее в Телеграме
-        self.how_many_monsters = 0
+        
 
     
     def __del__ (self):

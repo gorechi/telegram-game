@@ -1,8 +1,5 @@
 from math import floor, sqrt
 from random import randint as dice
-from weakref import WeakMethod
-
-from numpy import who
 
 from class_basic import *
 from functions import howmany, randomitem, tprint
