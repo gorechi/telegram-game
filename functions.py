@@ -5,6 +5,8 @@ from random import randint
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
+from class_weapon import Weapon
+
 # Функции
 
 def roll(dice):
@@ -208,3 +210,17 @@ def normal_count(input_string, exclude=None):
     count = input_string.count(' и ')
     input_string = input_string.replace(' и ', ', ', count - 1)
     return input_string
+
+
+def create_random_weapon(self, howmany:int=1, weapon_type:int=None) -> list:
+        
+        """Метод создает случайное оружие"""
+        
+        objects = []
+        for _ in range(howmany):
+            if weapon_type:
+                new_object = Weapon(self, 0, weapon_type=weapon_type)
+            else:
+                new_object = Weapon(self, 0)
+            objects.append(new_object)
+        return objects

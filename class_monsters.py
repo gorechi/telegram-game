@@ -5,7 +5,7 @@ from class_basic import Loot, Money
 from class_items import Rune
 from class_protection import Armor, Shield
 from class_weapon import Weapon
-from functions import howmany, randomitem, tprint
+from functions import create_random_weapon, howmany, randomitem, tprint
 from settings import *
 
 
@@ -78,8 +78,7 @@ class Monster:
 
     def on_create(self):
         if self.prefered_weapon:
-            self.weapon = self.game.readobjects(howmany=1, object_class=Weapon, random=True, object_type=self.prefered_weapon)[0]
-            print(self.name, self.weapon.name)
+            self.weapon = create_random_weapon(howmany=1, weapon_type=self.prefered_weapon)[0]
         return True
 
     def __str__(self):
