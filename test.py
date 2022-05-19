@@ -1,1 +1,6 @@
-print([1, 2, 3, 4, 56] + [])
+from class_items import Potion
+
+q = Potion('sdfsd', 'sdfsfs', 0, 0, False)
+
+print(dir(q))
+
