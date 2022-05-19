@@ -35,8 +35,6 @@ class Weapon:
         self.runes = []
         self.twohanded_dict = s_weapon_twohanded_dictionary
         self.empty = empty
-        self.mastery_level = 1
-        self.mastery_counter = 0
 
     def on_create(self):
         return True
@@ -47,28 +45,29 @@ class Weapon:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
 
-    def mastery(self):
-        if self.empty:
-            return False
-        self.mastery_counter += dice(1, 10)/100
-        if self.mastery_counter > self.mastery_level:
-            self.mastery_counter = 0
-            self.mastery_level += 1
-            return True
-        return False
     
-    def real_name(self):
+    def real_name(self, all:bool=False, additional:list=[]) -> list:
         names = []
         if self.element() != 0:
-            name1 = f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize()
-            name2 = f'{self.name1} {s_elements_dictionary[self.element()]}'.capitalize()
-        else:
-            name1 = self.name.capitalize()
-            name2 = self.name1.capitalize()
-        names.append(name1)
-        names.append(name2)
+            names.append(f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize())
+            names.append(f'{self.name1} {s_elements_dictionary[self.element()]}'.capitalize())
+        if self.element() == 0 or all == 'all':
+            names.append(self.name.capitalize())
+            names.append(self.name1.capitalize())
+        names += additional
         return names
+    
+    
+    def check_name(self, message:str) -> bool:
+        names_list = self.real_name(all=True) + ['оружие']
+        names_list_lower = []
+        for name in names_list:
+            names_list_lower.append(name.lower())
+        if message.lower() in names_list_lower:
+            return True
+        return False
 
+    
     def element(self):
         element_sum = 0
         for rune in self.runes:

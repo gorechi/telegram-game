@@ -31,6 +31,10 @@ class Furniture:
         self.name1 = 'мебель'
         self.room = None
 
+    def __str__(self):
+        return self.where + ' ' + self.state + ' ' + self.name
+    
+    
     def on_create(self):
         self.name = randomitem(self.descriptions, False) + ' ' + self.name
         self.state = randomitem(self.states, False)
@@ -196,7 +200,7 @@ class Room:
 
     def monsters(self, mode=None):
         all_monsters = self.floor.monsters_in_rooms[self]
-        if len(all_monsters) > 0:
+        if bool(all_monsters):
             if mode == 'random':
                 return randomitem(all_monsters, False)
             elif mode == 'first':

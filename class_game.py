@@ -111,7 +111,7 @@ class Game():
         floors = []
         for i in s_castle_floors_sizes:
             floor = Floor(self, i[0], i[1], i[2])
-            self.floors.append(floor)
+            floors.append(floor)
         return floors
     
     
@@ -182,6 +182,20 @@ class Game():
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
     
+    def create_random_weapon(self, howmany:int=1, weapon_type:int=None) -> list:
+        
+        """Метод создает случайное оружие"""
+        
+        objects = []
+        for _ in range(howmany):
+            if weapon_type:
+                new_object = Weapon(self, 0, weapon_type=weapon_type)
+            else:
+                new_object = Weapon(self, 0)
+            objects.append(new_object)
+        return objects
+    
+    
     def rune_actions(self, answer:str) -> bool:
         
         """
@@ -194,7 +208,7 @@ class Game():
         """
         
         player = self.player
-        rune_list = self.player.inpockets(Rune)
+        rune_list = self.player.what_in_pockets(Rune)
         if answer == 'отмена':
             self.state = 0
             return False

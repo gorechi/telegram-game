@@ -123,50 +123,46 @@ class Floor:
         
         # Создаем мебель и разбрасываем по замку
         self.all_furniture = game.create_objects_from_json(file='furniture.json',
-                                        howmany=self.how_many['мебель'],
+                                        how_many=self.how_many['мебель'],
                                         random=True)
         for furniture in self.all_furniture:
             furniture.place(self)
         
         # Создаем очаги и разбрасываем по замку
         self.all_rest_places = game.create_objects_from_json(file='furniture-rest.json',
-                                        howmany=self.how_many['очаг'],)
+                                        how_many=self.how_many['очаг'],)
         self.all_rest_places[0].place(self, room_to_place=self.plan[0])
         for rest_place in self.all_rest_places[1:]:
             rest_place.place(self)
         
         # Читаем монстров из файла и разбрасываем по замку
         self.all_monsters = game.create_objects_from_json(file='monsters.json',
-                                       howmany=self.how_many['монстры'])
+                                       how_many=self.how_many['монстры'])
         for monster in self.all_monsters:
             monster.place(self)
             self.game.how_many_monsters += 1
         
         # Читаем оружие из файла и разбрасываем по замку
         self.all_weapon = game.create_objects_from_json(file='weapon.json',
-                                     howmany=self.how_many['оружие'],
-                                     object_class=Weapon)
+                                     how_many=self.how_many['оружие'])
         for weapon in self.all_weapon:
             weapon.place(self)
         
         # Читаем щиты из файла и разбрасываем по замку
         self.all_shields = game.create_objects_from_json(file='shields.json',
-                                      howmany=self.how_many['щит'],
-                                      object_class=Shield)
+                                      how_many=self.how_many['щит'])
         for shield in self.all_shields:
             shield.place(self)
         
         # Читаем доспехи из файла и разбрасываем по замку
         self.all_armor = game.create_objects_from_json(file='armor.json',
-                                    howmany=self.how_many['доспех'],
-                                    object_class=Armor)
+                                    how_many=self.how_many['доспех'])
         for armor in self.all_armor:
             armor.place(self)
         
         # Читаем зелья из файла и разбрасываем по замку
         self.all_potions = game.create_objects_from_json(file='potions.json',
-                                      howmany=self.how_many['зелье'],
-                                      object_class=Potion)
+                                      how_many=self.how_many['зелье'])
         for potion in self.all_potions:
             potion.place(self)
         
@@ -176,16 +172,15 @@ class Floor:
             rune.place(self)
         
         # Создаем книги и разбрасываем по замку
-        self.all_books = game.create_objects(file='books.json',
-                                    howmany=self.how_many['книга'],
-                                    random=True,
-                                    object_class=Book)
+        self.all_books = game.create_objects_from_json(file='books.json',
+                                    how_many=self.how_many['книга'],
+                                    random=True)
         for book in self.all_books:
             book.place(self)
         new_map = Map(game)
-        new_map.place(self)  # Создаем и прячем карту
+        new_map.place(self) 
         matches = Matches(game)
-        matches.place(self)  # Создаем и прячем спички
+        matches.place(self)
 
     
     def secret_rooms(self):
