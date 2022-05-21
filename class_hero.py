@@ -64,6 +64,7 @@ class Hero:
         self.current_position = 0
         self.game_is_over = False
         self.start_health = self.health
+        self.weakness = {}
         self.wins = 0
         self.rage = 0
         self.hide = False
@@ -122,6 +123,10 @@ class Hero:
         return f'<Hero: name = {self.name}>'
 
     
+    def get_weakness(self, weapon:Weapon) -> float:
+        return 1
+    
+    
     def get_shield(self) -> Shield:
         """Метод возвращает щит героя."""
         
@@ -172,17 +177,20 @@ class Hero:
 
         """
         
+        if target.poisoned or target.venomous:
+            return None
         if self.weapon.is_poisoned():
-            poison = s_weapon_poison_level
+            poison_die = dice(1, s_weapon_poison_level)
         else:
-            poison = s_hero_default_poison_die
-        if target.armor.is_poisoned() or target.shield.is_poisoned() and poison > 0:
-            poison_die = poison + s_hero_add_poison_level
-        else:
-            poison_die = s_hero_default_poison_die
-        if dice(1, poison_die) > poison and not target.poisoned and not target.venomous:
+            poison_die = 0
+        base_protection_die = dice(1, s_poison_base_protection_die)
+        if target.armor.is_poisoned() or target.shield.is_poisoned():
+            additional_protection_die = dice(1, s_poison_additional_protection_die)
+        protection = base_protection_die + additional_protection_die
+        if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь \
+                неважно себя чувствует.'
         return None
     
     
@@ -408,7 +416,7 @@ class Hero:
             if len(all_items) > 0:
                 item = randomitem(all_items)
                 self.pockets.remove(item)
-                stealing_monster.give(item)
+                stealing_monster.take(item)
                 return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
         return None
     
@@ -749,7 +757,7 @@ class Hero:
         """Метод генерирует значение дополнительной атаки оружием."""
         
         if self.weapon.empty:
-            return 0, False
+            return 0
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
         critical_probability = weapon_mastery * s_critical_step
@@ -783,7 +791,7 @@ class Hero:
             return None
         else:
             shield = target.shield
-            r = dice(1, 100)
+            r = dice(1, s_shield_crushed_upper_limit)
             damage_to_shield = total_attack * target.shield.accumulated_damage
             if r < damage_to_shield:
                 self.game.all_shields.remove(shield)
@@ -810,9 +818,6 @@ class Hero:
         """Метод моделирует удар героя по врагу во время схватки."""
         
         mesage = []
-        shield_string = None
-        poison_string = None
-        mastery_string = None
         game = self.game
         room = self.floor.plan[self.current_position]
         target_name, target_name1 = self.get_target_name(room=room, target=target)
@@ -829,20 +834,20 @@ class Hero:
         mesage.append(hit_string)
         total_damage, target_defence = self.generate_total_damage(target=target, total_attack=total_attack)
         if target_defence < 0:
-            damage_string = f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.'
+            message.append(f' {target.name} {target.g(["смог", "смогла"])} увернуться \
+                от атаки и не потерять ни одной жизни.')
         elif total_damage == 0:
-            damage_string =  f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.'
+            message.append(f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.')
         elif total_damage > 0:
             damage_string = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
-            shield_string = self.break_enemy_shield(target=target, total_attack=total_attack)
-            poison_string = self.poison_enemy(target=target)
-            mastery_string = self.increase_weapon_mastery()
+            message += [
+                damage_string,
+                self.break_enemy_shield(target=target, total_attack=total_attack),
+                self.poison_enemy(target=target),
+                self.increase_weapon_mastery()
+            ] 
         target.health -= total_damage
         self.rage = 0
-        message.append(damage_string)
-        message.append(shield_string)
-        message.append(poison_string)
-        message.append(mastery_string)
         tprint(game, message)
     
     

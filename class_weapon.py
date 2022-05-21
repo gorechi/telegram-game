@@ -122,7 +122,7 @@ class Weapon:
         damage = dice(1, int(self.damage))
         big_damage = damage + self.perm_damage()
         if who:
-            damage_multiplier = who.get_weakness([self])[0]
+            damage_multiplier = who.get_weakness(self)
         else:
             damage_multiplier = 1
         full_damage = ceil(big_damage * damage_multiplier)
@@ -191,7 +191,7 @@ class Weapon:
         monster = room.monsters('random')
         if monster:
             if monster.carry_weapon:
-                monster.give(self)
+                monster.take(self)
                 return True
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)

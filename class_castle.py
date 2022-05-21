@@ -263,7 +263,7 @@ class Floor:
                     if not monster:
                         room.loot.add(new_money)
                     else:
-                        monster.give(new_money)
+                        monster.take(new_money)
                     new_key = Key(self.game)
                     new_key.place(self)
                     break

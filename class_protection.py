@@ -167,7 +167,7 @@ class Armor(Protection):
         monster = room.monsters('random')
         if monster:
             if monster.wear_armor:
-                monster.give(self)
+                monster.take(self)
                 return True
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
@@ -249,7 +249,7 @@ class Shield (Protection):
         monster = room.monsters('random')
         if monster:
             if monster.carry_shield:
-                monster.give(self)
+                monster.take(self)
                 return True
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
