@@ -6,7 +6,7 @@ from telebot import types
 
 from class_game import Game
 from constants import TOKEN
-
+ 
 # Константы и настройки
 game_sessions = {}
 
@@ -45,8 +45,8 @@ def all_commands(message):
         game_sessions[chat_id] = new_game
         player = new_game.player
         new_game.game_is_on = True
-        new_game.new_castle.plan[player.current_position].show(player)
-        new_game.new_castle.plan[player.current_position].map()
+        new_game.current_floor.plan[player.current_position].show(player)
+        new_game.current_floor.plan[player.current_position].map()
     if game:
         game.action(command, text)
     return True

@@ -5,6 +5,7 @@ from random import randint
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
+
 # Функции
 
 def roll(dice):
@@ -120,6 +121,8 @@ def readitems(what_kind, how_many, classes):
 
 
 def tprint(game, text, state=''):
+    if not bool(text):
+        return False
     if state == 'off':
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
@@ -165,7 +168,8 @@ def tprint(game, text, state=''):
     elif isinstance(text, list):
         final_text = ''
         for line in text:
-            final_text = final_text + str(line) + '\n'
+            if line:
+                final_text = final_text + str(line) + '\n'
         game.bot.send_message(game.chat_id, final_text.rstrip('\n'), reply_markup=markup)
 
 
@@ -194,15 +198,21 @@ def pprint(game, text, width=200, height=200, color='#FFFFFF'):
         game.bot.send_photo(game.chat_id, pic)
 
 
-# Функция принимает на вход нормальную строку текста, слова разделены пробелами.
-# Подразумевается, что строка будет перечислением чего-либо.
-# На выход выдается преобразованная строка, где все слова разделены запятыми, а последнее отделяется союзом "и".
-# В параметр exclude передается символ, перед которым не надо ставить запятую. Это может быть, например, скобка.
-# Таким образом, строка 'один два три (четыре) пять (шесть)'
-# может быть преобразована в 'один, два, три (четыре) и пять (шесть)'.
 
-def normal_count(input_string, exclude=None):
-    input_string = input_string.replace(' ', ' и ')
+
+def normal_count(input_string, exclude=None, divider=' '):
+    
+    """ 
+    Функция принимает на вход нормальную строку текста, слова разделены пробелами.
+    Подразумевается, что строка будет перечислением чего-либо.
+    На выход выдается преобразованная строка, где все слова разделены запятыми, а последнее отделяется союзом "и".
+    В параметр exclude передается символ, перед которым не надо ставить запятую. Это может быть, например, скобка.
+    Таким образом, строка 'один два три (четыре) пять (шесть)'
+    может быть преобразована в 'один, два, три (четыре) и пять (шесть)'.
+    
+    """
+    
+    input_string = input_string.replace(divider, ' и ')
     if exclude:
         input_string = input_string.replace(' и ' + str(exclude), ' ' + str(exclude))
     count = input_string.count(' и ')

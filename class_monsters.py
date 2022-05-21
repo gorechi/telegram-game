@@ -10,6 +10,8 @@ from settings import *
 
 
 class Monster:
+    """Базовый класс монстров."""
+    
     def __init__(self,
                  game,
                  name=s_monster_name,
@@ -31,6 +33,7 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.floor = None
         self.run = False
         self.room = None
         self.alive = True
@@ -53,7 +56,7 @@ class Monster:
         self.wounded = False
         self.venomous = 0
         self.poisoned = False
-        self.weakness = []
+        self.weakness = {}
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
         self.prefered_weapon = None
@@ -75,106 +78,164 @@ class Monster:
             self.agressive = False
         self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
 
+    
     def on_create(self):
+        """Метод вызывается после создания экземпляра класса Монстр."""
+        
         if self.prefered_weapon:
-            self.weapon = self.game.readobjects(howmany=1, object_class=Weapon, random=True, object_type=self.prefered_weapon)[0]
-            print(self.name, self.weapon.name)
+            self.weapon = self.game.create_random_weapon(howmany=1, weapon_type=self.prefered_weapon)[0]
+        print(self.weakness)
         return True
 
+    
     def __str__(self):
         return self.name
     
-    def g(self, words_list):
+    
+    def g(self, words_list:list) -> str:
+        """
+        Метод выбирает слово из полученного списка
+        в зависимости от пола монстра.
+        
+        """
+        
         return words_list[self.gender]
 
-    def poison(self, who):
-        """Функция проводит проверку, отравил монстр противника при атаке, или нет
-
-        Args:
-            who (obj Hero): Герой, которого атакует монстр
-
-        Returns:
-            boolean: Признак, отравил монстр героя, или нет
+    
+    def poison_enemy(self, target) -> str:
         """
-        if self.venomous > 0:
-            poison = self.venomous
-        elif self.weapon.is_poisoned():
-            poison = s_weapon_poison_level
-        else:
-            poison = s_monster_default_poison_die
-        if (who.armor.is_poisoned() or who.shield.is_poisoned()) and poison > 0:
-            poison_die = poison + s_monster_add_poison_level
-        else:
-            poison_die = s_monster_default_poison_die
-        if dice(1, poison_die) > poison and not who.poisoned:
-            return True
-        return False
-    
-    def vampire_suck(self, total_damage):
-        return False
-    
-    def give(self, item):
-        if isinstance(item, Weapon) and self.weapon.empty and self.carry_weapon:
-            if self.prefered_weapon and self.prefered_weapon != item.type:
-                self.loot.pile.append(item)
-                return False
-            if item.twohanded and not self.shield.empty:
-                    shield = self.shield
-                    self.shield = self.game.no_shield
-                    self.game.new_castle.plan[self.current_position].loot.pile.append(shield)
-            self.weapon = item
-        elif isinstance(item, Shield) and self.shield.empty and self.carry_shield:
-            if not self.weapon.empty and self.weapon.twohanded:
-                self.loot.pile.append(item)
-                return True
-            else:
-                self.shield = item
-                return True
-        elif isinstance(item, Armor) and self.armor.empty and self.wear_armor:
-            self.armor = item
-        elif isinstance(item, Rune):
-            if item.damage >= item.defence:
-                if self.weapon.enchant(item):
-                    return True
-                if self.armor.enchant(item):
-                    return True
-                if self.shield.enchant(item):
-                    return True
-                self.loot.pile.append(item)
-                return True
-            else:
-                if self.shield.enchant(item):
-                    return True
-                if self.armor.enchant(item):
-                    return True
-                if self.weapon.enchant(item):
-                    return True
-                self.loot.pile.append(item)
-                return True
-        else:
-            self.loot.pile.append(item)
+        Метод проводит проверку, отравил монстр противника при атаке, или нет.
 
-    def action(self):
+        Параметры:
+        - who (obj Hero): Герой, которого атакует монстр
+
+        """
+        if target.poisoned:
+            return None
+        if self.weapon.is_poisoned() or self.venomous:
+            poison_die = dice(1, s_weapon_poison_level)
+        else:
+            poison_die = 0
+        base_protection_die = dice(1, s_poison_base_protection_die)
+        if target.armor.is_poisoned() or target.shield.is_poisoned():
+            additional_protection_die = dice(1, s_poison_additional_protection_die)
+        protection = base_protection_die + additional_protection_die
+        if poison_die > protection:
+            target.poisoned = True
+            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь \
+                неважно себя чувствует.'
+        return None
+        
+            
+    def vampire_suck(self, total_damage) -> str:
+        """
+        Метод вампирского высасывания здоровья из соперника.
+        В базовом классе ничего не делает.
+        
+        """
+        return None
+    
+    
+    def take_rune(self, item:Rune) -> bool:
+        """Метод обрабатывает ситуацию, когда монстр подбирает руну."""
+        
+        if item.damage >= item.defence:
+            if self.weapon.enchant(item):
+                return True
+            if self.armor.enchant(item):
+                return True
+            if self.shield.enchant(item):
+                return True
+            self.loot.pile.append(item)
+            return False
+        else:
+            if self.shield.enchant(item):
+                return True
+            if self.armor.enchant(item):
+                return True
+            if self.weapon.enchant(item):
+                return True
+            self.loot.pile.append(item)
+            return False
+    
+    
+    def take_weapon(self, item:Weapon) -> bool:
+        """Метод обрабатывает ситуацию, когда монстр подбирает оружие."""
+        
+        if not self.weapon.empty or not self.carry_weapon:
+            return False
+        if self.prefered_weapon and self.prefered_weapon != item.type:
+            self.loot.add(item)
+            return True
+        if item.twohanded and not self.shield.empty:
+                shield = self.shield
+                self.shield = self.game.no_shield
+                self.floor.plan[self.current_position].loot.add(shield)
+        self.weapon = item
+        return True
+    
+    
+    def take_shield(self, item:Shield) -> bool:
+        """Метод обрабатывает ситуацию, когда монст подбирает щит."""
+        
+        if not self.shield.empty or not self.carry_shield:
+            return False
+        if self.weapon.twohanded:
+            self.loot.add(item)
+        else:
+            self.shield = item
+        return True
+    
+    
+    def take_armor(self, item:Armor) -> bool:
+        """Метод обрабатывает ситуацию, когда монстр подбирает доспехи."""
+        
+        if not self.armor.empty or not self.wear_armor:
+            return False
+        self.armor = item
+        return True
+    
+    
+    def take(self, item) -> bool:
+        """
+        Метод моделирует ситуацию, когда монстр получает 
+        или подбирает какую-то штуку.
+        
+        """
+        
+        if isinstance(item, Weapon):
+            return self.take_weapon(item=item)
+        if isinstance(item, Shield):
+            return self.take_shield(item=item)
+        if isinstance(item, Armor):
+            return self.take_armor(item=item)
+        if isinstance(item, Rune):
+            return self.take_rune(item=item)
+        self.loot.add(item)
+        return True
+
+    
+    def action(self) -> str:
+        """Метод возвращает случайную строку действия монстра."""
+        
         return randomitem(self.weapon.actions)
 
-    def get_weakness(self, weapons=None): # weapons - массив оружий, 0 или более элементов
-        if weapons:
-            weaknesses = []
-            for weapon in weapons:
-                element = weapon.element()
-                found = False
-                for w in self.weakness:
-                    if w[0] == element:
-                        weaknesses.append(w[1])
-                        found = True
-                if not found:
-                    weaknesses.append(1)
-            return weaknesses
-        else:
-            return self.weakness
     
-    def mele(self):
-        room = self.game.new_castle.plan[self.current_position]
+    def get_weakness(self, weapon:Weapon) -> float: 
+        """
+        Метод возвращает значение коэффициента ославбления/усиления 
+        при использовании против монстра определенного оружия.
+        
+        """
+        
+        element = str(weapon.element())
+        if self.weakness.get(element):
+            return self.weakness[element]
+        return 1
+        
+            
+    def generate_mele_attack(self) -> int:
+        room = self.floor.plan[self.current_position]
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
@@ -184,62 +245,77 @@ class Monster:
         else:
             return dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
 
+    
+    def generate_weapon_attack(self, target) -> int:
+        if not self.weapon.empty:
+            return self.weapon.attack(target)
+        return 0
+    
+    
+    
+    def break_enemy_shield(self, target, total_attack:int) -> str:
+        """Метод проверяет, смог ли монстр сломать вражеский щит."""
+        
+        if target.shield.empty:
+            return None
+        else:
+            shield = target.shield
+            r = dice(1, s_shield_crushed_upper_limit)
+            damage_to_shield = total_attack * target.shield.accumulated_damage
+            if r < damage_to_shield:
+                self.game.all_shields.remove(shield)
+                target.shield = self.game.no_shield
+            return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+    
+    
     def attack(self, target):
         game = self.game
-        new_castle = self.game.new_castle
-        room = new_castle.plan[self.current_position]
+        room = self.floor.plan[self.current_position]
+        message = []
         if room.light:
             self_name = self.name
         else:
             self_name = s_monster_name_in_darkness
-        text = []
-        mele_attack = self.mele()
-        if not self.weapon.empty:
-            weapon_attack = self.weapon.attack()
-            text.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name1} и '
+        mele_attack = self.generate_mele_attack()
+        weapon_attack = self.generate_weapon_attack(target=target)
+        if weapon_attack > 0:
+            message.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name1} и '
                         f'наносит {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
         else:
-            weapon_attack = 0
-            text.append(f'{self_name} бьет {target.name1} не используя оружия и '
+            message.append(f'{self_name} бьет {target.name1} не используя оружия и '
                         f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
-        total_attack = weapon_attack + mele_attack
         target_defence = target.defence(self)
         if target_defence < 0:
-            total_damage = 0
-            text.append(f'{target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
-            tprint(game, text)
-            return True
-        if (total_attack - target_defence) > 0:
-            total_damage = weapon_attack + mele_attack - target_defence
-            text.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
+            message.append(f'{target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
+            tprint(game, message)
+            return False
+        total_attack = weapon_attack + mele_attack
+        total_damage = total_attack - target_defence
+        if total_damage > 0:
+            message.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
+            message += [
+                self.break_enemy_shield(target=target, total_attack=total_attack),
+                self.poison_enemy(target=target),
+                self.vampire_suck(total_damage=total_damage)
+            ]
         else:
             total_damage = 0
-            text.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
-        if not target.shield.empty:
-            rand = dice(1, s_shield_crushed_upper_limit)
-            dam = total_attack * target.shield.accumulated_damage
-            if rand < dam:
-                text.append(f'{self_name} наносит настолько сокрушительный удар, что ломает щит соперника.')
-                target.shield = self.game.no_shield
-        if self.poison(target):
-            target.poisoned = True
-            text.append(f'{target.name} получает отравление, {target.g(["ему", "ей"])} совсем нехорошо.')
+            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
         target.health -= total_damage
-        vampire_suck = self.vampire_suck(total_damage)
-        if vampire_suck:
-            text.append(vampire_suck)
         if target.health <= 0:
             game.state = 0
             target.lose(self)
             self.win(target)
-            text.append(f'{target.name} терпит сокрушительное поражение и сбегает к ближайшему очагу.')
-            tprint(game, text, 'direction')
+            message.append(f'{target.name} терпит сокрушительное поражение и сбегает к ближайшему очагу.')
+            tprint(game, message, 'direction')
         else:
-            tprint(game, text)
+            tprint(game, message)
         return True
 
+    
     def hit_chance(self):
         return self.hit_chance
+    
     
     def defence(self, attacker):
         result = 0
@@ -266,95 +342,158 @@ class Monster:
             result = -1
         return result
 
+    
+    def finally_die(self) -> bool:
+        room = self.room
+        if self.money > 0:
+            money = Money(self.game, self.money)
+            room.loot.add(money)
+            room.loot.pile.extend(self.loot.pile)
+        if not self.shield.empty:
+            room.loot.add(self.shield)
+        if not self.armor.empty:
+            room.loot.add(self.armor)
+        if not self.weapon.empty:
+            room.loot.add(self.weapon)
+        self.floor.all_monsters.remove(self)
+        self.floor.monsters_in_rooms[room].remove(self)
+        self.game.how_many_monsters -= 1
+        self.alive = False
+        return True
+    
+    
     def lose(self, winner=None):
-        game = self.game
         result = dice(1, 10)
-        where = self.room
-        if where.loot.empty:
-            new_loot = Loot(game)
-            where.loot = new_loot
         if result < 6 or self.wounded or not self.can_run:
-            if self.money > 0:
-                a = Money(game, self.money)
-                where.loot.pile.append(a)
-                where.loot.pile.extend(self.loot.pile)
-            if not self.shield.empty:
-                where.loot.pile.append(self.shield)
-            if not self.armor.empty:
-                where.loot.pile.append(self.armor)
-            if not self.weapon.empty:
-                where.loot.pile.append(self.weapon)
-            game.all_monsters.remove(self)
-            where.castle.monsters_in_rooms[where].remove(self)
-            self.alive = False
+            return self.finally_die()
         else:
-            self.wounded = True
-            if where.light:
-                name = self.name
-                lost_weapon = f'На пол падает {self.weapon.name}. '
-                lost_shield = f'На пол падает {self.shield.name}. '
-            else:
-                name = 'Противник'
-                lost_weapon = 'Слышно, что какое-то оружие ударилось об пол комнаты. '
-                lost_shield = 'В темноте можно услышать, что что-то большое упало в углу. '
-            alive_text = f'{name} остается в живых и '
-            weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
-            ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
-            if result < 10:
-                if result == 6:
-                    alive_text += 'получает легкое ранение в руку. '
-                    if not self.weapon.empty:
-                        alive_text += lost_weapon
-                        where.loot.pile.append(self.weapon)
-                        self.weapon = self.game.no_weapon
-                    elif not self.shield.empty:
-                        alive_text += lost_shield
-                        where.loot.pile.append(self.shield)
-                        self.shield = self.game.no_shield
-                elif result == 7:
-                    alive_text += f'истекает кровью, теряя при ' \
-                                   f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы. '
-                    self.stren -= weakness_amount
-                    self.health = self.start_health
-                elif result == 8:
-                    alive_text += f'приходит в ярость, получая при ' \
-                                   f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
-                                   f'теряя {howmany(ill_amount, "жизнь,жизни,жизней")}. '
-                    self.stren += weakness_amount
-                    self.health = self.start_health - ill_amount
-                else:
-                    alive_text += f'получает контузию, теряя при ' \
-                                   f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
-                                   f'получая {howmany(ill_amount, "жизнь,жизни,жизней")}. '
-                    self.stren -= weakness_amount
-                    self.health = self.start_health + ill_amount
-                if self.place(game.new_castle, old_place = where):
-                    alive_text += f'{name} убегает из комнаты.'
-                    tprint(game, alive_text)
-                else:
-                    alive_text += f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
-                    tprint(game, alive_text)
-            else:
-                alive_text += f'получает ранение в ногу и не может двигаться, теряя при ' \
-                               f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \
-                               f'и {howmany(ill_amount, "жизнь,жизни,жизней")}.'
-                self.stren -= weakness_amount
-                self.health = self.start_health - ill_amount
-                tprint(game, alive_text)
+            return self.get_wounded(result=result)
+            
+            
+    def lose_weapon_text(self) -> str:
+        room = self.room
+        if room.light:
+            return f'На пол падает {self.weapon.name}. '
+        else:
+            return'Слышно, что какое-то оружие ударилось об пол комнаты. '
+    
+    
+    def lose_shield_text(self) -> str:
+        room = self.room
+        if room.light:
+            return f'На пол падает {self.shield.name}. '
+        else:
+            return 'В темноте можно услышать, что что-то большое упало в углу. '
+    
+    
+    def get_self_name_in_room(self) -> str:
+        room = self.room
+        if room.light:
+            return self.name
+        else:
+            return 'Противник'
+    
+    
+    def get_wounded(self, result:int) -> bool:        
+        self.wounded = True
+        results_dict = {
+            6: self.hand_wound,
+            7: self.bleed,
+            8: self.rage,
+            9: self.contusion,
+            10: self.leg_wound
+        }
+        return results_dict.get(result)()
+        
+        
+    def hand_wound(self) -> bool:
+        if not self.weapon.empty:
+            alive_text += self.lose_weapon_text()
+            self.room.loot.add(self.weapon)
+            self.weapon = self.game.no_weapon
+        elif not self.shield.empty:
+            alive_text += self.lose_shield_text()
+            self.room.loot.add(self.shield)
+            self.shield = self.game.no_shield
+        text = f'{self.get_self_name_in_room(self)} остается в живых иполучает легкое ранение в руку. '
+        text += self.try_to_run_away()
+        tprint(self.game, text)
+        return True
+        
+        
+    def bleed(self) -> bool:
+        weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
+        self.stren -= weakness_amount
+        self.health = self.start_health
+        text = f'{self.get_self_name_in_room(self)} остается в живых и истекает кровью, теряя при ' \
+                        f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы. '
+        text += self.try_to_run_away()
+        tprint(self.game, text)
+        return True
+        
+    
+    def rage(self) -> bool:
+        strengthening_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
+        ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
+        self.stren += strengthening_amount
+        self.health = self.start_health - ill_amount
+        text = f'{self.get_self_name_in_room(self)} остается в живых и приходит в ярость, получая при ' \
+                        f'этом {howmany(strengthening_amount, "единицу,единицы,единиц")} силы и ' \
+                        f'теряя {howmany(ill_amount, "жизнь,жизни,жизней")}. '
+        text += self.try_to_run_away()
+        tprint(self.game, text)
+        return True
+    
+    
+    def contusion(self) -> bool:
+        weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
+        health_boost_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
+        self.stren -= weakness_amount
+        self.health = self.start_health + health_boost_amount
+        text = f'{self.get_self_name_in_room(self)} остается в живых и получает контузию, теряя при ' \
+                        f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
+                        f'получая {howmany(health_boost_amount, "жизнь,жизни,жизней")}. '
+        text += self.try_to_run_away()
+        tprint(self.game, text)
+        return True
 
+    
+    def leg_wound(self) -> bool:
+        weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
+        ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
+        self.stren -= weakness_amount
+        self.health = self.start_health - ill_amount
+        tprint(self.game, f'{self.get_self_name_in_room(self)} остается в живых и получает ранение в ногу и не может двигаться, теряя при ' \
+                            f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \
+                            f'и {howmany(ill_amount, "жизнь,жизни,жизней")}.')
+        return True
+    
+    
+    def try_to_run_away(self) -> str:
+        name = self.get_self_name_in_room()
+        if self.place(self.floor, old_place = self.room):
+            return f'{name} убегает из комнаты.'
+        else:
+            self.finally_die()
+            return f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
+
+    
     def win(self, loser=None):
         self.health = self.start_health
 
-    def place(self, castle, room_to_place=None, old_place=None):
+    
+    def place(self, floor, room_to_place=None, old_place=None):
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
+            empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush() and a != old_place and a.position != 0)]
+            if not bool(empty_rooms):
+                return False
             room = randomitem(empty_rooms, False)
         self.room = room
-        castle.monsters_in_rooms[room].append(self)
+        floor.monsters_in_rooms[room].append(self)
         if old_place:
-            castle.monsters_in_rooms[old_place].remove(self)
+            floor.monsters_in_rooms[old_place].remove(self)
         if self.can_hide and dice(1, s_monster_hide_possibility) == 1:
             places_to_hide = []
             for i in room.furniture:
@@ -365,8 +504,9 @@ class Monster:
         if self.stink:
             print('У нас есть вонючка!')
             print(self.name, room.position)
-            castle.stink(room, 3)
-            castle.stink_map()
+            floor.stink(room, 3)
+            floor.stink_map()
+        self.floor = floor
         return True
 
 
@@ -397,35 +537,37 @@ class Plant(Monster):
     def grow(self, room):
         new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
         new_plant.room = room
-        self.game.all_monsters.append(new_plant)
+        self.floor.all_monsters.append(new_plant)
+        self.game.how_many_monsters += 1
         return True
 
     def win(self, loser=None):
-        new_castle = self.game.new_castle
         self.health = self.start_health
         room = self.room
+        floor = self.floor
         new_rooms = []
         for i in range(4):
             if room.doors[i] == 1:
                 if i == 0: 
-                    new_rooms.append(new_castle.plan[room.position - new_castle.rooms])
+                    new_rooms.append(floor.plan[room.position - floor.rooms])
                 elif i == 1: 
-                    new_rooms.append(new_castle.plan[room.position + 1])
+                    new_rooms.append(floor.plan[room.position + 1])
                 elif i == 2:
-                    new_rooms.append(new_castle.plan[room.position + new_castle.rooms])
+                    new_rooms.append(floor.plan[room.position + floor.rooms])
                 elif i == 3:
-                    new_rooms.append(new_castle.plan[room.position - 1])
+                    new_rooms.append(floor.plan[room.position - 1])
         for i in new_rooms:
             if not i.monster():
                 self.grow(i)
 
-    def place(self, castle, roomr_to_place = None, old_place = None):
+    def place(self, floor, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monsters() and not a.monster_in_ambush())]
+            empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
         self.room = room
+        self.floor = floor
 
 class Berserk(Monster):
     def __init__(self,
@@ -456,10 +598,16 @@ class Berserk(Monster):
         self.rage = 0
         self.base_health = health
         self.empty = False
-
-    def mele(self):
+   
+    
+    def generate_mele_attack(self):
         self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
-        return dice(1, (self.stren + self.rage))
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
+        else:
+            poison_stren = 0
+        return dice(1, (self.stren + self.rage - poison_stren))
+
 
 class Shapeshifter(Monster):
     def __init__(self, 
@@ -490,6 +638,7 @@ class Shapeshifter(Monster):
         self.empty = False
         self.start_stren = stren
 
+    
     def defence(self, attacker):
         if not self.shifted:
             self.shifted = True
@@ -516,6 +665,7 @@ class Shapeshifter(Monster):
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result
+    
     
     def win(self, loser=None):
         self.health = self.start_health
@@ -553,16 +703,20 @@ class Vampire(Monster):
                          wear_armor)
         self.empty = False
 
+    
     def vampire_suck(self, total_damage):
+        """Метод вампирского высасывания здоровья из соперника."""
+        
         sucked = total_damage // s_vampire_suck_coefficient
         self.health += sucked
         return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, "жизнь,жизни,жизней")}.'
     
-    def place(self, castle, roomr_to_place = None, old_place = None):
+    
+    def place(self, floor, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
         else:
-            empty_rooms = [a for a in castle.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
+            empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
         places_to_hide = []
         for i in room.furniture:
@@ -572,5 +726,6 @@ class Vampire(Monster):
         where_to_hide = randomitem(places_to_hide, False)
         self.room = room
         self.hiding_place = where_to_hide
+        self.floor = floor
         return True
 

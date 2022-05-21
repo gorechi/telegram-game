@@ -21,18 +21,32 @@ class Protection:
         if self.perm_protection() != 0:
             protection_string += '+' + str(self.perm_protection())
         return self.name + self.enchantment() + ' (' + protection_string + ')'
-
+    
     def on_create(self):
         return True
 
-    def real_name(self):
+    
+    def check_name(self, message:str) -> bool:
+        names_list = self.real_name(all=True) + ['щит']
+        names_list_lower = []
+        for name in names_list:
+            names_list_lower.append(name.lower())
+        if message.lower() in names_list_lower:
+            return True
+        return False
+    
+    
+    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
         names = []
+        if self.empty:
+            return []
         if self.element() != 0:
             names.append(self.name + ' ' + s_elements_dictionary[self.element()])
             names.append(self.name1 + ' ' + s_elements_dictionary[self.element()])
-        else:
+        if self.element() == 0 or all:
             names.append(self.name)
             names.append(self.name1)
+        names += additional
         return names
 
     def is_poisoned(self):
@@ -94,12 +108,17 @@ class Protection:
             self.game.player.pockets.append(self)
             tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
-    def show(self):
+    
+    def show(self) -> str:
+        real_name = self.real_name()[0]
+        if self.empty:
+            return ''
         protection_string = str(self.protection)
         if self.perm_protection() != 0:
             protection_string += '+' + str(self.perm_protection())
-        return f'{self.name}{self.enchantment()} ({protection_string})'
+        return f'{real_name} ({protection_string})'
 
+    
     def use(self, who_using, in_action=False):
         if who_using.shield == '':
             who_using.shield = self
@@ -148,7 +167,7 @@ class Armor(Protection):
         monster = room.monsters('random')
         if monster:
             if monster.wear_armor:
-                monster.give(self)
+                monster.take(self)
                 return True
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
@@ -191,23 +210,15 @@ class Shield (Protection):
         self.empty = empty
         self.runes = []
         self.accumulated_damage = 0
-
+    
+    
     def on_create(self):
         return True
 
-    def show(self):
-        damage_dict = s_shield_states_dictionary
-        damage = damage_dict.get(self.accumulated_damage//1)
-        protection_string = str(self.protection)
-        text = ''
-        if self.perm_protection() != 0:
-            protection_string += '+' + str(self.perm_protection())
-        if damage:
-            text += (damage + ' ')
-        text += self.name + self.enchantment() + ' (' + protection_string + ')'
-        return text
-
-    def real_name(self):
+        
+    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
+        if self.empty:
+            return []
         damage_dict = s_shield_states_dictionary
         damage = damage_dict.get(self.accumulated_damage // 1)
         names = []
@@ -220,11 +231,16 @@ class Shield (Protection):
         if self.element() != 0:
             names.append(name + ' ' + s_elements_dictionary[self.element()])
             names.append(name1 + ' ' + s_elements_dictionary[self.element()])
-        else:
+        if self.element() == 0 or all:
             names.append(name)
             names.append(name1)
+        if all:
+            names.append(self.name)
+            names.append(self.name1)
+        names += additional
         return names
 
+    
     def place(self, castle, room_to_place = None):
         if room_to_place:
             room = room_to_place
@@ -233,7 +249,7 @@ class Shield (Protection):
         monster = room.monsters('random')
         if monster:
             if monster.carry_shield:
-                monster.give(self)
+                monster.take(self)
                 return True
         elif len(room.furniture) > 0:
             furniture = randomitem(room.furniture, False)
