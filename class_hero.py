@@ -636,7 +636,7 @@ class Hero:
         return items_list
     
     
-    def get_availavle_directions(self, room:Room) -> list:
+    def get_available_directions(self, room:Room) -> list:
         """
         Метод определяет, в каких направлениях герой может выйти из комнаты.
         Возвращает список направлений.
@@ -645,7 +645,7 @@ class Hero:
         
         available_directions = []
         for i in range(4):
-            if room.doors[i] == 1:
+            if not room.doors[i].empty and not room.doors[i].locked:
                 available_directions.append(i)
         return available_directions
     
@@ -671,7 +671,7 @@ class Hero:
             self.lose_weapon_or_shield(target=target)
         ]
         message += self.lose_random_items()        
-        available_directions = self.get_availavle_directions(room=room)
+        available_directions = self.get_available_directions(room=room)
         if room.light:
             direction = randomitem(available_directions)
         else:
@@ -1137,7 +1137,8 @@ class Hero:
         """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
         room = self.floor.plan[self.current_position]
-        if room.doors[s_hero_doors_dict[direction]] == 0:
+        door = room.doors[s_hero_doors_dict[direction]]
+        if door.empty:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
         elif self.fear >= s_fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
