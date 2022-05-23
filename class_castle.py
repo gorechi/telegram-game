@@ -281,8 +281,6 @@ class Floor:
         f = self.rows
         r = self.rooms
         game = self.game
-        doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
-        doors_vertical = {'0': '║', '1': ' ', '2': '|'}
         text = []
         text.append('======' * r + '=')
         for i in range(f):
@@ -298,8 +296,8 @@ class Floor:
                     a = '#'
                 else: 
                     a = room.visited
-                line1 += f'  {a}  {doors_vertical[str(self.all_doors[i * r + j][1])]}'
-                line2 += f'==={doors_horizontal[str(self.all_doors[i * r + j][2])]}=='
+                line1 += f'  {a}  {room.doors[1].vertical_symbol()}'
+                line2 += f'==={room.doors[2].horizontal_symbol()}=='
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
