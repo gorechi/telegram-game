@@ -131,7 +131,7 @@ class Weapon:
     def take(self, who):
         game = self.game
         message = [f'{who.name} берет {self.name1}.']
-        second_weapon = who.second_weapon()
+        second_weapon = who.get_second_weapon()
         if who.weapon.empty:
             who.weapon = self
             message.append(f'{who.name} теперь использует {self.name1} в качестве оружия.')

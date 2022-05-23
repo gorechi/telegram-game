@@ -33,7 +33,7 @@ class Floor:
         self.lock_doors()
         self.lights_off()
         self.inhabit()
-        
+                
     
     def create_rooms(self, f:int, r:int):    
         

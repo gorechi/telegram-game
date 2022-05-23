@@ -19,7 +19,7 @@ class Loot:
     
     def __eq__(self, other) -> bool:
         if isinstance(other, int):
-            return len(self.loot.pile) == other 
+            return len(self.pile) == other 
 
 
 class Money:

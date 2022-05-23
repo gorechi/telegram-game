@@ -1002,7 +1002,7 @@ class Hero:
         if self.poisoned:
             parry_chance -= self.dext // 2
         parry_die = dice(1, parry_chance)
-        hit_die = dice(1, (weapon.hit_chance + weapon.hit_chance))
+        hit_die = dice(1, (attacker.hit_chance + weapon.hit_chance))
         if parry_die > hit_die:
             return True
         return False
@@ -1025,7 +1025,7 @@ class Hero:
             self.damage_shield()
         if not self.armor.empty:
             result += self.armor.protect(attacker)
-        if self.try_to_parry(self, attacker=attacker):
+        if self.try_to_parry(attacker=attacker):
             result = -1
         return result
 
@@ -1228,7 +1228,7 @@ class Hero:
             tprint(game, showsides(self, monster, self.floor))
         if what in self.weapon.real_name(all=True, additional=['оружие']):
             tprint(game, self.look_at_weapon())
-        if what in self.shield.real_name(all=True, additijnal=['щит']):
+        if what in self.shield.real_name(all=True, additional=['щит']):
             tprint(game, self.look_at_shield())
         if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
             tprint(game, self.look_at_armor())
