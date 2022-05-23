@@ -1,10 +1,9 @@
 from functions import randomitem
 
-d = [12, 345, 1231, 123, 3, 56]
+d = [121, 345, 1231, 123, 3, 56]
 
-item = randomitem([i for i in d if i > 100])
+item = randomitem([a for a in d[1::] if a > 100])
 
-print ([i for i in d if i > 100])
+print ([a for a in d[1::] if a > 100])
 print (item)
-print (d.index(item))
 

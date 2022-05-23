@@ -249,25 +249,22 @@ class Floor:
     def lock_doors(self):
         
         """
-        Функция выключает свет в некоторых случайных комнатах этажа замка.
+        Функция запирает двери некоторых случайных комнатах этажа замка.
         
         """
         
         how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
-        for i in range(how_many_locked_rooms):
-            while True:
-                room = randomitem(self.plan)
-                if room != self.plan[0]:
-                    new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
-                    room.lock(2)
-                    monster = room.monsters('random')
-                    if not monster:
-                        room.loot.add(new_money)
-                    else:
-                        monster.take(new_money)
-                    new_key = Key(self.game)
-                    new_key.place(self)
-                    break
+        for _ in range(how_many_locked_rooms):
+            room = randomitem([r for r in self.plan[1::] if not r.locked])
+            new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
+            room.lock()
+            monster = room.monsters('random')
+            if not monster:
+                room.loot.add(new_money)
+            else:
+                monster.take(new_money)
+            new_key = Key(self.game)
+            new_key.place(self)
         return True
 
     
