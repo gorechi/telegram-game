@@ -1,6 +1,10 @@
-from class_items import Potion
+from functions import randomitem
 
-q = Potion('sdfsd', 'sdfsfs', 0, 0, False)
+d = [12, 345, 1231, 123, 3, 56]
 
-print(dir(q))
+item = randomitem([i for i in d if i > 100])
+
+print ([i for i in d if i > 100])
+print (item)
+print (d.index(item))
 

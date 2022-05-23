@@ -1,4 +1,3 @@
-from email import message
 from random import randint as dice
 
 from class_items import Book, Key, Money, Rune
@@ -1255,17 +1254,17 @@ class Hero:
         
         game = self.game
         room = self.floor.plan[self.current_position]
-        door_state = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[s_hero_doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
             tprint(game, f'{self.name} не знает такого направления!')
             return False
-        elif door_state == 0:
+        elif door.empty:
             if room.light:
                 tprint(game, f'Там нет двери. {self.name} не может туда пройти!')
             else:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
-        elif door_state == 2:
+        elif door.locked:
             if room.light:
                 tprint(game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
             else:
@@ -1315,6 +1314,7 @@ class Hero:
         """Метод обыскивания комнаты."""
         
         room = self.floor.plan[self.current_position]
+        message =[]
         if self.check_monster_in_ambush(place=room):
             return False
         for furniture in room.furniture:
@@ -1539,14 +1539,13 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         key = self.get_key_from_backpack()
-        if room.doors[s_hero_doors_dict[direction]] != 2:
+        door = room.doors[s_hero_doors_dict[direction]]
+        if  not door.locked:
             tprint(game, 'В той стороне нечего открывать.')
             return False
         else:
             self.pockets.remove(key)
-            room.doors[s_hero_doors_dict[direction]] = 1
-            j = s_hero_doors_dict[direction] + 2 if (s_hero_doors_dict[direction] + 2) < 4 else s_hero_doors_dict[direction] - 2
-            self.floor.plan[self.current_position + self.floor.directions_dict[direction]].doors[j] = 1
+            door.locked = False
             tprint(game, f'{self.name} открывает дверь.')
             return True
     
