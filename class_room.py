@@ -6,13 +6,40 @@ from class_monsters import Monster
 from functions import pprint, randomitem, readfile, tprint
 from settings import *
 
-decor1 = readfile('decorate1', False)
-decor2 = readfile('decorate2', False)
-decor3 = readfile('decorate3', False)
-decor4 = readfile('decorate4', False)
 
+class Door:
+    """Класс дверей."""
+    
+    
+    def __init__(self, game=None):
+        self.empty = True
+        self.game = game
+
+    
+    def activate(self):
+        self.empty = False
+        self.locked = False
+        self.closed = True
+        
+    def horizontal_symbol(self) -> str:
+        if self.empty:
+            return '='
+        elif self.locked:
+            return '-'
+        else:
+            return ' '       
+
+    def vertical_symbol(self) -> str:
+        if self.empty:
+            return '║'
+        elif self.locked:
+            return '|'
+        else:
+            return ' '
 
 class Furniture:
+    """Класс мебели."""
+    
     def __init__(self, game, name=''):
         self.game = game
         new_loot = Loot(self.game)
@@ -85,24 +112,21 @@ class Furniture:
 
 
 class Room:
-    def __init__(self, game, floor, doors, loot=None):
+    """Класс комнат."""
+    
+    decor1 = readfile('decorate1', False)
+    decor2 = readfile('decorate2', False)
+    decor3 = readfile('decorate3', False)
+    decor4 = readfile('decorate4', False)
+    
+    
+    def __init__(self, game, floor, doors):
         self.game = game
         self.floor = floor
         self.doors = doors
-        a = dice(0, len(decor1) - 1)
-        self.decoration1 = decor1[a]
-        a = dice(0, len(decor2) - 1)
-        self.decoration2 = decor2[a]
-        a = dice(0, len(decor3) - 1)
-        self.decoration3 = decor3[a]
-        a = dice(0, len(decor4) - 1)
-        self.decoration4 = decor4[a]
-        self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
         self.money = 0
-        if loot == '' or not loot:
-            self.loot = self.game.empty_thing
-        else:
-            self.loot = loot
+        self.decorate()
+        self.loot = Loot(self.game)
         self.secret_loot = Loot(self.game)
         self.locked = False
         self.position = -1
@@ -117,11 +141,25 @@ class Room:
             self.torch = False
         else:
             self.torch = True
-        self.secret_word = ''
+        self.secret_word = self.get_secret_word()
+
+    
+    def get_secret_word(self) -> str:
+        secret_word = ''
         for i in s_room_secrets_dictionary:
             if self.description.find(i) > -1:
-                self.secret_word = i
+                secret_word = i
+        return secret_word
+    
+    
+    def decorate(self):
+        self.decoration1 = randomitem(Room.decor1)
+        self.decoration2 = randomitem(Room.decor2)
+        self.decoration3 = randomitem(Room.decor3)
+        self.decoration4 = randomitem(Room.decor4)
+        self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
 
+    
     def can_rest(self):
         """Функция проверяет, можно ли отдыхать в комнате
 
@@ -219,37 +257,31 @@ class Room:
         return False
     
     def map(self):
+        if not self.light:
+            return False
         game=self.game
         monsters = self.monsters()
         if monsters:
             monster = monsters[0]
         else:
             monster = None
-        doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
-        doors_vertical = {'0': '║', '1': ' ', '2': '|'}
-        string1 = '=={0}=='.format(doors_horizontal[str(self.doors[0])])
+        string1 = '=={0}=='.format(self.doors[0].horizontal_symbol())
         string2 = '║   ║'
-        string3 = '{0} '.format(doors_vertical[str(self.doors[3])])
+        string3 = '{0} '.format(self.doors[3].vertical_symbol())
         if monster:
             string3 += monster.name[0]
         else:
             string3 += ' '
-        string3 += ' {0}'.format(doors_vertical[str(self.doors[1])])
-        string4 = '=={0}=='.format(doors_horizontal[str(self.doors[2])])
-        if self.light:
-            pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
-                   s_room_plan_picture_width, s_room_plan_picture_height)
-            return True
-        else:
-            return False
+        string3 += ' {0}'.format(self.doors[1].vertical_symbol())
+        string4 = '=={0}=='.format(self.doors[2].horizontal_symbol())
+        pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
+                s_room_plan_picture_width, s_room_plan_picture_height)
+        return True
 
-    def lock(self, locked_or_not=2):
-        game=self.game
-        a = [-self.floor.rooms, 1, self.floor.rooms, -1]
-        for i in range(4):
-            if self.doors[i] == 1:
-                self.doors[i] = locked_or_not
-                j = i + 2 if (i + 2) < 4 else i - 2
-                self.floor.plan[self.position + a[i]].doors[j] = locked_or_not
+    
+    def lock(self):
+        for door in self.doors:
+            if not door.empty:
+                door.locked = True
         self.locked = True
         return None

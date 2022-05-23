@@ -1,4 +1,3 @@
-from email import message
 from random import randint as dice
 
 from class_items import Book, Key, Money, Rune
@@ -637,7 +636,7 @@ class Hero:
         return items_list
     
     
-    def get_availavle_directions(self, room:Room) -> list:
+    def get_available_directions(self, room:Room) -> list:
         """
         Метод определяет, в каких направлениях герой может выйти из комнаты.
         Возвращает список направлений.
@@ -646,7 +645,7 @@ class Hero:
         
         available_directions = []
         for i in range(4):
-            if room.doors[i] == 1:
+            if not room.doors[i].empty and not room.doors[i].locked:
                 available_directions.append(i)
         return available_directions
     
@@ -672,7 +671,7 @@ class Hero:
             self.lose_weapon_or_shield(target=target)
         ]
         message += self.lose_random_items()        
-        available_directions = self.get_availavle_directions(room=room)
+        available_directions = self.get_available_directions(room=room)
         if room.light:
             direction = randomitem(available_directions)
         else:
@@ -1138,7 +1137,8 @@ class Hero:
         """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
         room = self.floor.plan[self.current_position]
-        if room.doors[s_hero_doors_dict[direction]] == 0:
+        door = room.doors[s_hero_doors_dict[direction]]
+        if door.empty:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
         elif self.fear >= s_fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
@@ -1255,17 +1255,17 @@ class Hero:
         
         game = self.game
         room = self.floor.plan[self.current_position]
-        door_state = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[s_hero_doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
             tprint(game, f'{self.name} не знает такого направления!')
             return False
-        elif door_state == 0:
+        elif door.empty:
             if room.light:
                 tprint(game, f'Там нет двери. {self.name} не может туда пройти!')
             else:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
-        elif door_state == 2:
+        elif door.locked:
             if room.light:
                 tprint(game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
             else:
@@ -1315,6 +1315,7 @@ class Hero:
         """Метод обыскивания комнаты."""
         
         room = self.floor.plan[self.current_position]
+        message =[]
         if self.check_monster_in_ambush(place=room):
             return False
         for furniture in room.furniture:
@@ -1539,14 +1540,13 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         key = self.get_key_from_backpack()
-        if room.doors[s_hero_doors_dict[direction]] != 2:
+        door = room.doors[s_hero_doors_dict[direction]]
+        if  not door.locked:
             tprint(game, 'В той стороне нечего открывать.')
             return False
         else:
             self.pockets.remove(key)
-            room.doors[s_hero_doors_dict[direction]] = 1
-            j = s_hero_doors_dict[direction] + 2 if (s_hero_doors_dict[direction] + 2) < 4 else s_hero_doors_dict[direction] - 2
-            self.floor.plan[self.current_position + self.floor.directions_dict[direction]].doors[j] = 1
+            door.locked = False
             tprint(game, f'{self.name} открывает дверь.')
             return True
     

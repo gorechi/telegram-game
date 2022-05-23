@@ -1,10 +1,8 @@
 from random import randint as dice
 
-from class_basic import Loot, Money
-from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
-from class_protection import Armor, Shield
-from class_weapon import Weapon
-from class_room import Room
+from class_basic import Money
+from class_items import Key, Map, Matches, Rune
+from class_room import Door, Room
 from functions import pprint, randomitem
 from settings import *
 
@@ -48,10 +46,9 @@ class Floor:
         
         all_doors = self.create_doors(f, r)
         self.plan = []
-        for i in range(f * r):
-            new_loot = Loot(self.game)
-            new_room = Room(self.game, self, all_doors[i], new_loot)
-            new_room.position = i
+        for index, doors in enumerate(all_doors):
+            new_room = Room(self.game, self, doors)
+            new_room.position = index
             self.plan.append(new_room)
             self.monsters_in_rooms[new_room] = []
          
@@ -87,28 +84,33 @@ class Floor:
         
         all_rooms = self.create_rooms_plan(f, r)
         all_doors = []
-        for i in range(f * r):
-            all_doors.append([0, 0, 0, 0])
-        for i in range(f * r):
-            row = i // r
-            room = i % r
+        for _ in range(f * r):
+            doors = []
+            for _ in range(4):
+                door = Door(self.game)
+                doors.append(door)
+            all_doors.append(doors)
+        for index, doors in enumerate(all_doors):
+            row = index // r
+            room = index % r
             if f > 1 and r > 1:
-                while all_doors[i].count(1) < all_rooms[i]:
-                    q = dice(0, 3)
-                    if all_doors[i][q] != 1:
-                        if q == 0 and row != 0:
-                            all_doors[i][0] = 1
-                            all_doors[i - r][2] = 1
-                        elif q == 2 and row < f - 1:
-                            all_doors[i][2] = 1
-                            all_doors[i + r][0] = 1
-                        elif q == 3 and room != 0:
-                            all_doors[i][3] = 1
-                            all_doors[i - 1][1] = 1
-                        elif q == 1 and room < r - 1:
-                            all_doors[i][1] = 1
-                            all_doors[i + 1][3] = 1
+                while sum(not door.empty for door in doors) < all_rooms[index]:
+                    door = randomitem([door for door in doors if door.empty])
+                    q = doors.index(door)
+                    if q == 0 and row != 0:
+                        doors[0].activate()
+                        all_doors[index - r][2] = doors[0]
+                    elif q == 2 and row < f - 1:
+                        doors[2].activate()
+                        all_doors[index + r][0] = doors[2]
+                    elif q == 3 and room != 0:
+                        doors[3].activate()
+                        all_doors[index - 1][1] = doors[3]
+                    elif q == 1 and room < r - 1:
+                        doors[1].activate()
+                        all_doors[index + 1][3] = doors[1]
         return all_doors
+    
     
     def inhabit(self):
         
@@ -116,8 +118,7 @@ class Floor:
         Функция населяет этаж замка всякими монстрами и штуками. 
         Отвечает за наполнение этажа всем содержимым.
         
-        """
-        
+        """    
         
         game = self.game
         
@@ -207,8 +208,8 @@ class Floor:
             return True
         else:
             room.stink = stink_level
-        for i in range(4):
-            if room.doors[i] in [1, 2]:
+        for i, door in enumerate(room.doors):
+            if not door.empty:
                 available_directions.append(i)
         if stink_level > 1:
             for direction in available_directions:
@@ -248,25 +249,22 @@ class Floor:
     def lock_doors(self):
         
         """
-        Функция выключает свет в некоторых случайных комнатах этажа замка.
+        Функция запирает двери некоторых случайных комнатах этажа замка.
         
         """
         
         how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
-        for i in range(how_many_locked_rooms):
-            while True:
-                room = randomitem(self.plan)
-                if room != self.plan[0]:
-                    new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
-                    room.lock(2)
-                    monster = room.monsters('random')
-                    if not monster:
-                        room.loot.add(new_money)
-                    else:
-                        monster.take(new_money)
-                    new_key = Key(self.game)
-                    new_key.place(self)
-                    break
+        for _ in range(how_many_locked_rooms):
+            room = randomitem([r for r in self.plan[1::] if not r.locked])
+            new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
+            room.lock()
+            monster = room.monsters('random')
+            if not monster:
+                room.loot.add(new_money)
+            else:
+                monster.take(new_money)
+            new_key = Key(self.game)
+            new_key.place(self)
         return True
 
     
@@ -280,8 +278,6 @@ class Floor:
         f = self.rows
         r = self.rooms
         game = self.game
-        doors_horizontal = {'0': '=', '1': ' ', '2': '-'}
-        doors_vertical = {'0': '║', '1': ' ', '2': '|'}
         text = []
         text.append('======' * r + '=')
         for i in range(f):
@@ -297,8 +293,8 @@ class Floor:
                     a = '#'
                 else: 
                     a = room.visited
-                line1 += f'  {a}  {doors_vertical[str(self.all_doors[i * r + j][1])]}'
-                line2 += f'==={doors_horizontal[str(self.all_doors[i * r + j][2])]}=='
+                line1 += f'  {a}  {room.doors[1].vertical_symbol()}'
+                line2 += f'==={room.doors[2].horizontal_symbol()}=='
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
