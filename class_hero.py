@@ -1180,21 +1180,10 @@ class Hero:
         """Метод генерирует текст осмотра мебели."""
         
         room = self.floor.plan[self.current_position]
-        furniture_list = room.furniture
         message = []
-        for i in furniture_list:
+        for i in room.furniture:
             if i.name1 == what:
-                message.append(i.show())
-        return message
-    
-    
-    def look_at_items_in_backpack(self, what:str) -> list[str]:
-        """Метод генерирует текст осмотра вещей в рюкзаке."""
-        
-        message = []
-        for i in self.pockets:
-            if what in [i.name, i.name1]:
-                message.append(i.show())
+                message += (i.show())
         return message
     
     
@@ -1232,8 +1221,9 @@ class Hero:
             tprint(game, self.look_at_shield())
         if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
             tprint(game, self.look_at_armor())
-        tprint(game, self.look_at_furniture(what=what))
-        tprint(game, self.look_at_items_in_backpack(what=what))
+        print ([f for f in room.furniture if f.name1 == what])
+        if bool([f for f in room.furniture if f.name1 == what]):
+            tprint(game, self.look_at_furniture(what=what))
 
     
     def check_monster_and_figth(self):
@@ -1703,6 +1693,7 @@ class Hero:
         if not room.light:
             tprint(game, f'{self.name} решает, что читать в такой темноте вредно для зрения.')
             return False
+        return True
     
     
     def get_book(self, item:str) -> Book:
@@ -1743,7 +1734,7 @@ class Hero:
         book = self.get_book(item=what)
         if book:
             message = [book.text]
-            message.append(book.print_mastery(self))
+            message += (book.print_mastery(self))
             message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
             self.weapon_mastery[book.weapon_type]['level'] += 1
             self.pockets.remove(book)

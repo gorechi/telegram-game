@@ -6,9 +6,9 @@ from settings import *
 
 
 class Weapon:
-    def __init__(self, game, name='', name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None):
+    def __init__(self, game, name=None, name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None):
         self.game = game
-        if name != 0:
+        if name:
             self.name = name
             self.damage = int(damage)
             self.name1 = name1

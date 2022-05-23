@@ -168,7 +168,7 @@ class Room:
             obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
-        monster = self.monster()
+        monster = self.monsters('first')
         if monster:
             message.append('Враг, который находится в комнате, точно не даст отдохнуть.')
         if self.stink > 0:
@@ -219,7 +219,7 @@ class Room:
             tprint(game, message, state = 'direction')
 
     def show_through_key_hole(self, who):
-        monster = self.monster()
+        monster = self.monsters('first')
         message = []
         if not monster:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')

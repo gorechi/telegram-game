@@ -110,9 +110,9 @@ class Protection:
 
     
     def show(self) -> str:
-        real_name = self.real_name()[0]
         if self.empty:
-            return ''
+            return None
+        real_name = self.real_name()[0]
         protection_string = str(self.protection)
         if self.perm_protection() != 0:
             protection_string += '+' + str(self.perm_protection())
