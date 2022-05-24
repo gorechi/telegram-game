@@ -230,7 +230,6 @@ class Floor:
             floor = ''
             for j in range(self.rooms):
                 floor = f'{floor + str(self.plan[i*self.rooms + j].stink)} '
-            print(floor)
 
     
     def lights_off(self):

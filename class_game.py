@@ -174,11 +174,11 @@ class Game():
             player.levelup(command)
             return True
         elif self.state == 2:
-            result = self.rune_actions(answer=answer)
+            return self.rune_actions(answer=answer)
         elif self.state == 4:
-            result = self.in_fight_actions(answer=answer)
+            return self.in_fight_actions(answer=answer)
         elif command in s_game_fight_commands and self.state == 1:
-            result = self.fight_actions(answer=answer)
+            return self.fight_actions(answer=answer)
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
     

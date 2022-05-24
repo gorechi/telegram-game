@@ -84,7 +84,6 @@ class Monster:
         
         if self.prefered_weapon:
             self.weapon = self.game.create_random_weapon(howmany=1, weapon_type=self.prefered_weapon)[0]
-        print(self.weakness)
         return True
 
     
@@ -119,6 +118,8 @@ class Monster:
         base_protection_die = dice(1, s_poison_base_protection_die)
         if target.armor.is_poisoned() or target.shield.is_poisoned():
             additional_protection_die = dice(1, s_poison_additional_protection_die)
+        else:
+            additional_protection_die = 0
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
@@ -502,8 +503,6 @@ class Monster:
             places_to_hide.append(room)
             self.hiding_place = randomitem(places_to_hide, False)
         if self.stink:
-            print('У нас есть вонючка!')
-            print(self.name, room.position)
             floor.stink(room, 3)
             floor.stink_map()
         self.floor = floor

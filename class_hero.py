@@ -183,6 +183,7 @@ class Hero:
         else:
             poison_die = 0
         base_protection_die = dice(1, s_poison_base_protection_die)
+        additional_protection_die = 0
         if target.armor.is_poisoned() or target.shield.is_poisoned():
             additional_protection_die = dice(1, s_poison_additional_protection_die)
         protection = base_protection_die + additional_protection_die
@@ -409,7 +410,7 @@ class Hero:
         
         steal_count = dice(1, s_steal_probability)
         if steal_count == 1 and len(self.pockets) > 0:
-            all_monsters = [monster for monster in self.game.all_monsters if (not monster.stink and monster.can_steal)]
+            all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
             all_items = [item for item in self.pockets if (not isinstance(item, Key))]
             if len(all_items) > 0:
@@ -463,7 +464,7 @@ class Hero:
         cant_rest, rest_place = room.can_rest()
         message = []
         if not rest_place or len(cant_rest) > 0:
-            message.append('В этой комнате нельзя отдыхать.')
+            message.append('В этой комнате нельзя этого делать.')
             message.append(randomitem(cant_rest))
             tprint(self.game, message)
             return False
@@ -489,7 +490,7 @@ class Hero:
         
         if not self.shield.empty:
             self.shield, self.removed_shield = self.removed_shield, self.shield
-            tprint(self.game, f'{self.name} убирает {self.removed_shield.realname()[1]} за спину.') 
+            tprint(self.game, f'{self.name} убирает {self.removed_shield.real_name()[1]} за спину.') 
             return True
         return False
         
@@ -816,25 +817,22 @@ class Hero:
     def hit_enemy(self, target:Monster) -> int:
         """Метод моделирует удар героя по врагу во время схватки."""
         
-        mesage = []
+        message = []
         game = self.game
         room = self.floor.plan[self.current_position]
         target_name, target_name1 = self.get_target_name(room=room, target=target)
         tprint(game, showsides(self, target, self.floor))
         self.hide = False
-        total_attack = self.generate_total_attack(taget=target)
+        total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
             action = randomitem(self.weapon.actions)
-            hit_string = f'{self.name} {action} {target_name1} используя {self.weapon.name1} и наносит \
-                {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
+            hit_string = f'{self.name} {action} {target_name1} используя {self.weapon.name1} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
         else:
-            hit_string = f'{self.name} бьет {target_name1} не используя оружие и \
-                наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
-        mesage.append(hit_string)
+            hit_string = f'{self.name} бьет {target_name1} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
+        message.append(hit_string)
         total_damage, target_defence = self.generate_total_damage(target=target, total_attack=total_attack)
         if target_defence < 0:
-            message.append(f' {target.name} {target.g(["смог", "смогла"])} увернуться \
-                от атаки и не потерять ни одной жизни.')
+            message.append(f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
         elif total_damage == 0:
             message.append(f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.')
         elif total_damage > 0:
@@ -1221,7 +1219,6 @@ class Hero:
             tprint(game, self.look_at_shield())
         if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
             tprint(game, self.look_at_armor())
-        print ([f for f in room.furniture if f.name1 == what])
         if bool([f for f in room.furniture if f.name1 == what]):
             tprint(game, self.look_at_furniture(what=what))
 
