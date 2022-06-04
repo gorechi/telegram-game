@@ -1731,7 +1731,7 @@ class Hero:
         book = self.get_book(item=what)
         if book:
             message = [book.text]
-            message += (book.print_mastery(self))
+            message.append(book.get_mastery_string(self))
             message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
             self.weapon_mastery[book.weapon_type]['level'] += 1
             self.pockets.remove(book)

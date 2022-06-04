@@ -1,5 +1,6 @@
 from math import floor, sqrt
 from random import randint as dice
+from typing import Any, NoReturn
 
 from class_basic import *
 from functions import howmany, randomitem, tprint
@@ -7,6 +8,9 @@ from settings import *
 
 
 class Rune:
+    
+    """ Класс Руна. """
+    
     def __init__(self, game):
         self.game = game
         self.damage = 4 - floor(sqrt(dice(1, 15)))
@@ -18,44 +22,76 @@ class Rune:
         self.name1 = 'руну'
         self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
+        self.check_if_poisoned()
+        
+        
+    def __str__(self) -> str:
+        return f'{self.name} {s_elements_dictionary[self.element]} - ' \
+            f'урон + {str(self.damage)} или защита + {str(self.defence)}'
+
+    
+    def check_if_poisoned(self) -> NoReturn:    
+        
+        """ Метод определяет, ядовитая руна, или нет. """
+        
         if dice(1, s_rune_poison_probability) == 1:
             self.poison = True
             self.description = f'ядовитая {self.description}'
         else:
             self.poison = False
 
-    def __str__(self):
-        return f'{self.name} {s_elements_dictionary[self.element]} - ' \
-               f'урон + {str(self.damage)} или защита + {str(self.defence)}'
 
-    def on_create(self):
+    def on_create(self) -> Any:
+        
+        """ Метод вызывается после создания экземпляра класса. Ничего не делает. """
+        
         return True
 
-    def place(self, castle, room=None):
+    def place(self, castle, room=None) -> bool:
+        
+        """ Метод раскидывания рун по замку. """
+        
         rooms_with_secrets = castle.secret_rooms()
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
         if room in rooms_with_secrets:
             room.secret_loot.add(self)
-        elif len(room.furniture) > 0:
+        elif bool(room.furniture):
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
             room.loot.add(self)
         return True
 
-    def element(self):
+    def element(self) -> int:
+        
+        """ Метод возвращает элемент руны в виде целого числа. """
+        
         return int(self.element)
 
-    def take(self, who):
+    
+    def take(self, who) -> NoReturn:
+        
+        """ Метод вызывается когда кто-то забирает руну себе. """
+        
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
-    def show(self):
+    def show(self) -> str:
+        
+        """ Метод возвращает описание руны в виде строки. """
+        
         return f'{self.description} - урон + {str(self.damage)} или защита + {str(self.defence)}'.capitalize()
 
-    def use(self, who_is_using, in_action:bool=False):
+    def use(self, who_is_using, in_action:bool=False) -> str:
+        
+        """ 
+        Метод использования руны. Возвращает строку ответа и ничего не делает 
+        так как руну использовать нельзя.
+        
+        """
+        
         tprint(
             self.game, f'{who_is_using.name} не знает, как использовать такие штуки.')
 
@@ -86,6 +122,9 @@ class Spell:
 
 
 class Matches:
+    
+    """ Класс Спички. """
+    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -95,16 +134,20 @@ class Matches:
         self.room = None
         self.empty = False
 
-    def show(self):
+    def show(self) -> str:
+        
+        """ Метод возвращает описание спичек в виде строки. """
+        
         return self.description
 
-    def place(self, castle, room_to_place=None):
-        if room_to_place:
-            room = room_to_place
-        else:
+    def place(self, castle, room=None) -> bool:
+        
+        """ Метод раскидывания спичек по замку. """
+        
+        if not room:
             rooms = [i for i in castle.plan if not i.locked and i.light]
             room = randomitem(rooms, False)
-        if len(room.furniture) > 0:
+        if bool(room.furniture):
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
@@ -112,41 +155,29 @@ class Matches:
         self.room = room
         return True
 
-    def take(self, who=''):
-        if who == '':
+    def take(self, who=None) -> bool:
+        
+        """ Метод вызывается когда кто-то забирает спички себе. """
+        
+        if not who:
             return False
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+        return True
 
-    def use(self, who_is_using=None, in_action=False):
-        player = self.game.player
-        game = self.game
-        if not who_is_using:
-            who_is_using = player
+    def use(self, who_is_using=None, in_action=False) -> NoReturn:
+        
+        """ Метод использования спичек. """
+        
         floor = who_is_using.floor
         room = floor.plan[who_is_using.current_position]
-        monster = room.monster()
+        if not who_is_using:
+            who_is_using = self.game.player
         if room.light:
-            message = ['Незачем тратить спички, здесь и так светло.']
-            tprint(game, message)
+            tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
         else:
-            room.light = True
-            room.torch = True
-            message = [
-                f'{who_is_using.name} зажигает факел и комната озаряется светом']
-            if monster:
-                if monster.frightening:
-                    message.append(
-                        f'{who_is_using.name} замирает от ужаса глядя на чудовище перед собой.')
-                    who_is_using.fear += 1
-            tprint(game, message)
-            room.show(who_is_using)
-            room.map()
-            if monster:
-                if monster.agressive:
-                    player.fight(monster.name, True)
-
-
+            room.turn_on_light(who_is_using)
+  
 class Map:
     def __init__(self, game):
         self.game = game
@@ -156,21 +187,27 @@ class Map:
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
-    def place(self, castle, room=None):
+    def place(self, castle, room=None) -> bool:
+        
+        """ Метод размещения карты в замке. """
+        
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
-        if len(room.furniture) > 0:
+        if bool(room.furniture):
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
-            room.loot.pile.append(self)
+            room.loot.add(self)
         return True
 
-    def show(self):
+    def show(self) -> str:
+        
+        """ Метод возвращает описание карты в виде строки. """
+        
         return self.description
 
-    def use(self, who, in_action: bool = False):
+    def use(self, who, in_action: bool = False) -> bool:
         """
         Метод использования карты. Если вызывается в бою, то ничего не происходит. 
         В мирное время выводит на экран карту замка.
@@ -186,22 +223,28 @@ class Map:
         if not in_action:
             if who.fear >= s_fear_limit:
                 tprint(
-                    game, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.', 'direction')
+                    game, 
+                    f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.', 'direction')
                 return False
             elif not room.light:
                 tprint(
-                    game, f'В комнате слишком темно чтобы разглядывать карту', 'direction')
+                    game, 
+                    f'В комнате слишком темно чтобы разглядывать карту', 'direction')
                 return False
             else:
                 tprint(
-                    game, f'{who.name} смотрит на карту этажа замка.', 'direction')
+                    game, 
+                    f'{who.name} смотрит на карту этажа замка.', 'direction')
                 floor.map()
                 return True
         else:
             tprint(game, 'Во время боя это совершенно неуместно!')
             return False
 
-    def take(self, who):
+    def take(self, who) -> NoReturn:
+        
+        """ Метод вызывается когда кто-то забирает карту себе. """
+        
         who.pockets.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
@@ -215,7 +258,7 @@ class Key:
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.description
 
     def show(self):
@@ -224,20 +267,16 @@ class Key:
     def on_create(self):
         return True
 
-    def place(self, castle, room=None):
-        furniture = None
+    def place(self, floor, room=None) -> bool:
         if not room:
-            unlocked_rooms = [a for a in castle.plan if (not a.locked)]
-            room = randomitem(unlocked_rooms, False)
-        if len(room.furniture) > 0:
-            for i in room.furniture:
-                if not i.locked:
-                    furniture = i
+            room = floor.get_random_unlocked_room()
+        furniture = room.get_random_unlocked_furniture()
         if furniture:
             furniture.put(self)
         else:
             room.loot.add(self)
         return True
+
 
     def take(self, who):
         who.pockets.append(self)
@@ -279,7 +318,7 @@ class Potion:
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
-        if len(room.furniture) > 0:
+        if bool(room.furniture):
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
@@ -419,18 +458,13 @@ class Book:
         self.shield_type = self.shield_types[self.type]
         return True
 
-    def print_mastery(self, who):
-        message = [
-            f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.']
-        return message
+    def get_mastery_string(self, who):
+        return f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.'
 
-    def place(self, castle, room=None):
+    
+    def place(self, floor, room=None):
         if not room:
-            rooms = []
-            for i in castle.plan:
-                if len(i.furniture) > 0:
-                    rooms.append(i)
-            room = randomitem(rooms, False)
+            room = floor.get_random_room_with_furniture()
         furniture = randomitem(room.furniture, False)
         furniture.put(self)
         return True

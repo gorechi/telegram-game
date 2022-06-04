@@ -298,3 +298,18 @@ class Floor:
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
         pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
+        
+    
+    def get_random_room_with_furniture(self) -> Room:
+    
+        """ Метод возвращает случайную комнату с мебелью. """
+    
+        rooms = [a for a in self.plan if (bool(a.furniture))]
+        return randomitem(rooms, False)
+    
+    def get_random_unlocked_room(self) -> Room:
+        
+        """ Метод возвращает случайную незапертую комнату. """
+        
+        rooms = [a for a in self.plan if (not a.locked)]
+        return randomitem(rooms, False)

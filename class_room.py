@@ -1,4 +1,5 @@
 from random import randint as dice
+from typing import NoReturn
 
 from class_basic import Loot, Money
 from class_items import Key
@@ -284,4 +285,32 @@ class Room:
             if not door.empty:
                 door.locked = True
         self.locked = True
+        return None
+    
+    def turn_on_light(self, who) -> NoReturn:
+        
+        """Метод зажигания в комнате света. """
+        
+        self.light = True
+        self.torch = True
+        monster = self.monsters('first')
+        message = [
+                f'{who.name} зажигает факел и комната озаряется светом']
+        if monster:
+            if monster.frightening:
+                message.append(
+                        f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
+                who.fear += 1
+        tprint(self.game, message)
+        self.show(who)
+        self.map()
+        if monster:
+            if monster.agressive:
+                who.fight(monster.name, True)
+                
+    
+    def get_random_unlocked_furniture(self) -> Furniture:
+        if bool(self.furniture):
+            furniture_list = [f for f in self.furniture if not f.locked]
+            return randomitem(furniture_list, neednumber=False)
         return None
