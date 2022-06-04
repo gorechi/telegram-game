@@ -492,6 +492,7 @@ class Monster:
                 return False
             room = randomitem(empty_rooms, False)
         self.room = room
+        self.current_position = room.position
         floor.monsters_in_rooms[room].append(self)
         if old_place:
             floor.monsters_in_rooms[old_place].remove(self)
