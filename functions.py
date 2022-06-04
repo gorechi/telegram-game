@@ -127,7 +127,7 @@ def tprint(game, text, state=''):
         markup = types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
         can_use = []
-        for i in game.player.pockets:
+        for i in game.player.backpack:
             if i.can_use_in_fight:
                 can_use.append(i)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)

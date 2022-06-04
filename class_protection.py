@@ -105,7 +105,7 @@ class Protection:
             who.shield = self
             tprint(self.game, f'{who.name} использует {self.name1} как защиту.')
         else:
-            self.game.player.pockets.append(self)
+            self.game.player.backpack.append(self)
             tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     
@@ -123,9 +123,9 @@ class Protection:
         if who_using.shield == '':
             who_using.shield = self
         else:
-            who_using.pockets.append(who_using.shield)
+            who_using.backpack.append(who_using.shield)
             who_using.shield = self
-            who_using.pockets.remove(self)
+            who_using.backpack.remove(self)
         tprint(self.game, f'{who_using.name} теперь использует {self.name1} в качестве защиты!')
 
 #Класс Доспех (подкласс Защиты)
