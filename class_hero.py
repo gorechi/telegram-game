@@ -24,16 +24,16 @@ class Hero:
                  actions=None,
                  weapon=None,
                  shield=None,
-                 pockets=None,
+                 backpack=None,
                  armor=None):
         if actions is None:
             self.actions = ['бьет']
         else:
             self.actions = actions
-        if pockets is None:
-            self.pockets = []
+        if backpack is None:
+            self.backpack = []
         else:
-            self.pockets = pockets
+            self.backpack = backpack
         self.game = game
         self.name = name
         self.name1 = name1
@@ -235,8 +235,8 @@ class Hero:
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
             message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
-        self.pockets.remove(second_weapon)
-        self.pockets.append(self.weapon)
+        self.backpack.remove(second_weapon)
+        self.backpack.append(self.weapon)
         self.weapon = second_weapon
         tprint(self.game, message)
         
@@ -251,7 +251,7 @@ class Hero:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
-        self.pockets.remove(second_weapon)
+        self.backpack.remove(second_weapon)
         self.weapon = second_weapon
         tprint(self.game, message)
         
@@ -300,10 +300,10 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         digit = int(digit)
-        if digit - 1 < len(self.pockets):
-            i = self.pockets[digit - 1]
+        if digit - 1 < len(self.backpack):
+            i = self.backpack[digit - 1]
             room.loot.add(i)
-            self.pockets.remove(i)
+            self.backpack.remove(i)
             tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
             return True
         else:
@@ -355,11 +355,11 @@ class Hero:
         
         game = self.game
         item_to_drop = None
-        for i in self.pockets:
+        for i in self.backpack:
             if item in [i.name.lower(), i.name1.lower()]:
                 item_to_drop = i
         if item_to_drop:
-            self.pockets.remove(item_to_drop)
+            self.backpack.remove(item_to_drop)
             tprint(game, f'{self.name} бросает {item_to_drop.name} на пол комнаты.')
             return True
         else:
@@ -409,13 +409,13 @@ class Hero:
         """
         
         steal_count = dice(1, s_steal_probability)
-        if steal_count == 1 and len(self.pockets) > 0:
+        if steal_count == 1 and len(self.backpack) > 0:
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
-            all_items = [item for item in self.pockets if (not isinstance(item, Key))]
+            all_items = [item for item in self.backpack if (not isinstance(item, Key))]
             if len(all_items) > 0:
                 item = randomitem(all_items)
-                self.pockets.remove(item)
+                self.backpack.remove(item)
                 stealing_monster.take(item)
                 return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
         return None
@@ -536,7 +536,7 @@ class Hero:
             return False
         
     
-    def what_in_pockets(self, item_class) -> list:
+    def what_in_backpack(self, item_class) -> list:
         """
         Метод возвращает список всех предметов определенного типа в рюкзаке героя
 
@@ -548,7 +548,7 @@ class Hero:
         
         """
         item_list = []
-        for item in self.pockets:
+        for item in self.backpack:
             if isinstance(item, item_class):
                 item_list.append(item)
         return item_list
@@ -563,7 +563,7 @@ class Hero:
         
         """
         
-        for i in self.pockets:
+        for i in self.backpack:
             if isinstance(i, Weapon):
                 return i
         return self.game.no_weapon
@@ -626,14 +626,14 @@ class Hero:
         
         room = self.floor.plan[self.current_position]
         items_list = []
-        a = dice(0, len(self.pockets))
+        a = dice(0, len(self.backpack))
         if a > 0:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
-                item = randomitem(self.pockets)
+                item = randomitem(self.backpack)
                 items_list.append(item.name1)
                 room.loot.add(item)
-                self.pockets.remove(item)
+                self.backpack.remove(item)
         return items_list
     
     
@@ -710,7 +710,7 @@ class Hero:
         """
         
         can_use = []
-        for i in self.pockets:
+        for i in self.backpack:
             if i.can_use_in_fight:
                 can_use.append(i)
         return can_use
@@ -882,7 +882,7 @@ class Hero:
         
         game = self.game
         can_use = []
-        for i in self.pockets:
+        for i in self.backpack:
             if i.can_use_in_fight:
                 can_use.append(i)
         if len(can_use) == 0:
@@ -1112,14 +1112,14 @@ class Hero:
         if not room.light:
             message.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
         else:
-            if len(self.pockets) == 0 and self.money == 0:
+            if len(self.backpack) == 0 and self.money == 0:
                 message.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
             else:
                 message.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
-                for i in range(len(self.pockets)):
-                    description = f'{str(i + 1)}: {self.pockets[i].show()}'
-                    if isinstance(self.pockets[i], Weapon):
-                        weapon = self.pockets[i]
+                for i in range(len(self.backpack)):
+                    description = f'{str(i + 1)}: {self.backpack[i].show()}'
+                    if isinstance(self.backpack[i], Weapon):
+                        weapon = self.backpack[i]
                         weapon_mastery = self.weapon_mastery[weapon.type]['level']
                         if weapon_mastery > 0:
                             description += f', мастерство - {weapon_mastery}'
@@ -1460,7 +1460,7 @@ class Hero:
     def get_key_from_backpack(self) -> Key:
         """Метод возвращает случайный ключ из рюкзака героя."""
         
-        for i in self.pockets:
+        for i in self.backpack:
             if isinstance(i, Key):
                 return i
         return None
@@ -1515,7 +1515,7 @@ class Hero:
                 {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
             return False
         furniture = what_is_locked[0]
-        self.pockets.remove(key)
+        self.backpack.remove(key)
         furniture.locked = False
         tprint(game, f'{self.name} отпирает {furniture.name1} ключом.')
         return True
@@ -1532,7 +1532,7 @@ class Hero:
             tprint(game, 'В той стороне нечего открывать.')
             return False
         else:
-            self.pockets.remove(key)
+            self.backpack.remove(key)
             door.locked = False
             tprint(game, f'{self.name} открывает дверь.')
             return True
@@ -1566,12 +1566,12 @@ class Hero:
         game = self.game
         if item.isdigit():
             item_index = int(item) - 1
-            if item_index < len(self.pockets):
-                i = self.pockets[item_index]
+            if item_index < len(self.backpack):
+                i = self.backpack[item_index]
                 i.use(self, False)
                 return True
         else:
-            for i in self.pockets:
+            for i in self.backpack:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     i.use(self, in_action=False)
                     return True
@@ -1596,7 +1596,7 @@ class Hero:
         
         game = self.game
         room = self.floor.plan[self.current_position]
-        rune_list = self.what_in_pockets(Rune)
+        rune_list = self.what_in_backpack(Rune)
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
             return False
@@ -1639,10 +1639,10 @@ class Hero:
             return True
         if item.isdigit():
             item_index = int(item) - 1
-            if item_index <= len(self.pockets):
-                selected_item = self.pockets[item_index]
+            if item_index <= len(self.backpack):
+                selected_item = self.backpack[item_index]
         else:
-            for i in self.pockets:
+            for i in self.backpack:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     selected_item = i
         if isinstance(selected_item, Weapon):
@@ -1669,7 +1669,7 @@ class Hero:
             return False
         if not self.chose_what_to_enchant(item=item):
             return False
-        rune_list = self.what_in_pockets(Rune)
+        rune_list = self.what_in_backpack(Rune)
         text = []
         text.append(f'{self.name} может использовать следующие руны:')
         for rune in rune_list:
@@ -1705,7 +1705,7 @@ class Hero:
         
         game = self.game
         books = []
-        for i in self.pockets:
+        for i in self.backpack:
             if isinstance(i, Book):
                 books.append(i)
         if not bool(books):
@@ -1734,7 +1734,7 @@ class Hero:
             message.append(book.get_mastery_string(self))
             message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
             self.weapon_mastery[book.weapon_type]['level'] += 1
-            self.pockets.remove(book)
+            self.backpack.remove(book)
         else:
             message = 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.'
         tprint(self.game, message)

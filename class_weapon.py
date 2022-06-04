@@ -148,7 +148,7 @@ class Weapon:
                 who.weapon = self
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
-                who.pockets.append(self)
+                who.backpack.append(self)
         tprint(game, message)
 
     def show(self):
@@ -166,9 +166,9 @@ class Weapon:
         if who.weapon.empty:
             who.weapon = self
         else:
-            who.pockets.append(who.weapon)
+            who.backpack.append(who.weapon)
             who.weapon = self
-            who.pockets.remove(self)
+            who.backpack.remove(self)
             message = [f'{who.name} теперь использует {self.name1} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield

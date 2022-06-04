@@ -75,7 +75,7 @@ class Rune:
         
         """ Метод вызывается когда кто-то забирает руну себе. """
         
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     def show(self) -> str:
@@ -117,7 +117,7 @@ class Spell:
     def take(self, who=''):
         if who == '':
             return False
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
 
 
@@ -161,7 +161,7 @@ class Matches:
         
         if not who:
             return False
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
         return True
 
@@ -245,7 +245,7 @@ class Map:
         
         """ Метод вызывается когда кто-то забирает карту себе. """
         
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
 
@@ -279,7 +279,7 @@ class Key:
 
 
     def take(self, who):
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
         return True
 
@@ -422,11 +422,11 @@ class Potion:
             return False
         result = functions_list[self.type](who_using=who_using)
         if result:
-            who_using.pockets.remove(self)
+            who_using.backpack.remove(self)
         return result
 
     def take(self, who):
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
         return True
 
@@ -480,6 +480,6 @@ class Book:
             return who_using.read(self)
 
     def take(self, who):
-        who.pockets.append(self)
+        who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
         return True
