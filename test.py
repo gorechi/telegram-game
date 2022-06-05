@@ -1,4 +1,4 @@
-a = [1]
+a = ' sdfsf sdfs fs sdf sf sf sdf sf sdf sdf'
 
-print(bool(a))
+print(a[1::])
 

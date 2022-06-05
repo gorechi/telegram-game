@@ -936,6 +936,7 @@ class Hero:
             if self.weapon_mastery[mastery]['level'] > 0:
                 mastery_text += f' {mastery} ({self.weapon_mastery[mastery]["level"]})'
         if mastery_text:
+            mastery_text = mastery_text[1::]
             text = f'{self.g(["Герой", "Героиня"])} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
             return text
         return ''
