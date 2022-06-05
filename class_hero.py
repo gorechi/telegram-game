@@ -1033,7 +1033,7 @@ class Hero:
         Метод сбрасывает состояние героя при его проигрыше в бою
 
         Входящие параметры:
-        - winner - атакующий монстр.
+        - winner - атакующий монстр (пока не используется).
         
         """
         self.health = self.start_health
@@ -1056,7 +1056,7 @@ class Hero:
 
     
     def gain_experience (self, exp:int):
-        """Метод увеличения опыта героя после."""
+        """Метод увеличения опыта героя после схватки."""
         
         self.exp += exp
         if self.exp > self.levels[self.level]:
@@ -1142,7 +1142,8 @@ class Hero:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
             what_position = room.position + self.floor.directions_dict[direction]
-            message = self.floor.plan[what_position].show_through_key_hole(self)
+            room_behind_the_door = self.floor.plan[what_position]
+            message = room_behind_the_door.show_through_key_hole(self)
         tprint(self.game, message)
         return True
        
@@ -1346,7 +1347,7 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         if room.secret_word.lower() == item.lower():
-            if len(room.secret_loot.pile) == 0:
+            if not bool(room.secret_loot.pile):
                 tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
             else:
                 message = []

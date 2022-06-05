@@ -1,12 +1,10 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 from random import randint
 
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
+from settings import s_command_markup_dict
 
-# Функции
 
 def roll(dice):
     """Функция имитирует бросок нескольких кубиков сразу
@@ -120,57 +118,71 @@ def readitems(what_kind, how_many, classes):
     return items_list
 
 
+def get_fight_markup(game):
+    can_use = []
+    for i in game.player.backpack:
+        if i.can_use_in_fight:
+            can_use.append(i)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+    markup.add(types.KeyboardButton('ударить'))
+    if not game.player.shield.empty:
+        markup.add(types.KeyboardButton('защититься'))
+    if bool(can_use):
+        markup.add(types.KeyboardButton('использовать'))
+    markup.add(types.KeyboardButton('бежать'))
+    if not game.player.weapon.empty and game.player.second_weapon():
+        markup.add(types.KeyboardButton('сменить оружие'))
+    return markup
+
+
+def get_direction_markup():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4, one_time_keyboard=False)
+    for item in ['идти вверх', 'идти вниз', 'идти налево', 'идти направо']:
+        markup.add(types.KeyboardButton(item), row_width=4)
+    return markup
+
+
+def get_levelup_markup():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
+    for item in ['здоровье', 'силу', 'ловкость', 'интеллект']:
+        markup.add(types.KeyboardButton(item))
+    return markup    
+
+
+def get_cancel_markup():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
+    markup.add(types.KeyboardButton('Отмена'))
+    return markup
+
+
+def get_markup(game, state:str):
+    if state == 'off':
+        return types.ReplyKeyboardRemove(selective=False)
+    elif state == 'fight':
+        return get_fight_markup(game)
+    elif state == 'direction':
+        return get_direction_markup()
+    elif state == 'levelup':
+        return get_levelup_markup()
+    elif state in ['enchant', 'use_in_fight']:
+        return get_cancel_markup()
+    else:
+        return ''
+
+
 def tprint(game, text, state=''):
     if not bool(text):
         return False
-    if state == 'off':
-        markup = types.ReplyKeyboardRemove(selective=False)
-    elif state == 'fight':
-        can_use = []
-        for i in game.player.backpack:
-            if i.can_use_in_fight:
-                can_use.append(i)
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-        item1 = types.KeyboardButton('ударить')
-        item2 = types.KeyboardButton('')
-        item3 = types.KeyboardButton('')
-        item5 = types.KeyboardButton('')
-        if not game.player.shield.empty:
-            item2 = types.KeyboardButton('защититься')
-        if len(can_use) > 0:
-            item3 = types.KeyboardButton('использовать')
-        item4 = types.KeyboardButton('бежать')
-        if not game.player.weapon.empty and game.player.second_weapon():
-            item5 = types.KeyboardButton('сменить оружие')
-        markup.add(item1, item2, item3, item4, item5)
-    elif state == 'direction':
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-        item1 = types.KeyboardButton('идти вверх')
-        item2 = types.KeyboardButton('идти вниз')
-        item3 = types.KeyboardButton('идти налево')
-        item4 = types.KeyboardButton('идти направо')
-        markup.add(item1, item2, item3, item4)
-    elif state == 'levelup':
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-        item1 = types.KeyboardButton('Здоровье')
-        item2 = types.KeyboardButton('Силу')
-        item3 = types.KeyboardButton('Ловкость')
-        item4 = types.KeyboardButton('Интеллект')
-        markup.add(item1, item2, item3, item4)
-    elif state in ['enchant', 'use_in_fight']:
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
-        item1 = types.KeyboardButton('Отмена')
-        markup.add(item1)
-    else:
-        markup = ''
+    markup = get_markup(game, state)
     if isinstance(text, str):
-        game.bot.send_message(game.chat_id, text, reply_markup=markup)
+        text_to_print = text
     elif isinstance(text, list):
         final_text = ''
         for line in text:
             if line:
                 final_text = final_text + str(line) + '\n'
-        game.bot.send_message(game.chat_id, final_text.rstrip('\n'), reply_markup=markup)
+        text_to_print = final_text.rstrip('\n')
+    game.bot.send_message(game.chat_id, text_to_print, reply_markup=markup)
 
 
 def pprint(game, text, width=200, height=200, color='#FFFFFF'):
