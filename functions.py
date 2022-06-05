@@ -144,14 +144,14 @@ def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
     keys.append('бежать')
     if not game.player.weapon.empty and game.player.second_weapon():
         keys.append('сменить оружие')
-    keyboard = generate_keyboard(keys=keys, keys_in_row=2)
+    keyboard = list(generate_keyboard(keys=keys, keys_in_row=2))
     markup.keyboard = keyboard
     return markup
 
 
 def get_direction_markup() -> types.ReplyKeyboardMarkup:
     keyboard = [['идти вверх', 'идти вниз'], ['идти налево', 'идти направо']]
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4, one_time_keyboard=False)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
     markup.keyboard = keyboard
     return markup
 
