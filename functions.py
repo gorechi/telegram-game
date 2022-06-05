@@ -3,8 +3,6 @@ from random import randint
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
-from settings import s_command_markup_dict
-
 
 def roll(dice):
     """Функция имитирует бросок нескольких кубиков сразу
@@ -118,38 +116,54 @@ def readitems(what_kind, how_many, classes):
     return items_list
 
 
-def get_fight_markup(game):
+def generate_keyboard(keys:list, keys_in_row:int) -> list:
+    for i in range(0, len(keys), keys_in_row):
+        yield keys[i : i + keys_in_row]
+
+
+def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
+    
+    """ 
+    Функция генерирует раскладку клавиатуры для схватки. 
+    Функция получает на вход объект игры. Раскладка генерируется динамически 
+    в зависимости от различных состояний героя. 
+    
+    """
+    
+    keys = []
     can_use = []
     for i in game.player.backpack:
         if i.can_use_in_fight:
             can_use.append(i)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-    markup.add(types.KeyboardButton('ударить'))
+    keys.append('ударить')
     if not game.player.shield.empty:
-        markup.add(types.KeyboardButton('защититься'))
+        keys.append('защититься')
     if bool(can_use):
-        markup.add(types.KeyboardButton('использовать'))
-    markup.add(types.KeyboardButton('бежать'))
+        keys.append('использовать')
+    keys.append('бежать')
     if not game.player.weapon.empty and game.player.second_weapon():
-        markup.add(types.KeyboardButton('сменить оружие'))
+        keys.append('сменить оружие')
+    keyboard = generate_keyboard(keys=keys, keys_in_row=2)
+    markup.keyboard = keyboard
     return markup
 
 
-def get_direction_markup():
+def get_direction_markup() -> types.ReplyKeyboardMarkup:
+    keyboard = [['идти вверх', 'идти вниз'], ['идти налево', 'идти направо']]
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4, one_time_keyboard=False)
-    for item in ['идти вверх', 'идти вниз', 'идти налево', 'идти направо']:
-        markup.add(types.KeyboardButton(item), row_width=4)
+    markup.keyboard = keyboard
     return markup
 
 
-def get_levelup_markup():
+def get_levelup_markup() -> types.ReplyKeyboardMarkup:
+    keyboard = [['здоровье', 'силу'], ['ловкость', 'интеллект']]
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
-    for item in ['здоровье', 'силу', 'ловкость', 'интеллект']:
-        markup.add(types.KeyboardButton(item))
+    markup.keyboard = keyboard
     return markup    
 
 
-def get_cancel_markup():
+def get_cancel_markup() -> types.ReplyKeyboardMarkup:
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
     markup.add(types.KeyboardButton('Отмена'))
     return markup
