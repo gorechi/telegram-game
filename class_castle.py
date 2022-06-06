@@ -304,7 +304,7 @@ class Floor:
     
         """ Метод возвращает случайную комнату с мебелью. """
     
-        rooms = [a for a in self.plan if (bool(a.furniture))]
+        rooms = [a for a in self.plan if a.furniture]
         return randomitem(rooms, False)
     
     def get_random_unlocked_room(self) -> Room:

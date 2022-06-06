@@ -32,7 +32,16 @@ def readfile(filename, divide, divider='|'):
 # Функция генерирует описание сторон схватки.
 # На вход получает объекты сторон (например, героя и монстра), а также замок, в котором происходит схватка.
 # Возвращает список, состоящий из строк, описывающих стороны схватки.
-def showsides(side1, side2, castle):
+def showsides(side1, side2, castle) -> list:
+    
+    """
+    Функция генерирует описание сторон схватки. 
+    На вход получает объекты сторон (например, героя и монстра), 
+    а также замок, в котором происходит схватка. 
+    Возвращает список, состоящий из строк, описывающих стороны схватки.
+    
+    """
+    
     room = castle.plan[side1.current_position]
     message = []
     line = f'{side1.name}: сила - d{str(side1.stren)}'
@@ -139,7 +148,7 @@ def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
     keys.append('ударить')
     if not game.player.shield.empty:
         keys.append('защититься')
-    if bool(can_use):
+    if can_use:
         keys.append('использовать')
     keys.append('бежать')
     if not game.player.weapon.empty and game.player.second_weapon():
@@ -185,7 +194,7 @@ def get_markup(game, state:str):
 
 
 def tprint(game, text, state=''):
-    if not bool(text):
+    if not text:
         return False
     markup = get_markup(game, state)
     if isinstance(text, str):

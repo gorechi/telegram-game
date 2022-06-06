@@ -239,7 +239,7 @@ class Room:
 
     def monsters(self, mode=None):
         all_monsters = self.floor.monsters_in_rooms[self]
-        if bool(all_monsters):
+        if all_monsters:
             if mode == 'random':
                 return randomitem(all_monsters, False)
             elif mode == 'first':
@@ -310,7 +310,7 @@ class Room:
                 
     
     def get_random_unlocked_furniture(self) -> Furniture:
-        if bool(self.furniture):
+        if self.furniture:
             furniture_list = [f for f in self.furniture if not f.locked]
             return randomitem(furniture_list, neednumber=False)
         return None

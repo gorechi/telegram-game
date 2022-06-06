@@ -1221,7 +1221,7 @@ class Hero:
             tprint(game, self.look_at_shield())
         if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
             tprint(game, self.look_at_armor())
-        if bool([f for f in room.furniture if f.name1 == what]):
+        if [f for f in room.furniture if f.name1 == what]:
             tprint(game, self.look_at_furniture(what=what))
 
     
@@ -1348,7 +1348,7 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         if room.secret_word.lower() == item.lower():
-            if not bool(room.secret_loot.pile):
+            if not room.secret_loot.pile:
                 tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
             else:
                 message = []
@@ -1509,7 +1509,7 @@ class Hero:
         room = self.floor.plan[self.current_position]
         what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
         key = self.get_key_from_backpack()
-        if not bool(what_is_locked):
+        if not what_is_locked:
             tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
             return False
         if len(what_is_locked) > 1:
@@ -1710,7 +1710,7 @@ class Hero:
         for i in self.backpack:
             if isinstance(i, Book):
                 books.append(i)
-        if not bool(books):
+        if not books:
             return None
         if not item or item == 'книгу':
             book = randomitem(books, False)

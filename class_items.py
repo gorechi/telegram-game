@@ -57,7 +57,7 @@ class Rune:
             room = randomitem(rooms, False)
         if room in rooms_with_secrets:
             room.secret_loot.add(self)
-        elif bool(room.furniture):
+        elif room.furniture:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
@@ -147,7 +147,7 @@ class Matches:
         if not room:
             rooms = [i for i in castle.plan if not i.locked and i.light]
             room = randomitem(rooms, False)
-        if bool(room.furniture):
+        if room.furniture:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
@@ -194,7 +194,7 @@ class Map:
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
-        if bool(room.furniture):
+        if room.furniture:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
@@ -318,7 +318,7 @@ class Potion:
         if not room:
             rooms = castle.plan
             room = randomitem(rooms, False)
-        if bool(room.furniture):
+        if room.furniture:
             furniture = randomitem(room.furniture, False)
             furniture.put(self)
         else:
