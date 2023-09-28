@@ -71,7 +71,7 @@ def showsides(side1, side2, castle) -> list:
         message.append(f'В темноте кто-то есть, но {side1.name} не понимает кто это.')
     return message
 
-def randomitem(list, neednumber=False, how_many=1):
+def randomitem(list, neednumber=False, how_many:int=1):
     """Возвращает случайные элементы списка
 
     Args:
@@ -80,17 +80,16 @@ def randomitem(list, neednumber=False, how_many=1):
         howMany (integer) - число случайных элементов списка, которые нужно вернуть\n
 
     Returns:
-        Если howMany = 1, возвращается список, состоящий из одного случайного элемента списка list\n
+        Если howMany = 1, возвращается один случайный элемент списка list\n
         Если howMany > 1, возвращается список из howMany случайных элементов списка list. Элементы не повторяются.
     """
     if len(list) == 0:
-        return []
-    if not how_many or int(how_many) < 2:
+        return None
+    if not how_many or how_many < 2:
         a = randint(0, len(list) - 1)
-        if not neednumber:
-            return list[a]
-        else:
+        if neednumber:
             return list[a], a
+        return list[a]
     else:
         result = []
         while how_many > 0:

@@ -1,4 +1,5 @@
 from random import randint as dice
+from typing import List
 
 from class_items import Book, Key, Money, Rune
 from class_monsters import Monster
@@ -502,7 +503,7 @@ class Hero:
             tprint(self.game, f'{self.name} не может чинить что-нибудь. \
                 Нужно понимать, какую вещь ремонтировать.')
             return False
-        if self.shield.check_name(what) or self.removed_shield.chaeck_name(what):
+        if self.shield.check_name(what) or self.removed_shield.check_name(what):
             return self.repair_shield()
         tprint(self.game, f'{self.name} не умеет чинить такие штуки.')
         return False
@@ -779,7 +780,7 @@ class Hero:
         
         target_defence = target.defence(self)
         if target_defence < 0 or total_attack < target_defence:
-                return 0, target_defence
+            return 0, target_defence
         else:
             return total_attack - target_defence, target_defence
         
@@ -1304,7 +1305,7 @@ class Hero:
         """Метод обыскивания комнаты."""
         
         room = self.floor.plan[self.current_position]
-        message =[]
+        message = []
         if self.check_monster_in_ambush(place=room):
             return False
         for furniture in room.furniture:
@@ -1461,7 +1462,6 @@ class Hero:
     
     def get_key_from_backpack(self) -> Key:
         """Метод возвращает случайный ключ из рюкзака героя."""
-        
         for i in self.backpack:
             if isinstance(i, Key):
                 return i
@@ -1650,7 +1650,7 @@ class Hero:
         if isinstance(selected_item, Weapon):
                     game.selected_item = selected_item
                     return True
-        tprint(game, f'{self.name} не улучшать такую штуку.')
+        tprint(game, f'{self.name} не умеет улучшать такую штуку.')
         return False
     
     
@@ -1695,6 +1695,32 @@ class Hero:
         return True
     
     
+    def get_items_from_backpack(self, item_class, mode:str=None):
+        """
+        Метод извлечения всх определенных вещей из рюкзака героя.
+        На вход передается:
+        - item_class - класс вещей, список которых надо сформировать
+        - mode - что возвращается:
+            - если значение не передано, возвращается массив вещей
+            - 'first' - возвращается первая вещь
+            - 'random' - возвращается случайная вещь
+        
+        Если в рюкзаке есть нужные вещи, то возвращается их массив.
+        Если в рюкзаке нет таких вещей, возращается None.
+        
+        """
+        
+        items = [i for i in self.backpack if isinstance(i, item_class)]
+        if not items:
+            return None
+        if mode == 'first':
+            return items[0]
+        if mode == 'random':
+            return randomitem(items)
+        if not mode:
+            return items
+    
+    
     def get_book(self, item:str) -> Book:
         """
         Метод поиска книги в рюкзаке.
@@ -1706,23 +1732,21 @@ class Hero:
         """
         
         game = self.game
-        books = []
-        for i in self.backpack:
-            if isinstance(i, Book):
-                books.append(i)
-        if not books:
-            return None
         if not item or item == 'книгу':
-            book = randomitem(books, False)
-            tprint(game, f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.')
+            book = self.get_items_from_backpack(Book, mode='random')
+            if book:
+                tprint(game, f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.')
             return book
         else:
+            books = self.get_items_from_backpack(Book)
+            if not books:
+                return None
+            book = None
             for i in books:
                 if item.lower() in [i.name.lower(), i.name1.lower()]:
                     book = i
                     tprint(game, f'{self.name} читает {book.name1}.')
-                    return book
-        return None    
+                    return book 
     
     
     def read(self, what:str) -> bool:
