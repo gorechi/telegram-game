@@ -1312,8 +1312,7 @@ class Hero:
             message.append(str(furniture))
         if not room.loot.empty and len(room.loot.pile) > 0:
             message.append('В комнате есть:')
-            for i in room.loot.pile:
-                message.append(i.name.capitalize())
+            message += room.loot.show_sorted()
         else:
             message.append('В комнате нет ничего интересного.')
         tprint(self.game, message)
@@ -1354,10 +1353,10 @@ class Hero:
             else:
                 message = []
                 message.append(f'{self.name} осматривает {item} и находит:')
+                message += room.secret_loot.show_sorted()
                 for i in room.secret_loot.pile:
-                    message.append(i.name.capitalize())
                     room.loot.add(i)
-                    message.append('Все, что было спрятано, теперь лежит на виду.')
+                message.append('Все, что было спрятано, теперь лежит на виду.')
                 tprint(game, message)
             return True
         return False
@@ -1390,8 +1389,8 @@ class Hero:
             tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
             return False
         message = [f'{self.name} осматривает {what.name1} и находит:']
+        message += room.secret_loot.show_sorted()
         for i in what.loot.pile:
-            message.append(i.name.capitalize())
             room.loot.add(i)
         message.append('Все, что было спрятано, теперь лежит на виду.')
         tprint(self.game, message)

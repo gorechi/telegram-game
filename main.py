@@ -13,6 +13,7 @@ game_sessions = {}
 # Запускаем бота
 bot = telebot.TeleBot(TOKEN)
 
+
 #Функции бота
 
 @bot.message_handler(commands=['start', 'старт', 's'])

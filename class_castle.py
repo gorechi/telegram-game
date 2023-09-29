@@ -182,6 +182,9 @@ class Floor:
         new_map.place(self) 
         matches = Matches(game)
         matches.place(self)
+        for i in range(5):
+            new_key = Key(game)
+            self.plan[0].loot.add(new_key) 
 
     
     def secret_rooms(self):

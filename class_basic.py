@@ -1,5 +1,5 @@
 from functions import howmany, tprint
-from settings import s_money_groups
+from settings import s_money_groups, s_money_piles
 
 
 class Loot:
@@ -19,26 +19,42 @@ class Loot:
     
     def __eq__(self, other) -> bool:
         if isinstance(other, int):
-            return len(self.pile) == other 
-
+            return len(self.pile) == other
+    
+    def show_sorted(self) -> list:
+        items = self.pile
+        items_dict = {}
+        sorted_list = []
+        for item in items:
+            item_name = item.name.capitalize()
+            if item_name in items_dict.keys():
+                items_dict[item_name] += 1
+            else:
+                items_dict[item_name] = 1
+        for item in items_dict:
+            if items_dict[item] == 1:
+                sorted_list.append(item)
+            else:
+                quantity = howmany(items_dict[item], 'штука,штуки,штук')
+                sorted_list.append(f'{item} ({quantity})')
+        return sorted_list 
 
 class Money:
     def __init__(self, game, how_much_money):
         self.game = game
         self.how_much_money = how_much_money
         self.empty = False
+        money_pile = 0
         if 0 < self.how_much_money <= s_money_groups[0]:
-            self.name = 'Несколько монет'
-            self.name1 = 'Несколько монет'
+            money_pile = 0
         elif s_money_groups[0] < self.how_much_money <= s_money_groups[1]:
-            self.name = 'Кучка монет'
-            self.name1 = 'Кучку монет'
+            money_pile = 1
         elif s_money_groups[1] < self.how_much_money <= s_money_groups[2]:
-            self.name = 'Груда монет'
-            self.name1 = 'Груду монет'
+            money_pile = 2
         elif s_money_groups[2] < self.how_much_money:
-            self.name = 'Много монет'
-            self.name1 = 'Много монет'
+            money_pile = 3
+        self.name = s_money_piles[money_pile][0]
+        self.name1 = s_money_piles[money_pile][1]
 
     def __repr__(self):
         return str(self.how_much_money)
