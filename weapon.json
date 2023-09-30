@@ -8,6 +8,7 @@
     "twohanded": true,
     "type": "рубящее",
     "hit_chance": 7,
+    "enchatable": true,
     "actions":
       [
       "крушит",
@@ -24,6 +25,7 @@
     "twohanded": true,
     "type": "рубящее",
     "hit_chance": 5,
+    "enchatable": true,
     "actions":
       [
       "крушит",
@@ -39,6 +41,7 @@
     "twohanded": true,
     "type": "ударное",
     "hit_chance": 4,
+    "enchatable": true,
     "actions":
       [
       "крушит",

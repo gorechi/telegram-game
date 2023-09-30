@@ -6,7 +6,7 @@ from settings import *
 
 
 class Weapon:
-    def __init__(self, game, name=None, name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None):
+    def __init__(self, game, name=None, name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None, enchantable=True):
         self.game = game
         if name:
             self.name = name
@@ -15,6 +15,7 @@ class Weapon:
             self.twohanded = False
             self.type = ''
             self.hit_chance = 0
+            self.enchatable = enchantable
         else:
             n1 = s_weapon_first_words_dictionary
             n2 = []
@@ -30,6 +31,10 @@ class Weapon:
             self.twohanded = n2[a2][4]
             self.gender = n2[a2][1]
             self.hit_chance = n2[a2][5]
+            if dice(0, s_enchantable_die) == 1:
+                self.enchatable = False
+            else:
+                self.enchatable = True
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.runes = []
@@ -81,7 +86,7 @@ class Weapon:
         return False
     
     def enchant(self, rune):
-        if len(self.runes) > 1 or self.empty:
+        if len(self.runes) > 1 or self.empty or not self.enchatable:
             return False
         else:
             self.runes.append(rune)
