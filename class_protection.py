@@ -6,7 +6,7 @@ from settings import *
 
 
 class Protection:
-    def __init__(self, game, name='', name1='защиту', protection=1, actions='', empty=False):
+    def __init__(self, game, name='', name1='защиту', protection=1, actions='', empty=False, enchantable=True):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -69,7 +69,7 @@ class Protection:
         return protection
 
     def enchant(self, rune):
-        if len(self.runes) > 1 or self.empty:
+        if len(self.runes) > 1 or self.empty or not self.enchantable:
             return False
         else:
             self.runes.append(rune)
@@ -130,12 +130,13 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, game, name='', name1='доспех', protection=1, actions='', empty=False):
+    def __init__(self, game, name='', name1='доспех', protection=1, actions='', empty=False, enchantable=True):
         self.game = game
         if name != 0:
             self.name = name
             self.name1 = name1
             self.protection = int(protection)
+            self.enchantable = enchantable
         else:
             n1 = [['Большой', 'Большая', 'Большой', 'Большую'],
                   ['Малый', 'Малая', 'Малый', 'Малую'],
@@ -151,6 +152,10 @@ class Armor(Protection):
             self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
             self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
             self.protection = dice(1, 3)
+            if dice(0, s_enchantable_die) == 1:
+                self.enchatable = False
+            else:
+                self.enchatable = True
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.empty = empty
@@ -189,12 +194,13 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, game, name='', name1='щит', protection=1, actions='', empty=False):
+    def __init__(self, game, name='', name1='щит', protection=1, actions='', empty=False, enchantable=True):
         self.game = game
         if name != 0:
             self.name = name
             self.name1 = name1
             self.protection = int(protection)
+            self.enchantable = enchantable
         else:
             n1 = ['Большой',
                   'Малый',
@@ -205,6 +211,10 @@ class Shield (Protection):
             self.name = n1[a1] + ' щит'
             self.name1 = self.name
             self.protection = dice(1, 3)
+            if dice(0, s_enchantable_die) == 1:
+                self.enchatable = False
+            else:
+                self.enchatable = True
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.empty = empty
