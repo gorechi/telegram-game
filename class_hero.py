@@ -1694,6 +1694,21 @@ class Hero:
         return True
     
     
+    def check_light(self) -> bool:
+        """Метод проверки, есть ли в комнате свет."""
+        
+        room = self.floor.plan[self.current_position]
+        if room.light:
+            return True
+        if self.weapon.element() in s_glowing_elements:
+            return True
+        if self.shield.element() in s_glowing_elements:
+            return True
+        if self.armor.element() in s_glowing_elements:
+            return True
+        return False
+    
+    
     def get_items_from_backpack(self, item_class, mode:str=None):
         """
         Метод извлечения всх определенных вещей из рюкзака героя.
