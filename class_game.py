@@ -67,7 +67,6 @@ class Game():
         TODO: Перевести параметр на ENUM. 
         """
         self.selected_item = self.empty_thing
-        self.game_is_on = False
         self.chat_id = chat_id
         self.bot = bot
         self.no_weapon = Weapon(self, empty=True)
