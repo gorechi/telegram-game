@@ -689,7 +689,7 @@ class Hero:
         tprint (self.game, message)
 
     
-    def get_target_name(self, room:Room, target:Monster) ->str:
+    def get_target_name(self, target:Monster) ->str:
         """
         Метод возвращает два имени противника - 
         в именительном и винительном падежах.
@@ -817,8 +817,7 @@ class Hero:
         
         message = []
         game = self.game
-        room = self.floor.plan[self.current_position]
-        target_name, target_name1 = self.get_target_name(room=room, target=target)
+        target_name, target_name1 = self.get_target_name(target=target)
         tprint(game, showsides(self, target, self.floor))
         self.hide = False
         total_attack = self.generate_total_attack(target=target)
