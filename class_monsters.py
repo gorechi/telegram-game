@@ -235,13 +235,12 @@ class Monster:
         return 1
         
             
-    def generate_mele_attack(self) -> int:
-        room = self.floor.plan[self.current_position]
+    def generate_mele_attack(self, target) -> int:
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
             poison_stren = 0
-        if room.light:
+        if target.check_light():
             return dice(1, self.stren - poison_stren)
         else:
             return dice(1, self.stren - poison_stren) // dice(1, s_dark_damage_divider_dice)
@@ -271,13 +270,12 @@ class Monster:
     
     def attack(self, target):
         game = self.game
-        room = self.floor.plan[self.current_position]
         message = []
-        if room.light:
+        if target.check_light():
             self_name = self.name
         else:
             self_name = s_monster_name_in_darkness
-        mele_attack = self.generate_mele_attack()
+        mele_attack = self.generate_mele_attack(target)
         weapon_attack = self.generate_weapon_attack(target=target)
         if weapon_attack > 0:
             message.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name1} и '
@@ -600,7 +598,7 @@ class Berserk(Monster):
         self.empty = False
    
     
-    def generate_mele_attack(self):
+    def generate_mele_attack(self, target):
         self.rage = (int(self.base_health) - int(self.health)) // s_berserk_rage_coefficient
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)

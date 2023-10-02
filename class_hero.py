@@ -577,12 +577,11 @@ class Hero:
         
         """
         
-        room = self.floor.plan[self.current_position]
         if target.frightening:
             fright_text = 'в ужасе '
         else:
             fright_text = ''
-        if room.light:
+        if self.check_light():
             message_text = f'{self.name} {fright_text}сбегает с поля боя.'
         else:
             message_text = f'{self.name} в кромешной тьме {fright_text}пытается убежать хоть куда-нибудь.'
@@ -674,7 +673,7 @@ class Hero:
         ]
         message += self.lose_random_items()        
         available_directions = self.get_available_directions(room=room)
-        if room.light:
+        if self.check_light():
             direction = randomitem(available_directions)
         else:
             direction = dice(0, 3)
@@ -697,7 +696,7 @@ class Hero:
         
         """
         
-        if room.light:
+        if self.check_light():
             return target.name, target.name1
         else:
             return 'Неизвестная тварь из темноты', 'черт знает кого'
@@ -720,8 +719,7 @@ class Hero:
     def generate_rage(self) -> int:
         """Метод генерирует значение ярости героя."""
         
-        room = self.floor.plan[self.current_position]
-        if room.light:
+        if self.check_light():
             if self.rage > 1:
                 rage = dice(2, self.rage)
             else:
@@ -744,10 +742,9 @@ class Hero:
     def generate_mele_attack(self) -> int:
         """Метод генерирует значение атаки голыми руками."""
         
-        room = self.floor.plan[self.current_position]
         rage = self.generate_rage()
         poison_strength = self.generate_poison_strength()
-        if room.light:
+        if self.check_light():
             mele_attack = dice(1, self.stren - poison_strength) * rage
         else:
             mele_attack = dice(1, self.stren - poison_strength) // dice(1, s_dark_damage_divider_dice)
@@ -1109,9 +1106,8 @@ class Hero:
     def backpack(self):
         """Метод генерирует описание рюкзака героя."""
         
-        room = self.floor.plan[self.current_position]
         message = []
-        if not room.light:
+        if not self.check_light():
             message.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
         else:
             if len(self.backpack) == 0 and self.money == 0:
@@ -1152,8 +1148,7 @@ class Hero:
     def look_at_shield(self) -> str:
         """Метод генерирует текст осмотра своего щита."""
         
-        room = self.floor.plan[self.current_position]
-        if not room.light:
+        if not self.check_light():
             return f'Из-за темноты нельзя осмотреть даже собственный щит.'
         else:
             return self.shield.show()
@@ -1161,8 +1156,7 @@ class Hero:
     def look_at_weapon(self) -> str:
         """Метод генерирует текст осмотра собственного оружия."""
         
-        room = self.floor.plan[self.current_position]
-        if not room.light:
+        if not self.check_light():
             return f'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
         else:
             return self.weapon.show()
@@ -1170,8 +1164,7 @@ class Hero:
     def look_at_armor(self) -> str:
         """Метод генерирует текст осмотра своих доспехов."""
         
-        room = self.floor.plan[self.current_position]
-        if not room.light:
+        if not self.check_light():
             return 'Так темно, что не видно, что на тебе надето.'
         else:
             return self.armor.show()
@@ -1194,7 +1187,7 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         monster = room.monsters(mode='first')
-        if not room.light:
+        if not self.check_light():
             tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
             return
         if not what:
@@ -1236,7 +1229,7 @@ class Hero:
         room = self.floor.plan[self.current_position]
         monster = room.monsters('first')
         if monster:
-            if monster.agressive and room.light:
+            if monster.agressive and self.check_light():
                 self.fight(monster.name, True)
     
     
@@ -1250,13 +1243,13 @@ class Hero:
             tprint(game, f'{self.name} не знает такого направления!')
             return False
         elif door.empty:
-            if room.light:
+            if self.check_light():
                 tprint(game, f'Там нет двери. {self.name} не может туда пройти!')
             else:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         elif door.locked:
-            if room.light:
+            if self.check_light():
                 tprint(game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
             else:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
@@ -1292,7 +1285,7 @@ class Hero:
             tprint(game, f'{game.player.name} начинает схватку!', 'fight')
             self.attack(who_is_fighting, 'атаковать')
         else:
-            if room.light:
+            if self.check_light():
                 message = [f'{who_is_fighting.name} начинает схватку!']
             else:
                 message = ['Что-то жуткое и непонятное нападает первым из темноты.']
@@ -1329,7 +1322,7 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         enemy_in_room = room.monsters('first')
-        if not room.light:
+        if self.check_light():
             tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
             return False
         if enemy_in_room:
@@ -1489,10 +1482,9 @@ class Hero:
         """Метод проверяет, может ли герой что-то открывать."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
         if self.check_fear():
             return False
-        if not room.light:
+        if not self.check_light():
             tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')
             return False
         key = self.get_key_from_backpack()
@@ -1596,7 +1588,6 @@ class Hero:
         """Метод проверки, может ли герой что-то улучшать."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
         rune_list = self.what_in_backpack(Rune)
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
@@ -1608,7 +1599,7 @@ class Hero:
         if len(rune_list) == 0:
             tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
             return False
-        if not room.light:
+        if not self.check_light():
             tprint(game, f'{self.name} не может ничего улучшать в такой темноте.')
             return False
         return True
@@ -1684,14 +1675,28 @@ class Hero:
         """Метод проверки, может ли герой сейчас читать."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
         if self.fear >= s_fear_limit:
             tprint(game, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.')
             return False
-        if not room.light:
+        if not self.check_light():
             tprint(game, f'{self.name} решает, что читать в такой темноте вредно для зрения.')
             return False
         return True
+    
+    
+    def check_light(self) -> bool:
+        """Метод проверки, есть ли в комнате свет."""
+        
+        room = self.floor.plan[self.current_position]
+        if room.light:
+            return True
+        if self.weapon.element() in s_glowing_elements:
+            return True
+        if self.shield.element() in s_glowing_elements:
+            return True
+        if self.armor.element() in s_glowing_elements:
+            return True
+        return False
     
     
     def get_items_from_backpack(self, item_class, mode:str=None):
