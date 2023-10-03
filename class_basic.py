@@ -11,6 +11,12 @@ class Loot:
     def __str__(self):
         return 'loot'
 
+    def __add__(self, other) -> bool:
+        if not isinstance(other, Loot):
+            return False
+        self.pile.extend(other.pile)
+        return True
+    
     def add(self, obj):
         self.pile.append(obj)
 

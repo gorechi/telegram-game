@@ -25,7 +25,8 @@ class Monster:
                  carry_shield=s_is_monster_carry_shield,
                  wear_armor=s_is_monster_wear_armor,
                  hit_chance=s_monster_hit_chance,
-                 parry_chance = s_monster_parry_chance):
+                 parry_chance=s_monster_parry_chance,
+                 corpse=True):
         self.game = game
         self.name = name
         self.name1 = name1
@@ -33,6 +34,7 @@ class Monster:
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.corpse = corpse
         self.floor = None
         self.run = False
         self.room = None
@@ -89,8 +91,8 @@ class Monster:
     
     def __str__(self):
         return self.name
-    
-    
+          
+        
     def g(self, words_list:list) -> str:
         """
         Метод выбирает слово из полученного списка
@@ -106,7 +108,7 @@ class Monster:
         Метод проводит проверку, отравил монстр противника при атаке, или нет.
 
         Параметры:
-        - who (obj Hero): Герой, которого атакует монстр
+        - target (obj Hero): Герой, которого атакует монстр
 
         """
         if target.poisoned:
@@ -344,23 +346,37 @@ class Monster:
     
     def finally_die(self) -> bool:
         room = self.room
-        if self.money > 0:
-            money = Money(self.game, self.money)
-            room.loot.add(money)
-            room.loot.pile.extend(self.loot.pile)
-        if not self.shield.empty:
-            room.loot.add(self.shield)
-        if not self.armor.empty:
-            room.loot.add(self.armor)
-        if not self.weapon.empty:
-            room.loot.add(self.weapon)
         self.floor.all_monsters.remove(self)
         self.floor.monsters_in_rooms[room].remove(self)
         self.game.how_many_monsters -= 1
         self.alive = False
+        self.become_a_corpse()
         return True
     
     
+    def become_a_corpse(self) -> bool:
+        if not self.corpse:
+            return False
+        self.gather_loot()
+        loot = self.loot
+        room = self.room
+        new_corpse = Corpse('труп', loot, room)
+        return True
+        
+    
+    def gather_loot(self):
+        loot = self.loot
+        if self.money > 0:
+            money = Money(self.game, self.money)
+            loot.add(money)
+        if not self.shield.empty:
+            loot.add(self.shield)
+        if not self.armor.empty:
+            loot.add(self.armor)
+        if not self.weapon.empty:
+            loot.add(self.weapon)
+
+        
     def lose(self, winner=None):
         result = dice(1, 10)
         if result < 6 or self.wounded or not self.can_run:
@@ -727,3 +743,17 @@ class Vampire(Monster):
         self.floor = floor
         return True
 
+
+class Corpse():
+    def __init__(self,
+                 name:str,
+                 loot:Loot,
+                 room):
+        self.name = name
+        self.loot = loot
+        self.place(room)
+        
+    
+    def place(self, room) -> bool:
+        room.morgue.add(self)
+        return True
