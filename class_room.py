@@ -145,6 +145,12 @@ class Room:
         self.secret_word = self.get_secret_word()
 
     
+    def has_a_corpse(self) -> bool:
+        if len(self.morgue) > 0:
+            return True
+        return False
+    
+    
     def get_secret_word(self) -> str:
         secret_word = ''
         for i in s_room_secrets_dictionary:

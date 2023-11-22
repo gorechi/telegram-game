@@ -103,6 +103,21 @@ class Monster:
         return words_list[self.gender]
 
     
+    def get_name(self, case:str) -> str:
+        """
+        Метод имя монстра, приведенное к определенному падежу.
+        
+        На вход передается строка с названием падежа:
+        - accus - венительный
+        - gen - родительный
+        
+        """       
+        
+        if self.lexemes:
+            return self.lexemes.get(case, self.name)
+        return self.name
+    
+    
     def poison_enemy(self, target) -> str:
         """
         Метод проводит проверку, отравил монстр противника при атаке, или нет.
@@ -360,7 +375,8 @@ class Monster:
         self.gather_loot()
         loot = self.loot
         room = self.room
-        new_corpse = Corpse('труп', loot, room)
+        corpse_name = f'труп {self.get_name("gen")}'
+        new_corpse = Corpse(corpse_name, loot, room)
         return True
         
     
