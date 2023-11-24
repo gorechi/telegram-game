@@ -15,7 +15,7 @@ class Monster:
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -29,7 +29,7 @@ class Monster:
                  corpse=True):
         self.game = game
         self.name = name
-        self.name1 = name1
+        self.lexemes = lexemes
         self.stren = stren
         self.health = health
         self.actions = actions.split(',')
@@ -140,8 +140,7 @@ class Monster:
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь \
-                неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
         return None
         
             
@@ -544,7 +543,7 @@ class Plant(Monster):
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -552,7 +551,7 @@ class Plant(Monster):
                  agressive=False,
                  carry_weapon=False,
                  carry_shield=False):
-        super().__init__(game, name, name1, stren, health, actions, state, agressive, carry_weapon, carry_shield)
+        super().__init__(game, name, lexemes, stren, health, actions, state, agressive, carry_weapon, carry_shield)
         self.carry_shield = False
         self.carry_weapon = False
         self.wear_armor = False
@@ -565,7 +564,7 @@ class Plant(Monster):
 
 
     def grow(self, room):
-        new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
+        new_plant = Plant(self.game, self.name, self.lexemes, self.stren, self.health, 'бьет', 'растет', False, False, False)
         new_plant.room = room
         self.floor.all_monsters.append(new_plant)
         self.game.how_many_monsters += 1
@@ -603,7 +602,7 @@ class Berserk(Monster):
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -614,7 +613,7 @@ class Berserk(Monster):
                  wear_armor=s_is_monster_wear_armor):
         super().__init__(game,
                          name,
-                         name1,
+                         lexemes,
                          stren,
                          health,
                          actions,
@@ -642,8 +641,8 @@ class Berserk(Monster):
 class Shapeshifter(Monster):
     def __init__(self, 
                 game, 
-                name='', 
-                name1='', 
+                name='',
+                lexemes=s_monster_lexemes, 
                 stren=10, 
                 health=20, 
                 actions='бьет', 
@@ -653,8 +652,8 @@ class Shapeshifter(Monster):
                 carry_shield=True, 
                 wear_armor=True):
         super().__init__(game, 
-                         name, 
-                         name1, 
+                         name,
+                         lexemes, 
                          stren, 
                          health, 
                          actions, 
@@ -710,8 +709,8 @@ class Shapeshifter(Monster):
 class Vampire(Monster):
     def __init__(self, 
                  game, 
-                 name='', 
-                 name1='', 
+                 name='',
+                 lexemes=s_monster_lexemes, 
                  stren=10, 
                  health=20, 
                  actions='бьет', 
@@ -721,8 +720,8 @@ class Vampire(Monster):
                  carry_shield=True,
                  wear_armor=True):
         super().__init__(game, 
-                         name, 
-                         name1, 
+                         name,
+                         lexemes, 
                          stren, 
                          health, 
                          actions, 
@@ -767,6 +766,7 @@ class Corpse():
                  room):
         self.name = name
         self.loot = loot
+        self.room = room
         self.place(room)
         
     

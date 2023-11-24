@@ -190,8 +190,7 @@ class Hero:
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь \
-                неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
         return None
     
     
@@ -697,7 +696,7 @@ class Hero:
         """
         
         if self.check_light():
-            return target.name, target.name1
+            return target.name, target.get_name('accus')
         else:
             return 'Неизвестная тварь из темноты', 'черт знает кого'
         
@@ -817,21 +816,21 @@ class Hero:
         
         message = []
         game = self.game
-        target_name, target_name1 = self.get_target_name(target=target)
+        target_name, target_name_accusative = self.get_target_name(target=target)
         tprint(game, showsides(self, target, self.floor))
         self.hide = False
         total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
             action = randomitem(self.weapon.actions)
-            hit_string = f'{self.name} {action} {target_name1} используя {self.weapon.name1} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
+            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.name1} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
         else:
-            hit_string = f'{self.name} бьет {target_name1} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
+            hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
         message.append(hit_string)
         total_damage, target_defence = self.generate_total_damage(target=target, total_attack=total_attack)
         if target_defence < 0:
             message.append(f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
         elif total_damage == 0:
-            message.append(f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name1}.')
+            message.append(f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name_accusative}.')
         elif total_damage > 0:
             damage_string = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
             message += [
@@ -1102,7 +1101,7 @@ class Hero:
         return False
 
     
-    def backpack(self):
+    def show_backpack(self):
         """Метод генерирует описание рюкзака героя."""
         
         message = []
@@ -1195,11 +1194,11 @@ class Hero:
         if what == 'себя':
             self.show()
         if what == 'рюкзак':
-            self.backpack()
+            self.show_backpack()
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
         if monster and what.lower() in [monster.name.lower(),
-                                        monster.name1.lower(),
+                                        monster.get_name('accus').lower(),
                                         monster.name[0].lower(),
                                         'монстр', 
                                         'врага', 
@@ -1272,7 +1271,7 @@ class Hero:
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
-        if not enemy in [who_is_fighting.name, who_is_fighting.name1, who_is_fighting.name[0]] and enemy != '':
+        if not enemy in [who_is_fighting.name, who_is_fighting.get_name('accus'), who_is_fighting.name[0]] and enemy != '':
             tprint(game, f'{self.name} не может атаковать. В комнате нет такого существа.')
             return False
         game.state = 1
@@ -1289,7 +1288,7 @@ class Hero:
             else:
                 message = ['Что-то жуткое и непонятное нападает первым из темноты.']
             tprint(game, message, 'fight')
-            tprint(game, who_is_fighting.attack(self))
+            who_is_fighting.attack(self)
             return True
 
     
@@ -1321,7 +1320,7 @@ class Hero:
         game = self.game
         room = self.floor.plan[self.current_position]
         enemy_in_room = room.monsters('first')
-        if self.check_light():
+        if not self.check_light():
             tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
             return False
         if enemy_in_room:
