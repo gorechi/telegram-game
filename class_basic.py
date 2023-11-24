@@ -27,6 +27,13 @@ class Loot:
         if isinstance(other, int):
             return len(self.pile) == other
     
+    def transfer(self, other_loot):
+        if not isinstance(other_loot, Loot):
+            return False
+        other_loot.pile.extend(self.pile)
+        self.pile = []
+        return True
+    
     def show_sorted(self) -> list:
         items = self.pile
         items_dict = {}

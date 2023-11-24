@@ -1380,9 +1380,8 @@ class Hero:
             tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
             return False
         message = [f'{self.name} осматривает {what.name1} и находит:']
-        message += room.secret_loot.show_sorted()
-        for i in what.loot.pile:
-            room.loot.add(i)
+        message += what.loot.show_sorted()
+        what.loot.transfer(room.loot)
         message.append('Все, что было спрятано, теперь лежит на виду.')
         tprint(self.game, message)
         return True
