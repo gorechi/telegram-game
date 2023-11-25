@@ -2,7 +2,7 @@ from random import randint as dice
 from typing import List
 
 from class_items import Book, Key, Money, Rune
-from class_monsters import Monster
+from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room
 from class_weapon import Weapon
@@ -752,9 +752,10 @@ class Hero:
     
     def generate_weapon_attack(self, target:Monster) -> int:
         """Метод генерирует значение дополнительной атаки оружием."""
-        
         if self.weapon.empty:
             return 0
+        if isinstance(target, Vampire) and self.weapon.element() == 4:
+            return target.health
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
         critical_probability = weapon_mastery * s_critical_step
