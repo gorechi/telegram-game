@@ -38,7 +38,6 @@ class Monster:
         self.corpse = corpse
         self.floor = None
         self.run = False
-        self.room = None
         self.alive = True
         self.hide = False
         self.hit_chance = hit_chance
@@ -48,7 +47,7 @@ class Monster:
         self.removed_shield = self.game.no_shield
         self.armor = self.game.no_armor
         self.money = s_monster_money
-        self.current_position = 0
+        self.current_position = None
         self.start_health = self.health
         self.loot = Loot(self.game)
         self.can_steal = True
@@ -188,7 +187,7 @@ class Monster:
         if item.twohanded and not self.shield.empty:
                 shield = self.shield
                 self.shield = self.game.no_shield
-                self.floor.plan[self.current_position].loot.add(shield)
+                self.current_position.loot.add(shield)
         self.weapon = item
         return True
     
@@ -360,7 +359,7 @@ class Monster:
 
     
     def finally_die(self) -> bool:
-        room = self.room
+        room = self.current_position
         self.floor.all_monsters.remove(self)
         self.floor.monsters_in_rooms[room].remove(self)
         self.game.how_many_monsters -= 1
@@ -374,7 +373,7 @@ class Monster:
             return False
         self.gather_loot()
         corpse_name = f'труп {self.get_name("gen")}'
-        new_corpse = Corpse(corpse_name, self.loot, self.room)
+        new_corpse = Corpse(corpse_name, self.loot, self.current_position)
         return True
         
     
@@ -400,7 +399,7 @@ class Monster:
             
             
     def lose_weapon_text(self) -> str:
-        room = self.room
+        room = self.current_position
         if room.light:
             return f'На пол падает {self.weapon.name}. '
         else:
@@ -408,7 +407,7 @@ class Monster:
     
     
     def lose_shield_text(self) -> str:
-        room = self.room
+        room = self.current_position
         if room.light:
             return f'На пол падает {self.shield.name}. '
         else:
@@ -416,7 +415,7 @@ class Monster:
     
     
     def get_self_name_in_room(self) -> str:
-        room = self.room
+        room = self.current_position
         if room.light:
             return self.name
         else:
@@ -438,11 +437,11 @@ class Monster:
     def hand_wound(self) -> bool:
         if not self.weapon.empty:
             alive_text += self.lose_weapon_text()
-            self.room.loot.add(self.weapon)
+            self.current_position.loot.add(self.weapon)
             self.weapon = self.game.no_weapon
         elif not self.shield.empty:
             alive_text += self.lose_shield_text()
-            self.room.loot.add(self.shield)
+            self.current_position.loot.add(self.shield)
             self.shield = self.game.no_shield
         text = f'{self.get_self_name_in_room(self)} остается в живых иполучает легкое ранение в руку. '
         text += self.try_to_run_away()
@@ -500,7 +499,7 @@ class Monster:
     
     def try_to_run_away(self) -> str:
         name = self.get_self_name_in_room()
-        if self.place(self.floor, old_place = self.room):
+        if self.place(self.floor, old_place = self.current_position):
             return f'{name} убегает из комнаты.'
         else:
             self.finally_die()
@@ -519,8 +518,7 @@ class Monster:
             if not bool(empty_rooms):
                 return False
             room = randomitem(empty_rooms, False)
-        self.room = room
-        self.current_position = room.position
+        self.current_position = room
         floor.monsters_in_rooms[room].append(self)
         if old_place:
             floor.monsters_in_rooms[old_place].remove(self)
@@ -571,7 +569,7 @@ class Plant(Monster):
 
     def win(self, loser=None):
         self.health = self.start_health
-        room = self.room
+        room = self.current_position
         floor = self.floor
         new_rooms = []
         for i in range(4):
@@ -594,8 +592,9 @@ class Plant(Monster):
         else:
             empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
-        self.room = room
+        self.current_position = room
         self.floor = floor
+
 
 class Berserk(Monster):
     def __init__(self,
@@ -752,7 +751,7 @@ class Vampire(Monster):
                 places_to_hide.append(i)
         places_to_hide.append(room)
         where_to_hide = randomitem(places_to_hide, False)
-        self.room = room
+        self.current_position = room
         self.hiding_place = where_to_hide
         self.floor = floor
         return True

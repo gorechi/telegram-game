@@ -61,7 +61,7 @@ class Hero:
             self.shield = shield
         self.removed_shield = self.game.no_shield
         self.money = Money(self.game, 0)
-        self.current_position = 0
+        self.current_position = None
         self.game_is_over = False
         self.start_health = self.health
         self.weakness = {}
@@ -298,7 +298,7 @@ class Hero:
         """
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         digit = int(digit)
         if digit - 1 < len(self.backpack):
             i = self.backpack[digit - 1]
@@ -317,7 +317,7 @@ class Hero:
         if self.shield.empty:
             return False
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         room.loot.add(self.shield)
         tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
         self.shield = game.no_shield
@@ -330,7 +330,7 @@ class Hero:
         if self.removed_shield.empty:
             return False
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         room.loot.add(self.removed_shield)
         tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
         self.removed_shield = game.no_shield
@@ -343,7 +343,7 @@ class Hero:
         if self.weapon.empty:
             return False
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         room.loot.add(self.weapon)
         tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
         self.weapon = game.no_weapon
@@ -370,7 +370,7 @@ class Hero:
     def rest(self, what=None):
         """Метод обрабатывает команду "отдохнуть". """
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         if not self.check_rest_possibility(room=room):
             return False
         if self.check_monster_in_ambush(place=room):
@@ -596,7 +596,7 @@ class Hero:
         
         """
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         a = dice(1, 2)
         if a == 1 and not self.weapon.empty:
             if target.weapon.empty and target.carryweapon:
@@ -623,7 +623,7 @@ class Hero:
         
         """
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         items_list = []
         a = dice(0, len(self.backpack))
         if a > 0:
@@ -663,7 +663,7 @@ class Hero:
         
         """
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         self.rage = 0
         self.hide = False
         message = [
@@ -677,12 +677,12 @@ class Hero:
         else:
             direction = dice(0, 3)
             if direction not in available_directions:
-                message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону.\
-                    Схватка продолжается.')
+                message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
                 tprint(self.game, message)
                 return
-        self.current_position += self.floor.directions_dict[direction]
-        self.floor.plan[self.current_position].visited = '+'
+        new_position = self.current_position.position + self.floor.directions_dict[direction]
+        self.current_position = self.floor.plan[new_position]
+        self.current_position.visited = '+'
         self.run = True
         message.append('На этом схватка заканчивается.')
         tprint (self.game, message)
@@ -1037,8 +1037,8 @@ class Hero:
         self.stren = self.start_stren
         self.dext = self.start_dext
         self.intel = self.start_intel
-        self.current_position = self.save_room.position
-
+        self.current_position = self.save_room
+    
     
     def win(self, loser):
         """Метод обрабатыват событие победы в схватке."""
@@ -1130,7 +1130,7 @@ class Hero:
     def key_hole(self, direction):
         """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         door = room.doors[s_hero_doors_dict[direction]]
         if door.empty:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
@@ -1171,7 +1171,7 @@ class Hero:
     def look_at_furniture(self, what:str) -> list[str]:
         """Метод генерирует текст осмотра мебели."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         message = []
         for i in room.furniture:
             if i.name1 == what:
@@ -1183,7 +1183,7 @@ class Hero:
         """Метод обрабатывает команду "осмотреть". """
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         monster = room.monsters(mode='first')
         if not self.check_light():
             tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
@@ -1224,7 +1224,7 @@ class Hero:
          
          """
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         monster = room.monsters('first')
         if monster:
             if monster.agressive and self.check_light():
@@ -1235,8 +1235,7 @@ class Hero:
         """Метод обрабатывает команду "идти". """
         
         game = self.game
-        room = self.floor.plan[self.current_position]
-        door = room.doors[s_hero_doors_dict[direction]]
+        door = self.current_position.doors[s_hero_doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
             tprint(game, f'{self.name} не знает такого направления!')
             return False
@@ -1253,11 +1252,11 @@ class Hero:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         else:
-            self.current_position += self.floor.directions_dict[direction]
-            room = self.floor.plan[self.current_position]
-            room.visited = '+'
-            room.show(self)
-            room.map()
+            new_position = self.current_position.position + self.floor.directions_dict[direction]
+            self.current_position = self.floor.plan[new_position]
+            self.current_position.visited = '+'
+            self.current_position.show(self)
+            self.current_position.map()
             self.check_monster_and_figth()
             return True
 
@@ -1266,7 +1265,7 @@ class Hero:
         """Метод обрабатывает команду "атаковать". """
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         who_is_fighting = room.monsters(mode='first')
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
@@ -1295,7 +1294,7 @@ class Hero:
     def search_room(self) -> bool:
         """Метод обыскивания комнаты."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         message = []
         if self.check_monster_in_ambush(place=room):
             return False
@@ -1320,7 +1319,7 @@ class Hero:
         """
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         enemy_in_room = room.monsters('first')
         if not self.check_light():
             tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
@@ -1339,7 +1338,7 @@ class Hero:
         """Метод обыскивания секретного места комнаты."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         if room.secret_word.lower() == item.lower():
             if not room.secret_loot.pile:
                 tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
@@ -1358,8 +1357,9 @@ class Hero:
     def search_furniture(self, item:str) -> bool:
         """Метод обыскивания мебели."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         game = self.game
+        what_to_search = None
         for i in room.furniture:
             if item.lower() in [i.name.lower(), i.name1.lower()]:
                 what_to_search = i
@@ -1377,7 +1377,7 @@ class Hero:
     def get_loot_from_furniture(self, what:Furniture) -> bool:
         """Метод извлекает весь лут из обысканной мебели."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         if what.loot == 0:
             tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
             return False
@@ -1419,7 +1419,7 @@ class Hero:
         """Метод обрабатывает команду "взять". """
         
         game = self.game
-        current_loot = self.floor.plan[self.current_position].loot
+        current_loot = self.current_position.loot
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
@@ -1496,7 +1496,7 @@ class Hero:
         """Метод отпирания мебели при помощи ключа."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
         key = self.get_key_from_backpack()
         if not what_is_locked:
@@ -1517,7 +1517,7 @@ class Hero:
         """Метод отпирания двери при помощи ключа."""
         
         game = self.game
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         key = self.get_key_from_backpack()
         door = room.doors[s_hero_doors_dict[direction]]
         if  not door.locked:
@@ -1686,7 +1686,7 @@ class Hero:
     def check_light(self) -> bool:
         """Метод проверки, есть ли в комнате свет."""
         
-        room = self.floor.plan[self.current_position]
+        room = self.current_position
         if room.light:
             return True
         if self.weapon.element() in s_glowing_elements:

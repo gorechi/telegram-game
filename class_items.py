@@ -170,7 +170,7 @@ class Matches:
         """ Метод использования спичек. """
         
         floor = who_is_using.floor
-        room = floor.plan[who_is_using.current_position]
+        room = who_is_using.current_position
         if not who_is_using:
             who_is_using = self.game.player
         if room.light:
@@ -219,7 +219,7 @@ class Map:
         """
         game = self.game
         floor = who.floor
-        room = floor.plan[who.current_position]
+        room = who.current_position
         if not in_action:
             if who.fear >= s_fear_limit:
                 tprint(

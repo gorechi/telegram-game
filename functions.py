@@ -42,7 +42,7 @@ def showsides(side1, side2, castle) -> list:
     
     """
     
-    room = castle.plan[side1.current_position]
+    room = side1.current_position
     message = []
     line = f'{side1.name}: сила - d{str(side1.stren)}'
     if not side1.weapon.empty:

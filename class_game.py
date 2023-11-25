@@ -75,6 +75,7 @@ class Game():
         self.castle_floors = self.create_floors()
         self.current_floor = self.castle_floors[0]
         self.player = self.check_hero(hero=hero)
+        self.player.current_position = self.current_floor.plan[0]
         self.current_floor.plan[0].visited = '+'
         new_key = Key(self)
         self.player.backpack.append(new_key)
@@ -265,13 +266,12 @@ class Game():
         """
 
         player = self.player
-        enemy = self.current_floor.plan[self.player.current_position].monsters('first')
+        enemy = self.player.current_position.monsters('first')
         tprint(self, player.attack(enemy, answer))
         if player.run:
             player.run = False
             player.look()
             self.state = 0
-            return True
         elif enemy.run:
             self.state = 0
         elif enemy.health > 0 and self.state == 1:
