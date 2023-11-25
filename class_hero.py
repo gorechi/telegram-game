@@ -1306,6 +1306,8 @@ class Hero:
             message += room.loot.show_sorted()
         else:
             message.append('В комнате нет ничего интересного.')
+        if room.has_a_corpse():
+            message + room.show_corpses()
         tprint(self.game, message)
         return True
     

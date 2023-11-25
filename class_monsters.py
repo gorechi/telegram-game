@@ -1,5 +1,6 @@
 from math import ceil
 from random import randint as dice
+from random import choice
 
 from class_basic import Loot, Money
 from class_items import Rune
@@ -372,10 +373,8 @@ class Monster:
         if not self.corpse:
             return False
         self.gather_loot()
-        loot = self.loot
-        room = self.room
         corpse_name = f'труп {self.get_name("gen")}'
-        new_corpse = Corpse(corpse_name, loot, room)
+        new_corpse = Corpse(corpse_name, self.loot, self.room)
         return True
         
     
@@ -761,15 +760,26 @@ class Vampire(Monster):
 
 class Corpse():
     def __init__(self,
+                 game,
                  name:str,
                  loot:Loot,
                  room):
+        self.game = game
         self.name = name
         self.loot = loot
         self.room = room
+        self.description = self.generate_description()
         self.place(room)
         
     
     def place(self, room) -> bool:
-        room.morgue.add(self)
+        room.morgue.append(self)
         return True
+    
+    
+    def generate_description(self) -> str:
+        place = choice(s_corpse_places)
+        state = choice(s_corpse_states)
+        depiction = choice(s_corpse_depiction)
+        description = f'{place} {state} {depiction} {self.name}'
+        return description
