@@ -292,7 +292,7 @@ class Floor:
             for j in range(r):
                 room = self.plan[i*r+j]
                 cant_rest, rest_place = room.can_rest()
-                if game.player.current_position == i * r + j:    
+                if game.player.current_position.position == i * r + j:    
                     a = game.player.name[0]
                 elif rest_place and not room.visited == ' ':
                     a = '#'
