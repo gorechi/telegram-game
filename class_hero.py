@@ -1347,12 +1347,39 @@ class Hero:
                 message = []
                 message.append(f'{self.name} осматривает {item} и находит:')
                 message += room.secret_loot.show_sorted()
-                for i in room.secret_loot.pile:
-                    room.loot.add(i)
+                room.secret_loot.transfer(room.loot)
                 message.append('Все, что было спрятано, теперь лежит на виду.')
                 tprint(game, message)
             return True
         return False
+     
+     
+    def search_corpse(self, item:str) -> bool:
+        """Метод обыскивания трупа."""
+        
+        game = self.game
+        room = self.current_position
+        if not room.has_a_corpse():
+            return False
+        corpse = None
+        if item.lower() == 'труп':
+            corpse = room.morgue[0]
+        else:
+            for candidate in room.morgue:
+                if item.lower() == candidate.name.lower():
+                    corpse = candidate
+        if not corpse:
+            return False
+        if not corpse.loot.pile:
+            tprint(game, f'{self.name} осматривает {corpse.name} и ничего не находит.')
+        else:
+            message = []
+            message.append(f'{self.name} осматривает {corpse.name} и находит:')
+            message += corpse.loot.show_sorted()
+            corpse.loot.transfer(room.loot)
+            message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
+            tprint(game, message)
+        return True
         
     
     def search_furniture(self, item:str) -> bool:
@@ -1398,6 +1425,8 @@ class Hero:
         if not item:
             return self.search_room()
         if self.search_secret_place(item=item):
+            return True
+        if self.search_corpse(item=item):
             return True
         return self.search_furniture(item=item)
         

@@ -187,7 +187,9 @@ class Floor:
             new_key = Key(game)
             self.plan[0].loot.add(new_key)
         new_loot = Loot(self.game)
-        new_corpse = Corpse(self.game, 'Труп разбойника', new_loot, self.plan[0]) 
+        new_corpse = Corpse(self.game, 'Труп разбойника', new_loot, self.plan[0])
+        new_key = Key(game)
+        new_corpse.loot.add(new_key)
 
     
     def secret_rooms(self):
