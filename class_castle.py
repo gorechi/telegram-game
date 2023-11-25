@@ -1,9 +1,10 @@
 from random import randint as dice
 
-from class_basic import Money
+from class_basic import Money, Loot
 from class_items import Key, Map, Matches, Rune
 from class_room import Door, Room
 from functions import pprint, randomitem
+from class_monsters import Corpse
 from settings import *
 
 
@@ -184,7 +185,9 @@ class Floor:
         matches.place(self)
         for i in range(5):
             new_key = Key(game)
-            self.plan[0].loot.add(new_key) 
+            self.plan[0].loot.add(new_key)
+        new_loot = Loot(self.game)
+        new_corpse = Corpse(self.game, 'Труп разбойника', new_loot, self.plan[0]) 
 
     
     def secret_rooms(self):

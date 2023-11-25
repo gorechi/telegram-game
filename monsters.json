@@ -2,7 +2,10 @@
   {
     "class": "монстр",
     "name": "Гоблин",
-    "name1": "Гоблина",
+    "lexemes": {
+      "accus": "Гоблина",
+      "gen": "Гоблина"
+    },
     "stren": 9,
     "health": 18,
     "hit_chance": 4,
@@ -22,12 +25,16 @@
     "carryshield": true,
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Тролль",
-    "name1": "Тролля",
+    "lexemes": {
+      "accus": "Тролля",
+      "gen": "Тролля"
+    },
     "stren": 13,
     "health": 40,
     "hit_chance": 4,
@@ -50,12 +57,16 @@
     "prefered_weapon": "ударное",
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Разбойник",
-    "name1": "Разбойника",
+    "lexemes": {
+      "accus": "Разбойника",
+      "gen": "Разбойника"
+    },
     "stren": 9,
     "health": 30,
     "hit_chance": 6,
@@ -76,12 +87,16 @@
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Разбойница",
-    "name1": "Разбойницу",
+    "lexemes": {
+      "accus": "Разбойницу",
+      "gen": "Разбойницы"
+    },
     "stren": 8,
     "health": 33,
     "hit_chance": 6,
@@ -102,12 +117,16 @@
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 1,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Бандит",
-    "name1": "Бандита",
+    "lexemes": {
+      "accus": "Бандита",
+      "gen": "Бандита"
+    },
     "stren": 8,
     "health": 23,
     "hit_chance": 5,
@@ -127,12 +146,16 @@
     "carryshield": false,
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Бандитка",
-    "name1": "Бандитку",
+    "lexemes": {
+      "accus": "Бандитку",
+      "gen": "Бандитки"
+    },
     "stren": 8,
     "health": 28,
     "hit_chance": 5,
@@ -152,12 +175,16 @@
     "carryshield": false,
     "venomous": 0,
     "gender": 1,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Оборотень",
-    "name1": "Оборотня",
+    "lexemes": {
+      "accus": "Оборотня",
+      "gen": "Оборотня"
+    },
     "stren": 10,
     "health": 29,
     "hit_chance": 5,
@@ -177,12 +204,16 @@
     "carryshield": true,
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Сундук-людоед",
-    "name1": "Сундук-людоед",
+    "lexemes": {
+      "accus": "Сундук-людоед",
+      "gen": "Сундука-людоеда"
+    },
     "stren": 10,
     "health": 15,
     "hit_chance": 4,
@@ -202,12 +233,16 @@
     "carryshield": false,
     "venomous": 0,
     "gender": 0,
+    "corpse": false,
     "wearArmor": false
   },
   {
     "class": "притворщик",
     "name": "Перевёртыш",
-    "name1": "Перевёртыша",
+    "lexemes": {
+      "accus": "Перевертыша",
+      "gen": "Перевертыша"
+    },
     "stren": 10,
     "health": 18,
     "hit_chance": 5,
@@ -227,12 +262,16 @@
     "carryshield": true,
     "venomous": 0,
     "gender": 0,
+    "corpse": false,
     "wearArmor": true
   },
   {
     "class": "монстр",
     "name": "Зомби",
-    "name1": "Зомби",
+    "lexemes": {
+      "accus": "Зомби",
+      "gen": "Зомби"
+    },
     "stren": 8,
     "health": 30,
     "hit_chance": 4,
@@ -252,12 +291,16 @@
     "carryshield": false,
     "venomous": 2,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   },
   {
     "class": "растение",
     "name": "Мухоловка",
-    "name1": "Мухоловку",
+    "lexemes": {
+      "accus": "Мухоловку",
+      "gen": "Мухоловки"
+    },
     "stren": 7,
     "health": 28,
     "hit_chance": 5,
@@ -286,12 +329,16 @@
     "carryshield": false,
     "venomous": 4,
     "gender": 1,
+    "corpse": false,
     "wearArmor": false
   },
   {
     "class": "растение",
     "name": "Лиана",
-    "name1": "Лиану",
+    "lexemes": {
+      "accus": "Лиану",
+      "gen": "Лианы"
+    },
     "stren": 10,
     "health": 35,
     "hit_chance": 5,
@@ -325,7 +372,10 @@
   {
     "class": "вампир",
     "name": "Дракула",
-    "name1": "Дракулу",
+    "lexemes": {
+      "accus": "Дракулу",
+      "gen": "Дракулы"
+    },
     "stren": 8,
     "health": 30,
     "hit_chance": 7,
@@ -345,12 +395,16 @@
     "carryshield": true,
     "venomous": 0,
     "gender": 0,
+    "corpse": false,
     "wearArmor": true
   },
   {
     "class": "берсерк",
     "name": "Берсерк",
-    "name1": "Берсерка",
+    "lexemes": {
+      "accus": "Берсерка",
+      "gen": "Берсерка"
+    },
     "stren": 10,
     "health": 25,
     "hit_chance": 7,
@@ -370,6 +424,7 @@
     "carryshield": false,
     "venomous": 0,
     "gender": 0,
+    "corpse": true,
     "wearArmor": true
   }
 ]

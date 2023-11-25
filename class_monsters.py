@@ -1,5 +1,6 @@
 from math import ceil
 from random import randint as dice
+from random import choice
 
 from class_basic import Loot, Money
 from class_items import Rune
@@ -15,7 +16,7 @@ class Monster:
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -25,14 +26,16 @@ class Monster:
                  carry_shield=s_is_monster_carry_shield,
                  wear_armor=s_is_monster_wear_armor,
                  hit_chance=s_monster_hit_chance,
-                 parry_chance = s_monster_parry_chance):
+                 parry_chance=s_monster_parry_chance,
+                 corpse=True):
         self.game = game
         self.name = name
-        self.name1 = name1
+        self.lexemes = lexemes
         self.stren = stren
         self.health = health
         self.actions = actions.split(',')
         self.state = state
+        self.corpse = corpse
         self.floor = None
         self.run = False
         self.room = None
@@ -89,8 +92,8 @@ class Monster:
     
     def __str__(self):
         return self.name
-    
-    
+          
+        
     def g(self, words_list:list) -> str:
         """
         Метод выбирает слово из полученного списка
@@ -101,12 +104,27 @@ class Monster:
         return words_list[self.gender]
 
     
+    def get_name(self, case:str) -> str:
+        """
+        Метод имя монстра, приведенное к определенному падежу.
+        
+        На вход передается строка с названием падежа:
+        - accus - венительный
+        - gen - родительный
+        
+        """       
+        
+        if self.lexemes:
+            return self.lexemes.get(case, self.name)
+        return self.name
+    
+    
     def poison_enemy(self, target) -> str:
         """
         Метод проводит проверку, отравил монстр противника при атаке, или нет.
 
         Параметры:
-        - who (obj Hero): Герой, которого атакует монстр
+        - target (obj Hero): Герой, которого атакует монстр
 
         """
         if target.poisoned:
@@ -123,8 +141,7 @@ class Monster:
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь \
-                неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
         return None
         
             
@@ -344,23 +361,36 @@ class Monster:
     
     def finally_die(self) -> bool:
         room = self.room
-        if self.money > 0:
-            money = Money(self.game, self.money)
-            room.loot.add(money)
-            room.loot.pile.extend(self.loot.pile)
-        if not self.shield.empty:
-            room.loot.add(self.shield)
-        if not self.armor.empty:
-            room.loot.add(self.armor)
-        if not self.weapon.empty:
-            room.loot.add(self.weapon)
         self.floor.all_monsters.remove(self)
         self.floor.monsters_in_rooms[room].remove(self)
         self.game.how_many_monsters -= 1
         self.alive = False
+        self.become_a_corpse()
         return True
     
     
+    def become_a_corpse(self) -> bool:
+        if not self.corpse:
+            return False
+        self.gather_loot()
+        corpse_name = f'труп {self.get_name("gen")}'
+        new_corpse = Corpse(corpse_name, self.loot, self.room)
+        return True
+        
+    
+    def gather_loot(self):
+        loot = self.loot
+        if self.money > 0:
+            money = Money(self.game, self.money)
+            loot.add(money)
+        if not self.shield.empty:
+            loot.add(self.shield)
+        if not self.armor.empty:
+            loot.add(self.armor)
+        if not self.weapon.empty:
+            loot.add(self.weapon)
+
+        
     def lose(self, winner=None):
         result = dice(1, 10)
         if result < 6 or self.wounded or not self.can_run:
@@ -512,7 +542,7 @@ class Plant(Monster):
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -520,7 +550,7 @@ class Plant(Monster):
                  agressive=False,
                  carry_weapon=False,
                  carry_shield=False):
-        super().__init__(game, name, name1, stren, health, actions, state, agressive, carry_weapon, carry_shield)
+        super().__init__(game, name, lexemes, stren, health, actions, state, agressive, carry_weapon, carry_shield)
         self.carry_shield = False
         self.carry_weapon = False
         self.wear_armor = False
@@ -533,7 +563,7 @@ class Plant(Monster):
 
 
     def grow(self, room):
-        new_plant = Plant(self.game, self.name, self.name1, self.stren, self.health, 'бьет', 'растет', False, False, False)
+        new_plant = Plant(self.game, self.name, self.lexemes, self.stren, self.health, 'бьет', 'растет', False, False, False)
         new_plant.room = room
         self.floor.all_monsters.append(new_plant)
         self.game.how_many_monsters += 1
@@ -571,7 +601,7 @@ class Berserk(Monster):
     def __init__(self,
                  game,
                  name=s_monster_name,
-                 name1=s_monster_name1,
+                 lexemes=s_monster_lexemes,
                  stren=s_monster_strength,
                  health=s_monster_health,
                  actions=s_monster_actions,
@@ -582,7 +612,7 @@ class Berserk(Monster):
                  wear_armor=s_is_monster_wear_armor):
         super().__init__(game,
                          name,
-                         name1,
+                         lexemes,
                          stren,
                          health,
                          actions,
@@ -610,8 +640,8 @@ class Berserk(Monster):
 class Shapeshifter(Monster):
     def __init__(self, 
                 game, 
-                name='', 
-                name1='', 
+                name='',
+                lexemes=s_monster_lexemes, 
                 stren=10, 
                 health=20, 
                 actions='бьет', 
@@ -621,8 +651,8 @@ class Shapeshifter(Monster):
                 carry_shield=True, 
                 wear_armor=True):
         super().__init__(game, 
-                         name, 
-                         name1, 
+                         name,
+                         lexemes, 
                          stren, 
                          health, 
                          actions, 
@@ -678,8 +708,8 @@ class Shapeshifter(Monster):
 class Vampire(Monster):
     def __init__(self, 
                  game, 
-                 name='', 
-                 name1='', 
+                 name='',
+                 lexemes=s_monster_lexemes, 
                  stren=10, 
                  health=20, 
                  actions='бьет', 
@@ -689,8 +719,8 @@ class Vampire(Monster):
                  carry_shield=True,
                  wear_armor=True):
         super().__init__(game, 
-                         name, 
-                         name1, 
+                         name,
+                         lexemes, 
                          stren, 
                          health, 
                          actions, 
@@ -727,3 +757,29 @@ class Vampire(Monster):
         self.floor = floor
         return True
 
+
+class Corpse():
+    def __init__(self,
+                 game,
+                 name:str,
+                 loot:Loot,
+                 room):
+        self.game = game
+        self.name = name
+        self.loot = loot
+        self.room = room
+        self.description = self.generate_description()
+        self.place(room)
+        
+    
+    def place(self, room) -> bool:
+        room.morgue.append(self)
+        return True
+    
+    
+    def generate_description(self) -> str:
+        place = choice(s_corpse_places)
+        state = choice(s_corpse_states)
+        depiction = choice(s_corpse_depiction)
+        description = f'{place} {state} {depiction} {self.name}'
+        return description

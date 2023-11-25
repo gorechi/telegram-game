@@ -134,7 +134,7 @@ class Room:
         self.visited = ' '
         self.rune_place = self.game.empty_thing
         self.light = True
-        self.morgue = None
+        self.morgue = []
         self.furniture = []
         self.stink = 0
         self.stink_levels = s_room_stink_levels
@@ -144,6 +144,24 @@ class Room:
             self.torch = True
         self.secret_word = self.get_secret_word()
 
+    
+    def has_a_corpse(self) -> bool:
+        if len(self.morgue) > 0:
+            return True
+        return False
+
+    
+    def show_corpses(self) -> list:
+        corpses = [corpse.description for corpse in self.morgue]
+        return(corpses)
+
+    
+    def show_furniture(self) -> list:
+        furniture_list  = []
+        for furniture in self.furniture:
+                furniture_list.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
+        return furniture_list
+    
     
     def get_secret_word(self) -> str:
         secret_word = ''
@@ -184,6 +202,7 @@ class Room:
             message.append('В комнате нет места, где можно было бы отдохнуть.')
         return message, place
     
+    
     def show(self, player):
         game = self.game
         monsters = self.monsters()
@@ -205,8 +224,8 @@ class Room:
             message = []
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
-            for furniture in self.furniture:
-                message.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
+            message += self.show_furniture()
+            message += self.show_corpses()
             message.append(who_is_here)
             if self.stink > 0:
                 message.append(stink_text)
@@ -219,6 +238,7 @@ class Room:
                 message.append(stink_text)
             tprint(game, message, state = 'direction')
 
+    
     def show_through_key_hole(self, who):
         monster = self.monsters('first')
         message = []
@@ -230,6 +250,7 @@ class Room:
             message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message
 
+    
     def furniture_types(self):
         types = []
         for furniture in self.furniture:
@@ -237,6 +258,7 @@ class Room:
                 types.append(furniture.type)
         return types
 
+    
     def monsters(self, mode=None):
         all_monsters = self.floor.monsters_in_rooms[self]
         if all_monsters:
@@ -249,6 +271,7 @@ class Room:
         else:
             return False
         
+    
     def monster_in_ambush(self):
         monsters = self.monsters()
         if monsters:
@@ -256,6 +279,7 @@ class Room:
                 if monster.hiding_place == self:
                     return monster 
         return False
+    
     
     def map(self):
         if not self.light:
@@ -286,6 +310,7 @@ class Room:
                 door.locked = True
         self.locked = True
         return None
+    
     
     def turn_on_light(self, who) -> NoReturn:
         

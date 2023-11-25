@@ -3,7 +3,7 @@ import json
 from class_castle import Floor
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
-from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire
+from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon

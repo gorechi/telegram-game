@@ -11,6 +11,12 @@ class Loot:
     def __str__(self):
         return 'loot'
 
+    def __add__(self, other) -> bool:
+        if not isinstance(other, Loot):
+            return False
+        self.pile.extend(other.pile)
+        return True
+    
     def add(self, obj):
         self.pile.append(obj)
 
@@ -20,6 +26,13 @@ class Loot:
     def __eq__(self, other) -> bool:
         if isinstance(other, int):
             return len(self.pile) == other
+    
+    def transfer(self, other_loot):
+        if not isinstance(other_loot, Loot):
+            return False
+        other_loot.pile.extend(self.pile)
+        self.pile = []
+        return True
     
     def show_sorted(self) -> list:
         items = self.pile
