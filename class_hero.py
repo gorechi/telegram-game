@@ -1,5 +1,4 @@
 from random import randint as dice
-from typing import List
 
 from class_items import Book, Key, Money, Rune
 from class_monsters import Monster, Vampire
@@ -65,6 +64,7 @@ class Hero:
         self.game_is_over = False
         self.start_health = self.health
         self.weakness = {}
+        self.restless = 0
         self.wins = 0
         self.rage = 0
         self.hide = False
@@ -380,6 +380,7 @@ class Hero:
         self.poisoned = False
         self.health = self.start_health
         self.save_room = room
+        self.restless = 10
         return True
     
     
@@ -463,6 +464,9 @@ class Hero:
         
         cant_rest, rest_place = room.can_rest()
         message = []
+        if self.restless > 0:
+            cant_rest.append(f'У {self.g(["героя", "героини"])} столько нерастраченной энергии, \
+                что {self.g(["ему", "ей"])} не сидится на месте')
         if not rest_place or len(cant_rest) > 0:
             message.append('В этой комнате нельзя этого делать.')
             message.append(randomitem(cant_rest))
@@ -529,6 +533,7 @@ class Hero:
             shield.accumulated_damage = 0
             self.money.how_much_money -= needed_money
             tprint(game, f'{self.name} успешно чинит {shield.name1}')
+            self.decrease_restless(1)
             return True
         else:
             tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.name1}, \
@@ -685,6 +690,7 @@ class Hero:
         self.current_position.visited = '+'
         self.run = True
         message.append('На этом схватка заканчивается.')
+        self.restless = 0
         tprint (self.game, message)
 
     
@@ -1039,6 +1045,7 @@ class Hero:
         self.dext = self.start_dext
         self.intel = self.start_intel
         self.current_position = self.save_room
+        self.restless = 0
     
     
     def win(self, loser):
@@ -1051,6 +1058,7 @@ class Hero:
         self.wins += 1
         tprint(self.game, f'{self.name} получает {howmany(loser.exp, "единицу,единицы,единиц")} опыта!')
         self.gain_experience(exp=loser.exp)
+        self.restless = 0
 
     
     def gain_experience (self, exp:int):
@@ -1258,6 +1266,7 @@ class Hero:
             self.current_position.visited = '+'
             self.current_position.show(self)
             self.current_position.map()
+            self.decrease_restless(1)
             self.check_monster_and_figth()
             return True
 
@@ -1797,4 +1806,13 @@ class Hero:
         else:
             message = 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.'
         tprint(self.game, message)
+        self.decrease_restless(2)
+        return True
+    
+    
+    def decrease_restless(self, number:int) -> bool:
+        """Метод уменьшает значение непоседливости героя. Герой не может отдыхать когда непоседливость больше 0."""
+        
+        if self.restless >= number:
+            self.restless -= number
         return True
