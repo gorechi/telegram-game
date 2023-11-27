@@ -6,3 +6,18 @@ from class_weapon import Weapon
 from functions import howmany, normal_count, randomitem, showsides, tprint
 from settings import *
 
+class Trader:
+    """Класс Торговец"""
+    
+    def __init__(self,
+                 game,
+                 name,
+                 lexeme,
+                 gender):
+        self.game = game
+        self.name = name
+        self.lexeme = lexeme
+        self.gender = gender
+    
+    
+    
