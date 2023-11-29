@@ -134,6 +134,7 @@ class Room:
         self.visited = ' '
         self.rune_place = self.game.empty_thing
         self.light = True
+        self.traider = False
         self.morgue = []
         self.furniture = []
         self.stink = 0
@@ -258,6 +259,12 @@ class Room:
                 types.append(furniture.type)
         return types
 
+    
+    def clear_from_monsters(self):
+        monsters = self.monsters()
+        for monster in monsters:
+            monster.place(self.floor)           
+    
     
     def monsters(self, mode=None):
         all_monsters = self.floor.monsters_in_rooms[self]
