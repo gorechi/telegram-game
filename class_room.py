@@ -139,7 +139,8 @@ class Room:
         self.furniture = []
         self.stink = 0
         self.stink_levels = s_room_stink_levels
-        if not self.light or dice(1, s_room_torch_is_on_dice) != 4:
+        torch_die = s_room_torch_is_on_dice
+        if not self.light or dice(1, torch_die) != torch_die - 1:
             self.torch = False
         else:
             self.torch = True
@@ -241,6 +242,8 @@ class Room:
 
     
     def show_through_key_hole(self, who):
+        if self.traider:
+            return self.traider.show_through_key_hole()
         monster = self.monsters('first')
         message = []
         if not monster:

@@ -48,5 +48,9 @@ class Trader:
         traiders_room = randomitem(locked_rooms)
         traiders_room.traider = self
         traiders_room.clear_from_monsters()
+        traiders_room.light = True
         self.room = traiders_room
-        
+    
+    
+    def show_through_key_hole(self) -> str|list:
+        return 'Видно кусок витрины, наполненной разноцветными непонятными вещицами.'
