@@ -9,6 +9,11 @@ from settings import *
 class Trader:
     """Класс Торговец"""
     
+    trader_types = [
+        'books',
+        'runes'
+    ]
+    
     def __init__(self,
                  floor,
                  game,
@@ -22,9 +27,19 @@ class Trader:
         self.lexeme = lexeme
         self.gender = gender
         self.shop = []
-        self.get_books()
-        self.get_runes()
         self.place()
+        self.type = randomitem(Trader.trader_types)
+        self.get_items()    
+    
+    
+    def get_items(self) -> bool:
+        actions = {
+            'books': self.get_books,
+            'runes': self.get_runes
+        }
+        if not actions.get(self.type):
+            return False
+        return actions[self.type]()
     
     
     def get_books(self) -> bool:
