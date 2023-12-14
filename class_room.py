@@ -41,7 +41,7 @@ class Door:
 class Furniture:
     """Класс мебели."""
     
-    def __init__(self, game, name=''):
+    def __init__(self, game, name='', furniture_type=0, can_rest=False):
         self.game = game
         new_loot = Loot(self.game)
         self.loot = new_loot
@@ -50,7 +50,7 @@ class Furniture:
         self.opened = True
         self.can_contain_weapon = True
         self.can_hide = False
-        self.can_rest = False
+        self.can_rest = can_rest
         self.name = name
         self.empty = False
         self.empty_text = 'пусто'
@@ -58,6 +58,7 @@ class Furniture:
         self.where = 'в углу'
         self.name1 = 'мебель'
         self.room = None
+        self.type = furniture_type
 
     def __str__(self):
         return self.where + ' ' + self.state + ' ' + self.name
@@ -181,12 +182,16 @@ class Room:
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
 
     
-    def can_rest(self):
+    def can_rest(self, mode:str='full'):
         """Функция проверяет, можно ли отдыхать в комнате
 
-        Returns:
-            list: Список причин, почему нельзя отдыхать в комнате
-            obj Furniture: Объект мебели, который позволяет отдохнуть
+        Принимает на вход параметр mode:
+        - если mode == 'full', метод возвращает список причин и объект мебели
+        - если mode == 'simple', метод возвращает булево значение можно ли отдыхать в комнате
+        
+        Возвращает:
+            - list: Список причин, почему нельзя отдыхать в комнате
+            - obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
         monster = self.monsters('first')
@@ -202,6 +207,8 @@ class Room:
                 place = furniture
         if not place:
             message.append('В комнате нет места, где можно было бы отдохнуть.')
+        if mode == 'simple':
+            return len(message) == 0
         return message, place
     
     

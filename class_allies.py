@@ -65,6 +65,9 @@ class Trader:
         traiders_room.clear_from_monsters()
         traiders_room.light = True
         self.room = traiders_room
+        if not self.room.can_rest(mode='simple'):
+            new_rest_place = Furniture(game=self.game, name='Удобное кресло', can_rest=True)
+            new_rest_place.place(room_to_place=self.room)
     
     
     def show_through_key_hole(self) -> str|list:
