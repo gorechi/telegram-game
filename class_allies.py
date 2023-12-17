@@ -6,6 +6,7 @@ from class_weapon import Weapon
 from functions import howmany, normal_count, randomitem, tprint, roll
 from settings import *
 
+
 class Trader:
     """Класс Торговец"""
     
@@ -29,7 +30,15 @@ class Trader:
         self.shop = []
         self.place()
         self.type = randomitem(Trader.trader_types)
-        self.get_items()    
+        self.get_items()
+        self.money = self.generate_money()    
+    
+    
+    def generate_money(self) -> Money:
+        delta = s_traider_maximum_money - s_traider_minimum_money
+        money_amount = s_traider_minimum_money + roll([delta])
+        new_money = Money(self.game, money_amount)
+        return new_money
     
     
     def get_items(self) -> bool:
@@ -80,3 +89,32 @@ class Trader:
             'runes': 'Перед окном стоит яркий прилавок, из-за которого еле видно торговца рунами.'
         }
         return descriptions[self.type]
+    
+    
+    def get_item_by_number(self, number:str):
+        """
+        Метод возвращает вещь из магазина по ее порядковому номеру.
+        
+        """
+        
+        number = int(number) - 1
+        if number < len(self.shop):
+            return self.shop[number]
+        else:
+            return False
+    
+    
+    def show_shop(self):
+        """Метод генерирует список товаров в лавке торговца."""
+        
+        message = []
+        if len(self.shop) == 0:
+            message.append('Торговцу нечего предложить.')
+        else:
+            message.append('Торговец предлагает на продажу следующие диковины:')
+            for i, item in enumerate(self.backpack):
+                description = f'{str(i + 1)}: {item.show_in_shop()}'
+                message.append(description)
+            message.append(self.money.show())
+        tprint(self.game, message)
+        return True
