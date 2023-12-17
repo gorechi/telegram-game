@@ -72,3 +72,11 @@ class Trader:
     
     def show_through_key_hole(self) -> str|list:
         return 'Видно кусок витрины, наполненной разноцветными непонятными вещицами.'
+    
+    
+    def show(self) -> str:
+        descriptions = {
+            'books': 'У стены, под лампой среди пыльных томов сидит торговец книгами.',
+            'runes': 'Перед окном стоит яркий прилавок, из-за которого еле видно торговца рунами.'
+        }
+        return descriptions[self.type]

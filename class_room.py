@@ -234,6 +234,8 @@ class Room:
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
             message += self.show_furniture()
+            if self.traider:
+                message.append(self.traider.show())
             message += self.show_corpses()
             message.append(who_is_here)
             if self.stink > 0:
