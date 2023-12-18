@@ -285,6 +285,7 @@ s_money_piles = [
     ],
 ]
 """Текстовые обозначения для кучек с разным количеством монет"""
+
 # Замок
 
 s_dark_rooms_ratio = 8
@@ -495,6 +496,13 @@ s_elements_dictionary = {1: 'огня',
 s_glowing_elements = [1, 2, 4]
 """Массив стихий, которые заставляют оружие светиться в темноте"""
 
+s_rune_minimum_price = 20
+"""Минимальная цена руны"""
+
+s_rune_maximum_price = 30
+"""Максимальная цена руны"""
+
+
 # Торговец
 
 s_how_many_traders = 1
@@ -514,3 +522,11 @@ s_traider_maximum_money = 50
 
 s_traider_minimum_money = 20
 """Минимальное количество денег у торговца"""
+
+#Книги
+
+s_book_minimum_price = 20
+"""Минимальная цена книги"""
+
+s_book_maximum_price = 30
+"""Максимальная цена книги"""
