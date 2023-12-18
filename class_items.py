@@ -162,6 +162,13 @@ class Matches:
         return quantity_text[True]
     
     
+    def __add__(self, other) -> bool:
+        if not isinstance(other, Matches):
+            return False
+        self.quantity += other.quantity
+        return True   
+    
+    
     def show(self) -> str:
         
         """ Метод возвращает описание спичек в виде строки. """
