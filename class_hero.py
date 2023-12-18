@@ -1121,11 +1121,10 @@ class Hero:
                 message.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
             else:
                 message.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
-                for i in range(len(self.backpack)):
-                    description = f'{str(i + 1)}: {self.backpack[i].show()}'
-                    if isinstance(self.backpack[i], Weapon):
-                        weapon = self.backpack[i]
-                        weapon_mastery = self.weapon_mastery[weapon.type]['level']
+                for i, item in enumerate(self.backpack):
+                    description = f'{str(i + 1)}: {item.show()}'
+                    if isinstance(item, Weapon):
+                        weapon_mastery = self.weapon_mastery[item.type]['level']
                         if weapon_mastery > 0:
                             description += f', мастерство - {weapon_mastery}'
                     message.append(description)

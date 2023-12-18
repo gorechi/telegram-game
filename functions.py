@@ -232,8 +232,6 @@ def pprint(game, text, width=200, height=200, color='#FFFFFF'):
         game.bot.send_photo(game.chat_id, pic)
 
 
-
-
 def normal_count(input_string, exclude=None, divider=' '):
     
     """ 

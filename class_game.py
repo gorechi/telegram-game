@@ -7,6 +7,7 @@ from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corps
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
+from class_allies import Trader
 from functions import randomitem, tprint
 from settings import *
 
@@ -35,7 +36,8 @@ class Game():
     """
     
     def __init__(self, chat_id:str, bot, hero:Hero=None):
-        self.classes = { 'монстр': Monster,
+        self.classes = { 
+            'монстр': Monster,
             'герой': Hero,
             'оружие': Weapon,
             'щит': Shield,
@@ -52,6 +54,7 @@ class Game():
             'зелье': Potion,
             'руна': Rune,
             'заклинание': Spell,
+            'торговец': Trader,
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0

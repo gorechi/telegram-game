@@ -41,7 +41,7 @@ class Door:
 class Furniture:
     """Класс мебели."""
     
-    def __init__(self, game, name=''):
+    def __init__(self, game, name='', furniture_type=0, can_rest=False):
         self.game = game
         new_loot = Loot(self.game)
         self.loot = new_loot
@@ -50,7 +50,7 @@ class Furniture:
         self.opened = True
         self.can_contain_weapon = True
         self.can_hide = False
-        self.can_rest = False
+        self.can_rest = can_rest
         self.name = name
         self.empty = False
         self.empty_text = 'пусто'
@@ -58,6 +58,7 @@ class Furniture:
         self.where = 'в углу'
         self.name1 = 'мебель'
         self.room = None
+        self.type = furniture_type
 
     def __str__(self):
         return self.where + ' ' + self.state + ' ' + self.name
@@ -134,11 +135,13 @@ class Room:
         self.visited = ' '
         self.rune_place = self.game.empty_thing
         self.light = True
+        self.traider = False
         self.morgue = []
         self.furniture = []
         self.stink = 0
         self.stink_levels = s_room_stink_levels
-        if not self.light or dice(1, s_room_torch_is_on_dice) != 4:
+        torch_die = s_room_torch_is_on_dice
+        if not self.light or dice(1, torch_die) != torch_die - 1:
             self.torch = False
         else:
             self.torch = True
@@ -179,12 +182,16 @@ class Room:
         self.description = f'{self.decoration1} комнату {self.decoration2}. {self.decoration4}'
 
     
-    def can_rest(self):
+    def can_rest(self, mode:str='full'):
         """Функция проверяет, можно ли отдыхать в комнате
 
-        Returns:
-            list: Список причин, почему нельзя отдыхать в комнате
-            obj Furniture: Объект мебели, который позволяет отдохнуть
+        Принимает на вход параметр mode:
+        - если mode == 'full', метод возвращает список причин и объект мебели
+        - если mode == 'simple', метод возвращает булево значение можно ли отдыхать в комнате
+        
+        Возвращает:
+            - list: Список причин, почему нельзя отдыхать в комнате
+            - obj Furniture: Объект мебели, который позволяет отдохнуть
         """
         message = []
         monster = self.monsters('first')
@@ -200,6 +207,8 @@ class Room:
                 place = furniture
         if not place:
             message.append('В комнате нет места, где можно было бы отдохнуть.')
+        if mode == 'simple':
+            return len(message) == 0
         return message, place
     
     
@@ -225,6 +234,8 @@ class Room:
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
             message += self.show_furniture()
+            if self.traider:
+                message.append(self.traider.show())
             message += self.show_corpses()
             message.append(who_is_here)
             if self.stink > 0:
@@ -240,6 +251,8 @@ class Room:
 
     
     def show_through_key_hole(self, who):
+        if self.traider:
+            return self.traider.show_through_key_hole()
         monster = self.monsters('first')
         message = []
         if not monster:
@@ -258,6 +271,12 @@ class Room:
                 types.append(furniture.type)
         return types
 
+    
+    def clear_from_monsters(self):
+        monsters = self.monsters()
+        for monster in monsters:
+            monster.place(self.floor)           
+    
     
     def monsters(self, mode=None):
         all_monsters = self.floor.monsters_in_rooms[self]

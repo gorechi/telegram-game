@@ -23,11 +23,16 @@ class Rune:
         self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
         self.check_if_poisoned()
+        self.base_price = self.define_base_price()
         
         
     def __str__(self) -> str:
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
+
+    
+    def define_base_price(self) -> int:
+        return s_rune_maximum_price
 
     
     def check_if_poisoned(self) -> NoReturn:    
@@ -40,13 +45,14 @@ class Rune:
         else:
             self.poison = False
 
-
+    
     def on_create(self) -> Any:
         
         """ Метод вызывается после создания экземпляра класса. Ничего не делает. """
         
         return True
 
+    
     def place(self, castle, room=None) -> bool:
         
         """ Метод раскидывания рун по замку. """
@@ -64,6 +70,7 @@ class Rune:
             room.loot.add(self)
         return True
 
+    
     def element(self) -> int:
         
         """ Метод возвращает элемент руны в виде целого числа. """
@@ -78,12 +85,14 @@ class Rune:
         who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
+    
     def show(self) -> str:
         
         """ Метод возвращает описание руны в виде строки. """
         
         return f'{self.description} - урон + {str(self.damage)} или защита + {str(self.defence)}'.capitalize()
 
+    
     def use(self, who_is_using, in_action:bool=False) -> str:
         
         """ 
@@ -111,9 +120,11 @@ class Spell:
         self.min_damage = min_damage
         self.empty = False
 
+    
     def __str__(self):
         return self.name
 
+    
     def take(self, who=''):
         if who == '':
             return False
@@ -125,6 +136,7 @@ class Matches:
     
     """ Класс Спички. """
     
+    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -134,12 +146,14 @@ class Matches:
         self.room = None
         self.empty = False
 
+    
     def show(self) -> str:
         
         """ Метод возвращает описание спичек в виде строки. """
         
         return self.description
 
+    
     def place(self, castle, room=None) -> bool:
         
         """ Метод раскидывания спичек по замку. """
@@ -155,6 +169,7 @@ class Matches:
         self.room = room
         return True
 
+    
     def take(self, who=None) -> bool:
         
         """ Метод вызывается когда кто-то забирает спички себе. """
@@ -165,20 +180,21 @@ class Matches:
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
         return True
 
+    
     def use(self, who_is_using=None, in_action=False) -> NoReturn:
         
         """ Метод использования спичек. """
         
-        floor = who_is_using.floor
-        room = who_is_using.current_position
         if not who_is_using:
             who_is_using = self.game.player
+        room = who_is_using.current_position
         if room.light:
             tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
         else:
             room.turn_on_light(who_is_using)
   
 class Map:
+    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -187,6 +203,7 @@ class Map:
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
+    
     def place(self, castle, room=None) -> bool:
         
         """ Метод размещения карты в замке. """
@@ -201,12 +218,14 @@ class Map:
             room.loot.add(self)
         return True
 
+    
     def show(self) -> str:
         
         """ Метод возвращает описание карты в виде строки. """
         
         return self.description
 
+    
     def use(self, who, in_action: bool = False) -> bool:
         """
         Метод использования карты. Если вызывается в бою, то ничего не происходит. 
@@ -241,6 +260,7 @@ class Map:
             tprint(game, 'Во время боя это совершенно неуместно!')
             return False
 
+    
     def take(self, who) -> NoReturn:
         
         """ Метод вызывается когда кто-то забирает карту себе. """
@@ -250,6 +270,7 @@ class Map:
 
 
 class Key:
+    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -258,15 +279,19 @@ class Key:
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
 
+    
     def __str__(self) -> str:
         return self.description
 
+    
     def show(self):
         return self.description
 
+    
     def on_create(self):
         return True
 
+    
     def place(self, floor, room=None) -> bool:
         if not room:
             room = floor.get_random_unlocked_room()
@@ -277,7 +302,7 @@ class Key:
             room.loot.add(self)
         return True
 
-
+    
     def take(self, who):
         who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
@@ -285,6 +310,7 @@ class Key:
 
 
 class Potion:
+    
     def __init__(self, game, name='', effect=0, type=0, can_use_in_fight=True):
         self.game = game
         self.name = name
@@ -305,15 +331,19 @@ class Potion:
             self.can_use_in_fight = s_potion_types[n][3]
             self.description = s_potion_types[n][4]
 
+    
     def __str__(self):
         return self.description
 
+    
     def on_create(self):
         return True
 
+    
     def show(self):
         return self.description
 
+    
     def place(self, castle, room=None):
         if not room:
             rooms = castle.plan
@@ -325,6 +355,7 @@ class Potion:
             room.loot.add(self)
         return True
 
+    
     def check_if_can_be_used(self, who_using, in_action: bool) -> bool:
         game = self.game
         if self.type == 8 and not who_using.poisoned and who_using.fear == 0:
@@ -339,6 +370,7 @@ class Potion:
             return False
         return True
 
+    
     def use_type_0(self, who_using) -> bool:
         if (who_using.start_health - who_using.health) < self.effect:
             heal = dice(1, (who_using.start_health - who_using.health))
@@ -352,6 +384,7 @@ class Potion:
         tprint(self.game, text)
         return True
 
+    
     def use_type_1(self, who_using) -> bool:
         who_using.start_health += self.effect
         who_using.health += self.effect
@@ -359,6 +392,7 @@ class Potion:
             self.game, f'{who_using.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(who_using.health)}.')
         return True
 
+    
     def use_type_2(self, who_using) -> bool:
         who_using.stren += self.effect
         who_using.start_stren += self.effect
@@ -366,12 +400,14 @@ class Potion:
             self.game, f'{who_using.name} увеличивает свою силу на {str(self.effect)} до {str(who_using.stren)}.')
         return True
 
+    
     def use_type_3(self, who_using) -> bool:
         who_using.stren += self.effect
         tprint(self.game, f'На время боя {who_using.name} увеличивает \
             свою силу на {str(self.effect)} до {str(who_using.stren)}.')
         return True
 
+    
     def use_type_4(self, who_using) -> bool:
         who_using.dext += self.effect
         who_using.start_dext += self.effect
@@ -379,12 +415,14 @@ class Potion:
             self.game, f'{who_using.name} увеличивает свою ловкость на {str(self.effect)} до {str(who_using.dext)}.')
         return True
 
+    
     def use_type_5(self, who_using) -> bool:
         who_using.dext += self.effect
         tprint(
             self.game, f'На время боя {who_using.name} увеличивает свою ловкость на {str(self.effect)} до {str(who_using.dext)}.')
         return True
 
+    
     def use_type_6(self, who_using) -> bool:
         who_using.intel += self.effect
         who_using.start_intel += self.effect
@@ -392,12 +430,14 @@ class Potion:
             интеллект на {str(self.effect)} до {str(who_using.intel)}.')
         return True
 
+    
     def use_type_7(self, who_using) -> bool:
         who_using.intel += self.effect
         tprint(
             self.game, f'На время боя {who_using.name} увеличивает свой интеллект на {str(self.effect)} до {str(who_using.intel)}.')
         return True
 
+    
     def use_type_8(self, who_using) -> bool:
         who_using.poisoned = False
         who_using.fear = 0
@@ -405,6 +445,7 @@ class Potion:
             self.game, f'{who_using.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
         return True
 
+    
     def use(self, who_using, in_action:bool=False):
         game = self.game
         functions_list = {
@@ -425,6 +466,7 @@ class Potion:
             who_using.backpack.remove(self)
         return result
 
+    
     def take(self, who):
         who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name} себе.')
@@ -432,14 +474,22 @@ class Potion:
 
 
 class Book:
+    
     def __init__(self, game, name=None):
         self.game = game
         self.name = name
         self.empty = False
+        self.base_price = self.define_base_price()
 
+    
     def __str__(self):
         return self.name
-
+    
+    
+    def define_base_price(self) -> int:
+        return s_book_maximum_price
+        
+    
     def on_create(self):
         self.type = dice(0, 2)
         description = randomitem(self.descriptions, False)
@@ -458,9 +508,10 @@ class Book:
         self.shield_type = self.shield_types[self.type]
         return True
 
+    
     def get_mastery_string(self, who):
         return f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.'
-
+    
     
     def place(self, floor, room=None):
         if not room:
@@ -468,17 +519,20 @@ class Book:
         furniture = randomitem(room.furniture, False)
         furniture.put(self)
         return True
-
+    
+    
     def show(self):
         return self.description
-
+    
+    
     def use(self, who_using, in_action:bool=False):
         if in_action:
             tprint(self.game, 'Сейчас абсолютно не подходящее время для чтения.')
             return False
         else:
             return who_using.read(self)
-
+    
+    
     def take(self, who):
         who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
