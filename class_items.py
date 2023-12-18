@@ -3,7 +3,7 @@ from random import randint as dice
 from typing import Any, NoReturn
 
 from class_basic import *
-from functions import howmany, randomitem, tprint
+from functions import howmany, randomitem, tprint, roll
 from settings import *
 
 
@@ -136,7 +136,6 @@ class Matches:
     
     """ Класс Спички. """
     
-    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -145,13 +144,29 @@ class Matches:
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
         self.empty = False
+        self.quantity = self.get_quantity()
+        
+    
+    def get_quantity(self) -> int:
+        return roll([s_max_matches_quantity])
 
+    
+    def get_quantity_text(self, quantity:int) -> str:
+        quantity_text = {
+            quantity == 1: 'Коробок со всего одной спичкой',
+            quantity == 2: 'Коробок, в котором болтается пара спичек',
+            quantity > 2 and quantity <= 5: 'Коробок, в котором есть немного спичек',
+            quantity > 5 and quantity <= 9: 'Коробок, в котором много спичек',
+            quantity > 9: 'Полный спичек коробок',
+        }
+        return quantity_text[True]
+    
     
     def show(self) -> str:
         
         """ Метод возвращает описание спичек в виде строки. """
         
-        return self.description
+        return self.get_quantity_text(self.quantity)
 
     
     def place(self, castle, room=None) -> bool:
