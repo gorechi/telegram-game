@@ -169,6 +169,10 @@ class Matches:
         return True   
     
     
+    def __str__(self) -> str:
+        return f'Коробок спичек, {self.quantity}'    
+    
+    
     def show(self) -> str:
         
         """ Метод возвращает описание спичек в виде строки. """
@@ -198,7 +202,11 @@ class Matches:
         
         if not who:
             return False
-        who.backpack.append(self)
+        matches_in_backpack = who.what_in_backpack(Matches)
+        if matches_in_backpack:
+            matches_in_backpack[0] + self
+        else:
+            who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
         return True
 
