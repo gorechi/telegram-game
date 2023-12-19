@@ -211,7 +211,7 @@ class Matches:
         return True
 
     
-    def use(self, who_is_using=None, in_action=False) -> NoReturn:
+    def use(self, who_is_using=None, in_action=False) -> bool:
         
         """ Метод использования спичек. """
         
@@ -220,10 +220,14 @@ class Matches:
         room = who_is_using.current_position
         if room.light:
             tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
-        if not who_is_using.check_fear(fear_text='Пальцы не слушаются и спичка ломается пополам.'):
+            return False
+        if who_is_using.check_fear(print_message=False) and roll([2]) == 1:
+            tprint(self.game, f'От страха пальцы {who_is_using.g(["героя", "героини"])} не слушаются. Спичка ломается и падает на пол.')    
+        else:
             room.turn_on_light(who_is_using)
         self.quantity -= 1
         self.check_if_empty(who_is_using)
+        return True
     
     
     def check_if_empty(self, who) -> bool:
