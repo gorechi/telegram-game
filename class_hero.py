@@ -1480,11 +1480,20 @@ class Hero:
         return False
 
     
-    def check_fear(self) -> bool:
-        """Метод проверки того, что герой испытывает страх."""
+    def check_fear(self, fear_text:str = None) -> bool:
+        """
+        Метод проверки того, что герой испытывает страх.
+        Если страх выше лимита, то на экран выводится сообщение, что ничего не получилось.
+        Если в метод передан fear_text, то он добавляется к сообщению.
         
+        """
+        
+        message = []
         if self.fear >= s_fear_limit:
-            tprint(self.game, f'{self.name} Не может ничего сделать из-за того, что руки дрожат от страха.')
+            message.append(f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
+            if fear_text:
+                message.append(fear_text)
+            tprint(self.game, message)
             return True
         return False
     
@@ -1598,7 +1607,7 @@ class Hero:
             item_index = int(item) - 1
             if item_index < len(self.backpack):
                 i = self.backpack[item_index]
-                i.use(self, False)
+                i.use(self, in_action=False)
                 return True
         else:
             for i in self.backpack:

@@ -220,9 +220,19 @@ class Matches:
         room = who_is_using.current_position
         if room.light:
             tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
-        else:
+        if not who_is_using.check_fear(fear_text='Пальцы не слушаются и спичка ломается пополам.'):
             room.turn_on_light(who_is_using)
+        self.quantity -= 1
+        self.check_if_empty(who_is_using)
+    
+    
+    def check_if_empty(self, who) -> bool:
+        if self.quantity <= 0:
+            who.backpack.remove(self)
+            return True
+        return False
   
+
 class Map:
     
     def __init__(self, game):
