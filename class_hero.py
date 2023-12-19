@@ -546,7 +546,7 @@ class Hero:
         Метод возвращает список всех предметов определенного типа в рюкзаке героя
 
         Входящие параметры:
-        - item_type - Класс предмета, который нужно найти (например - Potion)
+        - item_class - Класс предмета, который нужно найти (например - Potion)
 
         Исходящие параметры:
         - items_list - Список всех найденных предметов
@@ -1480,11 +1480,17 @@ class Hero:
         return False
 
     
-    def check_fear(self) -> bool:
-        """Метод проверки того, что герой испытывает страх."""
+    def check_fear(self, print_message:bool=True) -> bool:
+        """
+        Метод проверки того, что герой испытывает страх.
+        Если страх выше лимита, то на экран выводится сообщение, что ничего не получилось.
+        Если в метод передан print_message=False, то сообщение не выводится.
+        
+        """
         
         if self.fear >= s_fear_limit:
-            tprint(self.game, f'{self.name} Не может ничего сделать из-за того, что руки дрожат от страха.')
+            if print_message:
+                tprint(self.game, f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
             return True
         return False
     
@@ -1598,7 +1604,7 @@ class Hero:
             item_index = int(item) - 1
             if item_index < len(self.backpack):
                 i = self.backpack[item_index]
-                i.use(self, False)
+                i.use(self, in_action=False)
                 return True
         else:
             for i in self.backpack:

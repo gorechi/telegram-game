@@ -3,7 +3,7 @@ from random import randint as dice
 from typing import Any, NoReturn
 
 from class_basic import *
-from functions import howmany, randomitem, tprint
+from functions import howmany, randomitem, tprint, roll
 from settings import *
 
 
@@ -136,7 +136,6 @@ class Matches:
     
     """ Класс Спички. """
     
-    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -145,13 +144,40 @@ class Matches:
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
         self.empty = False
+        self.quantity = self.get_quantity()
+        
+    
+    def get_quantity(self) -> int:
+        return roll([s_max_matches_quantity])
 
+    
+    def get_quantity_text(self, quantity:int) -> str:
+        quantity_text = {
+            quantity == 1: 'Коробок со всего одной спичкой',
+            quantity == 2: 'Коробок, в котором болтается пара спичек',
+            quantity > 2 and quantity <= 5: 'Коробок, в котором есть немного спичек',
+            quantity > 5 and quantity <= 9: 'Коробок, в котором много спичек',
+            quantity > 9: 'Полный спичек коробок',
+        }
+        return quantity_text[True]
+    
+    
+    def __add__(self, other) -> bool:
+        if not isinstance(other, Matches):
+            return False
+        self.quantity += other.quantity
+        return True   
+    
+    
+    def __str__(self) -> str:
+        return f'Коробок спичек, {self.quantity}'    
+    
     
     def show(self) -> str:
         
         """ Метод возвращает описание спичек в виде строки. """
         
-        return self.description
+        return self.get_quantity_text(self.quantity)
 
     
     def place(self, castle, room=None) -> bool:
@@ -176,12 +202,16 @@ class Matches:
         
         if not who:
             return False
-        who.backpack.append(self)
+        matches_in_backpack = who.what_in_backpack(Matches)
+        if matches_in_backpack:
+            matches_in_backpack[0] + self
+        else:
+            who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
         return True
 
     
-    def use(self, who_is_using=None, in_action=False) -> NoReturn:
+    def use(self, who_is_using=None, in_action=False) -> bool:
         
         """ Метод использования спичек. """
         
@@ -190,9 +220,23 @@ class Matches:
         room = who_is_using.current_position
         if room.light:
             tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
+            return False
+        if who_is_using.check_fear(print_message=False) and roll([2]) == 1:
+            tprint(self.game, f'От страха пальцы {who_is_using.g(["героя", "героини"])} не слушаются. Спичка ломается и падает на пол.')    
         else:
             room.turn_on_light(who_is_using)
+        self.quantity -= 1
+        self.check_if_empty(who_is_using)
+        return True
+    
+    
+    def check_if_empty(self, who) -> bool:
+        if self.quantity <= 0:
+            who.backpack.remove(self)
+            return True
+        return False
   
+
 class Map:
     
     def __init__(self, game):
