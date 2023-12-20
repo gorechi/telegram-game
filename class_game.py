@@ -81,7 +81,7 @@ class Game():
         self.player.current_position = self.current_floor.plan[0]
         self.current_floor.plan[0].visited = '+'
         new_key = Key(self)
-        self.player.backpack.append(new_key)
+        self.player.backpack + new_key
         self.game_is_on = False
         
 
@@ -211,14 +211,15 @@ class Game():
         """
         
         player = self.player
-        rune_list = self.player.what_in_backpack(Rune)
+        rune_list = self.player.backpack.get_items_by_class(Rune)
         if answer == 'отмена':
             self.state = 0
             return False
-        elif answer.isdigit() and int(answer) - 1 < len(rune_list):
-            if self.selected_item.enchant(rune_list[int(answer) - 1]):
+        elif answer.isdigit() and int(answer)  <= len(rune_list):
+            chosen_rune = rune_list[int(answer) - 1]
+            if self.selected_item.enchant(chosen_rune):
                 tprint(self, f'{player.name} улучшает {self.selected_item.name1} новой руной.', 'direction')
-                player.backpack.remove(rune_list[int(answer) - 1])
+                player.backpack.remove(chosen_rune)
                 self.state = 0
                 return True
             else:

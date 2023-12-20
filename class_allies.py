@@ -112,7 +112,7 @@ class Trader:
             message.append('Торговцу нечего предложить.')
         else:
             message.append('Торговец предлагает на продажу следующие диковины:')
-            for i, item in enumerate(self.backpack):
+            for i, item in enumerate(self.shop):
                 description = f'{str(i + 1)}: {item.show_in_shop()}'
                 message.append(description)
             message.append(self.money.show())
