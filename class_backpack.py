@@ -8,15 +8,30 @@ class Backpack:
         
     
     def append(self, item):
+        """Метод добавления вещи в рюкзак"""
+        
         self.insides.append(item)
+        item.place = self
 
 
     def __add__(self, item):
+        """Метод добавления вещи в рюкзак"""
+        
         self.insides.append(item)
+        item.place = self
     
         
-    def remove(self, item):
+    def remove(self, item, place=None):
+        """
+        Метод извлечения вещи из рюкзака.\n
+        Входные парамеры:
+        - item - вещь, которая извлекается из рюкзака
+        - place - место, в которое помещается вещь после извлечения
+        
+        """
+        
         self.insides.remove(item)
+        item.place = place
         
     
     def get_items_by_class(self, item_class) -> list:
