@@ -8,6 +8,7 @@ from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
 from class_allies import Trader
+from class_backpack import Backpack
 from functions import randomitem, tprint
 from settings import *
 
@@ -55,6 +56,7 @@ class Game():
             'руна': Rune,
             'заклинание': Spell,
             'торговец': Trader,
+            'рюкзак': Backpack,
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0
@@ -75,6 +77,7 @@ class Game():
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
+        self.no_backpack = Backpack(self, no_backpack=True)
         self.castle_floors = self.create_floors()
         self.current_floor = self.castle_floors[0]
         self.player = self.check_hero(hero=hero)

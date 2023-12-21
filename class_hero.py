@@ -138,6 +138,11 @@ class Hero:
         return None
 
     
+    def check_backpack(self) -> bool:
+        """Метод возвращает True если у героя есть рюкзак"""
+        return not self.backpack.no_backpack
+    
+    
     def do(self, command:str):
         """
         Метод обрабатывает команды, переданные герою и 
@@ -287,6 +292,8 @@ class Hero:
                 return self.drop_removed_shield()
             elif self.weapon.check_name(item):
                 return self.drop_weapon()
+            elif self.backpack.check_name(item):
+                return self.drop_backpack()
             else:
                 return self.drop_item(item=item)
    
@@ -310,6 +317,19 @@ class Hero:
         else:
             tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
             return False
+    
+    
+    def drop_backpack(self) -> bool:
+        """Метод выбрасывания рюкзака."""
+        
+        if self.backpack.no_backpack:
+            return False
+        game = self.game
+        room = self.current_position
+        room.loot.add(self.backpack)
+        tprint(game, f'{self.name} снимает рюкзак и кладет в угол комнаты.')
+        self.backpack = game.no_backpack
+        return True    
     
     
     def drop_shield(self) -> bool:

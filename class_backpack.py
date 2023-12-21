@@ -3,9 +3,21 @@ from class_weapon import Weapon
 
 class Backpack:
     
-    def __init__(self) -> None:
+    def __init__(self,
+                 game,
+                 no_backpack=False
+                 ) -> None:
         self.insides = []
-        
+        self.name = 'рюкзак'
+        self.lexemes = {
+            "accus": "рюкзак",
+            "gen": "рюкзака"
+            }
+    
+    
+    def check_name(self, message:str) -> bool:
+        return message.lower() in [self.name, self.lexemes['accus']]
+    
     
     def append(self, item):
         """Метод добавления вещи в рюкзак"""
