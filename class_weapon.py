@@ -173,7 +173,7 @@ class Weapon:
         else:
             who.backpack.append(who.weapon)
             who.weapon = self
-            who.backpack.remove(self)
+            who.backpack.remove(self, who)
             message = [f'{who.name} теперь использует {self.name1} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield

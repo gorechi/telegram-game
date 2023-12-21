@@ -139,10 +139,7 @@ def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
     """
     
     keys = []
-    can_use = []
-    for i in game.player.backpack:
-        if i.can_use_in_fight:
-            can_use.append(i)
+    can_use = game.player.backpack.get_items_for_fight()
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
     keys.append('ударить')
     if not game.player.shield.empty:

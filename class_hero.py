@@ -236,7 +236,7 @@ class Hero:
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
             message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
-        self.backpack.remove(second_weapon)
+        self.backpack.remove(second_weapon, self)
         self.backpack.append(self.weapon)
         self.weapon = second_weapon
         tprint(self.game, message)
@@ -252,7 +252,7 @@ class Hero:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
-        self.backpack.remove(second_weapon)
+        self.backpack.remove(second_weapon, self)
         self.weapon = second_weapon
         tprint(self.game, message)
         
@@ -279,7 +279,7 @@ class Hero:
         if not item or item in ['все', 'всё']:
             tprint(game, f'{self.name} {self.g(["хотел", "хотела"])} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
-            return self.drop_digit(digit=item)
+            return self.drop_digit(item)
         else:
             if shield_in_hand and self.shield.check_name(item):
                 return self.drop_shield()
@@ -291,7 +291,7 @@ class Hero:
                 return self.drop_item(item=item)
    
     
-    def drop_digit(self, digit:str) -> bool:
+    def drop_digit(self, number:str) -> bool:
         """
         Метод обрабатывает ситуацию, когда в команду "бросить" 
         в качестве аргумента передан порядковый номер предмета.
@@ -300,12 +300,12 @@ class Hero:
         
         game = self.game
         room = self.current_position
-        digit = int(digit)
-        if digit - 1 < len(self.backpack):
-            i = self.backpack.insides[digit - 1]
-            room.loot.add(i)
-            self.backpack.remove(i)
-            tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
+        number = int(number)
+        item = self.backpack.get_item_by_number(number)
+        if item:
+            room.loot.add(item)
+            self.backpack.remove(item, room)
+            tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
             return True
         else:
             tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
@@ -358,7 +358,7 @@ class Hero:
         room = self.current_position
         item_to_drop = self.backpack.get_first_item_by_name(item)
         if item_to_drop:
-            self.backpack.remove(item_to_drop)
+            self.backpack.remove(item_to_drop, room)
             room.loot.add(item_to_drop)
             tprint(game, f'{self.name} бросает {item_to_drop.name} на пол комнаты.')
             return True
@@ -416,7 +416,7 @@ class Hero:
             all_items = self.backpack.get_items_except_class(Key)
             if all_items:
                 item = randomitem(all_items)
-                self.backpack.remove(item)
+                self.backpack.remove(item, stealing_monster)
                 stealing_monster.take(item)
                 return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
         return None
@@ -617,7 +617,7 @@ class Hero:
                 item = self.backpack.get_random_item()
                 items_list.append(item.name1)
                 room.loot.add(item)
-                self.backpack.remove(item)
+                self.backpack.remove(item, room)
         return items_list
     
     

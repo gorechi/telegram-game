@@ -202,9 +202,9 @@ class Matches:
         
         if not who:
             return False
-        matches_in_backpack = who.what_in_backpack(Matches)
+        matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
         if matches_in_backpack:
-            matches_in_backpack[0] + self
+            matches_in_backpack + self
         else:
             who.backpack.append(self)
         tprint(self.game, f'{who.name} забирает {self.name1} себе.')
