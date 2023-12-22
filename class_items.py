@@ -523,6 +523,7 @@ class Book:
         self.game = game
         self.name = name
         self.empty = False
+        self.can_use_in_fight = False
         self.base_price = self.define_base_price()
 
     

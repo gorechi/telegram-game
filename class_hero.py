@@ -31,10 +31,6 @@ class Hero:
             self.actions = ['бьет']
         else:
             self.actions = actions
-        if backpack is None:
-            self.backpack = Backpack()
-        else:
-            self.backpack = backpack
         self.game = game
         self.name = name
         self.name1 = name1
@@ -60,6 +56,10 @@ class Hero:
         else:
             self.shield = shield
         self.removed_shield = self.game.no_shield
+        if backpack is None:
+            self.backpack = Backpack(self.game)
+        else:
+            self.backpack = backpack
         self.money = Money(self.game, 0)
         self.current_position = None
         self.game_is_over = False
@@ -624,13 +624,13 @@ class Hero:
         """
         Метод моделирует потерю героем вещей из рюкзака 
         когда он сбегает из схватки.
-        Метод возвращает описывающую ситуацию строку текста.
+        Метод возвращает список потерянных вещей.
         
         """
         
         room = self.current_position
         items_list = []
-        a = dice(0, len(self.backpack))
+        a = dice(0, self.backpack.count_items())
         if a > 0:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
@@ -1100,7 +1100,7 @@ class Hero:
         if not self.check_light():
             message.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
         else:
-            message += self.backpack.show()
+            message += self.backpack.show(self)
             message.append(self.money.show())
             if not self.removed_shield.empty:
                 message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')

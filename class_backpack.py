@@ -9,6 +9,9 @@ class Backpack:
                  ) -> None:
         self.insides = []
         self.name = 'рюкзак'
+        self.name1 = 'рюкзак'
+        self.game = game
+        self.no_backpack = no_backpack
         self.lexemes = {
             "accus": "рюкзак",
             "gen": "рюкзака"
@@ -121,17 +124,18 @@ class Backpack:
         """Метод генерирует описание рюкзака."""
         
         message = []
+        if self.no_backpack:
+            return [f'У {who.g(["героя", "героини"])} нет рюкзака, поэтому и осматривать нечего.']
         if self.is_empty():
-            message.append(f'{who.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
-        else:
-            message.append(f'{who.name} осматривает свой рюкзак и обнаруживает в нем:')
-            for i, item in enumerate(self.insides):
-                description = f'{str(i + 1)}: {item.show()}'
-                if isinstance(item, Weapon):
-                    weapon_mastery = who.weapon_mastery[item.type]['level']
-                    if weapon_mastery > 0:
-                        description += f', мастерство - {weapon_mastery}'
-                message.append(description)
+            return [f'{who.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.']
+        message.append(f'{who.name} осматривает свой рюкзак и обнаруживает в нем:')
+        for i, item in enumerate(self.insides):
+            description = f'{str(i + 1)}: {item.show()}'
+            if isinstance(item, Weapon):
+                weapon_mastery = who.weapon_mastery[item.type]['level']
+                if weapon_mastery > 0:
+                    description += f', мастерство - {weapon_mastery}'
+            message.append(description)
         return message
     
     
