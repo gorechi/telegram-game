@@ -125,7 +125,7 @@ class Protection:
         else:
             who_using.backpack.append(who_using.shield)
             who_using.shield = self
-            who_using.backpack.remove(self)
+            who_using.backpack.remove(self, who_using)
         tprint(self.game, f'{who_using.name} теперь использует {self.name1} в качестве защиты!')
 
 #Класс Доспех (подкласс Защиты)

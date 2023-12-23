@@ -5,6 +5,7 @@ from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room
 from class_weapon import Weapon
+from class_backpack import Backpack
 from functions import howmany, normal_count, randomitem, showsides, tprint
 from settings import *
 
@@ -30,10 +31,6 @@ class Hero:
             self.actions = ['бьет']
         else:
             self.actions = actions
-        if backpack is None:
-            self.backpack = []
-        else:
-            self.backpack = backpack
         self.game = game
         self.name = name
         self.name1 = name1
@@ -59,6 +56,10 @@ class Hero:
         else:
             self.shield = shield
         self.removed_shield = self.game.no_shield
+        if backpack is None:
+            self.backpack = Backpack(self.game)
+        else:
+            self.backpack = backpack
         self.money = Money(self.game, 0)
         self.current_position = None
         self.game_is_over = False
@@ -136,6 +137,11 @@ class Hero:
             return self.removed_shield
         return None
 
+    
+    def check_backpack(self) -> bool:
+        """Метод возвращает True если у героя есть рюкзак"""
+        return not self.backpack.no_backpack
+    
     
     def do(self, command:str):
         """
@@ -235,7 +241,7 @@ class Hero:
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
             message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
-        self.backpack.remove(second_weapon)
+        self.backpack.remove(second_weapon, self)
         self.backpack.append(self.weapon)
         self.weapon = second_weapon
         tprint(self.game, message)
@@ -251,7 +257,7 @@ class Hero:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
             message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
-        self.backpack.remove(second_weapon)
+        self.backpack.remove(second_weapon, self)
         self.weapon = second_weapon
         tprint(self.game, message)
         
@@ -278,7 +284,7 @@ class Hero:
         if not item or item in ['все', 'всё']:
             tprint(game, f'{self.name} {self.g(["хотел", "хотела"])} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
-            return self.drop_digit(digit=item)
+            return self.drop_digit(item)
         else:
             if shield_in_hand and self.shield.check_name(item):
                 return self.drop_shield()
@@ -286,11 +292,13 @@ class Hero:
                 return self.drop_removed_shield()
             elif self.weapon.check_name(item):
                 return self.drop_weapon()
+            elif self.backpack.check_name(item):
+                return self.drop_backpack()
             else:
                 return self.drop_item(item=item)
    
     
-    def drop_digit(self, digit:str) -> bool:
+    def drop_digit(self, number:str) -> bool:
         """
         Метод обрабатывает ситуацию, когда в команду "бросить" 
         в качестве аргумента передан порядковый номер предмета.
@@ -299,16 +307,29 @@ class Hero:
         
         game = self.game
         room = self.current_position
-        digit = int(digit)
-        if digit - 1 < len(self.backpack):
-            i = self.backpack[digit - 1]
-            room.loot.add(i)
-            self.backpack.remove(i)
-            tprint(game, f'{self.name} бросает {i.name} на пол комнаты.')
+        number = int(number)
+        item = self.backpack.get_item_by_number(number)
+        if item:
+            room.loot.add(item)
+            self.backpack.remove(item, room)
+            tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
             return True
         else:
             tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
             return False
+    
+    
+    def drop_backpack(self) -> bool:
+        """Метод выбрасывания рюкзака."""
+        
+        if self.backpack.no_backpack:
+            return False
+        game = self.game
+        room = self.current_position
+        room.loot.add(self.backpack)
+        tprint(game, f'{self.name} снимает рюкзак и кладет в угол комнаты.')
+        self.backpack = game.no_backpack
+        return True    
     
     
     def drop_shield(self) -> bool:
@@ -354,12 +375,11 @@ class Hero:
         """Метод выбрасывания вещи из рюкзака."""
         
         game = self.game
-        item_to_drop = None
-        for i in self.backpack:
-            if item in [i.name.lower(), i.name1.lower()]:
-                item_to_drop = i
+        room = self.current_position
+        item_to_drop = self.backpack.get_first_item_by_name(item)
         if item_to_drop:
-            self.backpack.remove(item_to_drop)
+            self.backpack.remove(item_to_drop, room)
+            room.loot.add(item_to_drop)
             tprint(game, f'{self.name} бросает {item_to_drop.name} на пол комнаты.')
             return True
         else:
@@ -410,13 +430,13 @@ class Hero:
         """
         
         steal_count = dice(1, s_steal_probability)
-        if steal_count == 1 and len(self.backpack) > 0:
+        if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
-            all_items = [item for item in self.backpack if (not isinstance(item, Key))]
-            if len(all_items) > 0:
+            all_items = self.backpack.get_items_except_class(Key)
+            if all_items:
                 item = randomitem(all_items)
-                self.backpack.remove(item)
+                self.backpack.remove(item, stealing_monster)
                 stealing_monster.take(item)
                 return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
         return None
@@ -541,36 +561,16 @@ class Hero:
             return False
         
     
-    def what_in_backpack(self, item_class) -> list:
-        """
-        Метод возвращает список всех предметов определенного типа в рюкзаке героя
-
-        Входящие параметры:
-        - item_class - Класс предмета, который нужно найти (например - Potion)
-
-        Исходящие параметры:
-        - items_list - Список всех найденных предметов
-        
-        """
-        item_list = []
-        for item in self.backpack:
-            if isinstance(item, item_class):
-                item_list.append(item)
-        return item_list
-
-    
-    
     def get_second_weapon(self) -> Weapon:
         """
         Метод ищет в рюкзаке героя оружие. 
         Если оружие найдено, возвращает его. 
         Если оружие не найдено, возвращается объект "Пустое оружие".
         
-        """
-        
-        for i in self.backpack:
-            if isinstance(i, Weapon):
-                return i
+        """       
+        item = self.backpack.get_first_item_by_class(Weapon)
+        if item:
+            return item
         return self.game.no_weapon
 
     
@@ -624,20 +624,20 @@ class Hero:
         """
         Метод моделирует потерю героем вещей из рюкзака 
         когда он сбегает из схватки.
-        Метод возвращает описывающую ситуацию строку текста.
+        Метод возвращает список потерянных вещей.
         
         """
         
         room = self.current_position
         items_list = []
-        a = dice(0, len(self.backpack))
+        a = dice(0, self.backpack.count_items())
         if a > 0:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
-                item = randomitem(self.backpack)
+                item = self.backpack.get_random_item()
                 items_list.append(item.name1)
                 room.loot.add(item)
-                self.backpack.remove(item)
+                self.backpack.remove(item, room)
         return items_list
     
     
@@ -705,21 +705,7 @@ class Hero:
             return target.name, target.get_name('accus')
         else:
             return 'Неизвестная тварь из темноты', 'черт знает кого'
-        
-        
-    def get_items_for_fight(self) -> list:
-        """
-        Метод возвращает список вещей, 
-        которые герой может использовать в бою. 
-        
-        """
-        
-        can_use = []
-        for i in self.backpack:
-            if i.can_use_in_fight:
-                can_use.append(i)
-        return can_use
-    
+            
     
     def generate_rage(self) -> int:
         """Метод генерирует значение ярости героя."""
@@ -884,21 +870,18 @@ class Hero:
         """
         
         game = self.game
-        can_use = []
-        for i in self.backpack:
-            if i.can_use_in_fight:
-                can_use.append(i)
+        can_use = self.backpack.get_items_for_fight()
         if len(can_use) == 0:
             tprint(game, f'{self.name} не может ничего использовать. В рюкзаке нет вещей, которые были бы полезны в бою.')
             return
-        text = []
-        text.append(f'{self.name} может использовать следующие предметы:')
+        message = []
+        message.append(f'{self.name} может использовать следующие предметы:')
         for item in can_use:
-            text.append(f'{str(can_use.index(item) + 1)}: {item.name1}')
-        text.append('Выберите номер предмета или скажите "отмена" для прекращения.')
+            message.append(f'{str(can_use.index(item) + 1)}: {item.name1}')
+        message.append('Выберите номер предмета или скажите "отмена" для прекращения.')
         game.selected_item = can_use
         game.state = 4
-        tprint(game, text, 'use_in_fight')
+        tprint(game, message, 'use_in_fight')
     
     
     def use_shield(self, target):
@@ -1117,18 +1100,8 @@ class Hero:
         if not self.check_light():
             message.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
         else:
-            if len(self.backpack) == 0 and self.money == 0:
-                message.append(f'{self.name} осматривает свой рюкзак и обнаруживает, что тот абсолютно пуст.')
-            else:
-                message.append(f'{self.name} осматривает свой рюкзак и обнаруживает в нем:')
-                for i, item in enumerate(self.backpack):
-                    description = f'{str(i + 1)}: {item.show()}'
-                    if isinstance(item, Weapon):
-                        weapon_mastery = self.weapon_mastery[item.type]['level']
-                        if weapon_mastery > 0:
-                            description += f', мастерство - {weapon_mastery}'
-                    message.append(description)
-                message.append(self.money.show())
+            message += self.backpack.show(self)
+            message.append(self.money.show())
             if not self.removed_shield.empty:
                 message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
         tprint(self.game, message)
@@ -1461,20 +1434,27 @@ class Hero:
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
-        elif item in ['все', 'всё', '']:
-            items_to_remove = []
-            for item in current_loot.pile:
-                if self.can_take(item):
-                    item.take(self)
-                    items_to_remove.append(item)
-            for item in items_to_remove:
-                current_loot.pile.remove(item)
+        if self.backpack.no_backpack:
+            backpacks = current_loot.check_for_backpacks()
+            if backpacks:
+                backpacks[0].take(self)
+                current_loot.remove(backpacks[0])
+                if item == 'рюкзак':
+                    return True
+            else:
+                tprint(game, f'У {self.g(["героя", "героини"])} нет рюкзака, \
+                       поэтому {self.g(["он", "она"])} может взять только то, что может нести в руках')
+        if item in ['все', 'всё', '']:
+            for i in current_loot.pile:
+                if self.can_take(i):
+                    i.take(self)
+                    current_loot.remove(i)
             return True
         else:
             for i in current_loot.pile:
                 if item in [i.name.lower(), i.name1.lower()]:
                     i.take(self)
-                    current_loot.pile.remove(i)
+                    current_loot.remove(i)
                     return True
         tprint(game, 'Такой вещи здесь нет.')
         return False
@@ -1493,14 +1473,6 @@ class Hero:
                 tprint(self.game, f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
             return True
         return False
-    
-    
-    def get_key_from_backpack(self) -> Key:
-        """Метод возвращает случайный ключ из рюкзака героя."""
-        for i in self.backpack:
-            if isinstance(i, Key):
-                return i
-        return None
     
     
     def get_list_of_locked_objects(self, room:Room, what:str='') -> list:
@@ -1530,7 +1502,7 @@ class Hero:
         if not self.check_light():
             tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')
             return False
-        key = self.get_key_from_backpack()
+        key = self.backpack.get_first_item_by_class(Key)
         if not key:
             tprint(game, 'Чтобы что-то открыть нужен хотя бы один ключ.')
             return False
@@ -1542,7 +1514,7 @@ class Hero:
         game = self.game
         room = self.current_position
         what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
-        key = self.get_key_from_backpack()
+        key = self.backpack.get_first_item_by_class(Key)
         if not what_is_locked:
             tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
             return False
@@ -1562,7 +1534,7 @@ class Hero:
         
         game = self.game
         room = self.current_position
-        key = self.get_key_from_backpack()
+        key = self.backpack.get_first_item_by_class(Key)
         door = room.doors[s_hero_doors_dict[direction]]
         if  not door.locked:
             tprint(game, 'В той стороне нечего открывать.')
@@ -1596,21 +1568,21 @@ class Hero:
         return True
     
     
-    def use_item_from_backpack(self, item:str) -> bool:
+    def use_item_from_backpack(self, item_string:str) -> bool:
         """Метод использования штуки из рюкзака."""
         
         game = self.game
+        if self.backpack.no_backpack:
+            tprint(game, f'{self.name} где-то {self.g(["потерял", "потеряла"])} свой рюкзак и не может ничего использовать.')
+            return False
         if item.isdigit():
-            item_index = int(item) - 1
-            if item_index < len(self.backpack):
-                i = self.backpack[item_index]
-                i.use(self, in_action=False)
-                return True
+            number = int(item_string)
+            item = self.backpack.get_item_by_number(number)
         else:
-            for i in self.backpack:
-                if item.lower() in [i.name.lower(), i.name1.lower()]:
-                    i.use(self, in_action=False)
-                    return True
+            item = self.backpack.get_first_item_by_name(item_string)
+        if item:
+            item.use(self, in_action=False)
+            return True
         tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
         return False
     
@@ -1624,14 +1596,14 @@ class Hero:
             return False
         if item.lower() in [self.removed_shield.name.lower(), self.removed_shield.name1.lower(), 'щит']:
             return self.take_out_shield()
-        return self.use_item_from_backpack(item=item)
+        return self.use_item_from_backpack(item)
 
     
     def check_if_hero_can_enchant(self, item:str) -> bool:
         """Метод проверки, может ли герой что-то улучшать."""
         
         game = self.game
-        rune_list = self.what_in_backpack(Rune)
+        rune_list = self.backpack.get_items_by_class(Rune)
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
             return False
@@ -1673,13 +1645,9 @@ class Hero:
             game.selected_item = self.armor
             return True
         if item.isdigit():
-            item_index = int(item) - 1
-            if item_index <= len(self.backpack):
-                selected_item = self.backpack[item_index]
+            selected_item = self.backpack.get_item_by_number(int(item))
         else:
-            for i in self.backpack:
-                if item.lower() in [i.name.lower(), i.name1.lower()]:
-                    selected_item = i
+            selected_item = self.backpack.get_first_item_by_name(item)
         if isinstance(selected_item, Weapon):
                     game.selected_item = selected_item
                     return True
@@ -1704,7 +1672,7 @@ class Hero:
             return False
         if not self.chose_what_to_enchant(item=item):
             return False
-        rune_list = self.what_in_backpack(Rune)
+        rune_list = self.backpack.get_items_by_class(Rune)
         text = []
         text.append(f'{self.name} может использовать следующие руны:')
         for rune in rune_list:
@@ -1740,35 +1708,9 @@ class Hero:
         if self.armor.element() in s_glowing_elements:
             return True
         return False
-    
-    
-    def get_items_from_backpack(self, item_class, mode:str=None):
-        """
-        Метод извлечения всх определенных вещей из рюкзака героя.
-        На вход передается:
-        - item_class - класс вещей, список которых надо сформировать
-        - mode - что возвращается:
-            - если значение не передано, возвращается массив вещей
-            - 'first' - возвращается первая вещь
-            - 'random' - возвращается случайная вещь
         
-        Если в рюкзаке есть нужные вещи, то возвращается их массив.
-        Если в рюкзаке нет таких вещей, возращается None.
-        
-        """
-        
-        items = [i for i in self.backpack if isinstance(i, item_class)]
-        if not items:
-            return None
-        if mode == 'first':
-            return items[0]
-        if mode == 'random':
-            return randomitem(items)
-        if not mode:
-            return items
     
-    
-    def get_book(self, item:str) -> Book:
+    def get_book(self, item:str) -> Book|None:
         """
         Метод поиска книги в рюкзаке.
         Принимает на вход строку из команды игрока.
@@ -1780,20 +1722,15 @@ class Hero:
         
         game = self.game
         if not item or item == 'книгу':
-            book = self.get_items_from_backpack(Book, mode='random')
-            if book:
-                tprint(game, f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.')
-            return book
+            book = self.backpack.get_random_item_by_class(Book)
+            message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
         else:
-            books = self.get_items_from_backpack(Book)
-            if not books:
-                return None
-            book = None
-            for i in books:
-                if item.lower() in [i.name.lower(), i.name1.lower()]:
-                    book = i
-                    tprint(game, f'{self.name} читает {book.name1}.')
-                    return book 
+            book = self.backpack.get_first_item_by_name(item)
+            message = f'{self.name} читает {book.name1}.'
+        if book:
+            tprint(game, message)
+            return book
+        return None 
     
     
     def read(self, what:str) -> bool:

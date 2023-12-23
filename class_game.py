@@ -8,6 +8,7 @@ from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
 from class_allies import Trader
+from class_backpack import Backpack
 from functions import randomitem, tprint
 from settings import *
 
@@ -55,6 +56,7 @@ class Game():
             'руна': Rune,
             'заклинание': Spell,
             'торговец': Trader,
+            'рюкзак': Backpack,
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0
@@ -75,13 +77,14 @@ class Game():
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
+        self.no_backpack = Backpack(self, no_backpack=True)
         self.castle_floors = self.create_floors()
         self.current_floor = self.castle_floors[0]
         self.player = self.check_hero(hero=hero)
         self.player.current_position = self.current_floor.plan[0]
         self.current_floor.plan[0].visited = '+'
         new_key = Key(self)
-        self.player.backpack.append(new_key)
+        self.player.backpack + new_key
         self.game_is_on = False
         
 
@@ -211,14 +214,15 @@ class Game():
         """
         
         player = self.player
-        rune_list = self.player.what_in_backpack(Rune)
+        rune_list = self.player.backpack.get_items_by_class(Rune)
         if answer == 'отмена':
             self.state = 0
             return False
-        elif answer.isdigit() and int(answer) - 1 < len(rune_list):
-            if self.selected_item.enchant(rune_list[int(answer) - 1]):
+        elif answer.isdigit() and int(answer)  <= len(rune_list):
+            chosen_rune = rune_list[int(answer) - 1]
+            if self.selected_item.enchant(chosen_rune):
                 tprint(self, f'{player.name} улучшает {self.selected_item.name1} новой руной.', 'direction')
-                player.backpack.remove(rune_list[int(answer) - 1])
+                player.backpack.remove(chosen_rune)
                 self.state = 0
                 return True
             else:
