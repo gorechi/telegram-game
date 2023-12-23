@@ -1565,6 +1565,9 @@ class Hero:
         """Метод использования штуки из рюкзака."""
         
         game = self.game
+        if self.backpack.no_backpack:
+            tprint(game, f'{self.name} где-то {self.g(["потерял", "потеряла"])} свой рюкзак и не может ничего использовать.')
+            return False
         if item.isdigit():
             number = int(item_string)
             item = self.backpack.get_item_by_number(number)
