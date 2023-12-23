@@ -9,8 +9,10 @@ class Loot:
         self.pile = []
         self.empty = False
 
+
     def __str__(self):
         return 'loot'
+
 
     def __add__(self, other) -> bool:
         if not isinstance(other, Loot):
@@ -18,15 +20,19 @@ class Loot:
         self.pile.extend(other.pile)
         return True
     
+    
     def add(self, obj):
         self.pile.append(obj)
+
 
     def remove(self, obj):
         self.pile.remove(obj)
     
+    
     def __eq__(self, other) -> bool:
         if isinstance(other, int):
             return len(self.pile) == other
+    
     
     def transfer(self, other_loot):
         if not isinstance(other_loot, Loot):
@@ -35,8 +41,31 @@ class Loot:
         self.pile = []
         return True
     
-    def check_for_backpacks(self) -> list:
-        return [item for item in self.pile if isinstance(item, Backpack)]
+    
+    def get_first_item_by_name(self, name:str):
+        """
+        Метод принимает на вход строку имени вещи и
+        и возвращает первую найденную  по этому имени вещь.
+        """
+        
+        for item in self.pile:
+            if name.lower() in [item.name.lower(), item.name1.lower()]:
+                return item
+        return False
+    
+    
+    def get_all_items_by_name(self, name:str) -> list:
+        """
+        Метод принимает на вход строку имени вещи и
+        и возвращает все найденные по этому имени вещи.
+        """
+        
+        return [item for item in self.pile if name.lower() in [item.name.lower(), item.name1.lower()]]
+
+    
+    def get_items_by_class(self, item_class) -> list:
+        return [item for item in self.insides if isinstance(item, item_class)]
+        
         
     def show_sorted(self) -> list:
         items = self.pile

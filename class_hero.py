@@ -1435,30 +1435,45 @@ class Hero:
             tprint(game, 'Здесь нечего брать.')
             return False
         if self.backpack.no_backpack:
-            backpacks = current_loot.check_for_backpacks()
-            if backpacks:
-                backpacks[0].take(self)
-                current_loot.remove(backpacks[0])
-                if item == 'рюкзак':
-                    return True
-            else:
-                tprint(game, f'У {self.g(["героя", "героини"])} нет рюкзака, \
-                       поэтому {self.g(["он", "она"])} может взять только то, что может нести в руках')
+            backpack_is_taken = self.try_to_take_backpack()
         if item in ['все', 'всё', '']:
-            for i in current_loot.pile:
-                if self.can_take(i):
-                    i.take(self)
-                    current_loot.remove(i)
-            return True
+            item_is_taken = self.take_all()
         else:
-            for i in current_loot.pile:
-                if item in [i.name.lower(), i.name1.lower()]:
-                    i.take(self)
-                    current_loot.remove(i)
-                    return True
-        tprint(game, 'Такой вещи здесь нет.')
-        return False
+            item_is_taken = self.take_item_by_name(item)
+        if not item_is_taken and not backpack_is_taken:
+            tprint(game, 'Такой вещи здесь нет.')
+        return item_is_taken or backpack_is_taken
 
+    
+    def try_to_take_backpack(self) -> bool:
+        current_loot = self.current_position.loot        
+        backpacks = current_loot.get_items_by_class(Backpack)
+        if backpacks:
+            backpacks[0].take(self)
+            current_loot.remove(backpacks[0])
+            return True
+        tprint(self.game, f'У {self.g(["героя", "героини"])} нет рюкзака, поэтому {self.g(["он", "она"])} может взять только то, что может нести в руках')
+        return False
+    
+    
+    def take_item_by_name(self, name):
+        current_loot = self.current_position.loot
+        item = current_loot.get_first_item_by_name(item)
+        if item:
+            item.take(self)
+            current_loot.remove(item)
+            return True
+        return False
+    
+    
+    def take_all(self):
+        current_loot = self.current_position.loot
+        for item in current_loot.pile:
+                if self.can_take(item):
+                    item.take(self)
+                    current_loot.remove(item)
+        return True
+    
     
     def check_fear(self, print_message:bool=True) -> bool:
         """
