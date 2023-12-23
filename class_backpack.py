@@ -138,7 +138,7 @@ class Backpack:
             message.append(description)
         return message
     
-    
+
     def get_item_by_number(self, number:int):
         if not isinstance (number, int):
             return False
@@ -146,3 +146,14 @@ class Backpack:
         if item_index < self.count_items():
             return self.insides[item_index]
         return False
+    
+    
+    def take(self, who) -> bool:
+        game = self.game
+        if not who.backpack.no_backpack:
+            tprint(game, f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.')
+            return False
+        who.backpack = self
+        self.place = who
+        tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who.g(["он", "она"])} может носить с собой необходимые вещи.')
+        return True

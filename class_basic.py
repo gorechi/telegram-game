@@ -1,5 +1,6 @@
 from functions import howmany, tprint
 from settings import s_money_groups, s_money_piles
+from class_backpack import Backpack
 
 
 class Loot:
@@ -34,6 +35,9 @@ class Loot:
         self.pile = []
         return True
     
+    def check_for_backpacks(self) -> list:
+        return [item for item in self.pile if isinstance(item, Backpack)]
+        
     def show_sorted(self) -> list:
         items = self.pile
         items_dict = {}
