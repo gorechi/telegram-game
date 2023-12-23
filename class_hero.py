@@ -1434,6 +1434,8 @@ class Hero:
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
+        if self.backpack.no_backpack:
+            tprint(game, f'У {self.g(["героя", "героини"])} нет рюкзаказ, поэтому {self.g(["он", "она"])} может взять только то, что может нести в руках')
         elif item in ['все', 'всё', '']:
             items_to_remove = []
             for item in current_loot.pile:

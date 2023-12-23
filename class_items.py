@@ -82,8 +82,9 @@ class Rune:
         
         """ Метод вызывается когда кто-то забирает руну себе. """
         
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
     
     def show(self) -> str:
@@ -128,8 +129,9 @@ class Spell:
     def take(self, who=''):
         if who == '':
             return False
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name} себе.')
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name} себе.')
 
 
 class Matches:
@@ -202,13 +204,15 @@ class Matches:
         
         if not who:
             return False
-        matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
-        if matches_in_backpack:
-            matches_in_backpack + self
-        else:
-            who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
-        return True
+        if not who.backpack.no_backpack:
+            matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
+            if matches_in_backpack:
+                matches_in_backpack + self
+            else:
+                who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            return True
+        return False
 
     
     def use(self, who_is_using=None, in_action=False) -> bool:
@@ -309,8 +313,9 @@ class Map:
         
         """ Метод вызывается когда кто-то забирает карту себе. """
         
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
 
 
 class Key:
@@ -348,9 +353,11 @@ class Key:
 
     
     def take(self, who):
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name} себе.')
-        return True
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name} себе.')
+            return True
+        return False
 
 
 class Potion:
@@ -512,9 +519,11 @@ class Potion:
 
     
     def take(self, who):
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name} себе.')
-        return True
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name} себе.')
+            return True
+        return False
 
 
 class Book:
@@ -579,6 +588,8 @@ class Book:
     
     
     def take(self, who):
-        who.backpack.append(self)
-        tprint(self.game, f'{who.name} забирает {self.name1} себе.')
-        return True
+        if not who.backpack.no_backpack:
+            who.backpack.append(self)
+            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            return True
+        return False
