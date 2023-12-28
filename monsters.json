@@ -399,6 +399,123 @@
     "wearArmor": true
   },
   {
+    "class": "вампир",
+    "name": "Вурдалак",
+    "lexemes": {
+      "accus": "Вурдалака",
+      "gen": "Вурдалака"
+    },
+    "stren": 6,
+    "health": 25,
+    "hit_chance": 6,
+    "parry_chance": 3,
+    "can_hide": true,
+    "can_run": true,
+    "actions":
+      [
+      "царапает",
+      "кусает",
+      "рвет"
+      ],
+    "state": "притаился",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": true,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": false,
+    "wearArmor": true
+  },    
+  {
+    "class": "животное",
+    "name": "Медведь",
+    "lexemes": {
+      "accus": "Медведя",
+      "gen": "Медведя"
+    },
+    "stren": 10,
+    "health": 27,
+    "hit_chance": 4,
+    "parry_chance": 2,
+    "can_hide": false,
+    "can_run": true,
+    "actions":
+      [
+      "бьет лапой",
+      "рвет когтями",
+      "кусает"
+      ],
+    "state": "переминается с лапы на лапу",
+    "frightening": true,
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": false,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": false
+  },
+  {
+    "class": "животное",
+    "name": "Лев",
+    "lexemes": {
+      "accus": "Льва",
+      "gen": "Льва"
+    },
+    "stren": 12,
+    "health": 27,
+    "hit_chance": 5,
+    "parry_chance": 3,
+    "can_hide": false,
+    "can_run": true,
+    "actions":
+      [
+      "бьет лапой",
+      "рвет зубами",
+      "кусает"
+      ],
+    "state": "вальяжно лежит",
+    "frightening": true,
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": false,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": false
+  },
+  {
+    "class": "монстр",
+    "name": "Гном",
+    "lexemes": {
+      "accus": "Гнома",
+      "gen": "Гнома"
+    },
+    "stren": 11,
+    "health": 22,
+    "hit_chance": 5,
+    "parry_chance": 4,
+    "can_hide": true,
+    "can_run": true,
+    "actions":
+      [
+      "рубит",
+      "бьет",
+      "стукает"
+      ],
+    "state": "стоит",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "prefered_weapon": "рубящее",
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": true
+  },
+  {
     "class": "берсерк",
     "name": "Берсерк",
     "lexemes": {
@@ -426,5 +543,151 @@
     "gender": 0,
     "corpse": true,
     "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Крестоносец",
+    "lexemes": {
+      "accus": "Крестоносца",
+      "gen": "Крестоносца"
+    },
+    "stren": 10,
+    "health": 28,
+    "hit_chance": 5,
+    "parry_chance": 0,
+    "can_hide": false,
+    "can_run": false,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "повергает"
+      ],
+    "state": "стоит",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Леший",
+    "lexemes": {
+      "accus": "Лешего",
+      "gen": "Лешего"
+    },
+    "stren": 15,
+    "health": 22,
+    "hit_chance": 4,
+    "parry_chance": 1,
+    "can_hide": false,
+    "can_run": false,
+    "actions":
+      [
+      "крушит",
+      "бьет",
+      "повергает"
+      ],
+    "state": "стоит",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": false,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Древень",
+    "lexemes": {
+      "accus": "Древня",
+      "gen": "Древня"
+    },
+    "stren": 17,
+    "health": 28,
+    "hit_chance": 3,
+    "parry_chance": 0,
+    "can_hide": false,
+    "can_run": false,
+    "actions":
+      [
+      "сокрушает",
+      "бьет",
+      "повергает"
+      ],
+    "state": "стоит",
+    "frightening": true,
+    "agressive": false,
+    "carryweapon": false,
+    "carryshield": true,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Солдат",
+    "lexemes": {
+      "accus": "Солдата",
+      "gen": "Солдата"
+    },
+    "stren": 8,
+    "health": 26,
+    "hit_chance": 7,
+    "parry_chance": 4,
+    "can_hide": true,
+    "can_run": true,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "что-то ищет",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": true,
+    "prefered_weapon": "колющее",
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": true
+  },
+  {
+    "class": "монстр",
+    "name": "Крестьянин",
+    "lexemes": {
+      "accus": "Крестьянина",
+      "gen": "Крестьянина"
+    },
+    "stren": 6,
+    "health": 30,
+    "hit_chance": 4,
+    "parry_chance": 1,
+    "can_hide": true,
+    "can_run": true,
+    "actions":
+      [
+      "режет",
+      "бьет",
+      "стукает"
+      ],
+    "state": "чего-то ждет",
+    "frightening": false,
+    "agressive": false,
+    "carryweapon": true,
+    "carryshield": false,
+    "venomous": 0,
+    "gender": 0,
+    "corpse": true,
+    "wearArmor": false
   }
 ]

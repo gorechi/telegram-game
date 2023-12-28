@@ -761,6 +761,33 @@ class Vampire(Monster):
         return True
 
 
+class Animal(Monster):
+    def __init__(self, 
+                 game, 
+                 name='',
+                 lexemes=s_monster_lexemes, 
+                 stren=10, 
+                 health=20, 
+                 actions='бьет', 
+                 state='стоит', 
+                 agressive=False,
+                 carry_weapon=True, 
+                 carry_shield=True,
+                 wear_armor=True):
+        super().__init__(game, 
+                         name,
+                         lexemes, 
+                         stren, 
+                         health, 
+                         actions, 
+                         state, 
+                         agressive, 
+                         carry_weapon, 
+                         carry_shield,
+                         wear_armor)
+        self.empty = False
+
+
 class Corpse():
     def __init__(self,
                  game,
