@@ -3,7 +3,7 @@ import json
 from class_castle import Floor
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
-from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse
+from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
@@ -48,6 +48,8 @@ class Game():
             'вампир': Vampire,
             'берсерк': Berserk,
             'растение': Plant,
+            'животное': Animal,
+            'труп': Corpse,
             'ключ': Key,
             'карта': Map,
             'спички': Matches,
