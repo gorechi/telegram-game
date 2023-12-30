@@ -126,3 +126,4 @@ dmypy.json
 *.xml
 .idea/workspace.xml
 test.py
+constants.py
