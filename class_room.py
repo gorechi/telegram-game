@@ -173,7 +173,21 @@ class Room:
                 secret_word = i
         return secret_word
     
-    
+
+    def get_available_directions(self) -> list:
+        """
+        Метод определяет, в каких направлениях герой может выйти из комнаты.
+        Возвращает список направлений.
+        
+        """
+        
+        available_directions = []
+        for i in range(4):
+            if not self.doors[i].empty and not self.doors[i].locked:
+                available_directions.append(i)
+        return available_directions
+
+      
     def decorate(self):
         self.decoration1 = randomitem(Room.decor1)
         self.decoration2 = randomitem(Room.decor2)
@@ -240,14 +254,13 @@ class Room:
             message.append(who_is_here)
             if self.stink > 0:
                 message.append(stink_text)
-            tprint(game, message, state = 'direction')
         else:
             message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
             if monster:
                 message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
             if self.stink > 0:
                 message.append(stink_text)
-            tprint(game, message, state = 'direction')
+        tprint(game, message, state='direction')
 
     
     def show_through_key_hole(self, who):

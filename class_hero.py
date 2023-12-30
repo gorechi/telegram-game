@@ -639,21 +639,7 @@ class Hero:
                 room.loot.add(item)
                 self.backpack.remove(item, room)
         return items_list
-    
-    
-    def get_available_directions(self, room:Room) -> list:
-        """
-        Метод определяет, в каких направлениях герой может выйти из комнаты.
-        Возвращает список направлений.
-        
-        """
-        
-        available_directions = []
-        for i in range(4):
-            if not room.doors[i].empty and not room.doors[i].locked:
-                available_directions.append(i)
-        return available_directions
-    
+      
     
     def run_away(self, target: Monster) -> list:
         """
@@ -669,6 +655,7 @@ class Hero:
         """
         
         room = self.current_position
+        available_directions = room.get_available_directions()
         self.rage = 0
         self.hide = False
         message = [
@@ -676,7 +663,6 @@ class Hero:
             self.lose_weapon_or_shield(target=target)
         ]
         message += self.lose_random_items()        
-        available_directions = self.get_available_directions(room=room)
         if self.check_light():
             direction = randomitem(available_directions)
         else:
@@ -1178,16 +1164,17 @@ class Hero:
             self.show_backpack()
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
-        if monster and what.lower() in [monster.name.lower(),
-                                        monster.get_name('accus').lower(),
-                                        monster.name[0].lower(),
-                                        'монстр', 
-                                        'врага', 
-                                        'монстра', 
-                                        'враг', 
-                                        'противника', 
-                                        'противник']:
-            tprint(game, showsides(self, monster, self.floor))
+        if monster and what: 
+            if what.lower() in [monster.name.lower(),
+                                monster.get_name('accus').lower(),
+                                monster.name[0].lower(),
+                                'монстр', 
+                                'врага', 
+                                'монстра', 
+                                'враг', 
+                                'противника', 
+                                'противник']:
+                tprint(game, showsides(self, monster, self.floor))
         if what in self.weapon.real_name(all=True, additional=['оружие']):
             tprint(game, self.look_at_weapon())
         if what in self.shield.real_name(all=True, additional=['щит']):
@@ -1471,7 +1458,7 @@ class Hero:
         for item in current_loot.pile:
                 if self.can_take(item):
                     item.take(self)
-                    current_loot.remove(item)
+        current_loot.get_empty()
         return True
     
     
@@ -1590,7 +1577,7 @@ class Hero:
         if self.backpack.no_backpack:
             tprint(game, f'{self.name} где-то {self.g(["потерял", "потеряла"])} свой рюкзак и не может ничего использовать.')
             return False
-        if item.isdigit():
+        if item_string.isdigit():
             number = int(item_string)
             item = self.backpack.get_item_by_number(number)
         else:

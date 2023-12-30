@@ -114,7 +114,7 @@ class Monster:
         """       
         
         if self.lexemes:
-            return self.lexemes.get(case, self.name)
+            return self.lexemes.get(case)
         return self.name
     
     

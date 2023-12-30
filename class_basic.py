@@ -34,6 +34,10 @@ class Loot:
             return len(self.pile) == other
     
     
+    def get_empty(self):
+        self.pile=[]
+        
+    
     def transfer(self, other_loot):
         if not isinstance(other_loot, Loot):
             return False

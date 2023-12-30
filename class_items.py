@@ -132,6 +132,19 @@ class Spell:
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             tprint(self.game, f'{who.name} забирает {self.name} себе.')
+            
+    
+    def use(self, who_is_using, in_action:bool=False) -> str:
+        
+        """ 
+        Метод использования заклинания. Возвращает строку ответа и ничего не делает 
+        так как заклинание использовать нельзя.
+        
+        """
+        
+        tprint(
+            self.game, f'{who_is_using.name} не знает, как использовать такие штуки.')
+
 
 
 class Matches:
@@ -358,6 +371,17 @@ class Key:
             tprint(self.game, f'{who.name} забирает {self.name} себе.')
             return True
         return False
+    
+    
+    def use(self, who_is_using, in_action:bool=False) -> str:
+        
+        """ 
+        Метод использования ключа. 
+        
+        """
+        
+        tprint(
+            self.game, f'{who_is_using.name} не знает, как можно использовать ключ если не открывать им что-то.')
 
 
 class Potion:
