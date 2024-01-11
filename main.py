@@ -2,16 +2,19 @@
 # -*- coding: utf-8 -*-
 # Импортируем необходимые модули
 import telebot
+import os
+from dotenv import find_dotenv, load_dotenv
 from telebot import types
 
 from class_game import Game
-from constants import TOKEN
  
 # Константы и настройки
 game_sessions = {}
 
 # Запускаем бота
-bot = telebot.TeleBot(TOKEN)
+load_dotenv(find_dotenv())
+token = os.getenv('TelegramGameToken')
+bot = telebot.TeleBot(token)
 
 
 #Функции бота
