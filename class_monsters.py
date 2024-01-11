@@ -373,7 +373,7 @@ class Monster:
             return False
         self.gather_loot()
         corpse_name = f'труп {self.get_name("gen")}'
-        new_corpse = Corpse(corpse_name, self.loot, self.current_position)
+        new_corpse = Corpse(corpse_name, self.loot, self.current_position, self)
         return True
         
     
@@ -793,11 +793,13 @@ class Corpse():
                  game,
                  name:str,
                  loot:Loot,
-                 room):
+                 room,
+                 creature=None):
         self.game = game
         self.name = name
         self.loot = loot
         self.room = room
+        self.creature = creature
         self.description = self.generate_description()
         self.place(room)
         
