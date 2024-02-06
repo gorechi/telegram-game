@@ -1226,6 +1226,7 @@ class Hero:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         else:
+            self.game.trigger_on_movement()
             new_position = self.current_position.position + self.floor.directions_dict[direction]
             self.current_position = self.floor.plan[new_position]
             self.current_position.visited = '+'
@@ -1233,7 +1234,6 @@ class Hero:
             self.current_position.map()
             self.decrease_restless(1)
             self.check_monster_and_figth()
-            self.game.trigger_on_movement()
             return True
 
     

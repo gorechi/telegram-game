@@ -64,7 +64,6 @@ class Monster:
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
         self.prefered_weapon = None
-        booleans = {'False': False, 'True': True}
         self.carry_weapon = carry_weapon
         self.wear_armor = wear_armor
         self.carry_shield = carry_shield
@@ -76,7 +75,7 @@ class Monster:
         stren_die = roll([s_monster_weak_strength_die])
         health_die = roll([s_monster_weak_health_die])
         self.stren = int(self.stren * (1 - stren_die/10))
-        self.health = int(self.health % (1 - health_die/10))
+        self.health = int(self.health * (1 - health_die/10))
         return True
     
     

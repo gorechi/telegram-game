@@ -318,5 +318,6 @@ class Game():
             floor.all_monsters.append(monster)
             floor.monsters_in_rooms[room] = []
             monster.place(floor, room)
+            tprint(self, [monster.name, monster.stren, monster.health])
             monster.become_a_zombie()
             
