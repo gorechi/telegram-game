@@ -232,6 +232,12 @@ s_poison_additional_protection_die = 5
 
 """
 
+s_monster_weak_strength_die = 6
+"""Кубик, определяющий, какая часть силы теряется монстром при ослаблении"""
+
+s_monster_weak_health_die = 6
+"""Кубик, определяющий, какая часть здоровья теряется монстром при ослаблении"""
+
 # Трупы
 
 s_corpse_places = [

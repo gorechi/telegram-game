@@ -72,6 +72,14 @@ class Monster:
         self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
 
     
+    def get_weaker(self) -> bool:
+        stren_die = roll([s_monster_weak_strength_die])
+        health_die = roll([s_monster_weak_health_die])
+        self.stren = int(self.stren * (1 - stren_die/10))
+        self.health = int(self.health % (1 - health_die/10))
+        return True
+    
+    
     def on_create(self):
         """Метод вызывается после создания экземпляра класса Монстр."""
         
@@ -423,7 +431,7 @@ class Monster:
         self.floor.monsters_in_rooms[room].append(self)
         self.game.how_many_monsters += 1
         self.alive = True
-        self.wounded = True
+        self.get_weaker()
         return True
     
     

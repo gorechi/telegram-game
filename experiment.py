@@ -21,3 +21,8 @@ for i in range(0, len(integers)-2):
     result += slice_count(s)
 print (result)
 
+a = '2342342'
+print(a.__dir__())
+
+b = 1.123123
+print(int(b))
