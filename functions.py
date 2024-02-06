@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from telebot import types
 
 
-def roll(dice):
+def roll(dice:list) -> int:
     """Функция имитирует бросок нескольких кубиков сразу
 
     Args:
@@ -29,9 +29,6 @@ def readfile(filename, divide, divider='|'):
     return filelines
 
 
-# Функция генерирует описание сторон схватки.
-# На вход получает объекты сторон (например, героя и монстра), а также замок, в котором происходит схватка.
-# Возвращает список, состоящий из строк, описывающих стороны схватки.
 def showsides(side1, side2, castle) -> list:
     
     """

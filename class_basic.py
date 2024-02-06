@@ -68,7 +68,7 @@ class Loot:
 
     
     def get_items_by_class(self, item_class) -> list:
-        return [item for item in self.insides if isinstance(item, item_class)]
+        return [item for item in self.pile if isinstance(item, item_class)]
         
         
     def show_sorted(self) -> list:

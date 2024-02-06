@@ -21,12 +21,12 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -52,13 +52,13 @@
     "agressive": false,
     "stink": true,
     "hide": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "prefered_weapon": "ударное",
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -82,13 +82,13 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -112,13 +112,13 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 1,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -142,12 +142,12 @@
     "state": "притаился",
     "frightening": false,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": false,
+    "carry_weapon": true,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_rmor": true
   },
   {
     "class": "монстр",
@@ -171,12 +171,12 @@
     "state": "притаилась",
     "frightening": false,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": false,
+    "carry_weapon": true,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 1,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -200,12 +200,12 @@
     "state": "прячется",
     "frightening": false,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -229,12 +229,12 @@
     "state": "стоит",
     "frightening": false,
     "agressive": true,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": false,
-    "wearArmor": false
+    "wear_armor": false
   },
   {
     "class": "притворщик",
@@ -258,15 +258,15 @@
     "state": "прячется",
     "frightening": false,
     "agressive": true,
-    "carryweapon": false,
-    "carryshield": true,
+    "carry_weapon": false,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": false,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
-    "class": "монстр",
+    "class": "мертвец",
     "name": "Зомби",
     "lexemes": {
       "accus": "Зомби",
@@ -287,12 +287,14 @@
     "state": "рычит",
     "frightening": true,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": false,
+    "carry_weapon": true,
+    "carry_shield": false,
     "venomous": 2,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "can_resurrect": true,
+    "resurrection_die": 6,
+    "wear_armor": true
   },
   {
     "class": "растение",
@@ -325,12 +327,12 @@
       },
     "frightening": false,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 4,
     "gender": 1,
     "corpse": false,
-    "wearArmor": false
+    "wear_armor": false
   },
   {
     "class": "растение",
@@ -363,11 +365,11 @@
     },
     "frightening": false,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 5,
     "gender": 1,
-    "wearArmor": false
+    "wear_armor": false
   },
   {
     "class": "вампир",
@@ -391,12 +393,12 @@
     "state": "парит",
     "frightening": true,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": true,
+    "carry_weapon": false,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": false,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "вампир",
@@ -420,12 +422,12 @@
     "state": "притаился",
     "frightening": false,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": true,
+    "carry_weapon": false,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": false,
-    "wearArmor": true
+    "wear_armor": true
   },    
   {
     "class": "животное",
@@ -449,12 +451,12 @@
     "state": "переминается с лапы на лапу",
     "frightening": true,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": false
+    "wear_armor": false
   },
   {
     "class": "животное",
@@ -478,12 +480,12 @@
     "state": "вальяжно лежит",
     "frightening": true,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": false
+    "wear_armor": false
   },
   {
     "class": "монстр",
@@ -507,13 +509,13 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "prefered_weapon": "рубящее",
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "берсерк",
@@ -537,12 +539,12 @@
     "state": "ревет",
     "frightening": false,
     "agressive": true,
-    "carryweapon": true,
-    "carryshield": false,
+    "carry_weapon": true,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -566,12 +568,12 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -595,12 +597,12 @@
     "state": "стоит",
     "frightening": false,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": false,
+    "carry_weapon": false,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -624,12 +626,12 @@
     "state": "стоит",
     "frightening": true,
     "agressive": false,
-    "carryweapon": false,
-    "carryshield": true,
+    "carry_weapon": false,
+    "carry_shield": true,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -653,13 +655,13 @@
     "state": "что-то ищет",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": true,
+    "carry_weapon": true,
+    "carry_shield": true,
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": true
+    "wear_armor": true
   },
   {
     "class": "монстр",
@@ -683,11 +685,11 @@
     "state": "чего-то ждет",
     "frightening": false,
     "agressive": false,
-    "carryweapon": true,
-    "carryshield": false,
+    "carry_weapon": true,
+    "carry_shield": false,
     "venomous": 0,
     "gender": 0,
     "corpse": true,
-    "wearArmor": false
+    "wear_armor": false
   }
 ]

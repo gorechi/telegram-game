@@ -118,11 +118,17 @@ class Hero:
                             'выбросить': self.drop,
                             'сменить': self.change,
                             'поменять': self.change,
+                            'test': self.test,
                             'улучшить': self.enchant}
 
     def __str__(self):
         return f'<Hero: name = {self.name}>'
 
+    
+    def test(self, commands:list):
+        self.game.test(self)
+        tprint(self.game, 'Тестирование началось')
+        
     
     def get_weakness(self, weapon:Weapon) -> float:
         return 1
@@ -1227,6 +1233,7 @@ class Hero:
             self.current_position.map()
             self.decrease_restless(1)
             self.check_monster_and_figth()
+            self.game.trigger_on_movement()
             return True
 
     
