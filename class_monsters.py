@@ -6,7 +6,7 @@ from class_basic import Loot, Money
 from class_items import Rune
 from class_protection import Armor, Shield
 from class_weapon import Weapon
-from functions import howmany, randomitem, tprint
+from functions import howmany, randomitem, tprint, roll
 from settings import *
 
 
@@ -27,7 +27,8 @@ class Monster:
                  wear_armor=s_is_monster_wear_armor,
                  hit_chance=s_monster_hit_chance,
                  parry_chance=s_monster_parry_chance,
-                 corpse=True):
+                 corpse=True,
+                 can_resurrect=False):
         self.game = game
         self.name = name
         self.lexemes = lexemes
@@ -53,6 +54,7 @@ class Monster:
         self.can_steal = True
         self.stink = False
         self.can_hide = True
+        self.can_resurrect = can_resurrect
         self.hiding_place = None
         self.can_run = True
         self.wounded = False
@@ -62,24 +64,20 @@ class Monster:
         self.key_hole = s_monster_see_through_keyhole
         self.empty = False
         self.prefered_weapon = None
-        if carry_weapon == 'False':
-            self.carry_weapon = False
-        else:
-            self.carry_weapon = True
-        if wear_armor == 'False':
-            self.wear_armor = False
-        else:
-            self.wear_armor = True
-        if carry_shield == 'False':
-            self.carry_shield = False
-        else:
-            self.carry_shield = True
-        if agressive == 'True':
-            self.agressive = True
-        else:
-            self.agressive = False
+        self.carry_weapon = carry_weapon
+        self.wear_armor = wear_armor
+        self.carry_shield = carry_shield
+        self.agressive = agressive
         self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
 
+    
+    def get_weaker(self) -> bool:
+        stren_die = roll([s_monster_weak_strength_die])
+        health_die = roll([s_monster_weak_health_die])
+        self.stren = int(self.stren * (1 - stren_die/10))
+        self.health = int(self.health * (1 - health_die/10))
+        return True
+    
     
     def on_create(self):
         """Метод вызывается после создания экземпляра класса Монстр."""
@@ -184,13 +182,34 @@ class Monster:
         if self.prefered_weapon and self.prefered_weapon != item.type:
             self.loot.add(item)
             return True
-        if item.twohanded and not self.shield.empty:
+        return self.equip_weapon(item)
+    
+    
+    def take_weapon_from_loot(self, loot:Loot) -> bool:
+        """Метод обрабатывает ситуацию, когда монстр выбирает оружие из лута."""
+        
+        all_weapons = loot.get_items_by_class(Weapon)
+        if self.prefered_weapon:
+            weapons = [i for i in weapons if i.type == self.prefered_weapon]
+        else:
+            weapons = all_weapons
+        if not self.weapon.empty or not self.carry_weapon or not weapons:
+            return False
+        weapon = randomitem(weapons)
+        self.eqip_weapon(weapon)
+        loot.remove(weapon)
+        return True
+    
+        
+    
+    def equip_weapon(self, weapon:Weapon) -> bool:
+        if weapon.twohanded and not self.shield.empty:
                 shield = self.shield
                 self.shield = self.game.no_shield
                 self.current_position.loot.add(shield)
-        self.weapon = item
+        self.weapon = weapon
         return True
-    
+
     
     def take_shield(self, item:Shield) -> bool:
         """Метод обрабатывает ситуацию, когда монст подбирает щит."""
@@ -204,6 +223,16 @@ class Monster:
         return True
     
     
+    def take_shield_from_loot(self, loot:Loot) -> bool:
+        all_sields = loot.get_items_by_class(Shield)
+        if not self.carry_shield or self.weapon.twohanded or not all_sields:
+            return False
+        shield = randomitem(all_sields)
+        self.shield = shield
+        loot.remove(shield)
+        return True
+    
+    
     def take_armor(self, item:Armor) -> bool:
         """Метод обрабатывает ситуацию, когда монстр подбирает доспехи."""
         
@@ -211,6 +240,23 @@ class Monster:
             return False
         self.armor = item
         return True
+    
+    
+    def take_armor_from_loot(self, loot:Loot) -> bool:
+        all_armor = loot.get_items_by_class(Armor)
+        if not self.armor.empty or not self.wear_armor or not all_armor:
+            return False
+        armor = randomitem(all_armor)
+        self.armor = armor
+        loot.remove(armor)
+        return True
+    
+    
+    def take_loot(self, loot:Loot) -> bool:
+        self.take_weapon_from_loot(loot)
+        self.take_shield_from_loot(loot)
+        self.take_armor_from_loot(loot)
+        self.loot.add(loot)
     
     
     def take(self, item) -> bool:
@@ -364,16 +410,36 @@ class Monster:
         self.floor.monsters_in_rooms[room].remove(self)
         self.game.how_many_monsters -= 1
         self.alive = False
-        self.become_a_corpse()
+        self.become_a_corpse(for_good=True)
         return True
     
     
-    def become_a_corpse(self) -> bool:
+    def become_a_zombie(self) -> bool:
+        room = self.current_position
+        self.floor.all_monsters.remove(self)
+        self.floor.monsters_in_rooms[room].remove(self)
+        self.game.how_many_monsters -= 1
+        self.alive = False
+        self.become_a_corpse(for_good=False)
+        return True
+    
+    
+    def resurrect(self) -> bool:
+        room = self.current_position
+        self.floor.all_monsters.append(self)
+        self.floor.monsters_in_rooms[room].append(self)
+        self.game.how_many_monsters += 1
+        self.alive = True
+        self.get_weaker()
+        return True
+    
+    
+    def become_a_corpse(self, for_good:bool) -> bool:
         if not self.corpse:
             return False
         self.gather_loot()
         corpse_name = f'труп {self.get_name("gen")}'
-        new_corpse = Corpse(corpse_name, self.loot, self.current_position)
+        new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)
         return True
         
     
@@ -391,7 +457,11 @@ class Monster:
 
         
     def lose(self, winner=None):
-        result = dice(1, 10)
+        if self.can_resurrect:
+            die = 15
+        else:
+            die = 10
+        result = dice(1, die)
         if result < 6 or self.wounded or not self.can_run:
             return self.finally_die()
         else:
@@ -425,13 +495,15 @@ class Monster:
     def get_wounded(self, result:int) -> bool:        
         self.wounded = True
         results_dict = {
-            6: self.hand_wound,
-            7: self.bleed,
-            8: self.rage,
-            9: self.contusion,
-            10: self.leg_wound
+            result == 6: self.hand_wound,
+            result == 7: self.bleed,
+            result == 8: self.rage,
+            result == 9: self.contusion,
+            result == 10: self.leg_wound,
+            result > 10: self.become_a_zombie
+            
         }
-        return results_dict.get(result)()
+        return results_dict[True]()
         
         
     def hand_wound(self) -> bool:
@@ -562,6 +634,7 @@ class Plant(Monster):
         self.can_hide = False
         self.can_run = False
         self.hiding_place = None
+        self.can_resurrect=False
 
 
     def grow(self, room):
@@ -571,6 +644,7 @@ class Plant(Monster):
         self.game.how_many_monsters += 1
         return True
 
+    
     def win(self, loser=None):
         self.health = self.start_health
         room = self.current_position
@@ -590,6 +664,7 @@ class Plant(Monster):
             if not i.monster():
                 self.grow(i)
 
+    
     def place(self, floor, roomr_to_place = None, old_place = None):
         if roomr_to_place:
             room = roomr_to_place
@@ -629,6 +704,7 @@ class Berserk(Monster):
         self.rage = 0
         self.base_health = health
         self.empty = False
+        self.can_resurrect=False
    
     
     def generate_mele_attack(self, target):
@@ -788,22 +864,75 @@ class Animal(Monster):
         self.empty = False
 
 
+class WalkingDead(Monster):
+    def __init__(self, 
+                 game, 
+                 name='',
+                 lexemes=s_monster_lexemes, 
+                 stren=10, 
+                 health=20, 
+                 actions='бьет', 
+                 state='стоит', 
+                 agressive=False,
+                 carry_weapon=True, 
+                 carry_shield=True,
+                 wear_armor=True):
+        super().__init__(game, 
+                         name,
+                         lexemes, 
+                         stren, 
+                         health, 
+                         actions, 
+                         state, 
+                         agressive, 
+                         carry_weapon, 
+                         carry_shield,
+                         wear_armor)
+        self.empty = False
+        self.can_resurrect = True
+        self.corpse = True
+
+
 class Corpse():
     def __init__(self,
                  game,
                  name:str,
                  loot:Loot,
-                 room):
+                 room,
+                 creature=None,
+                 can_resurrect=False):
         self.game = game
         self.name = name
         self.loot = loot
         self.room = room
+        self.creature = creature
         self.description = self.generate_description()
         self.place(room)
+        self.can_resurrect = can_resurrect
         
+    
+    def try_to_rise(self) -> bool:
+        if not self.creature or not self.can_resurrect:
+            return False
+        die = self.creature.resurrection_die
+        if roll([die]) == 1:
+            self.rise_from_dead()
+            return True
+        return False
+    
+    
+    def rise_from_dead(self):
+        self.creature.resurrect()
+        self.creature.take_loot(self.loot)
+        self.room.morgue.remove(self)
+        self.game.all_corpses.remove(self)
+        tprint(self.game, f'В комнате {self.room.position} труп воосстал из мертвых.')
+        return True
+    
     
     def place(self, room) -> bool:
         room.morgue.append(self)
+        self.game.all_corpses.append(self)
         return True
     
     

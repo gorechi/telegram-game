@@ -3,7 +3,7 @@ import json
 from class_castle import Floor
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
-from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal
+from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal, WalkingDead
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
@@ -39,6 +39,7 @@ class Game():
     def __init__(self, chat_id:str, bot, hero:Hero=None):
         self.classes = { 
             'монстр': Monster,
+            'мертвец': WalkingDead,
             'герой': Hero,
             'оружие': Weapon,
             'щит': Shield,
@@ -76,6 +77,7 @@ class Game():
         self.selected_item = self.empty_thing
         self.chat_id = chat_id
         self.bot = bot
+        self.all_corpses = []
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
@@ -90,6 +92,15 @@ class Game():
         self.game_is_on = False
         
 
+    def trigger_on_movement(self):
+        self.raise_dead()
+        
+    
+    def raise_dead(self):
+        for corpse in self.all_corpses: 
+            if corpse.can_resurrect:
+                corpse.try_to_rise()
+    
     
     def check_hero(self, hero:Hero) -> Hero:
         
@@ -129,7 +140,7 @@ class Game():
         print("=" * 40)
 
     
-    def create_objects_from_json(self, file:str, random:bool=False, how_many:int=None) -> list:
+    def create_objects_from_json(self, file:str, random:bool=False, how_many:int=None, obj_class:str=None) -> list:
         
         """
         Функция создает список объектов из файла JSON. 
@@ -145,6 +156,8 @@ class Game():
         objects = []
         with open(file, encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
+        if obj_class and isinstance(obj_class, str):
+            parsed_data = [i for i in parsed_data if i['class'] == obj_class]
         if random:
             for _ in range(how_many):
                 i = randomitem(parsed_data, False)
@@ -295,3 +308,16 @@ class Game():
     
     def monsters(self):
         return self.how_many_monsters
+    
+    
+    def test(self, hero:Hero):
+        floor = self.current_floor
+        rooms = [room for room in floor.plan if room.position in [1, 5, 6]]
+        for room in rooms:
+            monster = self.create_objects_from_json('monsters.json', True, 1, 'мертвец')[0]
+            floor.all_monsters.append(monster)
+            floor.monsters_in_rooms[room] = []
+            monster.place(floor, room)
+            tprint(self, [monster.name, monster.stren, monster.health])
+            monster.become_a_zombie()
+            

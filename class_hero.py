@@ -118,11 +118,17 @@ class Hero:
                             'выбросить': self.drop,
                             'сменить': self.change,
                             'поменять': self.change,
+                            'test': self.test,
                             'улучшить': self.enchant}
 
     def __str__(self):
         return f'<Hero: name = {self.name}>'
 
+    
+    def test(self, commands:list):
+        self.game.test(self)
+        tprint(self.game, 'Тестирование началось')
+        
     
     def get_weakness(self, weapon:Weapon) -> float:
         return 1
@@ -485,8 +491,7 @@ class Hero:
         cant_rest, rest_place = room.can_rest()
         message = []
         if self.restless > 0:
-            cant_rest.append(f'У {self.g(["героя", "героини"])} столько нерастраченной энергии, \
-                что {self.g(["ему", "ей"])} не сидится на месте')
+            cant_rest.append(f'У {self.g(["героя", "героини"])} столько нерастраченной энергии, что {self.g(["ему", "ей"])} не сидится на месте')
         if not rest_place or len(cant_rest) > 0:
             message.append('В этой комнате нельзя этого делать.')
             message.append(randomitem(cant_rest))
@@ -523,8 +528,7 @@ class Hero:
         """Метод обрабатывает команду "чинить". """
         
         if not what:
-            tprint(self.game, f'{self.name} не может чинить что-нибудь. \
-                Нужно понимать, какую вещь ремонтировать.')
+            tprint(self.game, f'{self.name} не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
             return False
         if self.shield.check_name(what) or self.removed_shield.check_name(what):
             return self.repair_shield()
@@ -556,8 +560,7 @@ class Hero:
             self.decrease_restless(1)
             return True
         else:
-            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.name1}, \
-                но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
+            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
             return False
         
     
@@ -1220,6 +1223,7 @@ class Hero:
                 tprint(game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         else:
+            self.game.trigger_on_movement()
             new_position = self.current_position.position + self.floor.directions_dict[direction]
             self.current_position = self.floor.plan[new_position]
             self.current_position.visited = '+'
@@ -1458,7 +1462,6 @@ class Hero:
         for item in current_loot.pile:
                 if self.can_take(item):
                     item.take(self)
-        current_loot.get_empty()
         return True
     
     
