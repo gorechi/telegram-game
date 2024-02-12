@@ -890,6 +890,7 @@ class WalkingDead(Monster):
                          wear_armor)
         self.empty = False
         self.can_resurrect = True
+        self.corpse = True
 
 
 class Corpse():
