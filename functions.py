@@ -121,7 +121,7 @@ def readitems(what_kind, how_many, classes):
     return items_list
 
 
-def generate_keyboard(keys:list, keys_in_row:int) -> list:
+def generate_keyboard(keys:list, keys_in_row:int):
     for i in range(0, len(keys), keys_in_row):
         yield keys[i : i + keys_in_row]
 

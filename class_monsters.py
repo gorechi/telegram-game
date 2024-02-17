@@ -1124,9 +1124,10 @@ class WalkingDead(Monster):
         self.wounds_list = [
             self.rage,
             self.leg_wound,
-            self.become_a_zombie
+            self.become_a_zombie,
+            self.become_a_zombie,
+            self.become_a_zombie,
         ]
-
 
 
 class Corpse():
