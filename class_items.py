@@ -25,7 +25,7 @@ class Rune:
         self.check_if_poisoned()
         self.base_price = self.define_base_price()
         
-        
+         
     def __str__(self) -> str:
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'

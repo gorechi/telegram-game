@@ -11,7 +11,12 @@ from settings import *
 
 
 class Monster:
-    """Базовый класс монстров."""
+    """
+    Базовый класс монстров, определяющий общие атрибуты и методы для всех монстров в игре.
+    Этот класс содержит атрибуты, такие как имя, сила, здоровье, действия, состояние и другие,
+    которые характеризуют монстра. Также включает в себя методы для управления состоянием монстра,
+    такие как атака, защита, перемещение и другие действия.
+    """
     
     def __init__(self,
                  game,
@@ -72,6 +77,10 @@ class Monster:
 
     
     def get_weaker(self) -> bool:
+        """
+        Метод уменьшает силу и здоровье монстра на случайное значение, 
+        определенное броском кубика.
+        """
         stren_die = roll([s_monster_weak_strength_die])
         health_die = roll([s_monster_weak_health_die])
         self.stren = int(self.stren * (1 - stren_die/10))
@@ -88,8 +97,11 @@ class Monster:
 
     
     def __str__(self):
+        """
+        Метод для представления объекта класса в виде строки.
+        Возвращает имя монстра.
+        """
         return self.name
-          
         
     def g(self, words_list:list) -> str:
         """
@@ -203,13 +215,18 @@ class Monster:
         
     
     def equip_weapon(self, weapon:Weapon) -> bool:
+        """
+        Этот метод оснащает монстра оружием. Если оружие двуручное и у монстра уже есть щит,
+        то щит помещается в лут текущей позиции монстра, а затем монстру назначается новое оружие.
+        Возвращает True после оснащения оружием.
+        """
         if weapon.twohanded and not self.shield.empty:
                 shield = self.shield
                 self.shield = self.game.no_shield
                 self.current_position.loot.add(shield)
         self.weapon = weapon
         return True
-
+    
     
     def take_shield(self, item:Shield) -> bool:
         """Метод обрабатывает ситуацию, когда монст подбирает щит."""
@@ -224,6 +241,10 @@ class Monster:
     
     
     def take_shield_from_loot(self, loot:Loot) -> bool:
+        """
+        Метод позволяет монстру выбрать щит из лута. Если монстр не может носить щиты, у него уже есть двуручное оружие,
+        или в луте нет щитов, метод возвращает False. В противном случае монстр берет случайный щит из лута и метод возвращает True.
+        """
         all_sields = loot.get_items_by_class(Shield)
         if not self.carry_shield or self.weapon.twohanded or not all_sields:
             return False
@@ -243,6 +264,11 @@ class Monster:
     
     
     def take_armor_from_loot(self, loot:Loot) -> bool:
+        """
+        Этот метод позволяет монстру взять доспехи из лута. Метод проверяет, есть ли у монстра уже доспехи,
+        может ли монстр носить доспехи и есть ли доспехи в луте. Если одно из условий не выполняется, метод возвращает False.
+        В противном случае монстр берет случайные доспехи из лута, и метод возвращает True.
+        """
         all_armor = loot.get_items_by_class(Armor)
         if not self.armor.empty or not self.wear_armor or not all_armor:
             return False
@@ -253,6 +279,10 @@ class Monster:
     
     
     def take_loot(self, loot:Loot) -> bool:
+        """
+        Метод позволяет монстру взять лут: оружие, щит и доспехи из переданного лута.
+        После попытки взять каждый из этих предметов, весь оставшийся лут добавляется к луту монстра.
+        """
         self.take_weapon_from_loot(loot)
         self.take_shield_from_loot(loot)
         self.take_armor_from_loot(loot)
@@ -298,6 +328,10 @@ class Monster:
         
             
     def generate_mele_attack(self, target) -> int:
+        """
+        Генерирует атаку в ближнем бою на цель. Если монстр отравлен, его атака уменьшается.
+        В зависимости от освещенности в комнате, атака может быть уменьшена.
+        """
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
@@ -309,6 +343,9 @@ class Monster:
 
     
     def generate_weapon_attack(self, target) -> int:
+        """
+        Генерирует атаку с использованием оружия на цель. Если у монстра нет оружия, атака равна 0.
+        """
         if not self.weapon.empty:
             return self.weapon.attack(target)
         return 0
@@ -331,6 +368,11 @@ class Monster:
     
     
     def attack(self, target):
+        """
+        Осуществляет атаку на цель. В зависимости от условий освещенности, использует имя монстра или общее название в темноте.
+        Генерирует атаку в ближнем бою и атаку оружием, суммирует их и вычитает защиту цели. Рассчитывает общий урон и применяет его к цели.
+        В случае смерти цели, обновляет состояние игры и выводит соответствующее сообщение. Возвращает результат атаки.
+        """
         game = self.game
         message = []
         if target.check_light():
@@ -372,9 +414,12 @@ class Monster:
         else:
             tprint(game, message)
         return True
-
+    
     
     def hit_chance(self):
+        """
+        Возвращает шанс попадания по цели.
+        """
         return self.hit_chance
     
     
@@ -405,6 +450,10 @@ class Monster:
 
     
     def finally_die(self) -> bool:
+        """
+        Обрабатывает смерть монстра, удаляя его из списка монстров на этаже и в комнате, уменьшая общее количество монстров.
+        Монстр становится мертвым и превращается в труп навсегда.
+        """
         room = self.current_position
         self.floor.all_monsters.remove(self)
         self.floor.monsters_in_rooms[room].remove(self)
@@ -415,6 +464,10 @@ class Monster:
     
     
     def become_a_zombie(self) -> bool:
+        """
+        Обрабатывает превращение монстра в зомби, удаляя его из списка монстров на этаже и в комнате, уменьшая общее количество монстров.
+        Монстр становится мертвым, но может быть воскрешен.
+        """
         room = self.current_position
         self.floor.all_monsters.remove(self)
         self.floor.monsters_in_rooms[room].remove(self)
@@ -425,6 +478,10 @@ class Monster:
     
     
     def resurrect(self) -> bool:
+        """
+        Обрабатывает воскрешение монстра, добавляя его обратно в список монстров на этаже и в комнате, увеличивая общее количество монстров.
+        Монстр становится живым и слабеет.
+        """
         room = self.current_position
         self.floor.all_monsters.append(self)
         self.floor.monsters_in_rooms[room].append(self)
@@ -435,6 +492,10 @@ class Monster:
     
     
     def become_a_corpse(self, for_good:bool) -> bool:
+        """
+        Обрабатывает превращение монстра в труп. Если монстр умирает навсегда, он собирает добычу и становится трупом.
+        Возвращает True, если монстр стал трупом.
+        """
         if not self.corpse:
             return False
         self.gather_loot()
@@ -444,6 +505,9 @@ class Monster:
         
     
     def gather_loot(self):
+        """
+        Собирает добычу с монстра, включая деньги, щит, броню и оружие.
+        """
         loot = self.loot
         if self.money > 0:
             money = Money(self.game, self.money)
@@ -457,6 +521,9 @@ class Monster:
 
         
     def lose(self, winner=None):
+        """
+        Обрабатывает поражение монстра. Определяет, умрет ли монстр, станет зомби или получит ранение в зависимости от результата броска кубика.
+        """
         if self.can_resurrect:
             die = 15
         else:
@@ -469,6 +536,9 @@ class Monster:
             
             
     def lose_weapon_text(self) -> str:
+        """
+        Возвращает текстовое сообщение о потере оружия монстром. Текст зависит от освещенности в комнате.
+        """
         room = self.current_position
         if room.light:
             return f'На пол падает {self.weapon.name}. '
@@ -477,6 +547,9 @@ class Monster:
     
     
     def lose_shield_text(self) -> str:
+        """
+        Возвращает текстовое сообщение о потере щита монстром. Текст зависит от освещенности в комнате.
+        """
         room = self.current_position
         if room.light:
             return f'На пол падает {self.shield.name}. '
@@ -485,6 +558,9 @@ class Monster:
     
     
     def get_self_name_in_room(self) -> str:
+        """
+        Возвращает имя монстра или общее название "Противник" в зависимости от освещенности в комнате.
+        """
         room = self.current_position
         if room.light:
             return self.name
@@ -493,6 +569,9 @@ class Monster:
     
     
     def get_wounded(self, result:int) -> bool:        
+        """
+        Обрабатывает получение ранения монстром в зависимости от результата броска кубика. Может привести к различным последствиям, включая превращение в зомби.
+        """
         self.wounded = True
         results_dict = {
             result == 6: self.hand_wound,
@@ -507,6 +586,10 @@ class Monster:
         
         
     def hand_wound(self) -> bool:
+        """
+        Обрабатывает получение ранения в руку. Если у монстра есть оружие или щит, он их теряет.
+        Возвращает True, указывая на то, что монстр остается в живых.
+        """
         if not self.weapon.empty:
             alive_text += self.lose_weapon_text()
             self.current_position.loot.add(self.weapon)
@@ -522,6 +605,10 @@ class Monster:
         
         
     def bleed(self) -> bool:
+        """
+        Обрабатывает ситуацию, когда монстр истекает кровью. Это приводит к потере силы,
+        но здоровье восстанавливается до начального уровня. Возвращает True.
+        """
         weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
         self.stren -= weakness_amount
         self.health = self.start_health
@@ -533,6 +620,10 @@ class Monster:
         
     
     def rage(self) -> bool:
+        """
+        Обрабатывает вход в состояние ярости. Монстр получает увеличение силы, но теряет часть здоровья.
+        Возвращает True.
+        """
         strengthening_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
         ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
         self.stren += strengthening_amount
@@ -546,6 +637,10 @@ class Monster:
     
     
     def contusion(self) -> bool:
+        """
+        Обрабатывает получение контузии. Монстр теряет силу, но получает дополнительное здоровье.
+        Возвращает True.
+        """
         weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
         health_boost_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
         self.stren -= weakness_amount
@@ -559,6 +654,10 @@ class Monster:
 
     
     def leg_wound(self) -> bool:
+        """
+        Обрабатывает получение ранения в ногу. Монстр теряет силу и часть здоровья, а также не может двигаться.
+        Возвращает True.
+        """
         weakness_amount = ceil(self.stren * s_wounded_monster_strength_coefficient)
         ill_amount = ceil(self.start_health * s_wounded_monster_health_coefficient)
         self.stren -= weakness_amount
@@ -570,6 +669,10 @@ class Monster:
     
     
     def try_to_run_away(self) -> str:
+        """
+        Пытается убежать из комнаты. Если удачно, возвращает сообщение об убегании.
+        В противном случае монстр умирает, врезавшись в стену.
+        """
         name = self.get_self_name_in_room()
         if self.place(self.floor, old_place = self.current_position):
             return f'{name} убегает из комнаты.'
@@ -579,10 +682,17 @@ class Monster:
 
     
     def win(self, loser=None):
+        """
+        Восстанавливает здоровье монстра до начального уровня после победы.
+        """
         self.health = self.start_health
 
     
     def place(self, floor, room_to_place=None, old_place=None):
+        """
+        Перемещает монстра в новую комнату. Если комната не указана, выбирает случайную.
+        Возвращает True, если перемещение успешно, иначе False.
+        """
         if room_to_place:
             room = room_to_place
         else:
@@ -613,6 +723,10 @@ class Monster:
 
 
 class Plant(Monster):
+    """
+    Класс Plant наследует класс Monster и представляет собой тип монстра - растение.
+    Растения не могут носить оружие, щиты, броню, не агрессивны, не могут красть, прятаться или бегать.
+    """
     def __init__(self,
                  game,
                  name=s_monster_name,
@@ -624,6 +738,9 @@ class Plant(Monster):
                  agressive=False,
                  carry_weapon=False,
                  carry_shield=False):
+        """
+        Инициализирует экземпляр класса Plant с заданными параметрами.
+        """
         super().__init__(game, name, lexemes, stren, health, actions, state, agressive, carry_weapon, carry_shield)
         self.carry_shield = False
         self.carry_weapon = False
@@ -638,6 +755,9 @@ class Plant(Monster):
 
 
     def grow(self, room):
+        """
+        Метод для размножения растения. Создает новый экземпляр растения в указанной комнате.
+        """
         new_plant = Plant(self.game, self.name, self.lexemes, self.stren, self.health, 'бьет', 'растет', False, False, False)
         new_plant.room = room
         self.floor.all_monsters.append(new_plant)
@@ -646,6 +766,10 @@ class Plant(Monster):
 
     
     def win(self, loser=None):
+        """
+        Метод, вызываемый при победе растения над противником. Восстанавливает здоровье растения до начального уровня
+        и пытается размножиться в соседние комнаты.
+        """
         self.health = self.start_health
         room = self.current_position
         floor = self.floor
@@ -664,10 +788,12 @@ class Plant(Monster):
             if not i.monster():
                 self.grow(i)
 
-    
-    def place(self, floor, roomr_to_place = None, old_place = None):
-        if roomr_to_place:
-            room = roomr_to_place
+    def place(self, floor, room_to_place = None, old_place = None):
+        """
+        Метод для размещения растения в комнате. Если комната не указана, выбирается случайная комната без монстров.
+        """
+        if room_to_place:
+            room = room_to_place
         else:
             empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
             room = randomitem(empty_rooms, False)
@@ -676,6 +802,10 @@ class Plant(Monster):
 
 
 class Berserk(Monster):
+    """
+    Класс Berserk наследует класс Monster и представляет собой тип монстра - берсерка.
+    Берсерки известны своей агрессивностью и способностью накапливать ярость в бою, что делает их более сильными.
+    """
     def __init__(self,
                  game,
                  name=s_monster_name,
@@ -688,6 +818,21 @@ class Berserk(Monster):
                  carry_weapon=s_is_monster_carry_weapon,
                  carry_shield=s_is_monster_carry_shield,
                  wear_armor=s_is_monster_wear_armor):
+        """
+        Инициализирует экземпляр класса Berserk с заданными параметрами.
+        
+        :param game: ссылка на игру
+        :param name: имя берсерка
+        :param lexemes: лексемы, связанные с берсерком
+        :param stren: сила берсерка
+        :param health: здоровье берсерка
+        :param actions: действия, которые может выполнять берсерк
+        :param state: состояние берсерка
+        :param agressive: является ли берсерк агрессивным
+        :param carry_weapon: несет ли берсерк оружие
+        :param carry_shield: несет ли берсерк щит
+        :param wear_armor: носит ли берсерк броню
+        """
         super().__init__(game,
                          name,
                          lexemes,
@@ -699,6 +844,10 @@ class Berserk(Monster):
                          carry_weapon,
                          carry_shield,
                          wear_armor)
+        self.agressive = True  # Берсерки всегда агрессивны
+        self.carry_shield = False  # Берсерки не носят щиты, предпочитая атаковать
+        self.rage = 0  # Начальное значение ярости берсерка
+        self.base_health = health  # Запоминаем начальное здоровье для расчета ярости
         self.agressive = True
         self.carry_shield = False
         self.rage = 0
@@ -717,6 +866,10 @@ class Berserk(Monster):
 
 
 class Shapeshifter(Monster):
+    """
+    Класс Shapeshifter наследует класс Monster и представляет собой тип монстра - перевертыша.
+    Перевертыши могут изменять свою форму, принимая облик своих противников.
+    """
     def __init__(self, 
                 game, 
                 name='',
@@ -729,6 +882,21 @@ class Shapeshifter(Monster):
                 carry_weapon=False, 
                 carry_shield=True, 
                 wear_armor=True):
+        """
+        Инициализирует экземпляр класса Shapeshifter с заданными параметрами.
+        
+        :param game: ссылка на игру
+        :param name: имя перевертыша
+        :param lexemes: лексемы, связанные с перевертышем
+        :param stren: сила перевертыша
+        :param health: здоровье перевертыша
+        :param actions: действия, которые может выполнять перевертыш
+        :param state: состояние перевертыша
+        :param agressive: является ли перевертыш агрессивным
+        :param carry_weapon: несет ли перевертыш оружие
+        :param carry_shield: несет ли перевертыш щит
+        :param wear_armor: носит ли перевертыш броню
+        """
         super().__init__(game, 
                          name,
                          lexemes, 
@@ -740,13 +908,19 @@ class Shapeshifter(Monster):
                          carry_weapon, 
                          carry_shield,
                          wear_armor)
-        self.shifted = False
+        self.shifted = False  # Флаг, указывающий на то, сменил ли перевертыш форму
         self.agressive = True
         self.empty = False
-        self.start_stren = stren
+        self.start_stren = stren  # Начальная сила перевертыша для восстановления после боя
 
     
     def defence(self, attacker):
+        """
+        Защита перевертыша, которая позволяет ему сменить форму, приняв облик атакующего.
+        
+        :param attacker: экземпляр атакующего
+        :return: результат защиты
+        """
         if not self.shifted:
             self.shifted = True
             self.stren = attacker.stren
@@ -775,6 +949,11 @@ class Shapeshifter(Monster):
     
     
     def win(self, loser=None):
+        """
+        Восстанавливает начальные параметры перевертыша после победы в бою.
+        
+        :param loser: экземпляр проигравшего (не используется)
+        """
         self.health = self.start_health
         self.stren = self.start_stren
         self.gender = self.start_gender
@@ -782,9 +961,13 @@ class Shapeshifter(Monster):
         if self.weapon_changed:
             self.weapon = self.game.no_weapon
             self.weapon_changed = False
-        
+
 
 class Vampire(Monster):
+    """
+    Класс Vampire наследует класс Monster и представляет собой тип монстра - вампира.
+    Вампиры обладают уникальной способностью высасывать здоровье из своих противников.
+    """
     def __init__(self, 
                  game, 
                  name='',
@@ -797,6 +980,21 @@ class Vampire(Monster):
                  carry_weapon=True, 
                  carry_shield=True,
                  wear_armor=True):
+        """
+        Инициализирует экземпляр класса Vampire с заданными параметрами.
+        
+        :param game: ссылка на игру
+        :param name: имя вампира
+        :param lexemes: лексемы, связанные с вампиром
+        :param stren: сила вампира
+        :param health: здоровье вампира
+        :param actions: действия, которые может выполнять вампир
+        :param state: состояние вампира
+        :param agressive: является ли вампир агрессивным
+        :param carry_weapon: несет ли вампир оружие
+        :param carry_shield: несет ли вампир щит
+        :param wear_armor: носит ли вампир броню
+        """
         super().__init__(game, 
                          name,
                          lexemes, 
@@ -812,16 +1010,29 @@ class Vampire(Monster):
 
     
     def vampire_suck(self, total_damage):
-        """Метод вампирского высасывания здоровья из соперника."""
+        """
+        Высасывает здоровье из соперника, основываясь на общем нанесенном уроне.
+        
+        :param total_damage: общий урон, нанесенный сопернику
+        :return: строка, описывающая действие и количество восстановленного здоровья
+        """
         
         sucked = total_damage // s_vampire_suck_coefficient
         self.health += sucked
         return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, "жизнь,жизни,жизней")}.'
     
     
-    def place(self, floor, roomr_to_place = None, old_place = None):
-        if roomr_to_place:
-            room = roomr_to_place
+    def place(self, floor, room_to_place = None, old_place = None):
+        """
+        Размещает вампира в комнате на этаже, учитывая возможность скрыться.
+        
+        :param floor: этаж, на котором нужно разместить вампира
+        :param room_to_place: комната, в которой нужно разместить вампира (опционально)
+        :param old_place: предыдущее местоположение вампира (опционально)
+        :return: True, если вампир успешно размещен
+        """
+        if room_to_place:
+            room = room_to_place
         else:
             empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
             room = randomitem(empty_rooms, False)
@@ -838,6 +1049,8 @@ class Vampire(Monster):
 
 
 class Animal(Monster):
+    """Класс Animal наследует класс Monster и представляет собой тип монстра - животное."""
+    
     def __init__(self, 
                  game, 
                  name='',
@@ -865,6 +1078,9 @@ class Animal(Monster):
 
 
 class WalkingDead(Monster):
+    """Класс WalkingDead наследует класс Monster и представляет собой тип монстра - ходячего мертвеца. 
+    Эти существа обладают способностью воскрешаться после смерти и могут быть встречены в различных локациях игры."""
+    
     def __init__(self, 
                  game, 
                  name='',
@@ -894,6 +1110,9 @@ class WalkingDead(Monster):
 
 
 class Corpse():
+    """Класс Corpse представляет собой труп, который может воскреснуть или содержать лут. 
+    Он связан с игровым миром, может быть размещен в комнате и имеет возможность воскрешения."""
+    
     def __init__(self,
                  game,
                  name:str,
@@ -912,16 +1131,17 @@ class Corpse():
         
     
     def try_to_rise(self) -> bool:
+        """Пытается воскресить существо, если это возможно."""
         if not self.creature or not self.can_resurrect:
             return False
         die = self.creature.resurrection_die
         if roll([die]) == 1:
-            self.rise_from_dead()
-            return True
+            return self.rise_from_dead()
         return False
     
     
     def rise_from_dead(self):
+        """Воскрешает существо и удаляет труп из игры."""
         self.creature.resurrect()
         self.creature.take_loot(self.loot)
         self.room.morgue.remove(self)
@@ -931,12 +1151,14 @@ class Corpse():
     
     
     def place(self, room) -> bool:
+        """Размещает труп в указанной комнате."""
         room.morgue.append(self)
         self.game.all_corpses.append(self)
         return True
     
     
     def generate_description(self) -> str:
+        """Генерирует описание трупа."""
         place = choice(s_corpse_places)
         state = choice(s_corpse_states)
         depiction = choice(s_corpse_depiction)
