@@ -74,6 +74,14 @@ class Monster:
         self.carry_shield = carry_shield
         self.agressive = agressive
         self.exp = self.stren * dice(1, s_monster_exp_multiplier_limit) + dice(1, self.health)
+        self.wounds_list = [
+            self.hand_wound,
+            self.bleed,
+            self.rage,
+            self.contusion,
+            self.leg_wound,
+            self.become_a_zombie
+        ]
 
     
     def get_weaker(self) -> bool:
@@ -532,7 +540,7 @@ class Monster:
         if result < 6 or self.wounded or not self.can_run:
             return self.finally_die()
         else:
-            return self.get_wounded(result=result)
+            return self.get_wounded()
             
             
     def lose_weapon_text(self) -> str:
@@ -568,21 +576,13 @@ class Monster:
             return 'Противник'
     
     
-    def get_wounded(self, result:int) -> bool:        
+    def get_wounded(self) -> bool:        
         """
-        Обрабатывает получение ранения монстром в зависимости от результата броска кубика. Может привести к различным последствиям, включая превращение в зомби.
+        Обрабатывает получение ранения монстром. Может привести к различным последствиям, включая превращение в зомби.
         """
         self.wounded = True
-        results_dict = {
-            result == 6: self.hand_wound,
-            result == 7: self.bleed,
-            result == 8: self.rage,
-            result == 9: self.contusion,
-            result == 10: self.leg_wound,
-            result > 10: self.become_a_zombie
-            
-        }
-        return results_dict[True]()
+        wound = randomitem(self.wounds_list)
+        return wound()
         
         
     def hand_wound(self) -> bool:
@@ -854,6 +854,8 @@ class Berserk(Monster):
         self.base_health = health
         self.empty = False
         self.can_resurrect=False
+        self.can_run = True
+
    
     
     def generate_mele_attack(self, target):
@@ -912,6 +914,7 @@ class Shapeshifter(Monster):
         self.agressive = True
         self.empty = False
         self.start_stren = stren  # Начальная сила перевертыша для восстановления после боя
+        self.can_run = True
 
     
     def defence(self, attacker):
@@ -1007,6 +1010,7 @@ class Vampire(Monster):
                          carry_shield,
                          wear_armor)
         self.empty = False
+        self.can_run = True
 
     
     def vampire_suck(self, total_damage):
@@ -1075,6 +1079,15 @@ class Animal(Monster):
                          carry_shield,
                          wear_armor)
         self.empty = False
+        self.can_run = True
+        self.wounds_list = [
+            self.bleed,
+            self.rage,
+            self.contusion,
+            self.leg_wound,
+            self.become_a_zombie
+        ]
+
 
 
 class WalkingDead(Monster):
@@ -1107,6 +1120,14 @@ class WalkingDead(Monster):
         self.empty = False
         self.can_resurrect = True
         self.corpse = True
+        self.can_run = True
+        self.wounds_list = [
+            self.rage,
+            self.leg_wound,
+            self.become_a_zombie,
+            self.become_a_zombie,
+            self.become_a_zombie,
+        ]
 
 
 class Corpse():
