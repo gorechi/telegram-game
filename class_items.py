@@ -570,22 +570,25 @@ class Book:
     
     def on_create(self):
         self.type = dice(0, 2)
-        description = randomitem(self.descriptions, False)
-        self.name = description[0] + ' ' + \
-            self.name + ' ' + self.decorations[self.type]
-        self.name1 = description[1] + ' ' + \
-            self.name1 + ' ' + self.decorations[self.type]
-        self.description = self.name
-        available_texts = []
-        for i in self.texts:
-            if i[0] == self.type:
-                available_texts.append(i[1])
+        self.create_description()
+        self.name = self.lexemes['nom']
+        available_texts = [i for i in self.texts if i[0] == self.type]
         self.text = randomitem(available_texts, False)
         self.weapon_type = self.weapon_types[self.type]
         self.armor_type = self.armor_types[self.type]
         self.shield_type = self.shield_types[self.type]
         return True
 
+    
+    def create_description(self):
+        description_dict = randomitem(self.descriptions, False)
+        name_dict = self.names
+        self.lexemes = {}
+        for lexeme in name_dict:
+            self.lexemes[lexeme] = description_dict[lexeme] + ' ' + \
+            name_dict[lexeme] + ' ' + self.decorations[self.type]
+        return True
+        
     
     def get_mastery_string(self, who):
         return f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.'
