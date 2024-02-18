@@ -386,25 +386,13 @@ class Key:
 
 class Potion:
     
-    def __init__(self, game, name='', effect=0, type=0, can_use_in_fight=True):
+    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
         self.game = game
         self.name = name
+        self.effect = effect
+        self.type = potion_type
+        self.can_use_in_fight = can_use_in_fight
         self.empty = False
-        if self.name != 0:
-            self.name = name
-            self.name1 = self.name
-            self.effect = int(effect)
-            self.type = int(type)
-            self.can_use_in_fight = can_use_in_fight
-            self.description = s_potion_types[self.type][4]
-        elif self.name == 0:
-            n = dice(0, 5)
-            self.name = s_potion_types[n][0]
-            self.name1 = self.name
-            self.effect = s_potion_types[n][1]
-            self.type = s_potion_types[n][2]
-            self.can_use_in_fight = s_potion_types[n][3]
-            self.description = s_potion_types[n][4]
 
     
     def __str__(self):
@@ -412,6 +400,7 @@ class Potion:
 
     
     def on_create(self):
+        print(self.name, self.lexemes)
         return True
 
     

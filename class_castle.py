@@ -164,7 +164,7 @@ class Floor:
         
         # Читаем зелья из файла и разбрасываем по замку
         self.all_potions = game.create_objects_from_json(file='potions.json',
-                                      how_many=self.how_many['зелье'])
+                                      how_many=self.how_many['зелье'], random=True)
         for potion in self.all_potions:
             potion.place(self)
         
