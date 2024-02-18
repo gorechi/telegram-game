@@ -68,12 +68,19 @@ class Protection:
                 protection += rune.defence
         return protection
 
-    def enchant(self, rune):
-        if len(self.runes) > 1 or self.empty or not self.enchantable:
+    
+    def can_be_enchanted(self) -> bool:
+        if len(self.runes) > 1 or self.empty or not self.enchatable:
             return False
-        else:
+        return True
+    
+    
+    def enchant(self, rune):
+        if self.can_be_enchanted():
             self.runes.append(rune)
             return True
+        return False
+
 
     def enchantment(self):
         if len(self.runes) not in [1, 2]:

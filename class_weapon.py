@@ -85,12 +85,19 @@ class Weapon:
                 return True
         return False
     
-    def enchant(self, rune):
+    
+    def can_be_enchanted(self) -> bool:
         if len(self.runes) > 1 or self.empty or not self.enchatable:
             return False
-        else:
+        return True
+    
+    
+    def enchant(self, rune):
+        if self.can_be_enchanted():
             self.runes.append(rune)
             return True
+        return False
+    
 
     def enchantment(self):
         """Функция генерирует название элемента оружия. 

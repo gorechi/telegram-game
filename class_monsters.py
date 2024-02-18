@@ -171,27 +171,30 @@ class Monster:
         return None
     
     
-    def take_rune(self, item:Rune) -> bool:
+    def take_rune(self, rune:Rune) -> bool:
         """Метод обрабатывает ситуацию, когда монстр подбирает руну."""
         
-        if item.damage >= item.defence:
-            if self.weapon.enchant(item):
-                return True
-            if self.armor.enchant(item):
-                return True
-            if self.shield.enchant(item):
-                return True
-            self.loot.pile.append(item)
+        item = self.choose_what_to_enchant(rune)
+        if not item:
+            self.loot.pile.append(rune)
             return False
+        item.enchant(rune)
+        return True
+    
+    
+    def choose_what_to_enchant(self, rune:Rune):
+        items = [
+            self.weapon,
+            self.armor,
+            self.shield
+        ]
+        items = [i for i in items if i.can_be_enchanted()]
+        if not items:
+            return None
+        if rune.damage >= rune.defence:
+            return items[0]
         else:
-            if self.shield.enchant(item):
-                return True
-            if self.armor.enchant(item):
-                return True
-            if self.weapon.enchant(item):
-                return True
-            self.loot.pile.append(item)
-            return False
+            return items[-1]
     
     
     def take_weapon(self, item:Weapon) -> bool:
