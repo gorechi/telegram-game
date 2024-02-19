@@ -11,15 +11,25 @@ class Rune:
     
     """ Класс Руна. """
     
+    elements = [1, 3, 7, 12]
+    
     def __init__(self, game):
         self.game = game
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
-        self.elements = [1, 3, 7, 12]
-        self.element = self.elements[dice(0, 3)]
+        self.element = Rune.elements[dice(0, 3)]
         self.can_use_in_fight = False
         self.name = 'руна'
         self.name1 = 'руну'
+        self.lexemes = {
+            "nom": "руна",
+            "accus": "руну",
+            "gen": "руны",
+            "dat": "руне",
+            "prep": "руне",
+            "inst": "руной"
+        }
+
         self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
         self.check_if_poisoned()
