@@ -156,6 +156,14 @@ class Matches:
         self.can_use_in_fight = False
         self.name = 'спички'
         self.name1 = 'спички'
+        self.lexemes = {
+            "nom": "спички",
+            "accus": "спички",
+            "gen": "спичек",
+            "dat": "спичкам",
+            "prep": "спичках",
+            "inst": "спичками"
+        }
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
         self.empty = False
@@ -261,6 +269,14 @@ class Map:
         self.can_use_in_fight = False
         self.name = 'карта'
         self.name1 = 'карту'
+        self.lexemes = {
+            "nom": "карта",
+            "accus": "карту",
+            "gen": "карты",
+            "dat": "карте",
+            "prep": "карте",
+            "inst": "картой"
+        }
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
@@ -338,6 +354,14 @@ class Key:
         self.can_use_in_fight = False
         self.name = 'ключ'
         self.name1 = 'ключ'
+        self.lexemes = {
+            "nom": "ключ",
+            "accus": "ключ",
+            "gen": "ключа",
+            "dat": "ключу",
+            "prep": "ключе",
+            "inst": "ключом"
+        }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
 
