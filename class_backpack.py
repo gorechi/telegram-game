@@ -13,9 +13,14 @@ class Backpack:
         self.game = game
         self.no_backpack = no_backpack
         self.lexemes = {
+            "nom": "рюкзак",
             "accus": "рюкзак",
-            "gen": "рюкзака"
-            }
+            "gen": "рюкзака",
+            "dat": "рюкзаку",
+            "prep": "рюкзаке",
+            "inst": "рюкзаком"
+        }
+
     
     
     def check_name(self, message:str) -> bool:

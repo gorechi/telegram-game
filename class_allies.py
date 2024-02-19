@@ -35,8 +35,8 @@ class Trader:
     
     
     def generate_money(self) -> Money:
-        delta = s_traider_maximum_money - s_traider_minimum_money
-        money_amount = s_traider_minimum_money + roll([delta])
+        delta = s_trader_maximum_money - s_trader_minimum_money
+        money_amount = s_trader_minimum_money + roll([delta])
         new_money = Money(self.game, money_amount)
         return new_money
     

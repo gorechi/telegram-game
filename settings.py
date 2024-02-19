@@ -524,10 +524,10 @@ s_how_many_runes_trader_can_have = 4
 s_how_many_potions_trader_can_have = 6
 """Кубик, который надо кинуть чтобы определить количество зелий у торговца"""
 
-s_traider_maximum_money = 50
+s_trader_maximum_money = 50
 """Максимальное количество денег у торговца"""
 
-s_traider_minimum_money = 20
+s_trader_minimum_money = 20
 """Минимальное количество денег у торговца"""
 
 #Книги
