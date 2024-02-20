@@ -100,12 +100,12 @@ class Money:
     
     def generate_name(self):
         piles = {
-            0 < self.how_much_money <= s_money_groups[0]: 0,
-            s_money_groups[0] < self.how_much_money <= s_money_groups[1]: 1,
-            s_money_groups[1] < self.how_much_money <= s_money_groups[2]: 2, 
+            0 <= self.how_much_money and self.how_much_money <= s_money_groups[0]: 0,
+            s_money_groups[0] < self.how_much_money and self.how_much_money <= s_money_groups[1]: 1,
+            s_money_groups[1] < self.how_much_money and self.how_much_money <= s_money_groups[2]: 2, 
             s_money_groups[2] < self.how_much_money: 3
         }
-        self.lexemes = s_money_piles[piles[True]][0]
+        self.lexemes = s_money_piles[piles[True]]
         self.name = self.lexemes['nom']
 
     
@@ -132,6 +132,7 @@ class Money:
             self.how_much_money += other.how_much_money
         else:
             raise TypeError('To Money you can only add integer or another Money.')
+        self.generate_name()
         return self
 
     
@@ -142,12 +143,14 @@ class Money:
             self.how_much_money -= other.how_much_money
         else:
             raise TypeError('From Money you can only substract integer or another Money.')
+        self.generate_name()
         return self
 
 
     def take(self, lucky_one):
         lucky_one.money.how_much_money += self.how_much_money
         tprint(self.game, f'{lucky_one.name} {lucky_one.g(["забрал", "забрала"])} {howmany(self.how_much_money, "монету,монеты,монет")}')
+        self.generate_name()
 
 
     def show(self):

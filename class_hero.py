@@ -15,19 +15,19 @@ class Hero:
     
     def __init__(self,
                  game,
-                 name,
-                 name1,
-                 gender,
-                 stren=10,
-                 dext=2,
-                 intel=0,
-                 health=20,
-                 actions=None,
+                 name:str = None,
+                 name1:str = None,
+                 gender:int = None,
+                 stren:int = 10,
+                 dext:int = 2,
+                 intel:int = 0,
+                 health:int = 20,
+                 actions:list = None,
                  weapon=None,
                  shield=None,
                  backpack=None,
                  armor=None):
-        if actions is None:
+        if not actions:
             self.actions = ['бьет']
         else:
             self.actions = actions
@@ -36,13 +36,13 @@ class Hero:
         self.name1 = name1
         self.gender = gender
         self.poisoned = False
-        self.stren = int(stren)
+        self.stren = stren
         self.start_stren = self.stren
-        self.dext = int(dext)
+        self.dext = dext
         self.start_dext = self.dext
-        self.intel = int(intel)
+        self.intel = intel
         self.start_intel = self.intel
-        self.health = int(health)
+        self.health = health
         if weapon is None:
             self.weapon = self.game.no_weapon
         else:
@@ -121,6 +121,11 @@ class Hero:
                             'test': self.test,
                             'улучшить': self.enchant}
 
+    
+    def on_create(self):
+        return None
+    
+    
     def __str__(self):
         return f'<Hero: name = {self.name}>'
 

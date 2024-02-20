@@ -434,7 +434,6 @@ class Potion:
 
     
     def on_create(self):
-        print(self.name, self.lexemes)
         return True
 
     

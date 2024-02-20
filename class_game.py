@@ -111,15 +111,7 @@ class Game():
         """
         
         if not hero:
-            hero = Hero(self,
-                            s_hero_name,
-                            s_hero_name1,
-                            s_hero_gender,
-                            s_hero_strength,
-                            s_hero_dexterity,
-                            s_hero_intelligence,
-                            s_hero_health,
-                            s_hero_actions)
+            hero = self.create_objects_from_json('hero.json')[0]
         return hero
     
     
