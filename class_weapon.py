@@ -6,7 +6,15 @@ from settings import *
 
 
 class Weapon:
-    def __init__(self, game, name=None, name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None, enchantable=True):
+    def __init__(self, 
+                 game, 
+                 name=None, 
+                 name1='оружие', 
+                 damage=1, 
+                 actions='бьет,ударяет', 
+                 empty=False, 
+                 weapon_type=None, 
+                 enchantable=True):
         self.game = game
         if name:
             self.name = name
@@ -16,40 +24,47 @@ class Weapon:
             self.type = ''
             self.hit_chance = 0
             self.enchatable = enchantable
-        else:
-            n1 = s_weapon_first_words_dictionary
-            n2 = []
-            for i in s_weapon_types_dictionary:
-                if not weapon_type or i[3] == weapon_type:
-                    n2.append(i)
-            a1 = dice(0, len(n1) - 1)
-            a2 = dice(0, len(n2) - 1)
-            self.name = n1[a1][n2[a2][1]][0] + ' ' + n2[a2][0]
-            self.name1 = n1[a1][n2[a2][1]][1] + ' ' + n2[a2][2]
-            self.damage = dice(3, 12)
-            self.type = n2[a2][3]
-            self.twohanded = n2[a2][4]
-            self.gender = n2[a2][1]
-            self.hit_chance = n2[a2][5]
-            if dice(0, s_enchantable_die) == 1:
-                self.enchatable = False
-            else:
-                self.enchatable = True
+            self.weapon_type = weapon_type
+            self.generate_type()
+            self.generate_name()
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.runes = []
         self.twohanded_dict = s_weapon_twohanded_dictionary
         self.empty = empty
 
+    
     def on_create(self):
         return True
 
+    
     def __str__(self):
         damage_string = str(self.damage)
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
 
+    
+    def generate_name(self):
+        first_word_lexemes = randomitem(s_weapon_first_words_dictionary)[self.gender]
+        self.lexemes = {}
+        for lexeme in first_word_lexemes:
+            self.lexemes[lexeme] = f'{first_word_lexemes[lexeme]} {self.weapon_type[0][lexeme]}'
+        self.name = self.lexemes['nom']
+        self.name1 = self.lexemes['accus']
+        print(self.lexemes)
+    
+    
+    def generate_type(self):
+        settings_list = s_weapon_types_dictionary
+        if self.weapon_type:
+            settings_list = [i for i in settings_list if i[3] == self.weapon_type]
+        self.settings = randomitem(settings_list)
+        self.type = self.weapon_type[3]
+        self.twohanded = self.weapon_type[4]
+        self.gender = self.weapon_type[1]
+        self.hit_chance = self.weapon_type[5]
+    
     
     def real_name(self, all:bool=False, additional:list=[]) -> list:
         names = []
