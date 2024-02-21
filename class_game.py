@@ -195,16 +195,16 @@ class Game():
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
     
-    def create_random_weapon(self, howmany:int=1, weapon_type:int=None) -> list:
+    def create_random_weapon(self, howmany:int=1, weapon_type:str=None) -> list:
         
         """Метод создает случайное оружие"""
         
         objects = []
         for _ in range(howmany):
             if weapon_type:
-                new_object = Weapon(self, 0, weapon_type=weapon_type)
+                new_object = Weapon(self, weapon_type=weapon_type)
             else:
-                new_object = Weapon(self, 0)
+                new_object = Weapon(self)
             objects.append(new_object)
         return objects
     

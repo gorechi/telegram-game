@@ -147,18 +147,21 @@ class Floor:
         # Читаем оружие из файла и разбрасываем по замку
         self.all_weapon = game.create_objects_from_json(file='weapon.json',
                                      how_many=self.how_many['оружие'])
+        print(self.all_weapon)
         for weapon in self.all_weapon:
             weapon.place(self)
         
         # Читаем щиты из файла и разбрасываем по замку
         self.all_shields = game.create_objects_from_json(file='shields.json',
                                       how_many=self.how_many['щит'])
+        print(self.all_shields)
         for shield in self.all_shields:
             shield.place(self)
         
         # Читаем доспехи из файла и разбрасываем по замку
         self.all_armor = game.create_objects_from_json(file='armor.json',
                                     how_many=self.how_many['доспех'])
+        print(self.all_armor)
         for armor in self.all_armor:
             armor.place(self)
         

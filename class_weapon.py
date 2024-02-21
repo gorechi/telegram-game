@@ -11,7 +11,7 @@ class Weapon:
                  name=None, 
                  name1='оружие', 
                  damage=1, 
-                 actions='бьет,ударяет', 
+                 actions=['бьет', 'ударяет'], 
                  empty=False, 
                  weapon_type=None, 
                  enchantable=True):
@@ -27,10 +27,10 @@ class Weapon:
             self.weapon_type = weapon_type
             self.generate_type()
             self.generate_name()
-        self.actions = actions.split(',')
+        self.actions = actions
         self.can_use_in_fight = True
         self.runes = []
-        self.twohanded_dict = s_weapon_twohanded_dictionary
+        self.twohanded = False
         self.empty = empty
 
     
