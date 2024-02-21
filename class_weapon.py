@@ -10,28 +10,25 @@ class Weapon:
                  game, 
                  name=None, 
                  name1='оружие', 
-                 damage=1, 
+                 damage:int=1, 
                  actions=['бьет', 'ударяет'], 
                  empty=False, 
                  weapon_type=None, 
                  enchantable=True):
         self.game = game
-        if name:
-            self.name = name
-            self.damage = int(damage)
-            self.name1 = name1
-            self.twohanded = False
-            self.type = ''
-            self.hit_chance = 0
-            self.enchatable = enchantable
-            self.weapon_type = weapon_type
-            self.generate_type()
-            self.generate_name()
+        self.name = name
+        self.damage = damage
+        self.name1 = name1
+        self.empty = empty
         self.actions = actions
+        self.enchatable = enchantable
+        self.weapon_type = weapon_type
+        self.type = ''
+        self.hit_chance = 0
         self.can_use_in_fight = True
         self.runes = []
         self.twohanded = False
-        self.empty = empty
+        self.twohanded = False
 
     
     def on_create(self):
@@ -43,27 +40,6 @@ class Weapon:
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
-
-    
-    def generate_name(self):
-        first_word_lexemes = randomitem(s_weapon_first_words_dictionary)[self.gender]
-        self.lexemes = {}
-        for lexeme in first_word_lexemes:
-            self.lexemes[lexeme] = f'{first_word_lexemes[lexeme]} {self.weapon_type[0][lexeme]}'
-        self.name = self.lexemes['nom']
-        self.name1 = self.lexemes['accus']
-        print(self.lexemes)
-    
-    
-    def generate_type(self):
-        settings_list = s_weapon_types_dictionary
-        if self.weapon_type:
-            settings_list = [i for i in settings_list if i[3] == self.weapon_type]
-        self.settings = randomitem(settings_list)
-        self.type = self.weapon_type[3]
-        self.twohanded = self.weapon_type[4]
-        self.gender = self.weapon_type[1]
-        self.hit_chance = self.weapon_type[5]
     
     
     def real_name(self, all:bool=False, additional:list=[]) -> list:

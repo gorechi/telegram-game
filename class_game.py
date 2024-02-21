@@ -201,12 +201,33 @@ class Game():
         
         objects = []
         for _ in range(howmany):
-            if weapon_type:
-                new_object = Weapon(self, weapon_type=weapon_type)
-            else:
-                new_object = Weapon(self)
+            settings = self.generate_weapon_settings(weapon_type)
+            new_object = Weapon(self, **settings)
             objects.append(new_object)
         return objects
+
+
+    def update_weapon_lexemes(self, settings:dict):
+        first_word_lexemes = randomitem(s_weapon_first_words_dictionary)[settings["gender"]]
+        lexemes = {}
+        for lexeme in first_word_lexemes:
+            lexemes[lexeme] = f'{first_word_lexemes[lexeme]} {settings["lexemes"][lexeme]}'
+        settings["name"] = lexemes['nom']
+        settings["name1"] = lexemes['accus']
+        settings["lexemes"] = lexemes
+        return settings        
+    
+    
+    def generate_weapon_settings(self, weapon_type:str=None):
+        settings_list = s_weapon_types_dictionary
+        if weapon_type:
+            settings_list = [i for i in settings_list if i['type'] == weapon_type]
+        if not settings_list:
+            return False
+        settings = randomitem(settings_list)
+        settings = self.update_weapon_lexemes(settings)
+        settings['game'] = self
+        return settings
     
     
     def rune_actions(self, answer:str) -> bool:

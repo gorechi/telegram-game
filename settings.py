@@ -582,97 +582,175 @@ s_weapon_first_words_dictionary = [[{
                                    ]
 """Словарь первых слов в описании оружия."""
  
-s_weapon_types_dictionary = [[{
+s_weapon_types_dictionary = [{"lexemes":{
                                 "nom": "меч",
                                 "accus": "меч",
                                 "gen": "меча",
                                 "dat": "мечу",
                                 "prep": "мече",
-                                "inst": "мечом"}, 0, 'меч', 'рубящее', False, 6],
-                             [{
+                                "inst": "мечом"
+                                }, 
+                              "gender":0, 
+                              "name1":'меч', 
+                              "type":'рубящее', 
+                              "twohanded":False, 
+                              "hit_chance":6},
+                             {"lexemes":{
                                 "nom": "сабля",
                                 "accus": "саблю",
                                 "gen": "сабли",
                                 "dat": "сабле",
                                 "prep": "сабле",
-                                "inst": "саблей"}, 1, 'саблю', 'рубящее', False, 7],
-                             [{
+                                "inst": "саблей"
+                                }, 
+                              "gender":1, 
+                              "name1":'саблю', 
+                              "type":'рубящее', 
+                              "twohanded":False, 
+                              "hit_chance":7},
+                             {"lexemes":{
                                 "nom": "катана",
                                 "accus": "катану",
                                 "gen": "катаны",
                                 "dat": "катане",
                                 "prep": "катане",
-                                "inst": "катаной"}, 1, 'катану', 'рубящее', False, 7],
-                             [{
+                                "inst": "катаной"
+                                }, 
+                              "gender":1, 
+                              "name1":'катану', 
+                              "type":'рубящее', 
+                              "twohanded":False, 
+                              "hit_chance":7},
+                             {"lexemes":{
                                 "nom": "рапира",
                                 "accus": "рапиру",
                                 "gen": "рапиры",
                                 "dat": "рапире",
                                 "prep": "рапире",
-                                "inst": "рапирой"}, 1, 'рапиру', 'колющее', False, 6],
-                             [{
+                                "inst": "рапирой"
+                                }, 
+                              "gender":1, 
+                              "name1":'рапиру', 
+                              "type":'колющее', 
+                              "twohanded":False, 
+                              "hit_chance":6},
+                             {"lexemes":{
                                 "nom": "пика",
                                 "accus": "пику",
                                 "gen": "пики",
                                 "dat": "пике",
                                 "prep": "пике",
-                                "inst": "пикой"}, 1, 'пику', 'колющее', True, 4],
-                             [{
+                                "inst": "пикой"
+                                }, 
+                              "gender":1, 
+                              "name1":'пику', 
+                              "type":'колющее', 
+                              "twohanded":True, 
+                              "hit_chance":4},
+                             {"lexemes":{
                                 "nom": "копье",
                                 "accus": "копье",
                                 "gen": "копья",
                                 "dat": "копью",
                                 "prep": "копье",
-                                "inst": "копьем"}, 2, 'копье', 'колющее', True, 4],
-                             [{
+                                "inst": "копьем"
+                                }, 
+                              "gender":2, 
+                              "name1":'копье', 
+                              "type":'колющее', 
+                              "twohanded":True, 
+                              "hit_chance":4},
+                             {"lexemes":{
                                 "nom": "топор",
                                 "accus": "топор",
                                 "gen": "топора",
                                 "dat": "топору",
                                 "prep": "топоре",
-                                "inst": "топором"}, 0, 'топор', 'рубящее', False, 5],
-                             [{
+                                "inst": "топором"
+                                }, 
+                              "gender":0, 
+                              "name1":'топор', 
+                              "type":'рубящее', 
+                              "twohanded":False, 
+                              "hit_chance":5},
+                             {"lexemes":{
                                 "nom": "кинжал",
                                 "accus": "кинжал",
                                 "gen": "кинжала",
                                 "dat": "кинжалу",
                                 "prep": "кинжале",
-                                "inst": "кинжалом"}, 0, 'кинжал', 'колющее', False, 5],
-                             [{
+                                "inst": "кинжалом"
+                                }, 
+                              "gender":0, 
+                              "name1":'кинжал', 
+                              "type":'колющее', 
+                              "twohanded":False, 
+                              "hit_chance":5},
+                             {"lexemes":{
                                 "nom": "дубина",
                                 "accus": "дубину",
                                 "gen": "дубины",
                                 "dat": "дубине",
                                 "prep": "дубине",
-                                "inst": "дубиной"}, 1, 'дубину', 'ударное', False, 4],
-                             [{
+                                "inst": "дубиной"
+                                }, 
+                              "gender":1, 
+                              "name1":'дубину', 
+                              "type":'ударное', 
+                              "twohanded":False, 
+                              "hit_chance":4},
+                             {"lexemes":{
                                 "nom": "палица",
                                 "accus": "палицу",
                                 "gen": "палицы",
                                 "dat": "палице",
                                 "prep": "палице",
-                                "inst": "палицей"}, 1, 'палицу', 'ударное', False, 5],
-                             [{
+                                "inst": "палицей"
+                                }, 
+                              "gender":1, 
+                              "name1":'палицу', 
+                              "type":'ударное', 
+                              "twohanded":False, 
+                              "hit_chance":5},
+                             {"lexemes":{
                                 "nom": "булава",
                                 "accus": "булаву",
                                 "gen": "булавы",
                                 "dat": "булаве",
                                 "prep": "булаве",
-                                "inst": "булавой"}, 1, 'булаву', 'ударное', False, 5],
-                             [{
+                                "inst": "булавой"
+                                }, 
+                              "gender":1, 
+                              "name1":'булаву', 
+                              "type":'ударное', 
+                              "twohanded":False, 
+                              "hit_chance":5},
+                             {"lexemes":{
                                 "nom": "молот",
                                 "accus": "молот",
                                 "gen": "молота",
                                 "dat": "молоту",
                                 "prep": "молоте",
-                                "inst": "молотом"}, 0, 'молот', 'ударное', True, 5],
-                             [{
+                                "inst": "молотом"
+                                }, 
+                              "gender":0, 
+                              "name1":'молот', 
+                              "type":'ударное', 
+                              "twohanded":True, 
+                              "hit_chance":5},
+                             {"lexemes":{
                                 "nom": "шпага",
                                 "accus": "шпагу",
                                 "gen": "шпаги",
                                 "dat": "шпаге",
                                 "prep": "шпаге",
-                                "inst": "шпагой"}, 1, 'шпагу', 'колющее', False, 6]]
+                                "inst": "шпагой"
+                                }, 
+                              "gender":1, 
+                              "name1":'шпагу', 
+                              "type":'колющее', 
+                              "twohanded":False, 
+                              "hit_chance":6}]
 """Словарь типов оружия."""
  
 s_weapon_twohanded_dictionary = [{  "nom": "двуручный",
