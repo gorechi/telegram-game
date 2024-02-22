@@ -13,8 +13,9 @@ class Weapon:
                  damage:int=1, 
                  actions=['бьет', 'ударяет'], 
                  empty=False, 
-                 weapon_type=None, 
-                 enchantable=True):
+                 type=None, 
+                 enchantable=True,
+                 gender=0):
         self.game = game
         self.name = name
         self.damage = damage
@@ -22,18 +23,27 @@ class Weapon:
         self.empty = empty
         self.actions = actions
         self.enchatable = enchantable
-        self.weapon_type = weapon_type
-        self.type = ''
+        self.type = type
         self.hit_chance = 0
-        self.can_use_in_fight = True
         self.runes = []
-        self.twohanded = False
-        self.twohanded = False
+        self.gender = gender
 
     
     def on_create(self):
+        self.decorate()
         return True
 
+    
+    def decorate(self):
+        decorators = s_weapon_decorators[self.type]
+        decorator = randomitem(decorators)
+        lexemes = {}
+        for lexeme in self.lexemes:
+            lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
+        self.damage += decorator['damage_modifier']
+        self.lexemes = lexemes
+        print(self.lexemes)
+    
     
     def __str__(self):
         damage_string = str(self.damage)
@@ -70,6 +80,7 @@ class Weapon:
             element_sum += rune.element
         return element_sum
 
+    
     def is_poisoned(self):
         for i in self.runes:
             if i.poison:
@@ -106,6 +117,7 @@ class Weapon:
                 element += int(i.element)
             return ' ' + s_elements_dictionary[element]
 
+    
     def perm_damage(self):
         damage = 0
         if len(self.runes) in [1, 2]:
@@ -113,6 +125,7 @@ class Weapon:
                 damage += rune.damage
         return damage
 
+    
     def attack(self, who=None):
         """Функция рассчитывает урон, который наносит оружие конкретному монстру
 
@@ -131,6 +144,7 @@ class Weapon:
         full_damage = ceil(big_damage * damage_multiplier)
         return full_damage
 
+    
     def take(self, who):
         game = self.game
         message = [f'{who.name} берет {self.name1}.']
@@ -154,6 +168,7 @@ class Weapon:
                 who.backpack.append(self)
         tprint(game, message)
 
+    
     def show(self):
         damage_string = str(self.damage)
         if self.perm_damage() != 0:
@@ -164,6 +179,7 @@ class Weapon:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string}), {self.type}'.capitalize()
 
+    
     def use(self, who, in_action=False):
         game = self.game
         if who.weapon.empty:
@@ -186,6 +202,7 @@ class Weapon:
                                f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.real_name()[1]}.')
         tprint(game, message)
 
+    
     def place(self, castle, room_to_place = None):
         if room_to_place:
             room = room_to_place

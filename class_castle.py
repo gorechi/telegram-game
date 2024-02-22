@@ -146,7 +146,8 @@ class Floor:
         
         # Читаем оружие из файла и разбрасываем по замку
         self.all_weapon = game.create_objects_from_json(file='weapon.json',
-                                     how_many=self.how_many['оружие'])
+                                     how_many=self.how_many['оружие'],
+                                     random=True)
         print(self.all_weapon)
         for weapon in self.all_weapon:
             weapon.place(self)

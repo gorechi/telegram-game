@@ -100,7 +100,7 @@ class Monster:
         """Метод вызывается после создания экземпляра класса Монстр."""
         
         if self.prefered_weapon:
-            self.weapon = self.game.create_random_weapon(howmany=1, weapon_type=self.prefered_weapon)[0]
+            self.weapon = self.game.create_random_weapon(weapon_type=self.prefered_weapon)
         return True
 
     

@@ -162,6 +162,21 @@ class Game():
         return objects
     
           
+    def create_random_weapon(self, how_many:int=1, weapon_type:str=None) -> Weapon | list[Weapon]:
+        objects = []
+        with open('weapon.json', encoding='utf-8') as read_data:
+            parsed_data = json.load(read_data)
+        if weapon_type:
+            parsed_data = [i for i in parsed_data if i['type'] == weapon_type]
+        for _ in range(how_many):
+            i = randomitem(parsed_data, False)
+            new_game_object = self.object_from_json(json_object=i)
+            objects.append(new_game_object)
+        if len(objects) == 1:
+            return objects[0]
+        return objects
+    
+    
     def object_from_json(self, json_object:object) -> object:
         
         """Функция создания одного объекта игры из объекта JSON."""
@@ -194,41 +209,6 @@ class Game():
             return self.fight_actions(answer=answer)
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
-    
-    def create_random_weapon(self, howmany:int=1, weapon_type:str=None) -> list:
-        
-        """Метод создает случайное оружие"""
-        
-        objects = []
-        for _ in range(howmany):
-            settings = self.generate_weapon_settings(weapon_type)
-            new_object = Weapon(self, **settings)
-            objects.append(new_object)
-        return objects
-
-
-    def update_weapon_lexemes(self, settings:dict):
-        first_word_lexemes = randomitem(s_weapon_first_words_dictionary)[settings["gender"]]
-        lexemes = {}
-        for lexeme in first_word_lexemes:
-            lexemes[lexeme] = f'{first_word_lexemes[lexeme]} {settings["lexemes"][lexeme]}'
-        settings["name"] = lexemes['nom']
-        settings["name1"] = lexemes['accus']
-        settings["lexemes"] = lexemes
-        return settings        
-    
-    
-    def generate_weapon_settings(self, weapon_type:str=None):
-        settings_list = s_weapon_types_dictionary
-        if weapon_type:
-            settings_list = [i for i in settings_list if i['type'] == weapon_type]
-        if not settings_list:
-            return False
-        settings = randomitem(settings_list)
-        settings = self.update_weapon_lexemes(settings)
-        settings['game'] = self
-        return settings
-    
     
     def rune_actions(self, answer:str) -> bool:
         
