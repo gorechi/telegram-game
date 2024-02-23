@@ -137,40 +137,43 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, game, name='', name1='доспех', protection=1, actions='', empty=False, enchantable=True):
+    def __init__(self, 
+                 game, 
+                 name:str='защита', 
+                 name1:str='защиту', 
+                 protection:int=1, 
+                 actions:list=['отражает'], 
+                 empty:bool=False, 
+                 enchantable:bool=True):
         self.game = game
-        if name != 0:
-            self.name = name
-            self.name1 = name1
-            self.protection = int(protection)
-            self.enchantable = enchantable
-        else:
-            n1 = [['Большой', 'Большая', 'Большой', 'Большую'],
-                  ['Малый', 'Малая', 'Малый', 'Малую'],
-                  ['Старый', 'Старая', 'Старый', 'Старую'],
-                  ['Тяжелый', 'Тяжелая', 'Тяжелый', 'Тяжелую'],
-                  ['Новый', 'Новая', 'Новый', 'Новую']]
-            n2 = [['броня', 1, 'броню'],
-                  ['кольчуга', 1, 'кольчугу'],
-                  ['защита', 1, 'защиту'],
-                  ['панцирь', 0, 'панцирь']]
-            a1 = dice(0, len(n1) - 1)
-            a2 = dice(0, len(n2) - 1)
-            self.name = n1[a1][n2[a2][1]] + ' ' + n2[a2][0]
-            self.name1 = n1[a1][n2[a2][1]+2] + ' ' + n2[a2][2]
-            self.protection = dice(1, 3)
-            if dice(0, s_enchantable_die) == 1:
-                self.enchatable = False
-            else:
-                self.enchatable = True
-        self.actions = actions.split(',')
+        self.name = name
+        self.name1 = name1
+        self.protection = protection
+        self.enchantable = enchantable
+        self.actions = actions
         self.can_use_in_fight = True
         self.empty = empty
         self.runes = []
 
+    
     def on_create(self):
+        self.decorate()
         return True
 
+    
+    def decorate(self):
+        decorators = s_armor_decorators[self.type]
+        decorator = randomitem(decorators)
+        lexemes = {}
+        for lexeme in self.lexemes:
+            lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
+        self.protection += decorator['protection_modifier']
+        if self.protection < 2:
+            self.protection = 1
+        self.lexemes = lexemes
+        print(self.lexemes)
+    
+    
     def place(self, castle, room_to_place = None):
         if room_to_place:
             room = room_to_place

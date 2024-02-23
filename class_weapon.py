@@ -29,12 +29,12 @@ class Weapon:
         self.gender = gender
 
     
-    def on_create(self):
+    def on_create(self) -> bool:
         self.decorate()
         return True
 
     
-    def decorate(self):
+    def decorate(self) -> None:
         decorators = s_weapon_decorators[self.type]
         decorator = randomitem(decorators)
         lexemes = {}
@@ -42,17 +42,16 @@ class Weapon:
             lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
         self.damage += decorator['damage_modifier']
         self.lexemes = lexemes
-        print(self.lexemes)
     
     
-    def __str__(self):
+    def __str__(self) -> str:
         damage_string = str(self.damage)
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
     
     
-    def real_name(self, all:bool=False, additional:list=[]) -> list:
+    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
         names = []
         if self.element() != 0:
             names.append(f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize())
@@ -65,7 +64,7 @@ class Weapon:
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.real_name(all=True) + ['оружие']
+        names_list = self.real_name(all=True) + ['защита']
         names_list_lower = []
         for name in names_list:
             names_list_lower.append(name.lower())
