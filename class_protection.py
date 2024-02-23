@@ -171,7 +171,6 @@ class Armor(Protection):
         if self.protection < 2:
             self.protection = 1
         self.lexemes = lexemes
-        print(self.lexemes)
     
     
     def place(self, castle, room_to_place = None):
@@ -204,28 +203,20 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
-    def __init__(self, game, name='', name1='щит', protection=1, actions='', empty=False, enchantable=True):
+    def __init__(self, 
+                 game, 
+                 name:str='', 
+                 name1:str='щит', 
+                 protection:int=1, 
+                 actions:list=[], 
+                 empty:bool=False, 
+                 enchantable:bool=True):
         self.game = game
-        if name != 0:
-            self.name = name
-            self.name1 = name1
-            self.protection = int(protection)
-            self.enchantable = enchantable
-        else:
-            n1 = ['Большой',
-                  'Малый',
-                  'Старый',
-                  'Тяжелый',
-                  'Новый']
-            a1 = dice(0, len(n1) - 1)
-            self.name = n1[a1] + ' щит'
-            self.name1 = self.name
-            self.protection = dice(1, 3)
-            if dice(0, s_enchantable_die) == 1:
-                self.enchatable = False
-            else:
-                self.enchatable = True
-        self.actions = actions.split(',')
+        self.name = name
+        self.name1 = name1
+        self.protection = protection
+        self.enchantable = enchantable
+        self.actions = actions
         self.can_use_in_fight = True
         self.empty = empty
         self.runes = []

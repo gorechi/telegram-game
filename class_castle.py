@@ -139,7 +139,8 @@ class Floor:
         
         # Читаем монстров из файла и разбрасываем по замку
         self.all_monsters = game.create_objects_from_json(file='monsters.json',
-                                       how_many=self.how_many['монстры'])
+                                       how_many=self.how_many['монстры'],
+                                       random=True)
         for monster in self.all_monsters:
             monster.place(self)
             self.game.how_many_monsters += 1
@@ -148,27 +149,27 @@ class Floor:
         self.all_weapon = game.create_objects_from_json(file='weapon.json',
                                      how_many=self.how_many['оружие'],
                                      random=True)
-        print(self.all_weapon)
         for weapon in self.all_weapon:
             weapon.place(self)
         
         # Читаем щиты из файла и разбрасываем по замку
         self.all_shields = game.create_objects_from_json(file='shields.json',
-                                      how_many=self.how_many['щит'])
-        print(self.all_shields)
+                                      how_many=self.how_many['щит'],
+                                      random=True)
         for shield in self.all_shields:
             shield.place(self)
         
         # Читаем доспехи из файла и разбрасываем по замку
         self.all_armor = game.create_objects_from_json(file='armor.json',
-                                    how_many=self.how_many['доспех'])
-        print(self.all_armor)
+                                    how_many=self.how_many['доспех'],
+                                    random=True)
         for armor in self.all_armor:
             armor.place(self)
         
         # Читаем зелья из файла и разбрасываем по замку
         self.all_potions = game.create_objects_from_json(file='potions.json',
-                                      how_many=self.how_many['зелье'], random=True)
+                                      how_many=self.how_many['зелье'], 
+                                      random=True)
         for potion in self.all_potions:
             potion.place(self)
         
@@ -187,13 +188,10 @@ class Floor:
         new_map.place(self) 
         matches = Matches(game)
         matches.place(self)
-        for i in range(5):
+        for _ in range(5):
             new_key = Key(game)
             self.plan[0].loot.add(new_key)
-        new_loot = Loot(self.game)
-        new_corpse = Corpse(self.game, 'Труп разбойника', new_loot, self.plan[0])
         new_key = Key(game)
-        new_corpse.loot.add(new_key)
 
     
     def secret_rooms(self):
