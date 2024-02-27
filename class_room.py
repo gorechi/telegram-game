@@ -41,10 +41,10 @@ class Door:
 class Furniture:
     """Класс мебели."""
     
+    
     def __init__(self, game, name='', furniture_type=0, can_rest=False):
         self.game = game
-        new_loot = Loot(self.game)
-        self.loot = new_loot
+        self.loot = Loot(self.game)
         self.locked = False
         self.lockable = False
         self.opened = True
@@ -56,23 +56,24 @@ class Furniture:
         self.empty_text = 'пусто'
         self.state = 'стоит'
         self.where = 'в углу'
-        self.name1 = 'мебель'
         self.room = None
         self.type = furniture_type
 
+    
     def __str__(self):
         return self.where + ' ' + self.state + ' ' + self.name
     
     
     def on_create(self):
-        self.name = randomitem(self.descriptions, False) + ' ' + self.name
         self.state = randomitem(self.states, False)
         self.where = randomitem(self.wheres, False)
         return True
 
+    
     def put(self, item):
         self.loot.pile.append(item)
    
+    
     def monster_in_ambush(self):
         monsters = self.room.monsters()
         if monsters:
@@ -81,6 +82,7 @@ class Furniture:
                     return monster 
         return False
 
+    
     def show(self):
         message = []
         message.append(self.where + ' ' + self.state + ' ' + self.name + '.')
@@ -88,6 +90,7 @@ class Furniture:
             message.append('Внутри слышится какая-то возня.')
         return message
 
+    
     def place(self, castle=None, room_to_place=None):
         if room_to_place:
             if self.type not in room_to_place.furniture_types():
