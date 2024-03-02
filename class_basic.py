@@ -109,6 +109,10 @@ class Money:
         self.name = self.lexemes['nom']
 
     
+    def get_names_for_actions(self) -> list[str]:
+        return ['деньги', self.lexemes['nom'], self.lexemes['accus']]
+    
+    
     def __repr__(self):
         return str(self.how_much_money)
 

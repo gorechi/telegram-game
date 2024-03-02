@@ -13,33 +13,43 @@ class Rune:
     
     elements = [1, 3, 7, 12]
     
-    def __init__(self, game):
-        self.game = game
-        self.damage = 4 - floor(sqrt(dice(1, 15)))
-        self.defence = 3 - floor(sqrt(dice(1, 8)))
-        self.element = Rune.elements[dice(0, 3)]
-        self.can_use_in_fight = False
-        self.name = 'руна'
-        self.name1 = 'руну'
-        self.lexemes = {
+    lexemes = {
             "nom": "руна",
             "accus": "руну",
             "gen": "руны",
             "dat": "руне",
             "prep": "руне",
             "inst": "руной"
-        }
-
+            }
+    
+    def __init__(self, game):
+        self.game = game
+        self.damage = 4 - floor(sqrt(dice(1, 15)))
+        self.defence = 3 - floor(sqrt(dice(1, 8)))
+        self.element = randomitem(Rune.elements)
+        self.can_use_in_fight = False
+        self.name = 'руна'
+        self.lexemes = self.generate_lexemes()
         self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
         self.check_if_poisoned()
         self.base_price = self.define_base_price()
         
          
+    def generate_lexemes(self):
+        self.lexemes = {}
+        for key in Rune.lexemes:
+            self.lexemes[key] = f'{Rune.lexemes[key]} {s_elements_dictionary[self.element]}'
+    
+    
     def __str__(self) -> str:
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['руна', 'руну', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def define_base_price(self) -> int:
         return s_rune_maximum_price
@@ -180,6 +190,10 @@ class Matches:
         self.quantity = self.get_quantity()
         
     
+    def get_names_for_actions(self) -> list[str]:
+        return ['спички']
+    
+    
     def get_quantity(self) -> int:
         return roll([s_max_matches_quantity])
 
@@ -278,7 +292,6 @@ class Map:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'карта'
-        self.name1 = 'карту'
         self.lexemes = {
             "nom": "карта",
             "accus": "карту",
@@ -290,6 +303,10 @@ class Map:
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['карта', 'карту', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def place(self, castle, room=None) -> bool:
         
@@ -363,7 +380,6 @@ class Key:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'ключ'
-        self.name1 = 'ключ'
         self.lexemes = {
             "nom": "ключ",
             "accus": "ключ",
@@ -375,6 +391,10 @@ class Key:
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['ключ', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def __str__(self) -> str:
         return self.description
@@ -432,6 +452,10 @@ class Potion:
     def __str__(self):
         return self.description
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['зелье', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def on_create(self):
         return True
@@ -585,6 +609,10 @@ class Book:
     def __str__(self):
         return self.name
     
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['книга', 'книгу', self.lexemes['nom'], self.lexemes['accus']]
+        
     
     def define_base_price(self) -> int:
         return s_book_maximum_price

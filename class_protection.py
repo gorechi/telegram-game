@@ -140,14 +140,12 @@ class Armor(Protection):
     def __init__(self, 
                  game, 
                  name:str='защита', 
-                 name1:str='защиту', 
                  protection:int=1, 
                  actions:list=['отражает'], 
                  empty:bool=False, 
                  enchantable:bool=True):
         self.game = game
         self.name = name
-        self.name1 = name1
         self.protection = protection
         self.enchantable = enchantable
         self.actions = actions
@@ -155,6 +153,10 @@ class Armor(Protection):
         self.empty = empty
         self.runes = []
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['защита', 'защиту', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def on_create(self):
         self.decorate()
@@ -206,14 +208,12 @@ class Shield (Protection):
     def __init__(self, 
                  game, 
                  name:str='', 
-                 name1:str='щит', 
                  protection:int=1, 
                  actions:list=[], 
                  empty:bool=False, 
                  enchantable:bool=True):
         self.game = game
         self.name = name
-        self.name1 = name1
         self.protection = protection
         self.enchantable = enchantable
         self.actions = actions
@@ -226,7 +226,11 @@ class Shield (Protection):
     def on_create(self):
         return True
 
-        
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['щит', self.lexemes['nom'], self.lexemes['accus']] + self.real_name()    
+    
+    
     def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
         if self.empty:
             return []
@@ -234,8 +238,8 @@ class Shield (Protection):
         damage = damage_dict.get(self.accumulated_damage // 1)
         names = []
         if damage:
-            name = damage + ' ' + self.name
-            name1 = damage + ' ' + self.name1
+            names.append(damage + ' ' + self.lexemes['nom'])
+            names.append(damage + ' ' + self.lexemes['accus'])
         else:
             name = self.name
             name1 = self.name1
