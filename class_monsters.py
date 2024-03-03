@@ -366,16 +366,10 @@ class Monster:
     def break_enemy_shield(self, target, total_attack:int) -> str:
         """Метод проверяет, смог ли монстр сломать вражеский щит."""
         
-        if target.shield.empty:
-            return None
-        else:
-            shield = target.shield
-            r = dice(1, s_shield_crushed_upper_limit)
-            damage_to_shield = total_attack * target.shield.accumulated_damage
-            if r < damage_to_shield:
-                self.game.all_shields.remove(shield)
-                target.shield = self.game.no_shield
+        shield = target.shield
+        if not shield.empty and shield.check_if_broken():
             return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+        return None
     
     
     def attack(self, target):
@@ -439,12 +433,7 @@ class Monster:
         weapon = attacker.weapon
         if not self.shield.empty:
             result += self.shield.protect(attacker)
-            if self.hide:
-                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-                self.shield.accumulated_damage += dice_result
-            else:
-                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                self.shield.accumulated_damage += dice_result
+            self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.parry_chance
@@ -943,12 +932,7 @@ class Shapeshifter(Monster):
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
-            if self.hide:
-                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-                self.shield.accumulated_damage += dice_result
-            else:
-                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                self.shield.accumulated_damage += dice_result
+            self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result

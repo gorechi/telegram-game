@@ -458,10 +458,10 @@ class Hero:
         
         shield = self.get_shield()
         if shield:
-            need_money = shield.accumulated_damage * s_shield_repair_multiplier // 1
-            if need_money > 0 and self.money >= need_money:
-                shield.accumulated_damage = 0
-                self.money -= need_money
+            repair_price = shield.get_repair_price()
+            if repair_price > 0 and self.money >= repair_price:
+                shield.repair()
+                self.money -= repair_price
                 tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
     
     
@@ -554,18 +554,18 @@ class Hero:
         if not shield:
             tprint(game, f'У {self.g(["героя", "героини"])} нет щита, так что и ремонтировать нечего.')
             return False
-        needed_money = shield.accumulated_damage * s_shield_repair_multiplier // 1
-        if needed_money == 0:
-            tprint(game, f'{shield.name1} не нужно ремонтировать.')
+        repair_price = shield.get_repair_price()
+        if repair_price == 0:
+            tprint(game, f'{shield.lexemes['accus']} не нужно ремонтировать.')
             return False
-        if self.money >= needed_money:
-            shield.accumulated_damage = 0
-            self.money.how_much_money -= needed_money
-            tprint(game, f'{self.name} успешно чинит {shield.name1}')
+        if self.money >= repair_price:
+            shield.repair()
+            self.money.how_much_money -= repair_price
+            tprint(game, f'{self.name} успешно чинит {shield.lexemes['accus']}')
             self.decrease_restless(1)
             return True
         else:
-            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
+            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.lexemes['accus']}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
             return False
         
     
@@ -771,16 +771,10 @@ class Hero:
     def break_enemy_shield(self, target:Monster, total_attack:int) -> str:
         """Метод проверяет, смог ли герой сломать вражеский щит."""
         
-        if target.shield.empty:
-            return None
-        else:
-            shield = target.shield
-            r = dice(1, s_shield_crushed_upper_limit)
-            damage_to_shield = total_attack * target.shield.accumulated_damage
-            if r < damage_to_shield:
-                self.game.all_shields.remove(shield)
-                target.shield = self.game.no_shield
-            return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'    
+        shield = target.shield
+        if not shield.empty and shield.check_if_broken(total_attack):
+            return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+        return None    
     
         
     def increase_weapon_mastery(self) -> str:
@@ -965,12 +959,7 @@ class Hero:
     def damage_shield(self):
         """Метод моделирует урон, который наносится щиту персонажа во время схватки."""
         
-        if self.hide:
-            dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-            self.shield.accumulated_damage += dice_result
-        else:
-            dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-            self.shield.accumulated_damage += dice_result
+        self.shield.take_damage(self.hide)
             
     
     def try_to_parry(self, attacker:Monster) -> bool:

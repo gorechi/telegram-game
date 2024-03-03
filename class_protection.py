@@ -15,6 +15,7 @@ class Protection:
         self.empty = empty
         self.runes = []
         self.protection = int(protection)
+        self.user = None
 
     def __str__(self):
         protection_string = str(self.protection)
@@ -27,28 +28,12 @@ class Protection:
 
     
     def check_name(self, message:str) -> bool:
-        names_list = self.real_name(all=True) + ['щит']
-        names_list_lower = []
-        for name in names_list:
-            names_list_lower.append(name.lower())
-        if message.lower() in names_list_lower:
+        names_list = self.get_names_list(['nom', 'accus'])
+        if message.lower() in names_list:
             return True
         return False
     
     
-    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
-        names = []
-        if self.empty:
-            return []
-        if self.element() != 0:
-            names.append(self.name + ' ' + s_elements_dictionary[self.element()])
-            names.append(self.name1 + ' ' + s_elements_dictionary[self.element()])
-        if self.element() == 0 or all:
-            names.append(self.name)
-            names.append(self.name1)
-        names += additional
-        return names
-
     def is_poisoned(self):
         for i in self.runes:
             if i.poison:
@@ -119,12 +104,21 @@ class Protection:
     def show(self) -> str:
         if self.empty:
             return None
-        real_name = self.real_name()[0]
+        full_name = self.get_full_names('nom')
         protection_string = str(self.protection)
         if self.perm_protection() != 0:
             protection_string += '+' + str(self.perm_protection())
-        return f'{real_name} ({protection_string})'
+        return f'{full_name} ({protection_string})'
 
+    
+    def get_full_names(self, key:str=None) -> str|list:
+        element_names = self.get_element_names(key)
+        if element_names:
+            return element_names
+        if key:
+            return self.lexemes.get(key, '')
+        return self.lexemes
+    
     
     def use(self, who_using, in_action=False):
         if who_using.shield == '':
@@ -134,6 +128,24 @@ class Protection:
             who_using.shield = self
             who_using.backpack.remove(self, who_using)
         tprint(self.game, f'{who_using.name} теперь использует {self.name1} в качестве защиты!')
+    
+    
+    def get_element_decorator(self) -> str|None:
+        return s_elements_dictionary.get(self.element(), None)
+        
+        
+    def get_element_names(self, key:str=None) -> str|dict|None:
+        names = {}
+        element_decorator = self.get_element_decorator()
+        if not element_decorator:
+            return None
+        for lexeme in self.lexemes:
+            names[lexeme] = f'{self.lexemes[lexeme]} {element_decorator}'
+        if key:
+            return names.get(key, '')
+        return names
+           
+
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
@@ -152,11 +164,8 @@ class Armor(Protection):
         self.can_use_in_fight = True
         self.empty = empty
         self.runes = []
-
-    
-    def get_names_for_actions(self) -> list[str]:
-        return ['защита', 'защиту', self.lexemes['nom'], self.lexemes['accus']]
-    
+        self.user = None
+  
     
     def on_create(self):
         self.decorate()
@@ -173,6 +182,14 @@ class Armor(Protection):
         if self.protection < 2:
             self.protection = 1
         self.lexemes = lexemes
+    
+    
+    def get_names_list(self, keys:list=None) -> list:
+        names_list = ['защита', 'защиту']
+        for key in keys:
+            names_list.append(self.lexemes.get(key, '').lower())
+            names_list.append(self.get_element_names(key).lower())
+        return names_list
     
     
     def place(self, castle, room_to_place = None):
@@ -200,6 +217,7 @@ class Armor(Protection):
             message.append(f'При этом он снимает {old_armor.name1} и оставляет валяться на полу.')
             who.drop(old_armor.name)
         who.armor = self
+        self.user = who
         tprint(self.game, message)
 
 
@@ -221,39 +239,80 @@ class Shield (Protection):
         self.empty = empty
         self.runes = []
         self.accumulated_damage = 0
+        self.user = None
     
     
     def on_create(self):
         return True
-
+ 
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['щит', self.lexemes['nom'], self.lexemes['accus']] + self.real_name()    
-    
-    
-    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
-        if self.empty:
-            return []
-        damage_dict = s_shield_states_dictionary
-        damage = damage_dict.get(self.accumulated_damage // 1)
-        names = []
-        if damage:
-            names.append(damage + ' ' + self.lexemes['nom'])
-            names.append(damage + ' ' + self.lexemes['accus'])
-        else:
-            name = self.name
-            name1 = self.name1
-        if self.element() != 0:
-            names.append(name + ' ' + s_elements_dictionary[self.element()])
-            names.append(name1 + ' ' + s_elements_dictionary[self.element()])
-        if self.element() == 0 or all:
-            names.append(name)
-            names.append(name1)
-        if all:
-            names.append(self.name)
-            names.append(self.name1)
-        names += additional
+    def get_damaged_names(self, key:str=None) -> str|dict:
+        names = {}
+        damage_decorator = self.get_damage_decorator()
+        if not damage_decorator:
+            return None
+        for lexeme in self.lexemes:
+            names[lexeme] = f'{damage_decorator[lexeme]} {self.lexemes[lexeme].lower()}'
+        if key:
+            return names.get(key, '')
         return names
+    
+    
+    def get_full_names(self, key:str=None) -> str|dict:
+        names = {}
+        damage_decorator = self.get_damage_decorator()
+        element_decorator = self.get_element_decorator()
+        for lexeme in self.lexemes:
+            name = self.lexemes[lexeme]
+            if damage_decorator:
+                name = f'{damage_decorator[lexeme]} {name.lower()}'
+            if element_decorator:
+                name = f'{name} {element_decorator}'
+            names[lexeme] = name
+        if key:
+            return names.get(key, '')
+        return names
+          
+    
+    def get_damage_decorator(self) -> list|None:
+        return s_shield_states_dictionary.get(self.accumulated_damage // 1, None)
+    
+    
+    def check_if_broken(self, attack:int=0) -> bool:
+        damage_limit = dice(1, s_shield_crushed_upper_limit)
+        damage_to_shield = attack * self.accumulated_damage
+        if damage_limit < damage_to_shield:
+            self.game.all_shields.remove(self)
+            self.user.shield = self.game.no_shield
+            return True
+        return False
+    
+    
+    def take_damage(self, is_hiding:bool=False) -> None:
+        if is_hiding:
+            dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
+        else:
+            dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
+        self.accumulated_damage += dice_result
+    
+    
+    def get_repair_price(self):
+        return self.accumulated_damage * s_shield_repair_multiplier // 1
+    
+    
+    def repair(self) -> bool:
+        self.accumulated_damage = 0
+        return True
+    
+    
+    def get_names_list(self, keys:list=None) -> list:
+        names_list = ['щит']
+        for key in keys:
+            names_list.append(self.lexemes.get(key, '').lower())
+            names_list.append(self.get_element_names(key).lower())
+            names_list.append(self.get_damaged_names(key).lower())
+            names_list.append(self.get_full_names(key).lower())
+        return names_list
 
     
     def place(self, castle, room_to_place = None):
@@ -282,11 +341,12 @@ class Shield (Protection):
             old_shield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
-            message = [f'{who.name} помещает {self.name1} за спину.']
+            message = [f'{who.name} помещает {self.get_full_names('accus')} за спину.']
         else:
             who.shield = self
-            message = [f'{who.name} берет {self.name1} в руку.']
+            message = [f'{who.name} берет {self.get_full_names('accus')} в руку.']
         if old_shield:
-            message.append(f'При этом он бросает {old_shield.real_name()[1]} и оставляет валяться на полу.')
+            message.append(f'При этом он бросает {old_shield.get_full_names('accus')} и оставляет валяться на полу.')
             who.drop(old_shield.name)
+        self.user = who
         tprint(self.game, message)
