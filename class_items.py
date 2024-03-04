@@ -104,7 +104,7 @@ class Rune:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
 
     
     def show(self) -> str:
@@ -127,11 +127,17 @@ class Rune:
 
 
 class Spell:
-    def __init__(self, game, name='Обычное заклинание', name1='Обычного заклинания', element='магия', min_damage=1,
-                 max_damage=5, min_damage_mult=1, max_damage_mult=1, actions='кастует'):
+    def __init__(self, 
+                 game, 
+                 name='Обычное заклинание', 
+                 element='магия', 
+                 min_damage=1,
+                 max_damage=5, 
+                 min_damage_mult=1, 
+                 max_damage_mult=1, 
+                 actions='кастует'):
         self.game = game
         self.name = name
-        self.name1 = name1
         self.description = self.name
         self.element = element
         self.min_damage_mult = min_damage_mult
@@ -175,7 +181,6 @@ class Matches:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'спички'
-        self.name1 = 'спички'
         self.lexemes = {
             "nom": "спички",
             "accus": "спички",
@@ -255,7 +260,7 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False
 
@@ -371,7 +376,7 @@ class Map:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
 
 
 class Key:
@@ -591,7 +596,7 @@ class Potion:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False
 
@@ -667,6 +672,6 @@ class Book:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False

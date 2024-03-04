@@ -81,7 +81,22 @@ class Furniture:
                 if monster.hiding_place == self:
                     return monster 
         return False
+    
+    
+    def get_names_list(self, keys:list=None) -> list:
+        names_list = [self.name]
+        for key in keys:
+            names_list.append(self.lexemes.get(key, '').lower())
+            names_list.append(self.get_element_names(key).lower())
+        return names_list
 
+
+    def check_name(self, message:str) -> bool:
+        names_list = self.get_names_list(['nom', 'accus'])
+        if message.lower() in names_list:
+            return True
+        return False
+    
     
     def show(self):
         message = []

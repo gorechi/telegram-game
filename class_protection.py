@@ -6,10 +6,9 @@ from settings import *
 
 
 class Protection:
-    def __init__(self, game, name='', name1='защиту', protection=1, actions='', empty=False, enchantable=True):
+    def __init__(self, game, name='', protection=1, actions='', empty=False, enchantable=True):
         self.game = game
         self.name = name
-        self.name1 = name1
         self.actions = actions.split(',')
         self.can_use_in_fight = True
         self.empty = empty
@@ -95,10 +94,10 @@ class Protection:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            tprint(self.game, f'{who.name} использует {self.name1} как защиту.')
+            tprint(self.game, f'{who.name} использует {self.lexemes['accus']} как защиту.')
         else:
             self.game.player.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
 
     
     def show(self) -> str:
@@ -112,9 +111,8 @@ class Protection:
 
     
     def get_full_names(self, key:str=None) -> str|list:
-        element_names = self.get_element_names(key)
-        if element_names:
-            return element_names
+        if self.element != 0:
+            return self.get_element_names(key)
         if key:
             return self.lexemes.get(key, '')
         return self.lexemes
@@ -127,7 +125,7 @@ class Protection:
             who_using.backpack.append(who_using.shield)
             who_using.shield = self
             who_using.backpack.remove(self, who_using)
-        tprint(self.game, f'{who_using.name} теперь использует {self.name1} в качестве защиты!')
+        tprint(self.game, f'{who_using.name} теперь использует {self.lexemes['accus']} в качестве защиты!')
     
     
     def get_element_decorator(self) -> str|None:
@@ -212,9 +210,9 @@ class Armor(Protection):
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
         old_armor = who.armor
-        message = [f'{who.name} использует {self.name1} как защиту.']
+        message = [f'{who.name} использует {self.lexemes['accus']} как защиту.']
         if not old_armor.empty:
-            message.append(f'При этом он снимает {old_armor.name1} и оставляет валяться на полу.')
+            message.append(f'При этом он снимает {old_armor.lexemes['accus']} и оставляет валяться на полу.')
             who.drop(old_armor.name)
         who.armor = self
         self.user = who

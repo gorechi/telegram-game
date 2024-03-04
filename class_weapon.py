@@ -9,7 +9,6 @@ class Weapon:
     def __init__(self, 
                  game, 
                  name=None, 
-                 name1='оружие', 
                  damage:int=1, 
                  actions=['бьет', 'ударяет'], 
                  empty=False, 
@@ -19,7 +18,6 @@ class Weapon:
         self.game = game
         self.name = name
         self.damage = damage
-        self.name1 = name1
         self.empty = empty
         self.actions = actions
         self.enchatable = enchantable
@@ -51,27 +49,44 @@ class Weapon:
         return f'{self.name}{self.enchantment()} ({damage_string})'
     
     
-    def real_name(self, all:bool=False, additional:list=[]) -> list[str]:
-        names = []
-        if self.element() != 0:
-            names.append(f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize())
-            names.append(f'{self.name1} {s_elements_dictionary[self.element()]}'.capitalize())
-        if self.element() == 0 or all == 'all':
-            names.append(self.name.capitalize())
-            names.append(self.name1.capitalize())
-        names += additional
+    def get_full_names(self, key:str=None) -> str|list:
+        if self.element != 0:
+            return self.get_element_names(key)
+        if key:
+            return self.lexemes.get(key, '')
+        return self.lexemes
+    
+    
+    def get_element_decorator(self) -> str|None:
+        return s_elements_dictionary.get(self.element(), None)
+        
+        
+    def get_element_names(self, key:str=None) -> str|dict|None:
+        names = {}
+        element_decorator = self.get_element_decorator()
+        if not element_decorator:
+            return None
+        for lexeme in self.lexemes:
+            names[lexeme] = f'{self.lexemes[lexeme]} {element_decorator}'
+        if key:
+            return names.get(key, '')
         return names
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.real_name(all=True) + ['оружие']
-        names_list_lower = []
-        for name in names_list:
-            names_list_lower.append(name.lower())
-        if message.lower() in names_list_lower:
+        names_list = self.get_names_list(['nom', 'accus'])
+        if message.lower() in names_list:
             return True
         return False
 
+    
+    def get_names_list(self, keys:list=None) -> list:
+        names_list = ['оружие']
+        for key in keys:
+            names_list.append(self.lexemes.get(key, '').lower())
+            names_list.append(self.get_element_names(key).lower())
+        return names_list
+    
     
     def element(self):
         element_sum = 0
@@ -146,11 +161,11 @@ class Weapon:
     
     def take(self, who):
         game = self.game
-        message = [f'{who.name} берет {self.name1}.']
+        message = [f'{who.name} берет {self.lexemes['accus']}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
             who.weapon = self
-            message.append(f'{who.name} теперь использует {self.name1} в качестве оружия.')
+            message.append(f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
                 who.shield = self.game.no_shield
@@ -187,7 +202,7 @@ class Weapon:
             who.backpack.append(who.weapon)
             who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self.name1} в качестве оружия.']
+            message = [f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield
                 who.removed_shield = shield
