@@ -52,10 +52,10 @@ class Rune:
         return message.lower() in names_list
     
     
-    def get_names_list(self, keys:list=None) -> list:
+    def get_names_list(self, cases:list=None) -> list:
         names_list = ['руна', 'руну']
-        for key in keys:
-            names_list.append(self.lexemes.get(key, '').lower())
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
         return names_list
     
     
@@ -173,10 +173,10 @@ class Spell:
         return message.lower() in names_list
     
     
-    def get_names_list(self, keys:list=None) -> list:
+    def get_names_list(self, cases:list=None) -> list:
         names_list = ['заклинание']
-        for key in keys:
-            names_list.append(self.lexemes.get(key, '').lower())
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
         return names_list
     
     
@@ -483,10 +483,10 @@ class Potion:
         return message.lower() in names_list
     
     
-    def get_names_list(self, keys:list=None) -> list:
+    def get_names_list(self, cases:list=None) -> list:
         names_list = ['зелье', 'напиток']
-        for key in keys:
-            names_list.append(self.lexemes.get(key, '').lower())
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
         return names_list
     
     
@@ -648,10 +648,10 @@ class Book:
         return message.lower() in names_list
     
     
-    def get_names_list(self, keys:list=None) -> list:
+    def get_names_list(self, cases:list=None) -> list:
         names_list = ['книга', 'книгу', 'книжка', 'книжку']
-        for key in keys:
-            names_list.append(self.lexemes.get(key, '').lower())
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
         return names_list
             
     

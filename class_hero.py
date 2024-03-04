@@ -1160,17 +1160,8 @@ class Hero:
             self.show_backpack()
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
-        #TODO Сделать монстрам метод check_name
         if monster and what: 
-            if what in [monster.name.lower(),
-                            monster.get_name('accus').lower(),
-                            monster.name[0].lower(),
-                            'монстр', 
-                            'врага', 
-                            'монстра', 
-                            'враг', 
-                            'противника', 
-                            'противник']:
+            if monster.check_name(what):
                 tprint(game, showsides(self, monster, self.floor))
         if self.weapon.check_name(what):
             tprint(game, self.look_at_weapon())

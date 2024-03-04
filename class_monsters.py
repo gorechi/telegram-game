@@ -111,6 +111,7 @@ class Monster:
         """
         return self.name
         
+    
     def g(self, words_list:list) -> str:
         """
         Метод выбирает слово из полученного списка
@@ -120,6 +121,28 @@ class Monster:
         
         return words_list[self.gender]
 
+    
+    def check_name(self, message:str) -> bool:
+        room = self.current_position
+        if room.light:
+            names_list = self.get_names_list(['nom', 'accus'])
+        else:
+            names_list =  ['противник']
+        return message.lower() in names_list
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['монстр', 
+                      'врага', 
+                      'монстра', 
+                      'враг', 
+                      'противника', 
+                      'противник',
+                      self.name[0].lower()]
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
+    
     
     def get_name(self, case:str) -> str:
         """
@@ -563,7 +586,7 @@ class Monster:
         """
         room = self.current_position
         if room.light:
-            return self.name
+            return self.get_name('nom')
         else:
             return 'Противник'
     
