@@ -11,6 +11,7 @@ class Backpack:
         self.name = 'рюкзак'
         self.game = game
         self.no_backpack = no_backpack
+        self.owner = None
         self.lexemes = {
             "nom": "рюкзак",
             "accus": "рюкзак",
@@ -66,7 +67,7 @@ class Backpack:
         """
         
         for item in self.insides:
-            if name.lower() in item.get_names_for_actions():
+            if item.check_name(name):
                 return item
         return False
 
@@ -156,6 +157,6 @@ class Backpack:
             tprint(game, f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.')
             return False
         who.backpack = self
-        self.place = who
+        self.owner = who
         tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who.g(["он", "она"])} может носить с собой необходимые вещи.')
         return True

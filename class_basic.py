@@ -109,8 +109,8 @@ class Money:
         self.name = self.lexemes['nom']
 
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['деньги', self.lexemes['nom'], self.lexemes['accus']]
+    def check_name(self, message:str) -> bool:
+        return message.lower() in ['деньги', self.lexemes['nom'], self.lexemes['accus']]
     
     
     def __repr__(self):
@@ -134,8 +134,6 @@ class Money:
             self.how_much_money += other
         elif isinstance(other, Money):
             self.how_much_money += other.how_much_money
-        else:
-            raise TypeError('To Money you can only add integer or another Money.')
         self.generate_name()
         return self
 
@@ -145,8 +143,6 @@ class Money:
             self.how_much_money -= other
         elif isinstance(other, Money):
             self.how_much_money -= other.how_much_money
-        else:
-            raise TypeError('From Money you can only substract integer or another Money.')
         self.generate_name()
         return self
 

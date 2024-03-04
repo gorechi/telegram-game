@@ -1507,6 +1507,7 @@ class Hero:
             return False
         return True
         
+    
     def open_furniture(self, what:str) -> bool:
         """Метод отпирания мебели при помощи ключа."""
         
