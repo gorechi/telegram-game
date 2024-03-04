@@ -2,7 +2,8 @@ import json
 
 from class_castle import Floor
 from class_hero import Hero
-from class_items import Book, Key, Map, Matches, Potion, Rune, Spell
+from class_items import Book, Key, Map, Matches, Rune, Spell
+from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
 from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal, WalkingDead
 from class_protection import Armor, Shield
 from class_room import Furniture
@@ -60,6 +61,15 @@ class Game():
             'заклинание': Spell,
             'торговец': Trader,
             'рюкзак': Backpack,
+            'зелье исцеления': HealPotion,
+            'зелье здоровья': HealthPotion,
+            'зелье силы': StrengthPotion,
+            'зелье усиления': StrengtheningPotion,
+            'зелье ловкости': DexterityPotion,
+            'зелье увертливости': EvasionPotion,
+            'зелье ума': IntelligencePotion,
+            'зелье просветления': EnlightmentPotion,
+            'противодие': Antidote,
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0

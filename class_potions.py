@@ -4,11 +4,10 @@ from random import randint as dice
 
 class Potion:
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
         self.game = game
         self.name = name
         self.effect = effect
-        self.type = potion_type
         self.can_use_in_fight = can_use_in_fight
         self.empty = False
         self.owner = None
@@ -49,44 +48,6 @@ class Potion:
             room.loot.add(self)
         return True
 
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        owner = self.owner
-        if self.type == 8 and not owner.poisoned and owner.fear == 0:
-            tprint(
-                game, f'{owner.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
-            return False
-        if not in_action and self.type in [0, 3, 5, 7]:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        if in_action and self.type in [1, 2, 4, 6]:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
-    
-    def use_type_6(self, who_using) -> bool:
-        who_using.intel += self.effect
-        who_using.start_intel += self.effect
-        tprint(self.game, f'{who_using.name} увеличивает свой \
-            интеллект на {str(self.effect)} до {str(who_using.intel)}.')
-        return True
-
-    
-    def use_type_7(self, who_using) -> bool:
-        who_using.intel += self.effect
-        tprint(
-            self.game, f'На время боя {who_using.name} увеличивает свой интеллект на {str(self.effect)} до {str(who_using.intel)}.')
-        return True
-
-    
-    def use_type_8(self, who_using) -> bool:
-        who_using.poisoned = False
-        who_using.fear = 0
-        tprint(
-            self.game, f'{who_using.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
-        return True
-
        
     def take(self, who):
         if not who.backpack.no_backpack:
@@ -99,10 +60,15 @@ class Potion:
 
 class HealPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
         
+    
+    def on_create(self):
+        return True
+    
     
     def use(self, who_using, in_action:bool) -> bool:
         owner = self.owner
@@ -131,10 +97,15 @@ class HealPotion(Potion):
 
 class HealthPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
 
+        
+    def on_create(self):
+        return True
+    
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
         game = self.game
@@ -156,10 +127,15 @@ class HealthPotion(Potion):
 
 class StrengthPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
         
+    
+    def on_create(self):
+        return True
+    
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
         game = self.game
@@ -181,9 +157,14 @@ class StrengthPotion(Potion):
 
 class StrengtheningPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
+    
+    
+    def on_create(self):
+        return True
     
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
@@ -204,10 +185,15 @@ class StrengtheningPotion(Potion):
 
 class DexterityPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
         
+    
+    def on_create(self):
+        return True
+    
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
         game = self.game
@@ -229,9 +215,14 @@ class DexterityPotion(Potion):
 
 class EvasionPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
+    
+    
+    def on_create(self):
+        return True
     
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
@@ -253,10 +244,15 @@ class EvasionPotion(Potion):
     
 class IntelligencePotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, potion_type, can_use_in_fight)
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
         self.empty = False
+        self.owner = None
         
+    
+    def on_create(self):
+        return True
+    
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
         game = self.game
@@ -272,4 +268,62 @@ class IntelligencePotion(Potion):
         self.owner.intel += self.effect
         self.owner.start_intel += self.effect
         tprint(self.game, f'{self.owner.name} увеличивает свой интеллект на {str(self.effect)} до {str(self.owner.intel)}.')
+        return True
+    
+
+class EnlightmentPotion(Potion):
+    
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
+        self.empty = False
+        self.owner = None
+    
+    
+    def on_create(self):
+        return True
+    
+    
+    def check_if_can_be_used(self, in_action: bool) -> bool:
+        game = self.game
+        if not in_action:
+            tprint(game, 'Это зелье можно использовать только в бою!')
+            return False
+        return True
+    
+    
+    def use(self, who_using, in_action:bool) -> bool:
+        if not self.owner or not self.check_if_can_be_used(in_action):
+            return False
+        self.owner.intel += self.effect
+        tprint(self.game, f'На время боя {self.owner.name} увеличивает свой интеллект на {str(self.effect)} до {str(self.owner.intel)}.')
+        return True
+
+
+class Antidote(Potion):
+    
+    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+        super().__init__(game, name, effect, can_use_in_fight)
+        self.empty = False
+        self.owner = None
+    
+    
+    def on_create(self):
+        return True
+    
+    
+    def check_if_can_be_used(self, in_action: bool) -> bool:
+        game = self.game
+        if not self.owner.poisoned and self.owner.fear == 0:
+            tprint(game, f'{self.owner.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
+            return False
+        return True
+    
+    
+    def use(self, who_using, in_action:bool) -> bool:
+        if not self.owner or not self.check_if_can_be_used(in_action):
+            return False
+        self.owner.poisoned = False
+        self.owner.fear = 0
+        tprint(
+            self.game, f'{self.owner.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
         return True
