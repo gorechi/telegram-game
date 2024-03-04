@@ -170,12 +170,18 @@ class Armor(Protection):
         return True
 
     
-    def decorate(self):
-        decorators = s_armor_decorators[self.type]
+    def decorate(self) -> bool:
+        decorators = s_armor_decorators.get(self.type, [])
         decorator = randomitem(decorators)
+        if not decorator:
+            return False
+        if not decorator.get(self.gender, False):
+            return False
         lexemes = {}
         for lexeme in self.lexemes:
-            lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
+            decorate_string = decorator[self.gender].get(lexeme, False)
+            if decorate_string:
+                lexemes[lexeme] = f'{decorate_string} {self.lexemes[lexeme]}'
         self.protection += decorator['protection_modifier']
         if self.protection < 2:
             self.protection = 1
