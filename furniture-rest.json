@@ -3,7 +3,14 @@
       "class": "мебель",
       "type": 4,
       "name": "очаг",
-      "name1": "очаг",
+      "lexemes": {
+        "nom": "очаг",
+        "accus": "очаг",
+        "gen": "очага",
+        "dat": "очагу",
+        "prep": "очаге",
+        "inst": "очагом"
+        },
       "empty_text": "пуст",
       "lockable": false,
       "can_hide": false,

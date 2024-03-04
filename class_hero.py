@@ -16,7 +16,6 @@ class Hero:
     def __init__(self,
                  game,
                  name:str = None,
-                 name1:str = None,
                  gender:int = None,
                  stren:int = 10,
                  dext:int = 2,
@@ -33,7 +32,6 @@ class Hero:
             self.actions = actions
         self.game = game
         self.name = name
-        self.name1 = name1
         self.gender = gender
         self.poisoned = False
         self.stren = stren
@@ -245,11 +243,11 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} убирает {self.weapon.name1} в рюкзак и берет в руки {second_weapon.name1}.')
+        message.append(f'{self.name} убирает {self.weapon.lexemes['occus']} в рюкзак и берет в руки {second_weapon.lexemes['occus']}.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
+            message.append(f'Из-за того, что {second_weapon.lexemes['nom']} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
             message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
         self.backpack.remove(second_weapon, self)
@@ -263,11 +261,11 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} достает из рюкзака {second_weapon.name1} и берет в руку.')
+        message.append(f'{self.name} достает из рюкзака {second_weapon.lexemes['occus']} и берет в руку.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
+            message.append(f'Из-за того, что {second_weapon.lexemes['nom']} - двуручное оружие, щит приходится убрать за спину.')
         self.backpack.remove(second_weapon, self)
         self.weapon = second_weapon
         tprint(self.game, message)
@@ -449,7 +447,7 @@ class Hero:
                 item = randomitem(all_items)
                 self.backpack.remove(item, stealing_monster)
                 stealing_monster.take(item)
-                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
+                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.lexemes['occus']}.'
         return None
     
     
@@ -462,7 +460,7 @@ class Hero:
             if repair_price > 0 and self.money >= repair_price:
                 shield.repair()
                 self.money -= repair_price
-                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
+                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names('occus')}')
     
     
     def check_monster_in_ambush(self, place) -> bool:
@@ -480,7 +478,7 @@ class Hero:
         message = []
         if monster:
             monster.hiding_place = None
-            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.lexemes['occus']}.')
             if monster.frightening:
                 message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
                 self.fear += 1
@@ -524,7 +522,7 @@ class Hero:
         
         if not self.shield.empty:
             self.shield, self.removed_shield = self.removed_shield, self.shield
-            tprint(self.game, f'{self.name} убирает {self.removed_shield.real_name()[1]} за спину.') 
+            tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names('occus')} за спину.') 
             return True
         return False
         
@@ -1086,7 +1084,7 @@ class Hero:
             message += self.backpack.show(self)
             message.append(self.money.show())
             if not self.removed_shield.empty:
-                message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
+                message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.get_full_names('nom')}')
         tprint(self.game, message)
         return True
     
@@ -1174,9 +1172,9 @@ class Hero:
                 tprint(game, showsides(self, monster, self.floor))
         if what in self.weapon.real_name(all=True, additional=['оружие']):
             tprint(game, self.look_at_weapon())
-        if what in self.shield.real_name(all=True, additional=['щит']):
+        if what in self.shield.get_names_list(['nom', 'accus']):
             tprint(game, self.look_at_shield())
-        if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
+        if what in self.armor.get_names_list(['nom', 'accus']):
             tprint(game, self.look_at_armor())
         if [f for f in room.furniture if f.name1 == what]:
             tprint(game, self.look_at_furniture(what=what))
@@ -1563,7 +1561,7 @@ class Hero:
             tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
             return False
         self.shield, self.removed_shield = self.removed_shield, self.shield
-        tprint(self.game, f'{self.name} достает {self.shield.real_name()[0]} из-за спины и берет его в руку.')
+        tprint(self.game, f'{self.name} достает {self.shield.get_full_names('accus')} из-за спины и берет его в руку.')
         return True
     
     

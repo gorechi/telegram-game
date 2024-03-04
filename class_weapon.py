@@ -64,7 +64,7 @@ class Weapon:
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.real_name(all=True) + ['защита']
+        names_list = self.real_name(all=True) + ['оружие']
         names_list_lower = []
         for name in names_list:
             names_list_lower.append(name.lower())
@@ -156,7 +156,7 @@ class Weapon:
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
                 message.append(f'Из-за того, что {who.g(["герой взял", "героиня взяла"])} двуручное оружие, '
-                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.real_name()[1]} за спину.')
+                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.get_full_name('accus')} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -198,7 +198,7 @@ class Weapon:
                 who.shield = shield
                 who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.real_name()[1]}.')
+                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.get_full_name('occus')}.')
         tprint(game, message)
 
     

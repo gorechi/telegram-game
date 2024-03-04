@@ -229,12 +229,12 @@ class Game():
         elif answer.isdigit() and int(answer)  <= len(rune_list):
             chosen_rune = rune_list[int(answer) - 1]
             if self.selected_item.enchant(chosen_rune):
-                tprint(self, f'{player.name} улучшает {self.selected_item.name1} новой руной.', 'direction')
+                tprint(self, f'{player.name} улучшает {self.selected_item.lexemes['occus']} новой руной.', 'direction')
                 player.backpack.remove(chosen_rune)
                 self.state = 0
                 return True
             else:
-                tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.name1}.', 'direction')
+                tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.lexemes['occus']}.', 'direction')
                 self.state = 0
                 return False
         else:
@@ -265,7 +265,7 @@ class Game():
                 self.selected_item.remove(item)
                 return True
             else:
-                tprint(self, f'Похоже, что {player.name} не может использовать {item.name1}.', 'fight')
+                tprint(self, f'Похоже, что {player.name} не может использовать {item.lexemes['occus']}.', 'fight')
                 self.state = 1
                 return False
         else:

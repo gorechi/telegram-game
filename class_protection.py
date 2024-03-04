@@ -185,7 +185,7 @@ class Armor(Protection):
     
     
     def get_names_list(self, keys:list=None) -> list:
-        names_list = ['защита', 'защиту']
+        names_list = ['защита', 'защиту', 'доспех', 'доспехи']
         for key in keys:
             names_list.append(self.lexemes.get(key, '').lower())
             names_list.append(self.get_element_names(key).lower())
