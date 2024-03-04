@@ -32,14 +32,21 @@ class Weapon:
         return True
 
     
-    def decorate(self) -> None:
-        decorators = s_weapon_decorators[self.type]
+    def decorate(self) -> bool:
+        decorators = s_weapon_decorators.get(self.type, [])
         decorator = randomitem(decorators)
+        if not decorator:
+            return False
+        if not decorator.get(self.gender, False):
+            return False
         lexemes = {}
         for lexeme in self.lexemes:
-            lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
+            decorate_string = decorator[self.gender].get(lexeme, False)
+            if decorate_string:
+                lexemes[lexeme] = f'{decorate_string} {self.lexemes[lexeme]}'
         self.damage += decorator['damage_modifier']
         self.lexemes = lexemes
+        return True
     
     
     def __str__(self) -> str:
