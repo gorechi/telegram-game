@@ -111,15 +111,7 @@ class Game():
         """
         
         if not hero:
-            hero = Hero(self,
-                            s_hero_name,
-                            s_hero_name1,
-                            s_hero_gender,
-                            s_hero_strength,
-                            s_hero_dexterity,
-                            s_hero_intelligence,
-                            s_hero_health,
-                            s_hero_actions)
+            hero = self.create_objects_from_json('hero.json')[0]
         return hero
     
     
@@ -170,6 +162,21 @@ class Game():
         return objects
     
           
+    def create_random_weapon(self, how_many:int=1, weapon_type:str=None) -> Weapon | list[Weapon]:
+        objects = []
+        with open('weapon.json', encoding='utf-8') as read_data:
+            parsed_data = json.load(read_data)
+        if weapon_type:
+            parsed_data = [i for i in parsed_data if i['type'] == weapon_type]
+        for _ in range(how_many):
+            i = randomitem(parsed_data, False)
+            new_game_object = self.object_from_json(json_object=i)
+            objects.append(new_game_object)
+        if len(objects) == 1:
+            return objects[0]
+        return objects
+    
+    
     def object_from_json(self, json_object:object) -> object:
         
         """Функция создания одного объекта игры из объекта JSON."""
@@ -203,20 +210,6 @@ class Game():
         tprint (self, f'{player.name} такого не умеет.', 'direction')
 
     
-    def create_random_weapon(self, howmany:int=1, weapon_type:int=None) -> list:
-        
-        """Метод создает случайное оружие"""
-        
-        objects = []
-        for _ in range(howmany):
-            if weapon_type:
-                new_object = Weapon(self, 0, weapon_type=weapon_type)
-            else:
-                new_object = Weapon(self, 0)
-            objects.append(new_object)
-        return objects
-    
-    
     def rune_actions(self, answer:str) -> bool:
         
         """
@@ -236,12 +229,12 @@ class Game():
         elif answer.isdigit() and int(answer)  <= len(rune_list):
             chosen_rune = rune_list[int(answer) - 1]
             if self.selected_item.enchant(chosen_rune):
-                tprint(self, f'{player.name} улучшает {self.selected_item.name1} новой руной.', 'direction')
+                tprint(self, f'{player.name} улучшает {self.selected_item.lexemes['occus']} новой руной.', 'direction')
                 player.backpack.remove(chosen_rune)
                 self.state = 0
                 return True
             else:
-                tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.name1}.', 'direction')
+                tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.lexemes['occus']}.', 'direction')
                 self.state = 0
                 return False
         else:
@@ -272,7 +265,7 @@ class Game():
                 self.selected_item.remove(item)
                 return True
             else:
-                tprint(self, f'Похоже, что {player.name} не может использовать {item.name1}.', 'fight')
+                tprint(self, f'Похоже, что {player.name} не может использовать {item.lexemes['occus']}.', 'fight')
                 self.state = 1
                 return False
         else:

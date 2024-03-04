@@ -11,25 +11,45 @@ class Rune:
     
     """ Класс Руна. """
     
+    elements = [1, 3, 7, 12]
+    
+    lexemes = {
+            "nom": "руна",
+            "accus": "руну",
+            "gen": "руны",
+            "dat": "руне",
+            "prep": "руне",
+            "inst": "руной"
+            }
+    
     def __init__(self, game):
         self.game = game
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
-        self.elements = [1, 3, 7, 12]
-        self.element = self.elements[dice(0, 3)]
+        self.element = randomitem(Rune.elements)
         self.can_use_in_fight = False
         self.name = 'руна'
-        self.name1 = 'руну'
+        self.lexemes = self.generate_lexemes()
         self.description = f'{self.name} {s_elements_dictionary[self.element]}'
         self.empty = False
         self.check_if_poisoned()
         self.base_price = self.define_base_price()
         
          
+    def generate_lexemes(self):
+        self.lexemes = {}
+        for key in Rune.lexemes:
+            self.lexemes[key] = f'{Rune.lexemes[key]} {s_elements_dictionary[self.element]}'
+    
+    
     def __str__(self) -> str:
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['руна', 'руну', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def define_base_price(self) -> int:
         return s_rune_maximum_price
@@ -84,7 +104,7 @@ class Rune:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
 
     
     def show(self) -> str:
@@ -107,11 +127,17 @@ class Rune:
 
 
 class Spell:
-    def __init__(self, game, name='Обычное заклинание', name1='Обычного заклинания', element='магия', min_damage=1,
-                 max_damage=5, min_damage_mult=1, max_damage_mult=1, actions='кастует'):
+    def __init__(self, 
+                 game, 
+                 name='Обычное заклинание', 
+                 element='магия', 
+                 min_damage=1,
+                 max_damage=5, 
+                 min_damage_mult=1, 
+                 max_damage_mult=1, 
+                 actions='кастует'):
         self.game = game
         self.name = name
-        self.name1 = name1
         self.description = self.name
         self.element = element
         self.min_damage_mult = min_damage_mult
@@ -155,12 +181,23 @@ class Matches:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'спички'
-        self.name1 = 'спички'
+        self.lexemes = {
+            "nom": "спички",
+            "accus": "спички",
+            "gen": "спичек",
+            "dat": "спичкам",
+            "prep": "спичках",
+            "inst": "спичками"
+        }
         self.description = 'Спички, которыми можно что-то поджечь'
         self.room = None
         self.empty = False
         self.quantity = self.get_quantity()
         
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['спички']
+    
     
     def get_quantity(self) -> int:
         return roll([s_max_matches_quantity])
@@ -223,7 +260,7 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False
 
@@ -260,10 +297,21 @@ class Map:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'карта'
-        self.name1 = 'карту'
+        self.lexemes = {
+            "nom": "карта",
+            "accus": "карту",
+            "gen": "карты",
+            "dat": "карте",
+            "prep": "карте",
+            "inst": "картой"
+        }
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['карта', 'карту', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def place(self, castle, room=None) -> bool:
         
@@ -328,7 +376,7 @@ class Map:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
 
 
 class Key:
@@ -337,10 +385,21 @@ class Key:
         self.game = game
         self.can_use_in_fight = False
         self.name = 'ключ'
-        self.name1 = 'ключ'
+        self.lexemes = {
+            "nom": "ключ",
+            "accus": "ключ",
+            "gen": "ключа",
+            "dat": "ключу",
+            "prep": "ключе",
+            "inst": "ключом"
+        }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['ключ', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def __str__(self) -> str:
         return self.description
@@ -386,30 +445,22 @@ class Key:
 
 class Potion:
     
-    def __init__(self, game, name='', effect=0, type=0, can_use_in_fight=True):
+    def __init__(self, game, name='Зелье', effect=0, potion_type=0, can_use_in_fight=True):
         self.game = game
         self.name = name
+        self.effect = effect
+        self.type = potion_type
+        self.can_use_in_fight = can_use_in_fight
         self.empty = False
-        if self.name != 0:
-            self.name = name
-            self.name1 = self.name
-            self.effect = int(effect)
-            self.type = int(type)
-            self.can_use_in_fight = can_use_in_fight
-            self.description = s_potion_types[self.type][4]
-        elif self.name == 0:
-            n = dice(0, 5)
-            self.name = s_potion_types[n][0]
-            self.name1 = self.name
-            self.effect = s_potion_types[n][1]
-            self.type = s_potion_types[n][2]
-            self.can_use_in_fight = s_potion_types[n][3]
-            self.description = s_potion_types[n][4]
 
     
     def __str__(self):
         return self.description
 
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['зелье', self.lexemes['nom'], self.lexemes['accus']]
+    
     
     def on_create(self):
         return True
@@ -545,7 +596,7 @@ class Potion:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False
 
@@ -564,28 +615,35 @@ class Book:
         return self.name
     
     
+    def get_names_for_actions(self) -> list[str]:
+        return ['книга', 'книгу', self.lexemes['nom'], self.lexemes['accus']]
+        
+    
     def define_base_price(self) -> int:
         return s_book_maximum_price
         
     
     def on_create(self):
         self.type = dice(0, 2)
-        description = randomitem(self.descriptions, False)
-        self.name = description[0] + ' ' + \
-            self.name + ' ' + self.decorations[self.type]
-        self.name1 = description[1] + ' ' + \
-            self.name1 + ' ' + self.decorations[self.type]
-        self.description = self.name
-        available_texts = []
-        for i in self.texts:
-            if i[0] == self.type:
-                available_texts.append(i[1])
+        self.create_description()
+        self.name = self.lexemes['nom']
+        available_texts = [i for i in self.texts if i[0] == self.type]
         self.text = randomitem(available_texts, False)
         self.weapon_type = self.weapon_types[self.type]
         self.armor_type = self.armor_types[self.type]
         self.shield_type = self.shield_types[self.type]
         return True
 
+    
+    def create_description(self):
+        description_dict = randomitem(self.descriptions, False)
+        name_dict = self.names
+        self.lexemes = {}
+        for lexeme in name_dict:
+            self.lexemes[lexeme] = description_dict[lexeme] + ' ' + \
+            name_dict[lexeme] + ' ' + self.decorations[self.type]
+        return True
+        
     
     def get_mastery_string(self, who):
         return f'{who.name} теперь немного лучше знает, как использовать {self.weapon_type} оружие.'
@@ -614,6 +672,6 @@ class Book:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name1} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
             return True
         return False

@@ -15,34 +15,32 @@ class Hero:
     
     def __init__(self,
                  game,
-                 name,
-                 name1,
-                 gender,
-                 stren=10,
-                 dext=2,
-                 intel=0,
-                 health=20,
-                 actions=None,
+                 name:str = None,
+                 gender:int = None,
+                 stren:int = 10,
+                 dext:int = 2,
+                 intel:int = 0,
+                 health:int = 20,
+                 actions:list = None,
                  weapon=None,
                  shield=None,
                  backpack=None,
                  armor=None):
-        if actions is None:
+        if not actions:
             self.actions = ['бьет']
         else:
             self.actions = actions
         self.game = game
         self.name = name
-        self.name1 = name1
         self.gender = gender
         self.poisoned = False
-        self.stren = int(stren)
+        self.stren = stren
         self.start_stren = self.stren
-        self.dext = int(dext)
+        self.dext = dext
         self.start_dext = self.dext
-        self.intel = int(intel)
+        self.intel = intel
         self.start_intel = self.intel
-        self.health = int(health)
+        self.health = health
         if weapon is None:
             self.weapon = self.game.no_weapon
         else:
@@ -121,6 +119,11 @@ class Hero:
                             'test': self.test,
                             'улучшить': self.enchant}
 
+    
+    def on_create(self):
+        return None
+    
+    
     def __str__(self):
         return f'<Hero: name = {self.name}>'
 
@@ -240,11 +243,11 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} убирает {self.weapon.name1} в рюкзак и берет в руки {second_weapon.name1}.')
+        message.append(f'{self.name} убирает {self.weapon.lexemes['occus']} в рюкзак и берет в руки {second_weapon.lexemes['occus']}.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит тоже приходится убрать.')
+            message.append(f'Из-за того, что {second_weapon.lexemes['nom']} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
             message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
         self.backpack.remove(second_weapon, self)
@@ -258,11 +261,11 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} достает из рюкзака {second_weapon.name1} и берет в руку.')
+        message.append(f'{self.name} достает из рюкзака {second_weapon.lexemes['occus']} и берет в руку.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon.name1} - двуручное оружие, щит приходится убрать за спину.')
+            message.append(f'Из-за того, что {second_weapon.lexemes['nom']} - двуручное оружие, щит приходится убрать за спину.')
         self.backpack.remove(second_weapon, self)
         self.weapon = second_weapon
         tprint(self.game, message)
@@ -444,7 +447,7 @@ class Hero:
                 item = randomitem(all_items)
                 self.backpack.remove(item, stealing_monster)
                 stealing_monster.take(item)
-                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.name1}.'
+                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item.lexemes['occus']}.'
         return None
     
     
@@ -453,11 +456,11 @@ class Hero:
         
         shield = self.get_shield()
         if shield:
-            need_money = shield.accumulated_damage * s_shield_repair_multiplier // 1
-            if need_money > 0 and self.money >= need_money:
-                shield.accumulated_damage = 0
-                self.money -= need_money
-                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.name1}')
+            repair_price = shield.get_repair_price()
+            if repair_price > 0 and self.money >= repair_price:
+                shield.repair()
+                self.money -= repair_price
+                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names('occus')}')
     
     
     def check_monster_in_ambush(self, place) -> bool:
@@ -475,7 +478,7 @@ class Hero:
         message = []
         if monster:
             monster.hiding_place = None
-            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.name1}.')
+            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self.lexemes['occus']}.')
             if monster.frightening:
                 message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
                 self.fear += 1
@@ -507,7 +510,7 @@ class Hero:
             tprint(self.game, f'{self.name} оглядывается по сторонам, \
                 находит какой-то мусор и закидывает его в самый темный угол комнаты.')
             return False
-        if what.lower() in ['щит', self.shield.name.lower(), self.shield.name1.lower()]:
+        if self.shield.check_name(what):
             return self.remove_shield()
         else:
             tprint(self.game, f'{self.name} не понимает, как это можно убрать.')
@@ -519,7 +522,7 @@ class Hero:
         
         if not self.shield.empty:
             self.shield, self.removed_shield = self.removed_shield, self.shield
-            tprint(self.game, f'{self.name} убирает {self.removed_shield.real_name()[1]} за спину.') 
+            tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names('occus')} за спину.') 
             return True
         return False
         
@@ -549,18 +552,18 @@ class Hero:
         if not shield:
             tprint(game, f'У {self.g(["героя", "героини"])} нет щита, так что и ремонтировать нечего.')
             return False
-        needed_money = shield.accumulated_damage * s_shield_repair_multiplier // 1
-        if needed_money == 0:
-            tprint(game, f'{shield.name1} не нужно ремонтировать.')
+        repair_price = shield.get_repair_price()
+        if repair_price == 0:
+            tprint(game, f'{shield.lexemes['accus']} не нужно ремонтировать.')
             return False
-        if self.money >= needed_money:
-            shield.accumulated_damage = 0
-            self.money.how_much_money -= needed_money
-            tprint(game, f'{self.name} успешно чинит {shield.name1}')
+        if self.money >= repair_price:
+            shield.repair()
+            self.money.how_much_money -= repair_price
+            tprint(game, f'{self.name} успешно чинит {shield.lexemes['accus']}')
             self.decrease_restless(1)
             return True
         else:
-            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.name1}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
+            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.lexemes['accus']}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
             return False
         
     
@@ -612,14 +615,14 @@ class Hero:
             else:
                 room.loot.add(self.weapon)
             self.weapon = self.game.no_weapon
-            return f'Убегая {self.name} роняет из рук {self.weapon.name1}.'
+            return f'Убегая {self.name} роняет из рук {self.weapon.lexemes['accus']}.'
         elif a == 2 and not self.shield.empty:
             if target.shield.empty and target.carryshield:
                 target.shield = self.shield
             else:
                 room.loot.add(self.shield)
             self.shield = self.game.no_shield
-            return f'Убегая {self.name} теряет {self.shield.name1}.'
+            return f'Убегая {self.name} теряет {self.shield.lexemes['accus']}.'
         return None
     
     
@@ -638,7 +641,7 @@ class Hero:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
                 item = self.backpack.get_random_item()
-                items_list.append(item.name1)
+                items_list.append(item.lexemes['accus'])
                 room.loot.add(item)
                 self.backpack.remove(item, room)
         return items_list
@@ -766,16 +769,10 @@ class Hero:
     def break_enemy_shield(self, target:Monster, total_attack:int) -> str:
         """Метод проверяет, смог ли герой сломать вражеский щит."""
         
-        if target.shield.empty:
-            return None
-        else:
-            shield = target.shield
-            r = dice(1, s_shield_crushed_upper_limit)
-            damage_to_shield = total_attack * target.shield.accumulated_damage
-            if r < damage_to_shield:
-                self.game.all_shields.remove(shield)
-                target.shield = self.game.no_shield
-            return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'    
+        shield = target.shield
+        if not shield.empty and shield.check_if_broken(total_attack):
+            return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+        return None    
     
         
     def increase_weapon_mastery(self) -> str:
@@ -804,7 +801,7 @@ class Hero:
         total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
             action = randomitem(self.weapon.actions)
-            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.name1} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
+            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.lexemes['accus']} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
         else:
             hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
         message.append(hit_string)
@@ -866,7 +863,7 @@ class Hero:
         message = []
         message.append(f'{self.name} может использовать следующие предметы:')
         for item in can_use:
-            message.append(f'{str(can_use.index(item) + 1)}: {item.name1}')
+            message.append(f'{str(can_use.index(item) + 1)}: {item.lexemes['accus']}')
         message.append('Выберите номер предмета или скажите "отмена" для прекращения.')
         game.selected_item = can_use
         game.state = 4
@@ -933,7 +930,7 @@ class Hero:
         """Метод генерирует описание оружия персонажа."""
         
         if not self.weapon.empty:
-            weapon_text = f'{self.weapon.real_name()[0]} в руке {self.g(["героя", "героини"])} добавляет к {self.g(["его", "ее"])} силе ' \
+            weapon_text = f'{self.weapon.get_full_names('nom')} в руке {self.g(["героя", "героини"])} добавляет к {self.g(["его", "ее"])} силе ' \
                           f'{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
@@ -960,12 +957,7 @@ class Hero:
     def damage_shield(self):
         """Метод моделирует урон, который наносится щиту персонажа во время схватки."""
         
-        if self.hide:
-            dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-            self.shield.accumulated_damage += dice_result
-        else:
-            dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-            self.shield.accumulated_damage += dice_result
+        self.shield.take_damage(self.hide)
             
     
     def try_to_parry(self, attacker:Monster) -> bool:
@@ -1092,7 +1084,7 @@ class Hero:
             message += self.backpack.show(self)
             message.append(self.money.show())
             if not self.removed_shield.empty:
-                message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.real_name()[0]}')
+                message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.get_full_names('nom')}')
         tprint(self.game, message)
         return True
     
@@ -1144,7 +1136,7 @@ class Hero:
         room = self.current_position
         message = []
         for i in room.furniture:
-            if i.name1 == what:
+            if i.lexemes['accus'] == what:
                 message += (i.show())
         return message
     
@@ -1155,6 +1147,7 @@ class Hero:
         game = self.game
         room = self.current_position
         monster = room.monsters(mode='first')
+        what = what.lower()
         if not self.check_light():
             tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
             return
@@ -1167,24 +1160,25 @@ class Hero:
             self.show_backpack()
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
+        #TODO Сделать монстрам метод check_name
         if monster and what: 
-            if what.lower() in [monster.name.lower(),
-                                monster.get_name('accus').lower(),
-                                monster.name[0].lower(),
-                                'монстр', 
-                                'врага', 
-                                'монстра', 
-                                'враг', 
-                                'противника', 
-                                'противник']:
+            if what in [monster.name.lower(),
+                            monster.get_name('accus').lower(),
+                            monster.name[0].lower(),
+                            'монстр', 
+                            'врага', 
+                            'монстра', 
+                            'враг', 
+                            'противника', 
+                            'противник']:
                 tprint(game, showsides(self, monster, self.floor))
-        if what in self.weapon.real_name(all=True, additional=['оружие']):
+        if self.weapon.check_name(what):
             tprint(game, self.look_at_weapon())
-        if what in self.shield.real_name(all=True, additional=['щит']):
+        if self.shield.check_name(what):
             tprint(game, self.look_at_shield())
-        if what in self.armor.real_name(all=True, additional=['защиту', 'доспехи', 'доспех']):
+        if self.armor.check_name(what):
             tprint(game, self.look_at_armor())
-        if [f for f in room.furniture if f.name1 == what]:
+        if [f for f in room.furniture if f.lexemes['accus'] == what]:
             tprint(game, self.look_at_furniture(what=what))
 
     
@@ -1361,13 +1355,13 @@ class Hero:
         game = self.game
         what_to_search = None
         for i in room.furniture:
-            if item.lower() in [i.name.lower(), i.name1.lower()]:
+            if item.lower() in [i.lexemes['nom'].lower(), i.lexemes['accus'].lower()]:
                 what_to_search = i
         if not what_to_search:
             tprint(game, 'В комнате нет такой вещи.')
             return False
         if what_to_search.locked:
-            tprint(game, f'Нельзя обыскать {what_to_search.name1}. Там заперто.')
+            tprint(game, f'Нельзя обыскать {what_to_search.lexemes['accus']}. Там заперто.')
             return False
         if self.check_monster_in_ambush(place=what_to_search):
             return False
@@ -1381,7 +1375,7 @@ class Hero:
         if what.loot == 0:
             tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
             return False
-        message = [f'{self.name} осматривает {what.name1} и находит:']
+        message = [f'{self.name} осматривает {what.lexemes['accus']} и находит:']
         message += what.loot.show_sorted()
         what.loot.transfer(room.loot)
         message.append('Все, что было спрятано, теперь лежит на виду.')
@@ -1490,7 +1484,7 @@ class Hero:
         what_is_in_room = []
         for furniture in room.furniture:
             if what:
-                if furniture.locked and what.lower() in [furniture.name.lower(), furniture.name1.lower()]:
+                if furniture.locked and furniture.check_name(what):
                     what_is_in_room.append(furniture)
             else:
                 if furniture.locked:
@@ -1530,7 +1524,7 @@ class Hero:
         furniture = what_is_locked[0]
         self.backpack.remove(key)
         furniture.locked = False
-        tprint(game, f'{self.name} отпирает {furniture.name1} ключом.')
+        tprint(game, f'{self.name} отпирает {furniture.lexemes['accus']} ключом.')
         return True
         
     
@@ -1569,7 +1563,7 @@ class Hero:
             tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
             return False
         self.shield, self.removed_shield = self.removed_shield, self.shield
-        tprint(self.game, f'{self.name} достает {self.shield.real_name()[0]} из-за спины и берет его в руку.')
+        tprint(self.game, f'{self.name} достает {self.shield.get_full_names('accus')} из-за спины и берет его в руку.')
         return True
     
     
@@ -1599,7 +1593,7 @@ class Hero:
         if not item:
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо использовать.')
             return False
-        if item.lower() in [self.removed_shield.name.lower(), self.removed_shield.name1.lower(), 'щит']:
+        if self.removed_shield.check_name(item):
             return self.take_out_shield()
         return self.use_item_from_backpack(item)
 
@@ -1731,7 +1725,7 @@ class Hero:
             message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
         else:
             book = self.backpack.get_first_item_by_name(item)
-            message = f'{self.name} читает {book.name1}.'
+            message = f'{self.name} читает {book.lexemes['accus']}.'
         if book:
             tprint(game, message)
             return book

@@ -53,7 +53,7 @@ class Loot:
         """
         
         for item in self.pile:
-            if name.lower() in [item.name.lower(), item.name1.lower()]:
+            if name.lower() in [item.name.lower(), item.lexemes['occus'].lower()]:
                 return item
         return False
     
@@ -64,7 +64,7 @@ class Loot:
         и возвращает все найденные по этому имени вещи.
         """
         
-        return [item for item in self.pile if name.lower() in [item.name.lower(), item.name1.lower()]]
+        return [item for item in self.pile if name.lower() in [item.name.lower(), item.lexemes['occus'].lower()]]
 
     
     def get_items_by_class(self, item_class) -> list:
@@ -89,34 +89,45 @@ class Loot:
                 sorted_list.append(f'{item} ({quantity})')
         return sorted_list 
 
+
 class Money:
     def __init__(self, game, how_much_money):
         self.game = game
         self.how_much_money = how_much_money
         self.empty = False
-        money_pile = 0
-        if 0 < self.how_much_money <= s_money_groups[0]:
-            money_pile = 0
-        elif s_money_groups[0] < self.how_much_money <= s_money_groups[1]:
-            money_pile = 1
-        elif s_money_groups[1] < self.how_much_money <= s_money_groups[2]:
-            money_pile = 2
-        elif s_money_groups[2] < self.how_much_money:
-            money_pile = 3
-        self.name = s_money_piles[money_pile][0]
-        self.name1 = s_money_piles[money_pile][1]
+        self.generate_name()
 
+    
+    def generate_name(self):
+        piles = {
+            0 <= self.how_much_money and self.how_much_money <= s_money_groups[0]: 0,
+            s_money_groups[0] < self.how_much_money and self.how_much_money <= s_money_groups[1]: 1,
+            s_money_groups[1] < self.how_much_money and self.how_much_money <= s_money_groups[2]: 2, 
+            s_money_groups[2] < self.how_much_money: 3
+        }
+        self.lexemes = s_money_piles[piles[True]]
+        self.name = self.lexemes['nom']
+
+    
+    def get_names_for_actions(self) -> list[str]:
+        return ['деньги', self.lexemes['nom'], self.lexemes['accus']]
+    
+    
     def __repr__(self):
         return str(self.how_much_money)
+
     
     def __int__(self) -> int:
         return self.how_much_money
+
     
     def __eq__(self, other:int) -> bool:
         return self.how_much_money == other
+
     
     def __ge__(self, other:int) -> bool:
         return self.how_much_money >= other
+
     
     def __add__(self, other):
         if isinstance(other, int):
@@ -125,7 +136,9 @@ class Money:
             self.how_much_money += other.how_much_money
         else:
             raise TypeError('To Money you can only add integer or another Money.')
+        self.generate_name()
         return self
+
     
     def __sub__(self, other):
         if isinstance(other, int):
@@ -134,11 +147,15 @@ class Money:
             self.how_much_money -= other.how_much_money
         else:
             raise TypeError('From Money you can only substract integer or another Money.')
+        self.generate_name()
         return self
+
 
     def take(self, lucky_one):
         lucky_one.money.how_much_money += self.how_much_money
         tprint(self.game, f'{lucky_one.name} {lucky_one.g(["забрал", "забрала"])} {howmany(self.how_much_money, "монету,монеты,монет")}')
+        self.generate_name()
+
 
     def show(self):
         if self >= 1:

@@ -9,14 +9,17 @@ class Backpack:
                  ) -> None:
         self.insides = []
         self.name = 'рюкзак'
-        self.name1 = 'рюкзак'
         self.game = game
         self.no_backpack = no_backpack
         self.lexemes = {
+            "nom": "рюкзак",
             "accus": "рюкзак",
-            "gen": "рюкзака"
-            }
-    
+            "gen": "рюкзака",
+            "dat": "рюкзаку",
+            "prep": "рюкзаке",
+            "inst": "рюкзаком"
+        }
+
     
     def check_name(self, message:str) -> bool:
         return message.lower() in [self.name, self.lexemes['accus']]
@@ -32,8 +35,7 @@ class Backpack:
     def __add__(self, item):
         """Метод добавления вещи в рюкзак"""
         
-        self.insides.append(item)
-        item.place = self
+        self.append(item)
     
         
     def remove(self, item, place=None):
@@ -64,7 +66,7 @@ class Backpack:
         """
         
         for item in self.insides:
-            if name.lower() in [item.name.lower(), item.name1.lower()]:
+            if name.lower() in item.get_names_for_actions():
                 return item
         return False
 

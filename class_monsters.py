@@ -100,7 +100,7 @@ class Monster:
         """Метод вызывается после создания экземпляра класса Монстр."""
         
         if self.prefered_weapon:
-            self.weapon = self.game.create_random_weapon(howmany=1, weapon_type=self.prefered_weapon)[0]
+            self.weapon = self.game.create_random_weapon(weapon_type=self.prefered_weapon)
         return True
 
     
@@ -366,16 +366,10 @@ class Monster:
     def break_enemy_shield(self, target, total_attack:int) -> str:
         """Метод проверяет, смог ли монстр сломать вражеский щит."""
         
-        if target.shield.empty:
-            return None
-        else:
-            shield = target.shield
-            r = dice(1, s_shield_crushed_upper_limit)
-            damage_to_shield = total_attack * target.shield.accumulated_damage
-            if r < damage_to_shield:
-                self.game.all_shields.remove(shield)
-                target.shield = self.game.no_shield
+        shield = target.shield
+        if not shield.empty and shield.check_if_broken():
             return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
+        return None
     
     
     def attack(self, target):
@@ -389,14 +383,14 @@ class Monster:
         if target.check_light():
             self_name = self.name
         else:
-            self_name = s_monster_name_in_darkness
+            self_name = s_monster_names_in_darkness['nom']
         mele_attack = self.generate_mele_attack(target)
         weapon_attack = self.generate_weapon_attack(target=target)
         if weapon_attack > 0:
-            message.append(f'{self_name} {self.action()} {target.name1} используя {self.weapon.name1} и '
+            message.append(f'{self_name} {self.action()} {target.lexemes['accus']} используя {self.weapon.lexemes['accus']} и '
                         f'наносит {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
         else:
-            message.append(f'{self_name} бьет {target.name1} не используя оружия и '
+            message.append(f'{self_name} бьет {target.lexemes['accus']} не используя оружия и '
                         f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
         target_defence = target.defence(self)
         if target_defence < 0:
@@ -414,7 +408,7 @@ class Monster:
             ]
         else:
             total_damage = 0
-            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.name1}.')
+            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.lexemes['accus']}.')
         target.health -= total_damage
         if target.health <= 0:
             game.state = 0
@@ -439,12 +433,7 @@ class Monster:
         weapon = attacker.weapon
         if not self.shield.empty:
             result += self.shield.protect(attacker)
-            if self.hide:
-                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-                self.shield.accumulated_damage += dice_result
-            else:
-                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                self.shield.accumulated_damage += dice_result
+            self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         parry_chance = self.parry_chance
@@ -943,12 +932,7 @@ class Shapeshifter(Monster):
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
-            if self.hide:
-                dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
-                self.shield.accumulated_damage += dice_result
-            else:
-                dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
-                self.shield.accumulated_damage += dice_result
+            self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
         return result

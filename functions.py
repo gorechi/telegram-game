@@ -68,6 +68,7 @@ def showsides(side1, side2, castle) -> list:
         message.append(f'В темноте кто-то есть, но {side1.name} не понимает кто это.')
     return message
 
+
 def randomitem(list, neednumber=False, how_many:int=1):
     """Возвращает случайные элементы списка
 

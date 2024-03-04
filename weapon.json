@@ -1,51 +1,359 @@
 [
   {
     "class": "оружие",
-    "name": "Зазубренный меч",
-    "name1": "Зазубренный меч",
-    "damage": 9,
-    "gender": 0,
-    "twohanded": true,
-    "type": "рубящее",
-    "hit_chance": 7,
-    "enchatable": true,
-    "actions":
-      [
+    "lexemes":{
+      "nom": "меч",
+      "accus": "меч",
+      "gen": "меча",
+      "dat": "мечу",
+      "prep": "мече",
+      "inst": "мечом"
+    },
+    "actions":[
       "крушит",
       "рубит",
       "колет"
-      ]
+    ], 
+    "gender": 0,
+    "name": "Меч", 
+    "type": "рубящее", 
+    "twohanded": false,
+    "damage": 9,
+    "enchatable": true, 
+    "hit_chance": 6
   },
   {
     "class": "оружие",
-    "name": "Огромный топор",
-    "name1": "Огромный топор",
-    "gender": 0,
-    "damage": 12,
-    "twohanded": true,
-    "type": "рубящее",
-    "hit_chance": 5,
-    "enchatable": true,
-    "actions":
-      [
+    "lexemes":{
+      "nom": "двуручный меч",
+      "accus": "двуручный меч",
+      "gen": "двуручного меча",
+      "dat": "двуручному мечу",
+      "prep": "двуручном мече",
+      "inst": "двуручным мечом"
+    },
+    "actions":[
       "крушит",
-      "рубит"
-      ]
-  },
-  {
-    "class": "оружие",
-    "name": "Исполинский молот",
-    "name1": "Исполинский молот",
+      "рубит",
+      "колет"
+    ], 
     "gender": 0,
+    "name": "Двуручный меч", 
+    "type": "рубящее", 
+    "twohanded": true,
     "damage": 11,
-    "twohanded": true,
-    "type": "ударное",
-    "hit_chance": 4,
-    "enchatable": true,
-    "actions":
-      [
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":{
+      "nom": "сабля",
+      "accus": "саблю",
+      "gen": "сабли",
+      "dat": "сабле",
+      "prep": "сабле",
+      "inst": "саблей"
+    },
+    "actions":[
       "крушит",
-      "разносит"
-      ]
+      "рубит",
+      "колет",
+      "вспарывает"
+    ], 
+    "gender": 1,
+    "name": "Сабля", 
+    "type": "рубящее", 
+    "twohanded": false,
+    "damage": 8,
+    "enchatable": true, 
+    "hit_chance": 7
+  },
+  {
+    "class": "оружие",
+    "lexemes":{
+      "nom": "катана",
+      "accus": "катану",
+      "gen": "катаны",
+      "dat": "катане",
+      "prep": "катане",
+      "inst": "катаной"
+    },
+    "actions":[
+      "крушит",
+      "рубит",
+      "вспарывает"
+    ], 
+    "gender": 1,
+    "name": "Катана", 
+    "type": "рубящее", 
+    "twohanded": true,
+    "damage": 9,
+    "enchatable": true, 
+    "hit_chance": 6
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "рапира",
+      "accus": "рапиру",
+      "gen": "рапиры",
+      "dat": "рапире",
+      "prep": "рапире",
+      "inst": "рапирой"
+    },
+    "actions":[
+      "колет",
+      "протыкает",
+      "вспарывает"
+    ], 
+    "gender": 1,
+    "name": "Рапира", 
+    "type": "колющее", 
+    "twohanded": false,
+    "damage": 7,
+    "enchatable": true, 
+    "hit_chance": 6
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "пика",
+      "accus": "пику",
+      "gen": "пики",
+      "dat": "пике",
+      "prep": "пике",
+      "inst": "пикой"
+    },
+    "actions":[
+      "колет",
+      "протыкает",
+      "вспарывает"
+    ], 
+    "gender": 1,
+    "name": "Пика", 
+    "type": "колющее", 
+    "twohanded": true,
+    "damage": 9,
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "копье",
+      "accus": "копье",
+      "gen": "копья",
+      "dat": "копью",
+      "prep": "копье",
+      "inst": "копьем"
+    },
+    "actions":[
+      "колет",
+      "протыкает"
+    ], 
+    "gender": 2,
+    "name": "Копье", 
+    "type": "колющее", 
+    "twohanded": true,
+    "damage": 9,
+    "enchatable": true, 
+    "hit_chance": 4
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "топор",
+      "accus": "топор",
+      "gen": "топора",
+      "dat": "топору",
+      "prep": "топоре",
+      "inst": "топором"
+    },
+    "actions":[
+      "рубит",
+      "крушит",
+      "бьет"
+    ], 
+    "gender": 0,
+    "name": "Топор", 
+    "type": "рубящее", 
+    "twohanded": false,
+    "damage": 10,
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "секира",
+      "accus": "секиру",
+      "gen": "секиры",
+      "dat": "секире",
+      "prep": "секире",
+      "inst": "секирой"
+    },
+    "actions":[
+      "рубит",
+      "крушит",
+      "бьет"
+    ], 
+    "gender": 1,
+    "name": "Секира", 
+    "type": "рубящее", 
+    "twohanded": true,
+    "damage": 12,
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "кинжал",
+      "accus": "кинжал",
+      "gen": "кинжала",
+      "dat": "кинжалу",
+      "prep": "кинжале",
+      "inst": "кинжалом"
+    },
+    "actions":[
+      "колет",
+      "протыкает",
+      "вспарывает"
+    ], 
+    "gender": 0,
+    "name": "Кинжал", 
+    "type": "колющее", 
+    "twohanded": false,
+    "damage": 6,
+    "enchatable": true, 
+    "hit_chance": 8
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "дубина",
+      "accus": "дубину",
+      "gen": "дубины",
+      "dat": "дубине",
+      "prep": "дубине",
+      "inst": "дубиной"
+    },
+    "actions":[
+      "бьет",
+      "колотит",
+      "шарахает"
+    ], 
+    "gender": 1,
+    "name": "Дубина", 
+    "type": "ударное", 
+    "twohanded": false,
+    "damage": 7,
+    "enchatable": false, 
+    "hit_chance": 4
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "палица",
+      "accus": "палицу",
+      "gen": "палицы",
+      "dat": "палице",
+      "prep": "палице",
+      "inst": "палицей"
+    },
+    "actions":[
+      "бьет",
+      "колотит",
+      "шарахает"
+    ], 
+    "gender": 1,
+    "name": "Палица", 
+    "type":"ударное", 
+    "twohanded": false,
+    "damage": 8,
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "булава",
+      "accus": "булаву",
+      "gen": "булавы",
+      "dat": "булаве",
+      "prep": "булаве",
+      "inst": "булавой"
+    },
+    "actions":[
+      "бьет",
+      "колотит",
+      "шарахает",
+      "стукает"
+    ], 
+    "gender": 1,
+    "name": "Булава", 
+    "type": "ударное", 
+    "twohanded": false,
+    "damage": 9,
+    "enchatable": true, 
+    "hit_chance": 5
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "молот",
+      "accus": "молот",
+      "gen": "молота",
+      "dat": "молоту",
+      "prep": "молоте",
+      "inst": "молотом"
+    },
+    "actions":[
+      "бьет",
+      "колотит",
+      "крушит"
+    ], 
+    "gender": 0,
+    "name": "Молот", 
+    "type": "ударное", 
+    "twohanded": true,
+    "damage": 10,
+    "enchatable": true, 
+    "hit_chance": 4
+  },
+  {
+    "class": "оружие",
+    "lexemes":
+    {
+      "nom": "шпага",
+      "accus": "шпагу",
+      "gen": "шпаги",
+      "dat": "шпаге",
+      "prep": "шпаге",
+      "inst": "шпагой"
+    },
+    "actions":[
+      "колет",
+      "делает выпад",
+      "ранит"
+    ], 
+    "gender": 1,
+    "name": "Шпага", 
+    "type": "колющее", 
+    "twohanded": false,
+    "damage": 7,
+    "enchatable": true, 
+    "hit_chance": 7
   }
 ]

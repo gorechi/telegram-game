@@ -6,72 +6,87 @@ from settings import *
 
 
 class Weapon:
-    def __init__(self, game, name=None, name1='оружие', damage=1, actions='бьет,ударяет', empty=False, weapon_type=None, enchantable=True):
+    def __init__(self, 
+                 game, 
+                 name=None, 
+                 damage:int=1, 
+                 actions=['бьет', 'ударяет'], 
+                 empty=False, 
+                 type=None, 
+                 enchantable=True,
+                 gender=0):
         self.game = game
-        if name:
-            self.name = name
-            self.damage = int(damage)
-            self.name1 = name1
-            self.twohanded = False
-            self.type = ''
-            self.hit_chance = 0
-            self.enchatable = enchantable
-        else:
-            n1 = s_weapon_first_words_dictionary
-            n2 = []
-            for i in s_weapon_types_dictionary:
-                if not weapon_type or i[3] == weapon_type:
-                    n2.append(i)
-            a1 = dice(0, len(n1) - 1)
-            a2 = dice(0, len(n2) - 1)
-            self.name = n1[a1][n2[a2][1]][0] + ' ' + n2[a2][0]
-            self.name1 = n1[a1][n2[a2][1]][1] + ' ' + n2[a2][2]
-            self.damage = dice(3, 12)
-            self.type = n2[a2][3]
-            self.twohanded = n2[a2][4]
-            self.gender = n2[a2][1]
-            self.hit_chance = n2[a2][5]
-            if dice(0, s_enchantable_die) == 1:
-                self.enchatable = False
-            else:
-                self.enchatable = True
-        self.actions = actions.split(',')
-        self.can_use_in_fight = True
-        self.runes = []
-        self.twohanded_dict = s_weapon_twohanded_dictionary
+        self.name = name
+        self.damage = damage
         self.empty = empty
+        self.actions = actions
+        self.enchatable = enchantable
+        self.type = type
+        self.hit_chance = 0
+        self.runes = []
+        self.gender = gender
 
-    def on_create(self):
+    
+    def on_create(self) -> bool:
+        self.decorate()
         return True
 
-    def __str__(self):
+    
+    def decorate(self) -> None:
+        decorators = s_weapon_decorators[self.type]
+        decorator = randomitem(decorators)
+        lexemes = {}
+        for lexeme in self.lexemes:
+            lexemes[lexeme] = f'{decorator[self.gender][lexeme]} {self.lexemes[lexeme]}'
+        self.damage += decorator['damage_modifier']
+        self.lexemes = lexemes
+    
+    
+    def __str__(self) -> str:
         damage_string = str(self.damage)
         if self.perm_damage() != 0:
             damage_string += '+' + str(self.perm_damage())
         return f'{self.name}{self.enchantment()} ({damage_string})'
-
     
-    def real_name(self, all:bool=False, additional:list=[]) -> list:
-        names = []
-        if self.element() != 0:
-            names.append(f'{self.name} {s_elements_dictionary[self.element()]}'.capitalize())
-            names.append(f'{self.name1} {s_elements_dictionary[self.element()]}'.capitalize())
-        if self.element() == 0 or all == 'all':
-            names.append(self.name.capitalize())
-            names.append(self.name1.capitalize())
-        names += additional
+    
+    def get_full_names(self, key:str=None) -> str|list:
+        if self.element != 0:
+            return self.get_element_names(key)
+        if key:
+            return self.lexemes.get(key, '')
+        return self.lexemes
+    
+    
+    def get_element_decorator(self) -> str|None:
+        return s_elements_dictionary.get(self.element(), None)
+        
+        
+    def get_element_names(self, key:str=None) -> str|dict|None:
+        names = {}
+        element_decorator = self.get_element_decorator()
+        if not element_decorator:
+            return None
+        for lexeme in self.lexemes:
+            names[lexeme] = f'{self.lexemes[lexeme]} {element_decorator}'
+        if key:
+            return names.get(key, '')
         return names
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.real_name(all=True) + ['оружие']
-        names_list_lower = []
-        for name in names_list:
-            names_list_lower.append(name.lower())
-        if message.lower() in names_list_lower:
+        names_list = self.get_names_list(['nom', 'accus'])
+        if message.lower() in names_list:
             return True
         return False
 
+    
+    def get_names_list(self, keys:list=None) -> list:
+        names_list = ['оружие']
+        for key in keys:
+            names_list.append(self.lexemes.get(key, '').lower())
+            names_list.append(self.get_element_names(key).lower())
+        return names_list
+    
     
     def element(self):
         element_sum = 0
@@ -79,6 +94,7 @@ class Weapon:
             element_sum += rune.element
         return element_sum
 
+    
     def is_poisoned(self):
         for i in self.runes:
             if i.poison:
@@ -115,6 +131,7 @@ class Weapon:
                 element += int(i.element)
             return ' ' + s_elements_dictionary[element]
 
+    
     def perm_damage(self):
         damage = 0
         if len(self.runes) in [1, 2]:
@@ -122,6 +139,7 @@ class Weapon:
                 damage += rune.damage
         return damage
 
+    
     def attack(self, who=None):
         """Функция рассчитывает урон, который наносит оружие конкретному монстру
 
@@ -140,19 +158,20 @@ class Weapon:
         full_damage = ceil(big_damage * damage_multiplier)
         return full_damage
 
+    
     def take(self, who):
         game = self.game
-        message = [f'{who.name} берет {self.name1}.']
+        message = [f'{who.name} берет {self.lexemes['accus']}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
             who.weapon = self
-            message.append(f'{who.name} теперь использует {self.name1} в качестве оружия.')
+            message.append(f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
                 message.append(f'Из-за того, что {who.g(["герой взял", "героиня взяла"])} двуручное оружие, '
-                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.real_name()[1]} за спину.')
+                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.get_full_name('accus')} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -163,6 +182,7 @@ class Weapon:
                 who.backpack.append(self)
         tprint(game, message)
 
+    
     def show(self):
         damage_string = str(self.damage)
         if self.perm_damage() != 0:
@@ -173,6 +193,7 @@ class Weapon:
             name = self.name + self.enchantment()
         return f'{name} ({damage_string}), {self.type}'.capitalize()
 
+    
     def use(self, who, in_action=False):
         game = self.game
         if who.weapon.empty:
@@ -181,7 +202,7 @@ class Weapon:
             who.backpack.append(who.weapon)
             who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self.name1} в качестве оружия.']
+            message = [f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield
                 who.removed_shield = shield
@@ -192,9 +213,10 @@ class Weapon:
                 who.shield = shield
                 who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.real_name()[1]}.')
+                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.get_full_name('occus')}.')
         tprint(game, message)
 
+    
     def place(self, castle, room_to_place = None):
         if room_to_place:
             room = room_to_place

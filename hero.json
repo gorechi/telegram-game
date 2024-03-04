@@ -1,0 +1,37 @@
+[
+{
+    "class": "герой",
+    "name": "Клава",
+    "lexemes": {
+        "nom": "Клава",
+        "accus": "Клаву",
+        "gen": "Клавы",
+        "dat": "Клавe",
+        "prep": "о Клавe",
+        "inst": "Клавoй"
+    },
+    "gender": 1,
+    "stren": 10,
+    "dext": 2,
+    "intel": 1,
+    "health": 20,
+    "hit_chance": 4,
+    "parry_chance": 2,
+    "can_hide": true,
+    "can_run": true,
+    "actions":
+      [
+        "бьет",
+        "калечит",
+        "терзает"
+      ],
+    "state": "стоит",
+    "frightening": false,
+    "agressive": false,
+    "carry_weapon": true,
+    "carry_shield": true,
+    "venomous": 0,
+    "corpse": true,
+    "wear_armor": true
+  }
+]
