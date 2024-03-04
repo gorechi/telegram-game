@@ -80,11 +80,11 @@ class Weapon:
         return False
 
     
-    def get_names_list(self, keys:list=None) -> list:
+    def get_names_list(self, cases:list=None) -> list:
         names_list = ['оружие']
-        for key in keys:
-            names_list.append(self.lexemes.get(key, '').lower())
-            names_list.append(self.get_element_names(key).lower())
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+            names_list.append(self.get_element_names(case).lower())
         return names_list
     
     

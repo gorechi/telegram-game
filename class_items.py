@@ -46,9 +46,17 @@ class Rune:
         return f'{self.name} {s_elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
 
+      
+    def check_name(self, message:str) -> bool:
+        names_list = self.get_names_list(['nom', 'accus'])
+        return message.lower() in names_list
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['руна', 'руну', self.lexemes['nom'], self.lexemes['accus']]
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['руна', 'руну']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
     
     
     def define_base_price(self) -> int:
@@ -160,6 +168,18 @@ class Spell:
             tprint(self.game, f'{who.name} забирает {self.name} себе.')
             
     
+    def check_name(self, message:str) -> bool:
+        names_list = self.get_names_list(['nom', 'accus'])
+        return message.lower() in names_list
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['заклинание']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
+    
+    
     def use(self, who_is_using, in_action:bool=False) -> str:
         
         """ 
@@ -194,9 +214,9 @@ class Matches:
         self.empty = False
         self.quantity = self.get_quantity()
         
-    
-    def get_names_for_actions(self) -> list[str]:
-        return ['спички']
+ 
+    def check_name(self, message:str) -> bool:
+        return message.lower() in ['спички', 'коробок']
     
     
     def get_quantity(self) -> int:
@@ -309,8 +329,8 @@ class Map:
         self.description = 'Карта, показывающая расположение комнат замка'
 
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['карта', 'карту', self.lexemes['nom'], self.lexemes['accus']]
+    def check_name(self, message:str) -> bool:
+        return message.lower() in ['карта', 'карту']
     
     
     def place(self, castle, room=None) -> bool:
@@ -397,8 +417,8 @@ class Key:
         self.empty = False
 
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['ключ', self.lexemes['nom'], self.lexemes['accus']]
+    def check_name(self, message:str) -> bool:
+        return message.lower() in ['ключ']
     
     
     def __str__(self) -> str:
@@ -458,8 +478,16 @@ class Potion:
         return self.description
 
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['зелье', self.lexemes['nom'], self.lexemes['accus']]
+    def check_name(self, message:str) -> bool:
+        names_list = self.get_names_list(['nom', 'accus'])
+        return message.lower() in names_list
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['зелье', 'напиток']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
     
     
     def on_create(self):
@@ -615,9 +643,17 @@ class Book:
         return self.name
     
     
-    def get_names_for_actions(self) -> list[str]:
-        return ['книга', 'книгу', self.lexemes['nom'], self.lexemes['accus']]
-        
+    def check_name(self, message:str) -> bool:
+        names_list = self.get_names_list(['nom', 'accus'])
+        return message.lower() in names_list
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['книга', 'книгу', 'книжка', 'книжку']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
+            
     
     def define_base_price(self) -> int:
         return s_book_maximum_price
