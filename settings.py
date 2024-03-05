@@ -197,7 +197,7 @@ s_monster_exp_multiplier_limit = 10
 
 s_monster_names_in_darkness = {
         'nom': 'Кто-то страшный',
-        'accus': 'черт знает кого',
+        "accus": 'черт знает кого',
         'gen': 'черт знает кого',
         'dat': 'черт знает кому',
         'prep': 'ком-то',

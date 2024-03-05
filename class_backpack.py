@@ -23,7 +23,7 @@ class Backpack:
 
     
     def check_name(self, message:str) -> bool:
-        return message.lower() in [self.name, self.lexemes['accus']]
+        return message.lower() in [self.name, self.lexemes["accus"]]
     
     
     def append(self, item):

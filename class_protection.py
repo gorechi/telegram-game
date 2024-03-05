@@ -27,10 +27,10 @@ class Protection:
 
     
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
-        if message.lower() in names_list:
-            return True
-        return False
+        if self.empty:
+            return False
+        names_list = self.get_names_list(['nom', "accus"])
+        return message.lower() in names_list
     
     
     def is_poisoned(self):
@@ -94,10 +94,10 @@ class Protection:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            tprint(self.game, f'{who.name} использует {self.lexemes['accus']} как защиту.')
+            tprint(self.game, f'{who.name} использует {self.lexemes["accus"]} как защиту.')
         else:
             self.game.player.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
 
     
     def show(self) -> str:
@@ -125,7 +125,7 @@ class Protection:
             who_using.backpack.append(who_using.shield)
             who_using.shield = self
             who_using.backpack.remove(self, who_using)
-        tprint(self.game, f'{who_using.name} теперь использует {self.lexemes['accus']} в качестве защиты!')
+        tprint(self.game, f'{who_using.name} теперь использует {self.lexemes["accus"]} в качестве защиты!')
     
     
     def get_element_decorator(self) -> str|None:
@@ -216,9 +216,9 @@ class Armor(Protection):
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
         old_armor = who.armor
-        message = [f'{who.name} использует {self.lexemes['accus']} как защиту.']
+        message = [f'{who.name} использует {self.lexemes["accus"]} как защиту.']
         if not old_armor.empty:
-            message.append(f'При этом он снимает {old_armor.lexemes['accus']} и оставляет валяться на полу.')
+            message.append(f'При этом он снимает {old_armor.lexemes["accus"]} и оставляет валяться на полу.')
             who.drop(old_armor.name)
         who.armor = self
         self.user = who
@@ -345,12 +345,12 @@ class Shield (Protection):
             old_shield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
-            message = [f'{who.name} помещает {self.get_full_names('accus')} за спину.']
+            message = [f'{who.name} помещает {self.get_full_names("accus")} за спину.']
         else:
             who.shield = self
-            message = [f'{who.name} берет {self.get_full_names('accus')} в руку.']
+            message = [f'{who.name} берет {self.get_full_names("accus")} в руку.']
         if old_shield:
-            message.append(f'При этом он бросает {old_shield.get_full_names('accus')} и оставляет валяться на полу.')
+            message.append(f'При этом он бросает {old_shield.get_full_names("accus")} и оставляет валяться на полу.')
             who.drop(old_shield.name)
         self.user = who
         tprint(self.game, message)

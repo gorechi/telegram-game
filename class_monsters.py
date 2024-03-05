@@ -125,7 +125,7 @@ class Monster:
     def check_name(self, message:str) -> bool:
         room = self.current_position
         if room.light:
-            names_list = self.get_names_list(['nom', 'accus'])
+            names_list = self.get_names_list(['nom', "accus"])
         else:
             names_list =  ['противник']
         return message.lower() in names_list
@@ -410,10 +410,10 @@ class Monster:
         mele_attack = self.generate_mele_attack(target)
         weapon_attack = self.generate_weapon_attack(target=target)
         if weapon_attack > 0:
-            message.append(f'{self_name} {self.action()} {target.lexemes['accus']} используя {self.weapon.lexemes['accus']} и '
+            message.append(f'{self_name} {self.action()} {target.lexemes["accus"]} используя {self.weapon.lexemes["accus"]} и '
                         f'наносит {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
         else:
-            message.append(f'{self_name} бьет {target.lexemes['accus']} не используя оружия и '
+            message.append(f'{self_name} бьет {target.lexemes["accus"]} не используя оружия и '
                         f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
         target_defence = target.defence(self)
         if target_defence < 0:
@@ -431,7 +431,7 @@ class Monster:
             ]
         else:
             total_damage = 0
-            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.lexemes['accus']}.')
+            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.lexemes["accus"]}.')
         target.health -= total_damage
         if target.health <= 0:
             game.state = 0

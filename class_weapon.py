@@ -19,6 +19,7 @@ class Weapon:
         self.name = name
         self.damage = damage
         self.empty = empty
+        self.twohanded = False
         self.actions = actions
         self.enchatable = enchantable
         self.type = type
@@ -81,10 +82,10 @@ class Weapon:
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
-        if message.lower() in names_list:
-            return True
-        return False
+        if self.empty:
+            return False
+        names_list = self.get_names_list(['nom', "accus"])
+        return message.lower() in names_list
 
     
     def get_names_list(self, cases:list=None) -> list:
@@ -168,17 +169,17 @@ class Weapon:
     
     def take(self, who):
         game = self.game
-        message = [f'{who.name} берет {self.lexemes['accus']}.']
+        message = [f'{who.name} берет {self.lexemes["accus"]}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
             who.weapon = self
-            message.append(f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.')
+            message.append(f'{who.name} теперь использует {self.lexemes["accus"]} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
                 message.append(f'Из-за того, что {who.g(["герой взял", "героиня взяла"])} двуручное оружие, '
-                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.get_full_name('accus')} за спину.')
+                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.get_full_name("accus")} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -209,7 +210,7 @@ class Weapon:
             who.backpack.append(who.weapon)
             who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self.lexemes['accus']} в качестве оружия.']
+            message = [f'{who.name} теперь использует {self.lexemes["accus"]} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield
                 who.removed_shield = shield
@@ -220,7 +221,7 @@ class Weapon:
                 who.shield = shield
                 who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.get_full_name('occus')}.')
+                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.get_full_name("occus")}.')
         tprint(game, message)
 
     
