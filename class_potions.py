@@ -79,7 +79,7 @@ class HealPotion(Potion):
         else:
             heal = dice(1, self.effect)
         owner.health += heal
-        text = f'{owner.lexemes['nom']} восполняет {howmany(heal, "единицу жизни,единицы жизни,единиц жизни")}'
+        text = f'{owner.lexemes["nom"]} восполняет {howmany(heal, "единицу жизни,единицы жизни,единиц жизни")}'
         if owner.poisoned:
             owner.poisoned = False
             text += ' и излечивается от отравления'
