@@ -110,7 +110,7 @@ class Money:
 
     
     def check_name(self, message:str) -> bool:
-        return message.lower() in ['деньги', self.lexemes["nom"], self.lexemes['accus']]
+        return message.lower() in ['деньги', self.lexemes["nom"], self.lexemes["accus"]]
     
     
     def __repr__(self):

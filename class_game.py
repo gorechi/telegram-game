@@ -69,7 +69,7 @@ class Game():
             'зелье увертливости': EvasionPotion,
             'зелье ума': IntelligencePotion,
             'зелье просветления': EnlightmentPotion,
-            'противодие': Antidote,
+            'противоядие': Antidote,
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0

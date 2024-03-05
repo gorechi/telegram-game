@@ -18,7 +18,7 @@ class Potion:
 
     
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
+        names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
@@ -53,7 +53,7 @@ class Potion:
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             self.owner = who
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
             return True
         return False
 

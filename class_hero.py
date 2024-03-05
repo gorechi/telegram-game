@@ -554,16 +554,16 @@ class Hero:
             return False
         repair_price = shield.get_repair_price()
         if repair_price == 0:
-            tprint(game, f'{shield.lexemes['accus']} не нужно ремонтировать.')
+            tprint(game, f'{shield.lexemes["accus"]} не нужно ремонтировать.')
             return False
         if self.money >= repair_price:
             shield.repair()
             self.money.how_much_money -= repair_price
-            tprint(game, f'{self.name} успешно чинит {shield.lexemes['accus']}')
+            tprint(game, f'{self.name} успешно чинит {shield.lexemes["accus"]}')
             self.decrease_restless(1)
             return True
         else:
-            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.lexemes['accus']}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
+            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield.lexemes["accus"]}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
             return False
         
     
@@ -615,14 +615,14 @@ class Hero:
             else:
                 room.loot.add(self.weapon)
             self.weapon = self.game.no_weapon
-            return f'Убегая {self.name} роняет из рук {self.weapon.lexemes['accus']}.'
+            return f'Убегая {self.name} роняет из рук {self.weapon.lexemes["accus"]}.'
         elif a == 2 and not self.shield.empty:
             if target.shield.empty and target.carryshield:
                 target.shield = self.shield
             else:
                 room.loot.add(self.shield)
             self.shield = self.game.no_shield
-            return f'Убегая {self.name} теряет {self.shield.lexemes['accus']}.'
+            return f'Убегая {self.name} теряет {self.shield.lexemes["accus"]}.'
         return None
     
     
@@ -641,7 +641,7 @@ class Hero:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
                 item = self.backpack.get_random_item()
-                items_list.append(item.lexemes['accus'])
+                items_list.append(item.lexemes["accus"])
                 room.loot.add(item)
                 self.backpack.remove(item, room)
         return items_list
@@ -694,7 +694,7 @@ class Hero:
         """
         
         if self.check_light():
-            return target.name, target.get_name('accus')
+            return target.name, target.get_name("accus")
         else:
             return 'Неизвестная тварь из темноты', 'черт знает кого'
             
@@ -801,7 +801,7 @@ class Hero:
         total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
             action = randomitem(self.weapon.actions)
-            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.lexemes['accus']} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
+            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.lexemes["accus"]} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
         else:
             hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
         message.append(hit_string)
@@ -863,7 +863,7 @@ class Hero:
         message = []
         message.append(f'{self.name} может использовать следующие предметы:')
         for item in can_use:
-            message.append(f'{str(can_use.index(item) + 1)}: {item.lexemes['accus']}')
+            message.append(f'{str(can_use.index(item) + 1)}: {item.lexemes["accus"]}')
         message.append('Выберите номер предмета или скажите "отмена" для прекращения.')
         game.selected_item = can_use
         game.state = 4
@@ -1136,7 +1136,7 @@ class Hero:
         room = self.current_position
         message = []
         for i in room.furniture:
-            if i.lexemes['accus'] == what:
+            if i.lexemes["accus"] == what:
                 message += (i.show())
         return message
     
@@ -1147,7 +1147,8 @@ class Hero:
         game = self.game
         room = self.current_position
         monster = room.monsters(mode='first')
-        what = what.lower()
+        if what:
+            what = what.lower()
         if not self.check_light():
             tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
             return
@@ -1169,7 +1170,7 @@ class Hero:
             tprint(game, self.look_at_shield())
         if self.armor.check_name(what):
             tprint(game, self.look_at_armor())
-        if [f for f in room.furniture if f.lexemes['accus'] == what]:
+        if [f for f in room.furniture if f.lexemes["accus"] == what]:
             tprint(game, self.look_at_furniture(what=what))
 
     
@@ -1228,7 +1229,7 @@ class Hero:
         if not who_is_fighting:
             tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
-        if not enemy in [who_is_fighting.name, who_is_fighting.get_name('accus'), who_is_fighting.name[0]] and enemy != '':
+        if not enemy in [who_is_fighting.name, who_is_fighting.get_name("accus"), who_is_fighting.name[0]] and enemy != '':
             tprint(game, f'{self.name} не может атаковать. В комнате нет такого существа.')
             return False
         game.state = 1
@@ -1345,14 +1346,14 @@ class Hero:
         room = self.current_position
         game = self.game
         what_to_search = None
-        for i in room.furniture:
-            if item.lower() in [i.lexemes['nom'].lower(), i.lexemes['accus'].lower()]:
-                what_to_search = i
+        for furniture in room.furniture:
+            if furniture.check_name(item):
+                what_to_search = furniture
         if not what_to_search:
             tprint(game, 'В комнате нет такой вещи.')
             return False
         if what_to_search.locked:
-            tprint(game, f'Нельзя обыскать {what_to_search.lexemes['accus']}. Там заперто.')
+            tprint(game, f'Нельзя обыскать {what_to_search.lexemes["accus"]}. Там заперто.')
             return False
         if self.check_monster_in_ambush(place=what_to_search):
             return False
@@ -1366,7 +1367,7 @@ class Hero:
         if what.loot == 0:
             tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
             return False
-        message = [f'{self.name} осматривает {what.lexemes['accus']} и находит:']
+        message = [f'{self.name} осматривает {what.lexemes["accus"]} и находит:']
         message += what.loot.show_sorted()
         what.loot.transfer(room.loot)
         message.append('Все, что было спрятано, теперь лежит на виду.')
@@ -1447,6 +1448,7 @@ class Hero:
         for item in current_loot.pile:
                 if self.can_take(item):
                     item.take(self)
+        current_loot.get_empty()
         return True
     
     
@@ -1516,7 +1518,7 @@ class Hero:
         furniture = what_is_locked[0]
         self.backpack.remove(key)
         furniture.locked = False
-        tprint(game, f'{self.name} отпирает {furniture.lexemes['accus']} ключом.')
+        tprint(game, f'{self.name} отпирает {furniture.lexemes["accus"]} ключом.')
         return True
         
     
@@ -1555,7 +1557,7 @@ class Hero:
             tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
             return False
         self.shield, self.removed_shield = self.removed_shield, self.shield
-        tprint(self.game, f'{self.name} достает {self.shield.get_full_names('accus')} из-за спины и берет его в руку.')
+        tprint(self.game, f'{self.name} достает {self.shield.get_full_names("accus")} из-за спины и берет его в руку.')
         return True
     
     
@@ -1717,7 +1719,7 @@ class Hero:
             message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
         else:
             book = self.backpack.get_first_item_by_name(item)
-            message = f'{self.name} читает {book.lexemes['accus']}.'
+            message = f'{self.name} читает {book.lexemes["accus"]}.'
         if book:
             tprint(game, message)
             return book

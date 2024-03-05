@@ -41,6 +41,13 @@ class Door:
 class Furniture:
     """Класс мебели."""
     
+    basic_lexemes = {
+        "полка": ['полка', 'полку'],
+        "шкаф": ['шкаф'],
+        "сундук": ['сундук'],
+        "очаг": ['очаг']
+    }
+    
     
     def __init__(self, game, name='', furniture_type=0, can_rest=False):
         self.game = game
@@ -84,18 +91,15 @@ class Furniture:
     
     
     def get_names_list(self, cases:list=None) -> list:
-        names_list = [self.name]
+        names_list = Furniture.basic_lexemes[self.name]
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
-            names_list.append(self.get_element_names(case).lower())
         return names_list
 
 
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
-        if message.lower() in names_list:
-            return True
-        return False
+        names_list = self.get_names_list(['nom', "accus"])
+        return message.lower() in names_list
     
     
     def show(self):
@@ -180,7 +184,7 @@ class Room:
     def show_furniture(self) -> list:
         furniture_list  = []
         for furniture in self.furniture:
-                furniture_list.append(furniture.where + ' ' + furniture.state + ' ' + furniture.name)
+                furniture_list.append(furniture.where + ' ' + furniture.state + ' ' + furniture.lexemes['nom'])
         return furniture_list
     
     

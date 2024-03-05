@@ -36,10 +36,11 @@ class Rune:
         self.base_price = self.define_base_price()
         
          
-    def generate_lexemes(self):
-        self.lexemes = {}
+    def generate_lexemes(self) -> dict:
+        lexemes = {}
         for key in Rune.lexemes:
-            self.lexemes[key] = f'{Rune.lexemes[key]} {s_elements_dictionary[self.element]}'
+            lexemes[key] = f'{Rune.lexemes[key]} {s_elements_dictionary[self.element]}'
+        return lexemes
     
     
     def __str__(self) -> str:
@@ -48,7 +49,7 @@ class Rune:
 
       
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
+        names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
@@ -112,7 +113,7 @@ class Rune:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
 
     
     def show(self) -> str:
@@ -169,7 +170,7 @@ class Spell:
             
     
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
+        names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
@@ -280,7 +281,7 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
             return True
         return False
 
@@ -396,7 +397,7 @@ class Map:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
 
 
 class Key:
@@ -478,7 +479,7 @@ class Book:
     
     
     def check_name(self, message:str) -> bool:
-        names_list = self.get_names_list(['nom', 'accus'])
+        names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
@@ -542,6 +543,6 @@ class Book:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes['accus']} себе.')
+            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
             return True
         return False
