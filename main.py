@@ -37,6 +37,7 @@ def welcome(message):
         markup.add(itembtn1)
         bot.reply_to(message, "Привет!\nХочешь начать игру?\n", reply_markup=markup)
 
+
 @bot.message_handler(func=lambda message: True)
 def all_commands(message):
     global game_sessions

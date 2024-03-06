@@ -9,10 +9,12 @@ from settings import *
 
 
 class Floor:
-    def __init__(self, game, rows:int, rooms:int, how_many:list):
+    def __init__(self, game, floor_number:int, data:dict):
         self.game = game
-        self.rows = rows
-        self.rooms = rooms
+        self.floor_number = floor_number
+        print(f'floor number = {self.floor_number}')
+        self.rows = data['rows']
+        self.rooms = data['rooms']
         self.directions_dict = {0: (0 - self.rooms),
                                1: 1,
                                2: self.rooms,
@@ -28,7 +30,7 @@ class Floor:
                                'вверх': (0 - self.rooms),
                                'верх': (0 - self.rooms),
                                'право': 1}
-        self.how_many = how_many
+        self.how_many = data['how_many']
         self.monsters_in_rooms = {}
         self.create_rooms(self.rows, self.rooms)
         self.lock_doors()
@@ -140,7 +142,8 @@ class Floor:
         # Читаем монстров из файла и разбрасываем по замку
         self.all_monsters = game.create_objects_from_json(file='monsters.json',
                                        how_many=self.how_many['монстры'],
-                                       random=True)
+                                       random=True,
+                                       floor=self.floor_number)
         for monster in self.all_monsters:
             monster.place(self)
             self.game.how_many_monsters += 1
