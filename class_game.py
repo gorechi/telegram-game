@@ -131,7 +131,7 @@ class Game():
         
         floors = []
         for i in s_castle_floors_sizes:
-            floor = Floor(self, i[0], i[1], i[2])
+            floor = Floor(self, i, s_castle_floors_sizes[i])
             floors.append(floor)
         return floors
     
@@ -142,7 +142,13 @@ class Game():
         print("=" * 40)
 
     
-    def create_objects_from_json(self, file:str, random:bool=False, how_many:int=None, obj_class:str=None) -> list:
+    def create_objects_from_json(self, 
+                                 file:str, 
+                                 random:bool=False, 
+                                 how_many:int=None, 
+                                 obj_class:str=None, 
+                                 floor:int=None
+                                 ) -> list:
         
         """
         Функция создает список объектов из файла JSON. 
@@ -160,6 +166,8 @@ class Game():
             parsed_data = json.load(read_data)
         if obj_class and isinstance(obj_class, str):
             parsed_data = [i for i in parsed_data if i['class'] == obj_class]
+        if floor and isinstance(floor, int):
+            parsed_data = [i for i in parsed_data if int(i.get('floor')) >= floor]
         if random:
             for _ in range(how_many):
                 i = randomitem(parsed_data, False)
