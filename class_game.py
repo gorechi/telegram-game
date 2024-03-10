@@ -103,10 +103,14 @@ class Game():
         
 
     def trigger_on_movement(self):
+        """Метод обрабатывает событие движения героя"""
+        
         self.raise_dead()
         
     
     def raise_dead(self):
+        """Метод воскрешения мертвецов"""
+        
         for corpse in self.all_corpses: 
             if corpse.can_resurrect:
                 corpse.try_to_rise()
@@ -115,7 +119,7 @@ class Game():
     def check_hero(self, hero:Hero) -> Hero:
         
         """
-        Функция проверяет, передан ли в игру герой. 
+        Метод проверяет, передан ли в игру герой. 
         Если не передан, то создает нового героя с настройками по умолчанию.
         
         """
@@ -127,7 +131,7 @@ class Game():
     
     def create_floors(self) -> list[Floor]:
         
-        """Функция создает этажи замка"""
+        """Метод создания этажей замка"""
         
         floors = []
         for i in s_castle_floors_sizes:
@@ -151,7 +155,7 @@ class Game():
                                  ) -> list:
         
         """
-        Функция создает список объектов из файла JSON. 
+        Метод создает список объектов из файла JSON. 
         Получает на вход следующие параметры:
         - file - имя файла, содержащего данные;
         - random - нужно ли создавать случайный набор объектов из прочитанных данных?
@@ -181,6 +185,11 @@ class Game():
     
           
     def create_random_weapon(self, how_many:int=1, weapon_type:str=None) -> Weapon | list[Weapon]:
+        """
+        Метод создания случайного оружия.
+        
+        """
+        
         objects = []
         with open('weapon.json', encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
@@ -197,7 +206,7 @@ class Game():
     
     def object_from_json(self, json_object:object) -> object:
         
-        """Функция создания одного объекта игры из объекта JSON."""
+        """Метод создает один игровой объект из объекта JSON."""
         
         new_object = self.classes[json_object['class']](self)
         for param in json_object:
@@ -208,7 +217,7 @@ class Game():
     
     def action(self, command:str, message:str):
         
-        """Функция обработки комманд от игрока."""
+        """Метод обработки комманд от игрока."""
         
         answer = message.lower()
         player = self.player
@@ -231,7 +240,7 @@ class Game():
     def rune_actions(self, answer:str) -> bool:
         
         """
-        Функция обрабатывает команды игрока когда он улучшает предметы при помощи рун.
+        Метод обрабатывает команды игрока когда он улучшает предметы при помощи рун.
         
         Возвращает:
         - True - если удалось улучшить предмет
@@ -263,7 +272,7 @@ class Game():
     def in_fight_actions(self, answer:str) -> bool:
         
         """
-        Функция обрабатывает команды игрока когда он что-то использует во время боя.
+        Метод обрабатывает команды игрока когда он что-то использует во время боя.
         
         Возвращает:
         - True - если удалось использовать предмет
@@ -294,7 +303,7 @@ class Game():
     def fight_actions(self, answer:str) -> bool:
         
         """
-        Функция обрабатывает команды игрока когда он дерется с монстром.
+        Метод обрабатывает команды игрока когда он дерется с монстром.
                 
         """
 
@@ -322,13 +331,5 @@ class Game():
     
     
     def test(self, hero:Hero):
-        floor = self.current_floor
-        rooms = [room for room in floor.plan if room.position in [1, 5, 6]]
-        for room in rooms:
-            monster = self.create_objects_from_json('monsters.json', True, 1, 'мертвец')[0]
-            floor.all_monsters.append(monster)
-            floor.monsters_in_rooms[room] = []
-            monster.place(floor, room)
-            tprint(self, [monster.name, monster.stren, monster.health])
-            monster.become_a_zombie()
+        return None
             
