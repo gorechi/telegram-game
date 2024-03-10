@@ -393,3 +393,20 @@ class Room:
             furniture_list = [f for f in self.furniture if not f.locked]
             return randomitem(furniture_list, neednumber=False)
         return None
+
+
+class Trap:
+    """Класс ловушки"""
+    
+    def __init__(self, game):
+        self.game = game
+        self.armed = True
+    
+    
+    def disarm(self) -> bool:
+        self.armed = False
+        return True
+    
+      
+        
+        
