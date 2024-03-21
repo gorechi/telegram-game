@@ -3,7 +3,6 @@ from typing import NoReturn
 
 from class_basic import Loot, Money
 from class_items import Key
-from class_monsters import Monster
 from functions import pprint, randomitem, readfile, tprint
 from settings import *
 
@@ -50,6 +49,33 @@ class Furniture:
     
     
     def __init__(self, game, name='', furniture_type=0, can_rest=False):
+        """
+        Инициализирует объект класса мебели
+
+        Args:
+            game: ссылка на объект игры
+            name: название объекта мебели
+            furniture_type: тип мебели (константы FURNITURE_*)
+            can_rest: можно ли отдыхать на этой мебели
+
+        Устанавливает атрибуты:
+            game - ссылка на объект игры
+            loot - объект класса Loot с содержимым мебели
+            locked - закрыта ли мебель
+            lockable - можно ли закрывать эту мебель
+            opened - открыта ли мебель
+            can_contain_weapon - может ли содержать оружие
+            can_hide - можно ли прятаться в этой мебели 
+            can_rest - можно ли отдыхать на мебели
+            name - название мебели
+            empty - пуста ли мебель
+            empty_text - текст если мебель пуста
+            state - состояние мебели
+            where - где находится мебель
+            room - комната, в которой находится мебель
+            type - тип мебели
+        """
+
         self.game = game
         self.loot = Loot(self.game)
         self.locked = False
@@ -171,17 +197,35 @@ class Room:
 
     
     def has_a_corpse(self) -> bool:
+        """
+        Проверяет, есть ли в комнате труп.
+
+        Возвращает:
+            bool: True, если в комнате есть труп, иначе False.
+        """
         if len(self.morgue) > 0:
             return True
         return False
 
     
     def show_corpses(self) -> list:
+        """
+        Возвращает список описаний трупов в комнате.
+
+        Возвращает:
+            list: Список строк, каждая из которых представляет описание трупа в комнате.
+        """
         corpses = [corpse.description for corpse in self.morgue]
         return(corpses)
 
     
     def show_furniture(self) -> list:
+        """
+        Возвращает список описаний мебели в комнате.
+
+        Возвращает:
+            list: Список строк, каждая из которых представляет описание мебели в комнате.
+        """
         furniture_list  = []
         for furniture in self.furniture:
                 furniture_list.append(furniture.where + ' ' + furniture.state + ' ' + furniture.lexemes['nom'])
@@ -189,6 +233,12 @@ class Room:
     
     
     def get_secret_word(self) -> str:
+        """
+        Возвращает секретное слово, связанное с комнатой.
+
+        Возвращает:
+            str: Секретное слово, связанное с комнатой. Если секретное слово не найдено, возвращается пустая строка.
+        """
         secret_word = ''
         for i in s_room_secrets_dictionary:
             if self.description.find(i) > -1:
@@ -211,6 +261,15 @@ class Room:
 
       
     def decorate(self):
+        """
+        Украшает комнату, случайным образом выбирая декорации из предопределенных списков и создавая описание.
+
+        Этот метод случайным образом выбирает декорации из списков 'decor1', 'decor2', 'decor3' и 'decor4' класса Room. 
+        Он назначает выбранные декорации атрибутам 'decoration1', 'decoration2', 'decoration3' и 'decoration4' соответственно. 
+        Затем он создает описание комнаты, комбинируя декорации следующим образом: '{decoration1} комнату {decoration2}. {decoration4}'.
+
+        Метод не принимает параметров и не возвращает значений.
+        """
         self.decoration1 = randomitem(Room.decor1)
         self.decoration2 = randomitem(Room.decor2)
         self.decoration3 = randomitem(Room.decor3)
@@ -249,6 +308,31 @@ class Room:
     
     
     def show(self, player):
+        """
+        Отображает описание комнаты и её содержимое игроку.
+
+        Параметры:
+            player (Player): Объект игрока.
+
+        Возвращает:
+            None
+
+        Метод сначала проверяет, есть ли в комнате монстры. Если есть, первому монстру присваивается переменная 'monster', в противном случае присваивается None.
+        Если в комнате уровень вони больше 0, переменной 'stink_text' присваивается текст о вони.
+        Если в комнате светло, переменной 'decoration1' присваивается соответствующее описание декорации в зависимости от того, горит ли факел.
+        Если в комнате нет монстра, переменной 'who_is_here' присваивается строка 'Не видно ничего интересного.', в противном случае 'who_is_here' присваивается описание монстра.
+        Затем метод создает список под названием 'message' и добавляет в него следующие строки:
+        - Имя игрока, за которым следует 'попадает в' и описание комнаты.
+        - Описания мебели в комнате.
+        - Описание торговца, если он есть.
+        - Описания трупов в комнате.
+        - Описание того, кто находится в комнате.
+        - Текст о вони, если уровень вони больше 0.
+        Если в комнате не светло, 'message' присваивается строка, указывающая на отсутствие источника света в комнате.
+        Если в комнате есть монстр, в 'message' добавляется строка, указывающая, что в темноте слышны странные звуки.
+        Если уровень вони больше 0, в 'message' добавляется текст о вони.
+        Наконец, метод вызывает функцию 'tprint' для вывода списка 'message' в чат игры.
+        """
         game = self.game
         monsters = self.monsters()
         if monsters:
@@ -286,6 +370,21 @@ class Room:
 
     
     def show_through_key_hole(self, who):
+        """
+        Отображает, что можно увидеть через замочную скважину двери.
+
+        Параметры:
+            who (object): Объект, представляющий персонажа, заглядывающего в замочную скважину.
+
+        Возвращает:
+            list: Список строк, описывающих, что можно увидеть через замочную скважину.
+
+        Если в комнате есть торговец, метод вызывает метод 'show_through_key_hole' объекта торговца и возвращает его результат.
+        Если в комнате нет монстра, метод добавляет в список 'message' строку, указывающую, что персонаж не может ничего толком разглядеть через замочную скважину.
+        Если в комнате есть монстр, метод добавляет в список 'message' строку, указывающую, что персонаж может видеть монстра через замочную скважину.
+        Если уровень вони в комнате больше 0, метод добавляет в список 'message' строку, указывающую, что из замочной скважины воняет чем-то омерзительным.
+
+        """
         if self.traider:
             return self.traider.show_through_key_hole()
         monster = self.monsters('first')
@@ -300,6 +399,15 @@ class Room:
 
     
     def furniture_types(self):
+        """
+        Возвращает список уникальных типов мебели, присутствующих в комнате.
+
+        Возвращает:
+            list: Список строк, каждая из которых представляет уникальный тип мебели в комнате.
+
+        Метод проходит по объектам мебели в комнате и проверяет, присутствует ли тип каждого объекта мебели уже в списке 'types'. 
+        Если нет, он добавляет тип в список. В конце концов, метод возвращает список уникальных типов мебели.
+        """
         types = []
         for furniture in self.furniture:
             if furniture.type not in types:
@@ -308,6 +416,18 @@ class Room:
 
     
     def clear_from_monsters(self):
+        """
+        Очищает комнату от всех монстров.
+
+        Этот метод получает список монстров, находящихся в комнате, используя метод 'monsters'. 
+        Затем он проходит по каждому монстру в списке и вызывает метод 'place' для монстра, передавая в качестве аргумента атрибут 'floor' комнаты.
+
+        Параметры:
+            Нет
+
+        Возвращает:
+            Нет
+        """
         monsters = self.monsters()
         for monster in monsters:
             monster.place(self.floor)           
@@ -396,17 +516,120 @@ class Room:
 
 
 class Trap:
-    """Класс ловушки"""
+    """
+    Класс, представляющий ловушку.
+
+    Атрибуты:
+        game (Game): Экземпляр игры, связанный с ловушкой.
+        activated (bool): Указывает, активирована ли ловушка.
+
+    Методы:
+        __init__(game): Инициализирует ловушку с данным экземпляром игры.
+        deactivate() -> bool: Обезвреживает ловушку и возвращает True.
+    """
+    
+    types = [
+        'intel',
+        'stren',
+        'dex',
+        'armor',
+        #'weapon',
+        #'backpack'
+    ]
+    
     
     def __init__(self, game):
         self.game = game
-        self.armed = True
+        self.activated = True
+        self.seen = False
+        self.triggered = False
+        self.where = None
+        self.actions = {
+            'intel': self.damage_intel,
+            'stren': self.damage_stren,
+            'dex': self.damage_dex,
+            'armor': self.damage_armor,
+            #'weapon': self.damage_weapon,
+            #'backpack': self.damage_backpack
+        }
     
     
-    def disarm(self) -> bool:
-        self.armed = False
+    def deactivate(self) -> bool:
+        if not self.activated:
+            return False
+        self.activated = False
         return True
     
+    
+    def activate(self) -> bool:
+        if self.activated:
+            return False
+        self.activated = True
+        return True
+    
+    
+    def trigger(self, target) -> bool:
+        """
+        Активирует ловушку и применяет её эффект к цели.
+
+        Этот метод выбирает случайный тип действия из доступных типов ловушек, 
+        затем применяет соответствующее действие к цели. Если все типы действий были испробованы 
+        и ни одно не сработало, выводится сообщение о том, что ловушка не может причинить урон цели.
+
+        Параметры:
+            - target: Цель, к которой применяется ловушка. Должен иметь атрибуты, необходимые для действий ловушки.
+
+        Возвращает:
+            bool:   
+            - Возвращает True, если ловушка успешно сработала и причинила урон цели. 
+            - Возвращает False, если ловушка не смогла причинить урон.
+        """
+        types = Trap.types.copy()
+        place = self.where.lexemes.get('prep', 'мебели')
+        message = [f'От неловкого прикосновения в {place} срабатывает ловушка']
+        while True:
+            if not types:
+                message.append(f'{target.name} настолько {target.g(['некчемен', 'некчемна'])}, что ловушка просто не может причинить еще какой-то урон.')
+                tprint(self.game, message)
+                return False
+            action_type = randomitem(types)
+            types.remove(action_type)
+            action = self.actions.get(action_type, False)
+            if not action:
+                raise Exception(f'У ловушки нет метода для типа {action_type}')
+            action_text = action(target)
+            if action_text:
+                message.append(action_text)
+                tprint(self.game, message)
+                return True
+    
+    
+    def damage_intel(self, target) -> str:
+        return target.intel_wound()
+    
+    
+    def damage_stren(self, target) -> str:
+        return target.stren_wound()
       
+    
+    def damage_dex(self, target) -> str:
+        return target.dex_wound()
         
-        
+
+    def damage_armor(self, target) -> bool|str:
+        if target.armor.empty:
+            return False
+        return True
+
+
+"""     def damage_weapon(self, target) -> bool|str:
+        if target.weapon.empty:
+            return False
+        return True
+ """
+
+"""     def damage_backpack(self, target) -> bool|str:
+        if target.backpack.empty:
+            return False
+        return True
+ """        

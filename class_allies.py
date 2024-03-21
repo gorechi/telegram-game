@@ -35,6 +35,15 @@ class Trader:
     
     
     def generate_money(self) -> Money:
+        """
+        Генерирует объект денег для торговца.
+
+        Метод вычисляет случайное количество денег в пределах заданных настроек (минимум и максимум),
+        создает и возвращает объект Money с этим количеством денег.
+
+        Returns:
+            Money: Объект денег с сгенерированным количеством.
+        """
         delta = s_trader_maximum_money - s_trader_minimum_money
         money_amount = s_trader_minimum_money + roll([delta])
         new_money = Money(self.game, money_amount)
@@ -42,6 +51,15 @@ class Trader:
     
     
     def get_items(self) -> bool:
+        """
+        Получает предметы для магазина торговца в зависимости от его типа.
+
+        Метод определяет тип торговца (книги или руны) и вызывает соответствующий метод для получения предметов этого типа.
+        Если тип торговца не поддерживается, метод возвращает False.
+
+        Returns:
+            bool: Возвращает True, если предметы успешно получены и добавлены в магазин торговца, иначе False.
+        """
         actions = {
             'books': self.get_books,
             'runes': self.get_runes
@@ -52,6 +70,15 @@ class Trader:
     
     
     def get_books(self) -> bool:
+        """
+        Получает книги для магазина торговца.
+
+        Метод определяет случайное количество книг, которое может иметь торговец, используя настройку `s_how_many_books_trader_can_have`.
+        Затем создает указанное количество книг, загружая их из файла 'books.json' в случайном порядке, и добавляет их в магазин торговца.
+
+        Returns:
+            bool: Всегда возвращает True, так как предполагается, что операция добавления книг в магазин всегда успешна.
+        """
         how_many_books = roll([s_how_many_books_trader_can_have])
         books = self.game.create_objects_from_json(file='books.json',
                                     how_many=how_many_books,
@@ -61,9 +88,18 @@ class Trader:
     
     
     def get_runes(self) -> bool:
+        """
+        Получает руны для магазина торговца.
+
+        Этот метод определяет количество рун, которые может иметь торговец, на основе настройки `s_how_many_runes_trader_can_have`.
+        Затем он создает указанное количество рун, инстанцируя класс `Rune`, и добавляет их в магазин торговца.
+
+        Возвращает:
+            bool: Возвращает True, если руны успешно получены и добавлены в магазин, иначе False.
+        """
         how_many_runes = roll([s_how_many_runes_trader_can_have])
         runes = [Rune(self.game) for _ in range(how_many_runes)]
-        self.shop += runes
+        self.shop.extend(runes)
         return True
     
     

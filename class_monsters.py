@@ -245,7 +245,6 @@ class Monster:
         self.eqip_weapon(weapon)
         loot.remove(weapon)
         return True
-    
         
     
     def equip_weapon(self, weapon:Weapon) -> bool:

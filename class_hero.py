@@ -77,6 +77,7 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
+        self.wounds = {}
         self.weapon_mastery = {'рубящее': {
                                         'counter': 0,
                                         'level': 0
@@ -133,11 +134,29 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def intel_wound(self) -> str:
+        wound = self.wounds.get('intel', 0)
+        self.wounds['intel'] = wound + 1
+        return f'{self.name} получает удар по голове, что отрицательно сказывается на {self.g(["его", "ее"])} способности к здравым рассуждениям.'
+    
+    
+    def stren_wound(self) -> str:
+        wound = self.wounds.get('stren', 0)
+        self.wounds['stren'] = wound + 1
+        return f'{self.name} получает ранение и теряет много крови. Из-за раны {self.g(["он", "она"])} сильно слабеет.'
+    
+    
+    def dex_wound(self) -> str:
+        wound = self.wounds.get('dex', 0)
+        self.wounds['dex'] = wound + 1
+        return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
+            
+       
     def get_weakness(self, weapon:Weapon) -> float:
         return 1
     
     
-    def get_shield(self) -> Shield:
+    def get_shield(self) -> Shield|None:
         """Метод возвращает щит героя."""
         
         if not self.shield.empty:
@@ -183,7 +202,7 @@ class Hero:
             c(full_command[1])
 
     
-    def poison_enemy(self, target:Monster) -> str:
+    def poison_enemy(self, target:Monster) -> str|None:
         """
         Метод проводит проверку, отравил герой противника при атаке, или нет.
         
