@@ -1,12 +1,10 @@
-from random import randint as dice
-
 from class_items import Book, Key, Money, Rune
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room
 from class_weapon import Weapon
 from class_backpack import Backpack
-from functions import howmany, normal_count, randomitem, showsides, tprint
+from functions import howmany, normal_count, randomitem, showsides, tprint, roll
 from settings import *
 
 
@@ -135,18 +133,36 @@ class Hero:
         
     
     def intel_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на интеллект, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
         wound = self.wounds.get('intel', 0)
         self.wounds['intel'] = wound + 1
         return f'{self.name} получает удар по голове, что отрицательно сказывается на {self.g(["его", "ее"])} способности к здравым рассуждениям.'
     
     
     def stren_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на силу, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
         wound = self.wounds.get('stren', 0)
         self.wounds['stren'] = wound + 1
         return f'{self.name} получает ранение и теряет много крови. Из-за раны {self.g(["он", "она"])} сильно слабеет.'
     
     
     def dex_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на ловкость, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
         wound = self.wounds.get('dex', 0)
         self.wounds['dex'] = wound + 1
         return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
@@ -214,13 +230,13 @@ class Hero:
         if target.poisoned or target.venomous:
             return None
         if self.weapon.is_poisoned():
-            poison_die = dice(1, s_weapon_poison_level)
+            poison_die = roll([s_weapon_poison_level])
         else:
             poison_die = 0
-        base_protection_die = dice(1, s_poison_base_protection_die)
+        base_protection_die = roll([s_poison_base_protection_die])
         additional_protection_die = 0
         if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = dice(1, s_poison_additional_protection_die)
+            additional_protection_die = roll([s_poison_additional_protection_die])
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
@@ -228,10 +244,25 @@ class Hero:
         return None
     
     
-    def hit_chance(self):
+    def hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
-        return self.dext + self.weapon_mastery[self.weapon.type]['level']
+        dext_wound = self.wounds.get('dext', 0)
+        wound_modifier = roll([dext_wound])
+        return self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+    
+    
+    def parry_chance(self) -> int:
+        """Метод рассчитывает и возвращает значение шанса парирования атаки."""
+        
+        dext_wound = self.wounds.get('dext', 0)
+        wound_modifier = roll([dext_wound])
+        chance = self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+        if self.poisoned:
+            chance -= self.dext // 2
+        if chance < 0:
+            chance = 0
+        return chance
     
     
     def change(self, what:str=None):
@@ -436,7 +467,7 @@ class Hero:
         """Метод моделирует сон героя во время отдыха."""
         
         message = []
-        dream_count = dice(1, s_nightmare_probability)
+        dream_count = roll([s_nightmare_probability])
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
                            Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
@@ -457,7 +488,7 @@ class Hero:
         
         """
         
-        steal_count = dice(1, s_steal_probability)
+        steal_count = roll([s_steal_probability])
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
@@ -627,7 +658,7 @@ class Hero:
         """
         
         room = self.current_position
-        a = dice(1, 2)
+        a = roll([2])
         if a == 1 and not self.weapon.empty:
             if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
@@ -655,8 +686,9 @@ class Hero:
         
         room = self.current_position
         items_list = []
-        a = dice(0, self.backpack.count_items())
-        if a > 0:
+        items_quantity = self.backpack.count_items()
+        a = roll([items_quantity + 1])
+        if a < items_quantity:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
                 item = self.backpack.get_random_item()
@@ -691,7 +723,7 @@ class Hero:
         if self.check_light():
             direction = randomitem(available_directions)
         else:
-            direction = dice(0, 3)
+            direction = roll([4]) - 1
             if direction not in available_directions:
                 message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
                 tprint(self.game, message)
@@ -722,35 +754,34 @@ class Hero:
         """Метод генерирует значение ярости героя."""
         
         if self.check_light():
-            if self.rage > 1:
-                rage = dice(2, self.rage)
-            else:
-                rage = 1
-        else:
-            rage = 1
-        return rage
+            return roll([self.rage])
+        return 1
     
     
-    def generate_poison_strength(self) -> int:
+    def generate_poison_effect(self) -> int:
         """Метод генерирует значение силы отравления, которое испытывает герой."""
         
         if self.poisoned:
-            poison_strength = dice(1, self.stren // 2)
-        else:
-            poison_strength = 0
-        return poison_strength
+            return roll([self.stren // 2])
+        return 0
     
+    
+    def get_real_strength(self) -> int:
+        strength_wound = self.wounds.get('stren', 0)
+        wound_modifier = roll([strength_wound])
+        poison_effect = self.generate_poison_effect()
+        return self.stren - wound_modifier - poison_effect
+        
     
     def generate_mele_attack(self) -> int:
         """Метод генерирует значение атаки голыми руками."""
         
         rage = self.generate_rage()
-        poison_strength = self.generate_poison_strength()
+        strength = self.get_real_strength()
+        strength_die = roll([strength])
         if self.check_light():
-            mele_attack = dice(1, self.stren - poison_strength) * rage
-        else:
-            mele_attack = dice(1, self.stren - poison_strength) // dice(1, s_dark_damage_divider_dice)
-        return mele_attack
+            return strength_die * rage
+        return strength_die // roll([s_dark_damage_divider_dice])
                 
     
     def generate_weapon_attack(self, target:Monster) -> int:
@@ -762,7 +793,7 @@ class Hero:
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
         critical_probability = weapon_mastery * s_critical_step
-        if dice(1, 100) <= critical_probability and not self.poisoned:
+        if roll([100]) <= critical_probability and not self.poisoned:
             weapon_attack = weapon_attack * s_critical_multiplier
         return weapon_attack
     
@@ -801,7 +832,7 @@ class Hero:
             return None
         weapon_type = self.weapon.type
         mastery = self.weapon_mastery.get(weapon_type)
-        mastery['counter'] += dice(1, 10)/100
+        mastery['counter'] += roll([10])/100
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
             mastery['level'] += 1
@@ -894,7 +925,7 @@ class Hero:
         
         game = self.game
         if self.shield.empty:
-            tprint(self.game, 'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self.g(["он", "она"])} не может.')
+            tprint(self.game, f'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self.g(["он", "она"])} не может.')
         else:
             tprint(game, showsides(self, target, self.floor))
             self.hide = True
@@ -983,11 +1014,9 @@ class Hero:
         """Метод проверки, удалось ли персонажу увернуться от удара врага."""
         
         weapon = attacker.weapon
-        parry_chance = self.dext + self.weapon_mastery[weapon.type]['level']
-        if self.poisoned:
-            parry_chance -= self.dext // 2
-        parry_die = dice(1, parry_chance)
-        hit_die = dice(1, (attacker.hit_chance + weapon.hit_chance))
+        parry_chance = self.parry_chance()
+        parry_die = roll([parry_chance])
+        hit_die = roll([attacker.hit_chance + weapon.hit_chance])
         if parry_die > hit_die:
             return True
         return False
@@ -1255,7 +1284,7 @@ class Hero:
         if agressive:
             who_first = 2
         else:
-            who_first = dice(1, 2)
+            who_first = roll([2])
         if who_first == 1:
             tprint(game, f'{game.player.name} начинает схватку!', 'fight')
             self.attack(who_is_fighting, 'атаковать')
