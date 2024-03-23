@@ -81,6 +81,8 @@ class Furniture:
         self.locked = False
         self.lockable = False
         self.opened = True
+        self.trap = None
+        self.can_contain_trap = True
         self.can_contain_weapon = True
         self.can_hide = False
         self.can_rest = can_rest
@@ -565,6 +567,17 @@ class Trap:
         if self.activated:
             return False
         self.activated = True
+        return True
+    
+    
+    def place(self, floor) -> bool:
+        all_furniture = [f for f in floor.all_furniture if f.can_contain_trap and not f.trap]
+        if not all_furniture:
+            return False
+        furniture = randomitem(all_furniture)
+        furniture.trap = self
+        self.where = furniture
+        self.activate()
         return True
     
     
