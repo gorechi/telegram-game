@@ -330,7 +330,8 @@ s_map_height_coefficient = 90
 s_castle_floors_sizes = {
     1: {
       'rows': 5, 
-      'rooms': 5, 
+      'rooms': 5,
+      'traps_difficulty': 4, 
       'how_many': {
         'монстры': 10,
         'оружие': 10,

@@ -3,7 +3,7 @@ from typing import NoReturn
 
 from class_basic import Loot, Money
 from class_items import Key
-from functions import pprint, randomitem, readfile, tprint
+from functions import pprint, randomitem, readfile, tprint, roll
 from settings import *
 
 
@@ -81,7 +81,7 @@ class Furniture:
         self.locked = False
         self.lockable = False
         self.opened = True
-        self.trap = None
+        self.trap = Trap(self.game)
         self.can_contain_trap = True
         self.can_contain_weapon = True
         self.can_hide = False
@@ -539,12 +539,22 @@ class Trap:
         #'backpack'
     ]
     
+    detection_texts = [
+        'Сбоку отчетливо виден какой-то странный механизм.',
+        'Тоненький волосок прикреплен к крышке.',
+        'Изнутри слышно какое-то странное пощелкивание.',
+        'В щели между крышкой и корпусом видно натянутую нитку.',
+        'Кто-то явно что-то делал с крышкой - щель с одной стороны шире, чем с другой.'
+    ]
+    
     
     def __init__(self, game):
         self.game = game
-        self.activated = True
+        self.activated = False
         self.seen = False
         self.triggered = False
+        self.difficulty = 0
+        self.detection_text = None
         self.where = None
         self.actions = {
             'intel': self.damage_intel,
@@ -554,6 +564,19 @@ class Trap:
             #'weapon': self.damage_weapon,
             #'backpack': self.damage_backpack
         }
+    
+    
+    def get_detection_text(self) -> str:
+        if self.detection_text:
+            return self.detection_text
+        texts = Trap.detection_texts
+        text = randomitem(texts)
+        self.detection_text = text
+        return text     
+    
+    
+    def set_difficulty(self, limit:int):
+        self.difficulty = roll([limit])
     
     
     def deactivate(self) -> bool:
@@ -568,18 +591,7 @@ class Trap:
             return False
         self.activated = True
         return True
-    
-    
-    def place(self, floor) -> bool:
-        all_furniture = [f for f in floor.all_furniture if f.can_contain_trap and not f.trap]
-        if not all_furniture:
-            return False
-        furniture = randomitem(all_furniture)
-        furniture.trap = self
-        self.where = furniture
-        self.activate()
-        return True
-    
+      
     
     def trigger(self, target) -> bool:
         """

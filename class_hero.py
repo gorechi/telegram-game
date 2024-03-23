@@ -39,6 +39,7 @@ class Hero:
         self.intel = intel
         self.start_intel = self.intel
         self.health = health
+        self.trap_mastery = 0
         if weapon is None:
             self.weapon = self.game.no_weapon
         else:
@@ -1184,9 +1185,25 @@ class Hero:
         room = self.current_position
         message = []
         for i in room.furniture:
-            if i.lexemes["accus"] == what:
+            if i.lexemes["accus"].find(what) != -1:
                 message += (i.show())
+                message.append(self.get_trap_text(i))
         return message
+    
+    
+    def get_trap_text(self, item) -> str|None:
+        trap = item.trap
+        if trap.activated and self.detect_trap(trap):
+            return trap.get_detection_text()
+        return None
+    
+    
+    def detect_trap(self, trap) -> bool:
+        if not trap.seen:
+            detection = roll([self.intel]) - roll([self.wounds['intel']]) + self.trap_mastery
+            if detection > trap.difficulty:
+                trap.seen = True
+        return trap.seen
     
     
     def look(self, what:str=None):
@@ -1218,7 +1235,7 @@ class Hero:
             tprint(game, self.look_at_shield())
         if self.armor.check_name(what):
             tprint(game, self.look_at_armor())
-        if [f for f in room.furniture if f.lexemes["accus"] == what]:
+        if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
             tprint(game, self.look_at_furniture(what=what))
 
     

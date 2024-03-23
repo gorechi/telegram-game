@@ -15,6 +15,7 @@ class Floor:
         print(f'floor number = {self.floor_number}')
         self.rows = data['rows']
         self.rooms = data['rooms']
+        self.traps_difficulty = data['traps_difficulty']
         self.directions_dict = {0: (0 - self.rooms),
                                1: 1,
                                2: self.rooms,
@@ -180,10 +181,12 @@ class Floor:
             rune.place(self)
     
     
-    def place_traps(self):
-        self.all_traps = [Trap(self.game) for _ in range(self.how_many['ловушка'])]
-        for trap in self.all_traps:
-            trap.place(self)
+    def activate_traps(self):
+        all_furnitures = [f for f in self.all_furniture if f.can_contain_trap and not f.trap.activated]
+        furnitures = randomitem(all_furnitures, how_many=self.how_many['ловушка'])
+        for f in furnitures:
+            f.trap.activate()
+            f.trap.set_difficulty(self.traps_difficulty)
 
     
     def place_potions(self, game):
