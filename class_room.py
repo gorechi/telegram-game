@@ -81,7 +81,7 @@ class Furniture:
         self.locked = False
         self.lockable = False
         self.opened = True
-        self.trap = Trap(self.game)
+        self.trap = Trap(self.game, self)
         self.can_contain_trap = True
         self.can_contain_weapon = True
         self.can_hide = False
@@ -548,14 +548,14 @@ class Trap:
     ]
     
     
-    def __init__(self, game):
+    def __init__(self, game, where=None):
         self.game = game
         self.activated = False
         self.seen = False
         self.triggered = False
         self.difficulty = 0
         self.detection_text = None
-        self.where = None
+        self.where = where
         self.actions = {
             'intel': self.damage_intel,
             'stren': self.damage_stren,

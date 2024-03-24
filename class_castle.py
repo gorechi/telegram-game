@@ -1,10 +1,9 @@
 from random import randint as dice
 
-from class_basic import Money, Loot
-from class_items import Key, Map, Matches, Rune
-from class_room import Door, Room, Trap
+from class_basic import Money
+from class_items import Key, Map, Matches, Rune, Book
+from class_room import Door, Room
 from functions import pprint, randomitem
-from class_monsters import Corpse
 from settings import *
 
 
@@ -168,11 +167,9 @@ class Floor:
 
     
     def place_books(self, game):
-        self.all_books = game.create_objects_from_json(file='books.json',
-                                    how_many=self.how_many['книга'],
-                                    random=True)
-        for book in self.all_books:
-            book.place(self)
+        for _ in range(self.how_many['книга']):
+            new_book = Book(self.game)
+            new_book.place(self)
 
     
     def place_runes(self):

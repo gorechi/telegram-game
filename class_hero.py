@@ -1801,7 +1801,10 @@ class Hero:
             message = [book.text]
             message.append(book.get_mastery_string(self))
             message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-            self.weapon_mastery[book.weapon_type]['level'] += 1
+            if book.type in [0, 1, 2]:
+                self.increase_weapon_mastery_after_reading(book.type)
+            if book.type == 3:
+                self.increase_trap_mastery_after_reading()
             self.backpack.remove(book)
         else:
             message = 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.'
@@ -1809,6 +1812,13 @@ class Hero:
         self.decrease_restless(2)
         return True
     
+    
+    def increase_weapon_mastery_after_reading(self, book_type):
+        self.weapon_mastery[book_type]['level'] += 1
+    
+    
+    def increase_trap_mastery_after_reading(self):
+        self.trap_mastery += 1
     
     def decrease_restless(self, number:int) -> bool:
         """Метод уменьшает значение непоседливости героя. Герой не может отдыхать когда непоседливость больше 0."""
