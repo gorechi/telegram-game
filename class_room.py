@@ -40,13 +40,19 @@ class Door:
 class Furniture:
     """Класс мебели."""
     
-    basic_lexemes = {
+    _basic_lexemes = {
         "полка": ['полка', 'полку'],
         "шкаф": ['шкаф'],
         "сундук": ['сундук'],
         "очаг": ['очаг']
     }
     
+    _locked_possibility = 4
+    """Вероятность того, что мебель будет заперта (если 4, то 1/4)."""
+
+    _initial_money_maximum = 50
+    """Верхний лимит денег в мебели при генерации."""
+
     
     def __init__(self, game, name='', furniture_type=0, can_rest=False):
         """
@@ -119,7 +125,7 @@ class Furniture:
     
     
     def get_names_list(self, cases:list=None) -> list:
-        names_list = Furniture.basic_lexemes[self.name]
+        names_list = Furniture._basic_lexemes[self.name]
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list
@@ -153,12 +159,12 @@ class Furniture:
                     can_place = True
             room.furniture.append(self)
             self.room = room
-        if dice(1, s_furniture_locked_possibility) == 1 and self.lockable:
+        if dice(1, Furniture._locked_possibility) == 1 and self.lockable:
             self.locked = True
             very_new_key = Key(self.game)
             very_new_key.place(castle)
         if dice(1, 100) <= 50:
-            new_money = Money(self.game, dice(1, s_furniture_initial_money_maximum))
+            new_money = Money(self.game, dice(1, Furniture._initial_money_maximum))
             self.loot.pile.append(new_money)
         return True
 
@@ -171,31 +177,62 @@ class Room:
     decor3 = readfile('decorate3', False)
     decor4 = readfile('decorate4', False)
     
+    _torch_die = 5
+    """
+    Кубик, который кидается чтобы определить, горит в комнате факел, или нет 
+    (берется выпадение одного конкретного значения).
+
+    """
+    
+    _stink_levels = {1: 'Немного', 2: 'Сильно', 3: 'Невыносимо'}
+    """Уровни вони."""
+    
+    _secrets = ('унитаз',
+                'аквариум',
+                'бак',
+                'камин',
+                'хлам')
+    """
+    Словарь секретных мест, которые могут встречаться в комнатах.
+    Если в тексте описания комнаты есть эти слова, 
+    то в ней может быть серкретный клад, который можно найти обыскав эти предметы.
+
+    """
+    
+
+    _plan_picture_width = 100
+    """Ширина картинки плана комнаты."""
+
+    _plan_picture_height = 120
+    """Высота картинки плана комнаты."""
+
     
     def __init__(self, game, floor, doors):
         self.game = game
         self.floor = floor
         self.doors = doors
-        self.money = 0
+        self.money:int = 0
         self.decorate()
-        self.loot = Loot(self.game)
-        self.secret_loot = Loot(self.game)
+        self.loot:Loot = Loot(self.game)
+        self.secret_loot:Loot = Loot(self.game)
         self.locked = False
-        self.position = -1
-        self.visited = ' '
+        self.position:int = -1
+        self.visited:str = ' '
         self.rune_place = self.game.empty_thing
-        self.light = True
-        self.traider = False
-        self.morgue = []
-        self.furniture = []
-        self.stink = 0
-        self.stink_levels = s_room_stink_levels
-        torch_die = s_room_torch_is_on_dice
-        if not self.light or dice(1, torch_die) != torch_die - 1:
-            self.torch = False
-        else:
-            self.torch = True
+        self.light:bool = True
+        self.traider:bool = False
+        self.morgue:list = []
+        self.furniture:list = []
+        self.stink:int = 0
+        self.stink_levels = Room._stink_levels
+        self.torch = self.set_torch()
         self.secret_word = self.get_secret_word()
+        self.last_seen_trap:Trap = None
+
+    def set_torch(self):
+        if not self.light or roll([Room._torch_die]) != Room._torch_die:
+            return False
+        return True
 
     
     def has_a_corpse(self) -> bool:
@@ -242,7 +279,7 @@ class Room:
             str: Секретное слово, связанное с комнатой. Если секретное слово не найдено, возвращается пустая строка.
         """
         secret_word = ''
-        for i in s_room_secrets_dictionary:
+        for i in Room._secrets:
             if self.description.find(i) > -1:
                 secret_word = i
         return secret_word
@@ -476,7 +513,7 @@ class Room:
         string3 += ' {0}'.format(self.doors[1].vertical_symbol())
         string4 = '=={0}=='.format(self.doors[2].horizontal_symbol())
         pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
-                s_room_plan_picture_width, s_room_plan_picture_height)
+                Room._plan_picture_width, Room._plan_picture_height)
         return True
 
     

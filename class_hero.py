@@ -5,11 +5,62 @@ from class_room import Furniture, Room
 from class_weapon import Weapon
 from class_backpack import Backpack
 from functions import howmany, normal_count, randomitem, showsides, tprint, roll
-from settings import *
 
 
 class Hero:
     """Класс героя игры"""
+    
+    _nightmare_probability = 3
+    """
+    Вероятность того, что герой увидит кошмар во время отдыха. 
+    Рассчитывается как 1/n, где n - это значение параметра.
+
+    """
+
+    _nightmare_divider = 2
+    """Коэффициент, на который делится страх если приснился кошмар."""
+
+    _steal_probability = 2 
+    """
+    Вероятность того, что героя обворуют во время отдыха. 
+    Рассчитывается как 1/n, где n - это значение параметра.
+
+    """
+    
+    _fear_limit = 5
+    """Значение уровня страха героя, при котором он начинает отказываться делать определенные вещи."""
+    
+    _critical_step = 5
+    """На сколько увеличивается вероятность критического удара оружием при увеличении мастерства на 1."""
+
+    _critical_multiplier = 2
+    """Коэффициент увеличения урона при критическом ударе."""
+    
+    _dark_damage_divider_die = 3
+    """Кубик, который кидается, чтобы выяснить, во сколько раз уменьшится урон от атаки в темноте."""
+    
+    _doors_dict = {'наверх': 0,
+                        'направо': 1,
+                        'вправо': 1,
+                        'право': 1,
+                        'налево': 3,
+                        'влево': 3,
+                        'лево': 3,
+                        'вниз': 2,
+                        'низ': 2,
+                        'вверх': 0,
+                        'верх': 0}
+    """Словарь направлений, в которых может пойти герой."""
+    
+    _poison_base_protection_die = 5
+    """Кубик, который кидается чтобы определить базовую защиту от отравления."""
+
+    _poison_additional_protection_die = 5
+    """
+    Кубик, который кидается чтобы определить дополнительную защиту от яда
+    когда у героя или монстра ядовитые доспехи или щит.
+
+    """
     
     def __init__(self,
                  game,
@@ -231,13 +282,13 @@ class Hero:
         if target.poisoned or target.venomous:
             return None
         if self.weapon.is_poisoned():
-            poison_die = roll([s_weapon_poison_level])
+            poison_die = roll([Weapon._weapon_poison_level])
         else:
             poison_die = 0
-        base_protection_die = roll([s_poison_base_protection_die])
+        base_protection_die = roll([Hero._poison_base_protection_die])
         additional_protection_die = 0
         if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = roll([s_poison_additional_protection_die])
+            additional_protection_die = roll([Hero._poison_additional_protection_die])
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
@@ -468,11 +519,11 @@ class Hero:
         """Метод моделирует сон героя во время отдыха."""
         
         message = []
-        dream_count = roll([s_nightmare_probability])
+        dream_count = roll([Hero._nightmare_probability])
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
                            Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
-            self.fear = self.fear // s_nightmare_divider
+            self.fear = self.fear // Hero._nightmare_divider
         else:
             message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
             self.fear = 0
@@ -489,7 +540,7 @@ class Hero:
         
         """
         
-        steal_count = roll([s_steal_probability])
+        steal_count = roll([Hero._steal_probability])
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
@@ -782,7 +833,7 @@ class Hero:
         strength_die = roll([strength])
         if self.check_light():
             return strength_die * rage
-        return strength_die // roll([s_dark_damage_divider_dice])
+        return strength_die // roll([Hero._dark_damage_divider_die])
                 
     
     def generate_weapon_attack(self, target:Monster) -> int:
@@ -793,9 +844,9 @@ class Hero:
             return target.health
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
-        critical_probability = weapon_mastery * s_critical_step
+        critical_probability = weapon_mastery * Hero._critical_step
         if roll([100]) <= critical_probability and not self.poisoned:
-            weapon_attack = weapon_attack * s_critical_multiplier
+            weapon_attack = weapon_attack * Hero._critical_multiplier
         return weapon_attack
     
     
@@ -1142,10 +1193,10 @@ class Hero:
         """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
         room = self.current_position
-        door = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[Hero._doors_dict[direction]]
         if door.empty:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
-        elif self.fear >= s_fear_limit:
+        elif self.fear >= Hero._fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
             what_position = room.position + self.floor.directions_dict[direction]
@@ -1257,7 +1308,7 @@ class Hero:
         """Метод обрабатывает команду "идти". """
         
         game = self.game
-        door = self.current_position.doors[s_hero_doors_dict[direction]]
+        door = self.current_position.doors[Hero._doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
             tprint(game, f'{self.name} не знает такого направления!')
             return False
@@ -1351,7 +1402,7 @@ class Hero:
         if enemy_in_room:
             tprint(game, f'{enemy_in_room.name} мешает толком осмотреть комнату.')
             return False
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
                 Страх сковал {self.g(["его", "ее"])} по рукам и ногам.')
             return False
@@ -1525,7 +1576,7 @@ class Hero:
         
         """
         
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             if print_message:
                 tprint(self.game, f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
             return True
@@ -1593,7 +1644,7 @@ class Hero:
         game = self.game
         room = self.current_position
         key = self.backpack.get_first_item_by_class(Key)
-        door = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[Hero._doors_dict[direction]]
         if  not door.locked:
             tprint(game, 'В той стороне нечего открывать.')
             return False
@@ -1609,7 +1660,7 @@ class Hero:
         
         if not self.check_if_hero_can_open():
             return False
-        if item == '' or not s_hero_doors_dict.get(item, False):
+        if item == '' or not Hero._doors_dict.get(item, False):
             return self.open_furniture(what=item)
         else:
             return self.open_door(direction=item)
@@ -1665,7 +1716,7 @@ class Hero:
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
             return False
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, \
                 но ничего не получается.')
             return False
@@ -1744,7 +1795,7 @@ class Hero:
         """Метод проверки, может ли герой сейчас читать."""
         
         game = self.game
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.')
             return False
         if not self.check_light():
@@ -1759,11 +1810,11 @@ class Hero:
         room = self.current_position
         if room.light:
             return True
-        if self.weapon.element() in s_glowing_elements:
+        if self.weapon.element() in Rune._glowing_elements:
             return True
-        if self.shield.element() in s_glowing_elements:
+        if self.shield.element() in Rune._glowing_elements:
             return True
-        if self.armor.element() in s_glowing_elements:
+        if self.armor.element() in Rune._glowing_elements:
             return True
         return False
         
