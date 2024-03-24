@@ -4,16 +4,15 @@ from typing import Any, NoReturn
 
 from class_basic import *
 from functions import howmany, randomitem, tprint, roll
-from settings import *
 
 
 class Rune:
     
     """ Класс Руна. """
     
-    elements = [1, 3, 7, 12]
+    _elements = (1, 3, 7, 12)
     
-    lexemes = {
+    _lexemes = {
             "nom": "руна",
             "accus": "руну",
             "gen": "руны",
@@ -22,15 +21,49 @@ class Rune:
             "inst": "руной"
             }
     
+    _poison_probability = 3
+    """
+    Вероятность того, что руна будет отравленной. 
+    Цифра указывает на количество граней кубика, который надо кинуть. 
+    Если 1 - руна отравлена.
+
+    """
+
+    _elements_dictionary = {1: 'огня',
+                        2: 'пламени',
+                        3: 'воздуха',
+                        4: 'света',
+                        6: 'ветра',
+                        7: 'земли',
+                        8: 'лавы',
+                        10: 'пыли',
+                        12: 'воды',
+                        13: 'пара',
+                        14: 'камня',
+                        15: 'дождя',
+                        19: 'грязи',
+                        24: 'потопа'}
+    """Словарь стихий."""
+
+    _glowing_elements = [1, 2, 4]
+    """Массив стихий, которые заставляют оружие светиться в темноте"""
+
+    _minimum_price = 20
+    """Минимальная цена руны"""
+
+    _maximum_price = 30
+    """Максимальная цена руны"""
+
+    
     def __init__(self, game):
         self.game = game
         self.damage = 4 - floor(sqrt(dice(1, 15)))
         self.defence = 3 - floor(sqrt(dice(1, 8)))
-        self.element = randomitem(Rune.elements)
+        self.element = randomitem(Rune._elements)
         self.can_use_in_fight = False
         self.name = 'руна'
         self.lexemes = self.generate_lexemes()
-        self.description = f'{self.name} {s_elements_dictionary[self.element]}'
+        self.description = f'{self.name} {Rune._elements_dictionary[self.element]}'
         self.empty = False
         self.check_if_poisoned()
         self.base_price = self.define_base_price()
@@ -38,13 +71,13 @@ class Rune:
          
     def generate_lexemes(self) -> dict:
         lexemes = {}
-        for key in Rune.lexemes:
-            lexemes[key] = f'{Rune.lexemes[key]} {s_elements_dictionary[self.element]}'
+        for key in Rune._lexemes:
+            lexemes[key] = f'{Rune._lexemes[key]} {Rune._elements_dictionary[self.element]}'
         return lexemes
     
     
     def __str__(self) -> str:
-        return f'{self.name} {s_elements_dictionary[self.element]} - ' \
+        return f'{self.name} {Rune._elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
 
       
@@ -61,14 +94,14 @@ class Rune:
     
     
     def define_base_price(self) -> int:
-        return s_rune_maximum_price
+        return Rune._maximum_price
 
     
     def check_if_poisoned(self) -> NoReturn:    
         
         """ Метод определяет, ядовитая руна, или нет. """
         
-        if dice(1, s_rune_poison_probability) == 1:
+        if roll([Rune._poison_probability]) == 1:
             self.poison = True
             self.description = f'ядовитая {self.description}'
         else:
@@ -198,6 +231,9 @@ class Matches:
     
     """ Класс Спички. """
     
+    _max_quantity = 10
+    """Кубик, который нужно кинуть чтобы определить, сколько спичек в коробке"""
+    
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -221,7 +257,7 @@ class Matches:
     
     
     def get_quantity(self) -> int:
-        return roll([s_max_matches_quantity])
+        return roll([Matches._max_quantity])
 
     
     def get_quantity_text(self, quantity:int) -> str:
@@ -362,33 +398,18 @@ class Map:
         В мирное время выводит на экран карту замка.
 
         Параметры:
-        - who_is_using - герой, который использует карту
+        - who - герой, который использует карту
         - in_action - признак того, что предмет используется в бою. По умолчанию False.
 
         """
         game = self.game
         floor = who.floor
-        room = who.current_position
-        if not in_action:
-            if who.fear >= s_fear_limit:
-                tprint(
-                    game, 
-                    f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.', 'direction')
-                return False
-            elif not room.light:
-                tprint(
-                    game, 
-                    f'В комнате слишком темно чтобы разглядывать карту', 'direction')
-                return False
-            else:
-                tprint(
-                    game, 
-                    f'{who.name} смотрит на карту этажа замка.', 'direction')
-                floor.map()
-                return True
-        else:
-            tprint(game, 'Во время боя это совершенно неуместно!')
-            return False
+        read_map, map_text = who.generate_map_text(in_action)
+        tprint(game, map_text, 'direction')
+        if read_map:    
+            floor.map()
+            return True
+        return False
 
     
     def take(self, who) -> NoReturn:

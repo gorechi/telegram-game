@@ -11,7 +11,6 @@ from class_weapon import Weapon
 from class_allies import Trader
 from class_backpack import Backpack
 from functions import randomitem, tprint
-from settings import *
 
 
 class Empty():
@@ -80,6 +79,31 @@ class Game():
                         'поменять',
                         'использовать')
     """Список комманд во время схватки."""
+    
+    _castle_floors_sizes = {
+        1: {
+        'rows': 5, 
+        'rooms': 5,
+        'traps_difficulty': 4, 
+        'how_many': {
+            'монстры': 10,
+            'оружие': 10,
+            'щит': 5,
+            'доспех': 5,
+            'зелье': 10,
+            'мебель': 10,
+            'книга': 5,
+            'очаг': 2,
+            'руна': 10,
+            'ловушка': 3}
+        }
+    }
+    """Размеры этажей замка. Каждый подмассив - это этаж замка."""
+    
+    _how_many_traders = 1
+    """Сколько торговцев в игре"""
+
+
 
     def __init__(self, chat_id:str, bot, hero:Hero=None):
         self.classes = { 
@@ -178,8 +202,8 @@ class Game():
         """Метод создания этажей замка"""
         
         floors = []
-        for i in s_castle_floors_sizes:
-            floor = Floor(self, i, s_castle_floors_sizes[i])
+        for i in Game._castle_floors_sizes:
+            floor = Floor(self, i, Game._castle_floors_sizes[i])
             floors.append(floor)
         return floors
     

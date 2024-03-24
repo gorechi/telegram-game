@@ -184,6 +184,18 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
+        if not in_action:
+            if self.fear >= Hero._fear_limit:
+                return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
+            elif not self.current_position.light:
+                return False, f'В комнате слишком темно чтобы разглядывать карту'
+            else:
+                return True, f'{self.name} смотрит на карту этажа замка.'
+        else:
+            return False, 'Во время боя это совершенно неуместно!'
+    
+    
     def intel_wound(self) -> str:
         """
         Наносит персонажу ранение, влияющее на интеллект, увеличивая счетчик таких ранений на 1.
@@ -282,7 +294,7 @@ class Hero:
         if target.poisoned or target.venomous:
             return None
         if self.weapon.is_poisoned():
-            poison_die = roll([Weapon._weapon_poison_level])
+            poison_die = roll([Weapon._poison_level])
         else:
             poison_die = 0
         base_protection_die = roll([Hero._poison_base_protection_die])

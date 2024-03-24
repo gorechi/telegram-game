@@ -4,10 +4,28 @@ from class_basic import Money
 from class_items import Key, Map, Matches, Rune, Book
 from class_room import Door, Room
 from functions import pprint, randomitem
-from settings import *
 
 
 class Floor:
+    
+    _dark_rooms_ratio = 8
+    """Какая часть комнат замка будет темными (если 5, то будет каждая пятая комната)."""
+    
+    _locked_rooms_ratio = 8
+    """Какая часть комнат замка будет заперта (если 5, то будет каждая пятая комната)."""
+    
+    _min_money_in_locked_room = 15
+    """Минимальное количество денег в запертой комнате."""
+    
+    _max_money_in_locked_room = 40
+    """Максимальное количество денег в запертой комнате."""
+    
+    _map_width_coefficient = 72
+    """Коэффициент для расчета ширины карты."""
+    
+    _map_height_coefficient = 90
+    """Коэффициент для расчета высоты карты."""
+    
     def __init__(self, game, floor_number:int, data:dict):
         self.game = game
         self.floor_number = floor_number
@@ -299,7 +317,7 @@ class Floor:
         
         """
         
-        self.how_many_dark_rooms = len(self.plan) // s_dark_rooms_ratio
+        self.how_many_dark_rooms = len(self.plan) // Floor._dark_rooms_ratio
         dark_rooms = randomitem(self.plan, False, self.how_many_dark_rooms)
         for room in dark_rooms:
             room.light = False
@@ -312,10 +330,10 @@ class Floor:
         
         """
         
-        how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
+        how_many_locked_rooms = len(self.plan) // Floor._locked_rooms_ratio
         for _ in range(how_many_locked_rooms):
             room = randomitem([r for r in self.plan[1::] if not r.locked])
-            new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
+            new_money = Money(self.game, dice(Floor._min_money_in_locked_room, Floor._max_money_in_locked_room))
             room.lock()
             monster = room.monsters('random')
             if not monster:
@@ -357,7 +375,7 @@ class Floor:
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
-        pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
+        pprint(game, text, r*Floor._map_width_coefficient, f*Floor._map_height_coefficient)
         
     
     def get_random_room_with_furniture(self) -> Room:
