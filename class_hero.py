@@ -168,6 +168,7 @@ class Hero:
                             'сменить': self.change,
                             'поменять': self.change,
                             'test': self.test,
+                            'обезвредить': self.trap,
                             'улучшить': self.enchant}
 
     
@@ -184,6 +185,83 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def disarm(self, what:str) -> bool:
+        """
+        Пытается обезвредить указанный объект. В текущей реализации поддерживается обезвреживание ловушек.
+        
+        :param what: Строка, указывающая, что нужно обезвредить. Поддерживаются значения 'ловушку', 'ловушка', и пустая строка для обезвреживания ловушки.
+        :return: Возвращает True, если удалось обезвредить объект, иначе False.
+        """
+        if what in ['ловушку', 'ловушка', '']:
+            return self.disarm_trap()
+    
+    
+    def disarm_trap(self) -> bool:
+        """
+        Пытается обезвредить ловушку в текущем помещении.
+
+        Метод проверяет наличие ловушки в текущем помещении (`current_position`). Если ловушка отсутствует,
+        выводит сообщение о том, что герой не видит ловушек, и возвращает `False`. В случае обнаружения ловушки
+        формирует сообщение о попытке обезвреживания и вызывает метод `try_to_disarm_trap()` для попытки обезвреживания.
+        Результат работы `try_to_disarm_trap()` добавляется к сообщению, которое затем выводится.
+
+        :return: Возвращает `True`, если ловушка успешно обезврежена, иначе `False`.
+        """
+        trap = self.current_position.get_trap()
+        if not trap:
+            tprint(self.game, f'{self.name} не видит в этом помещении никаких ловушек.')
+            return False
+        message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where.lexemes['dat']}.']
+        message.extend(self.try_to_disarm_trap())
+        tprint(self.game, message)
+    
+    
+    def try_to_disarm_trap(self, trap) -> list[str]:
+        """
+        Пытается обезвредить ловушку, с которой столкнулся герой.
+
+        Этот метод сначала рассчитывает шанс героя на успешное обезвреживание ловушки, 
+        затем сравнивает его со сложностью ловушки. Если шанс обезвреживания меньше сложности ловушки, 
+        ловушка срабатывает, вызывая соответствующий метод. В противном случае ловушка считается успешно обезвреженной, 
+        и герой получает опыт в обезвреживании ловушек.
+
+        Параметры:
+            - trap: Объект ловушки, которую необходимо обезвредить.
+
+        Возвращает:
+            Список строк, описывающих результат попытки обезвреживания ловушки.
+        """
+        disarm_chance = self.get_disarm_trap_chance()
+        trap_difficulty = trap.get_difficulty()
+        if disarm_chance < trap_difficulty:
+            return trap.trigger(self)
+        message = trap.disarm()
+        message.append(f'{self.name} теперь лучше понимает, какую опасность представляют ловушки, и как с ними правильно обращаться.')
+        self.increase_trap_mastery()
+        return message
+    
+    
+    def increase_trap_mastery(self):
+        """
+        Увеличивает мастерство героя в обезвреживании ловушек на 1.
+        
+        Этот метод увеличивает значение атрибута `trap_mastery` на единицу, что отражает улучшение навыков героя в обнаружении и обезвреживании ловушек.
+        """
+        self.trap_mastery += 1    
+
+
+    def get_disarm_trap_chance(self) -> int:
+        """
+        Рассчитывает и возвращает шанс героя на успешное обезвреживание ловушки.
+        
+        Шанс обезвреживания ловушки зависит от ловкости (`dext`) героя и его мастерства обезвреживания ловушек (`trap_mastery`).
+        Значение шанса определяется путем броска кубика с параметрами, зависящими от указанных атрибутов.
+        
+        :return: Целое число, представляющее шанс на успешное обезвреживание ловушки.
+        """
+        return roll([self.dext, self.trap_mastery])
+                
+        
     def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
         if not in_action:
             if self.fear >= Hero._fear_limit:
@@ -1262,10 +1340,19 @@ class Hero:
     
     
     def detect_trap(self, trap) -> bool:
-        if not trap.seen:
-            detection = roll([self.intel]) - roll([self.wounds['intel']]) + self.trap_mastery
-            if detection > trap.difficulty:
-                trap.seen = True
+        """
+        Пытается обнаружить ловушку, основываясь на интеллекте героя, его мастерстве обнаружения ловушек и ранениях.
+        
+        :param trap: Объект ловушки, который необходимо обнаружить.
+        :return: Возвращает True, если ловушка обнаружена, иначе False.
+        """
+        if trap.seen:
+            self.current_position.last_seen_trap = trap
+            return True
+        detection = roll([self.intel]) - roll([self.wounds['intel']]) + self.trap_mastery
+        if detection > trap.difficulty:
+            trap.seen = True
+            self.current_position.last_seen_trap = trap
         return trap.seen
     
     
@@ -1483,6 +1570,10 @@ class Hero:
         if what_to_search.locked:
             tprint(game, f'Нельзя обыскать {what_to_search.lexemes["accus"]}. Там заперто.')
             return False
+        if what_to_search.check_trap():
+            tprint(game, f'К несчастью в {what_to_search.lexemes["prep"]} кто-то установил ловушку.')
+            what_to_search.trap.trigger(self)
+            return False
         if self.check_monster_in_ambush(place=what_to_search):
             return False
         return self.get_loot_from_furniture(what=what_to_search)
@@ -1640,10 +1731,13 @@ class Hero:
             tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
             return False
         if len(what_is_locked) > 1:
-            tprint(game, f'В комнате слишком много запертых вещей. \
-                {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
+            tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
             return False
         furniture = what_is_locked[0]
+        if furniture.check_trap():
+            tprint(game, f'К несчастью в {furniture.lexemes["prep"]} кто-то установил ловушку.')
+            furniture.trap.trigger(self)
+            return False
         self.backpack.remove(key)
         furniture.locked = False
         tprint(game, f'{self.name} отпирает {furniture.lexemes["accus"]} ключом.')

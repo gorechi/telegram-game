@@ -1,3 +1,10 @@
 from functions import roll
 
-print(roll([0, 1, 1, 0, 1]))
+dex = 4
+intel = 1
+stren = 10
+mastery = 4
+
+
+for _ in range (20):
+    print(roll([dex, mastery]))

@@ -4,7 +4,6 @@ from typing import NoReturn
 from class_basic import Loot, Money
 from class_items import Key
 from functions import pprint, randomitem, readfile, tprint, roll
-from settings import *
 
 
 class Door:
@@ -113,6 +112,12 @@ class Furniture:
     
     def put(self, item):
         self.loot.pile.append(item)
+    
+    
+    def check_trap(self) -> bool:
+        if self.trap.activated:
+            return True
+        return False
    
     
     def monster_in_ambush(self):
@@ -256,6 +261,13 @@ class Room:
         """
         corpses = [corpse.description for corpse in self.morgue]
         return(corpses)
+
+    
+    def get_trap(self):
+        if self.last_seen_trap:
+            if self.last_seen_trap.activated:
+                return self.last_seen_trap
+        return None
 
     
     def show_furniture(self) -> list:
@@ -585,12 +597,12 @@ class Trap:
     ]
     
     
-    def __init__(self, game, where=None):
+    def __init__(self, game, where=None, limit=0):
         self.game = game
         self.activated = False
         self.seen = False
         self.triggered = False
-        self.difficulty = 0
+        self.difficulty = self.set_difficulty(limit)
         self.detection_text = None
         self.where = where
         self.actions = {
@@ -614,6 +626,10 @@ class Trap:
     
     def set_difficulty(self, limit:int):
         self.difficulty = roll([limit])
+        
+
+    def get_disarm_difficulty(self) -> int:
+        return self.difficulty * 2
     
     
     def deactivate(self) -> bool:
@@ -630,30 +646,27 @@ class Trap:
         return True
       
     
-    def trigger(self, target) -> bool:
+    def trigger(self, target) -> list[str]:
         """
-        Активирует ловушку и применяет её эффект к цели.
+        Активирует ловушку и применяет её эффекты к цели.
 
-        Этот метод выбирает случайный тип действия из доступных типов ловушек, 
-        затем применяет соответствующее действие к цели. Если все типы действий были испробованы 
-        и ни одно не сработало, выводится сообщение о том, что ловушка не может причинить урон цели.
+        Этот метод копирует список типов ловушек, выбирает случайный тип и применяет соответствующее действие к цели.
+        Если у ловушки нет метода для выбранного типа, возбуждается исключение.
+        После активации ловушка деактивируется, становится видимой и помечается как сработавшая.
 
-        Параметры:
-            - target: Цель, к которой применяется ловушка. Должен иметь атрибуты, необходимые для действий ловушки.
+        Args:
+            target: Цель, к которой применяется эффект ловушки.
 
-        Возвращает:
-            bool:   
-            - Возвращает True, если ловушка успешно сработала и причинила урон цели. 
-            - Возвращает False, если ловушка не смогла причинить урон.
+        Returns:
+            Список строк с сообщениями о последствиях активации ловушки.
         """
         types = Trap.types.copy()
-        place = self.where.lexemes.get('prep', 'мебели')
-        message = [f'От неловкого прикосновения в {place} срабатывает ловушка']
+        message = [f'От неловкого прикосновения в ловушка начинает противно щелкать, а потом взрывается.']
         while True:
             if not types:
-                message.append(f'{target.name} настолько {target.g(['некчемен', 'некчемна'])}, что ловушка просто не может причинить еще какой-то урон.')
-                tprint(self.game, message)
-                return False
+                message.append(f'{target.name} настолько {target.g(['некчемен', 'некчемна'])},' 
+                               f' что ловушка не может причинить еще какой-то дополнительный урон.')
+                return message
             action_type = randomitem(types)
             types.remove(action_type)
             action = self.actions.get(action_type, False)
@@ -662,8 +675,17 @@ class Trap:
             action_text = action(target)
             if action_text:
                 message.append(action_text)
-                tprint(self.game, message)
-                return True
+                self.deactivate()
+                self.seen = True
+                self.triggered = True
+                return message
+    
+    
+    def disarm(self) -> list[str]:
+        self.deactivate()
+        self.seen = True
+        self.triggered = False
+        return [f'Ловушка тихонько щелкает и больше не издает ни звука. Похоже, она больше не опасна.']
     
     
     def damage_intel(self, target) -> str:
