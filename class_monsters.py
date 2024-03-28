@@ -92,7 +92,7 @@ class Monster:
         self.lexemes = lexemes
         self.stren = stren
         self.health = health
-        self.actions = actions.split(',')
+        self.actions = actions
         self.state = state
         self.corpse = corpse
         self.floor = None
@@ -805,11 +805,11 @@ class Plant(Monster):
     """
     def __init__(self,
                  game,
-                 name,
-                 lexemes,
-                 stren,
-                 health,
-                 actions,
+                 name='',
+                 lexemes={},
+                 stren=0,
+                 health=0,
+                 actions=[],
                  state='растёт',
                  agressive=False,
                  carry_weapon=False,
@@ -889,16 +889,16 @@ class Berserk(Monster):
 
     def __init__(self,
                  game,
-                 name,
-                 lexemes,
-                 stren,
-                 health,
-                 actions,
-                 state,
-                 agressive,
-                 carry_weapon,
-                 carry_shield,
-                 wear_armor):
+                 name='',
+                 lexemes={},
+                 stren=0,
+                 health=0,
+                 actions=[],
+                 state='мечется',
+                 agressive=True,
+                 carry_weapon=True,
+                 carry_shield=True,
+                 wear_armor=True):
         """
         Инициализирует экземпляр класса Berserk с заданными параметрами.
         
@@ -955,8 +955,8 @@ class Shapeshifter(Monster):
     """
     def __init__(self, 
                 game, 
-                name,
-                lexemes, 
+                name='',
+                lexemes={}, 
                 stren=10, 
                 health=20, 
                 actions='бьет', 
@@ -1137,8 +1137,8 @@ class Animal(Monster):
     
     def __init__(self, 
                  game, 
-                 name,
-                 lexemes, 
+                 name='',
+                 lexemes={}, 
                  stren=10, 
                  health=20, 
                  actions='бьет', 
@@ -1176,8 +1176,8 @@ class WalkingDead(Monster):
     
     def __init__(self, 
                  game, 
-                 name,
-                 lexemes, 
+                 name='',
+                 lexemes={}, 
                  stren=10, 
                  health=20, 
                  actions='бьет', 

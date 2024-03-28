@@ -168,7 +168,7 @@ class Hero:
                             'сменить': self.change,
                             'поменять': self.change,
                             'test': self.test,
-                            'обезвредить': self.trap,
+                            'обезвредить': self.disarm,
                             'улучшить': self.enchant}
 
     
@@ -211,7 +211,7 @@ class Hero:
         if not trap:
             tprint(self.game, f'{self.name} не видит в этом помещении никаких ловушек.')
             return False
-        message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where.lexemes['dat']}.']
+        message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where.lexemes["dat"]}.']
         message.extend(self.try_to_disarm_trap())
         tprint(self.game, message)
     
@@ -1654,7 +1654,7 @@ class Hero:
     
     def take_item_by_name(self, name):
         current_loot = self.current_position.loot
-        item = current_loot.get_first_item_by_name(item)
+        item = current_loot.get_first_item_by_name(name)
         if item:
             item.take(self)
             current_loot.remove(item)

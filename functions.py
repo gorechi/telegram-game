@@ -83,20 +83,19 @@ def randomitem(items_list, how_many:int=1, need_number:bool=False):
         Если how_many = 1, возвращается один случайный элемент списка items_list\n
         Если how_many > 1, возвращается список из how_many случайных элементов списка items_list. Элементы не повторяются.
     """
-    if not isinstance(items_list, list):
-        raise TypeError('В метод randomitem передан не массив')
+    if not (isinstance(items_list, list) or isinstance(items_list, tuple)):
+        raise TypeError('В метод randomitem передан не массив или кортеж')
     if not items_list:
         raise ValueError('В метод randomitem передан пустой массив')
-    if not how_many > len(items_list):
+    if how_many > len(items_list):
         raise ValueError('В методе randomitem запрошено больше элементов, чем длина переданного списка')
-    result_list = sample(items_list, how_many)
     if how_many == 1:
-        item = result_list[0]
+        index = randint(0, len(items_list)-1)
+        item = items_list[index]
         if need_number:
-            item_index = items_list.index(item)
-            return item, item_index
+            return item, index
         return item
-    return result_list
+    return sample(items_list, how_many)
 
 
 def howmany(a, string):
