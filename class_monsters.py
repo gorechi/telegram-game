@@ -779,7 +779,7 @@ class Monster:
                                                      and a.position != 0)]
             if not bool(empty_rooms):
                 return False
-            room = randomitem(empty_rooms, False)
+            room = randomitem(empty_rooms)
         self.current_position = room
         floor.monsters_in_rooms[room].append(self)
         if old_place:
@@ -790,7 +790,7 @@ class Monster:
                 if i.can_hide:
                     places_to_hide.append(i)
             places_to_hide.append(room)
-            self.hiding_place = randomitem(places_to_hide, False)
+            self.hiding_place = randomitem(places_to_hide)
         if self.stink:
             floor.stink(room, 3)
             floor.stink_map()
@@ -872,7 +872,7 @@ class Plant(Monster):
             room = room_to_place
         else:
             empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
-            room = randomitem(empty_rooms, False)
+            room = randomitem(empty_rooms)
         self.current_position = room
         self.floor = floor
 
@@ -1119,13 +1119,13 @@ class Vampire(Monster):
             room = room_to_place
         else:
             empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
-            room = randomitem(empty_rooms, False)
+            room = randomitem(empty_rooms)
         places_to_hide = []
         for i in room.furniture:
             if i.can_hide:
                 places_to_hide.append(i)
         places_to_hide.append(room)
-        where_to_hide = randomitem(places_to_hide, False)
+        where_to_hide = randomitem(places_to_hide)
         self.current_position = room
         self.hiding_place = where_to_hide
         self.floor = floor

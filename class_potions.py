@@ -40,9 +40,9 @@ class Potion:
     def place(self, castle, room=None):
         if not room:
             rooms = castle.plan
-            room = randomitem(rooms, False)
+            room = randomitem(rooms)
         if room.furniture:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)

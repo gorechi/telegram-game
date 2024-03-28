@@ -105,8 +105,8 @@ class Furniture:
     
     
     def on_create(self):
-        self.state = randomitem(self.states, False)
-        self.where = randomitem(self.wheres, False)
+        self.state = randomitem(self.states)
+        self.where = randomitem(self.wheres)
         return True
 
     
@@ -159,7 +159,7 @@ class Furniture:
         else:
             can_place = False
             while not can_place:
-                room = randomitem(castle.plan, False)
+                room = randomitem(castle.plan)
                 if self.type not in room.furniture_types():
                     can_place = True
             room.furniture.append(self)
@@ -488,7 +488,7 @@ class Room:
         all_monsters = self.floor.monsters_in_rooms[self]
         if all_monsters:
             if mode == 'random':
-                return randomitem(all_monsters, False)
+                return randomitem(all_monsters)
             elif mode == 'first':
                 return all_monsters[0]
             else:
@@ -562,7 +562,7 @@ class Room:
     def get_random_unlocked_furniture(self) -> Furniture:
         if self.furniture:
             furniture_list = [f for f in self.furniture if not f.locked]
-            return randomitem(furniture_list, neednumber=False)
+            return randomitem(furniture_list)
         return None
 
 

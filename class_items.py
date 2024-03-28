@@ -122,11 +122,11 @@ class Rune:
         rooms_with_secrets = castle.secret_rooms()
         if not room:
             rooms = castle.plan
-            room = randomitem(rooms, False)
+            room = randomitem(rooms)
         if room in rooms_with_secrets:
             room.secret_loot.add(self)
         elif room.furniture:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
@@ -295,9 +295,9 @@ class Matches:
         
         if not room:
             rooms = [i for i in castle.plan if not i.locked and i.light]
-            room = randomitem(rooms, False)
+            room = randomitem(rooms)
         if room.furniture:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
@@ -376,9 +376,9 @@ class Map:
         
         if not room:
             rooms = castle.plan
-            room = randomitem(rooms, False)
+            room = randomitem(rooms)
         if room.furniture:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
@@ -643,7 +643,7 @@ class Book:
     def place(self, floor, room=None):
         if not room:
             room = floor.get_random_room_with_furniture()
-        furniture = randomitem(room.furniture, False)
+        furniture = randomitem(room.furniture)
         furniture.put(self)
         return True
     
