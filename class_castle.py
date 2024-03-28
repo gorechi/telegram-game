@@ -318,7 +318,7 @@ class Floor:
         """
         
         self.how_many_dark_rooms = len(self.plan) // Floor._dark_rooms_ratio
-        dark_rooms = randomitem(self.plan, False, self.how_many_dark_rooms)
+        dark_rooms = randomitem(self.plan, self.how_many_dark_rooms)
         for room in dark_rooms:
             room.light = False
 
@@ -383,7 +383,7 @@ class Floor:
         """ Метод возвращает случайную комнату с мебелью. """
     
         rooms = [a for a in self.plan if a.furniture]
-        return randomitem(rooms, False)
+        return randomitem(rooms)
     
     
     def get_random_unlocked_room(self) -> Room:
@@ -391,4 +391,4 @@ class Floor:
         """ Метод возвращает случайную незапертую комнату. """
         
         rooms = [a for a in self.plan if (not a.locked)]
-        return randomitem(rooms, False)
+        return randomitem(rooms)

@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, sample
 
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
@@ -71,33 +71,32 @@ def showsides(side1, side2, castle) -> list:
     return message
 
 
-def randomitem(list, neednumber=False, how_many:int=1):
+def randomitem(items_list, how_many:int=1, need_number:bool=False):
     """Возвращает случайные элементы списка
 
     Args:
-        list - список, из которого нужно начитать случайный элемент\n
-        neednumber (boolean) - признак того, что кроме самого элемента нужно вернуть и его номер в списке\n
-        howMany (integer) - число случайных элементов списка, которые нужно вернуть\n
+        items_list - список, из которого нужно начитать случайный элемент\n
+        need_number (boolean) - признак того, что кроме самого элемента нужно вернуть и его номер в списке\n
+        how_many (integer) - число случайных элементов списка, которые нужно вернуть\n
 
     Returns:
-        Если howMany = 1, возвращается один случайный элемент списка list\n
-        Если howMany > 1, возвращается список из howMany случайных элементов списка list. Элементы не повторяются.
+        Если how_many = 1, возвращается один случайный элемент списка items_list\n
+        Если how_many > 1, возвращается список из how_many случайных элементов списка items_list. Элементы не повторяются.
     """
-    if len(list) == 0:
-        return None
-    if not how_many or how_many < 2:
-        a = randint(0, len(list) - 1)
-        if neednumber:
-            return list[a], a
-        return list[a]
-    else:
-        result = []
-        while how_many > 0:
-            a = randint(0, len(list) - 1)
-            if list[a] not in result:
-                result.append(list[a])
-                how_many -= 1
-        return result
+    if not isinstance(items_list, list):
+        raise TypeError('В метод randomitem передан не массив')
+    if not items_list:
+        raise ValueError('В метод randomitem передан пустой массив')
+    if not how_many > len(items_list):
+        raise ValueError('В методе randomitem запрошено больше элементов, чем длина переданного списка')
+    result_list = sample(items_list, how_many)
+    if how_many == 1:
+        item = result_list[0]
+        if need_number:
+            item_index = items_list.index(item)
+            return item, item_index
+        return item
+    return result_list
 
 
 def howmany(a, string):

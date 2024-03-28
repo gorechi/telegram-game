@@ -242,7 +242,7 @@ class Game():
             parsed_data = [i for i in parsed_data if int(i.get('floor')) >= floor]
         if random:
             for _ in range(how_many):
-                i = randomitem(parsed_data, False)
+                i = randomitem(parsed_data)
                 new_game_object = self.object_from_json(json_object=i)
                 objects.append(new_game_object)
         else:
@@ -264,7 +264,7 @@ class Game():
         if weapon_type:
             parsed_data = [i for i in parsed_data if i['type'] == weapon_type]
         for _ in range(how_many):
-            i = randomitem(parsed_data, False)
+            i = randomitem(parsed_data)
             new_game_object = self.object_from_json(json_object=i)
             objects.append(new_game_object)
         if len(objects) == 1:

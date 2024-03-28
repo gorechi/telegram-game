@@ -506,14 +506,14 @@ class Armor(Protection):
         if room_to_place:
             room = room_to_place
         else:
-            room = randomitem(castle.plan, False)
+            room = randomitem(castle.plan)
         monster = room.monsters('random')
         if monster:
             if monster.wear_armor:
                 monster.take(self)
                 return True
         elif len(room.furniture) > 0:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             if furniture.can_contain_weapon:
                 furniture.put(self)
                 return True
@@ -689,14 +689,14 @@ class Shield (Protection):
         if room_to_place:
             room = room_to_place
         else:
-            room = randomitem(castle.plan, False)
+            room = randomitem(castle.plan)
         monster = room.monsters('random')
         if monster:
             if monster.carry_shield:
                 monster.take(self)
                 return True
         elif len(room.furniture) > 0:
-            furniture = randomitem(room.furniture, False)
+            furniture = randomitem(room.furniture)
             if furniture.can_contain_weapon:
                 furniture.put(self)
                 return True
