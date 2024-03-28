@@ -15,7 +15,9 @@ def roll(dice:list) -> int:
     """
     result = 0 
     for i in dice:
-        result += randint(1, int(i))
+        i = int(i)
+        if i > 0:
+            result += randint(1, i)
     return result
 
 def readfile(filename, divide, divider='|'):

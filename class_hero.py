@@ -1,17 +1,66 @@
-from random import randint as dice
-
 from class_items import Book, Key, Money, Rune
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room
 from class_weapon import Weapon
 from class_backpack import Backpack
-from functions import howmany, normal_count, randomitem, showsides, tprint
-from settings import *
+from functions import howmany, normal_count, randomitem, showsides, tprint, roll
 
 
 class Hero:
     """Класс героя игры"""
+    
+    _nightmare_probability = 3
+    """
+    Вероятность того, что герой увидит кошмар во время отдыха. 
+    Рассчитывается как 1/n, где n - это значение параметра.
+
+    """
+
+    _nightmare_divider = 2
+    """Коэффициент, на который делится страх если приснился кошмар."""
+
+    _steal_probability = 2 
+    """
+    Вероятность того, что героя обворуют во время отдыха. 
+    Рассчитывается как 1/n, где n - это значение параметра.
+
+    """
+    
+    _fear_limit = 5
+    """Значение уровня страха героя, при котором он начинает отказываться делать определенные вещи."""
+    
+    _critical_step = 5
+    """На сколько увеличивается вероятность критического удара оружием при увеличении мастерства на 1."""
+
+    _critical_multiplier = 2
+    """Коэффициент увеличения урона при критическом ударе."""
+    
+    _dark_damage_divider_die = 3
+    """Кубик, который кидается, чтобы выяснить, во сколько раз уменьшится урон от атаки в темноте."""
+    
+    _doors_dict = {'наверх': 0,
+                        'направо': 1,
+                        'вправо': 1,
+                        'право': 1,
+                        'налево': 3,
+                        'влево': 3,
+                        'лево': 3,
+                        'вниз': 2,
+                        'низ': 2,
+                        'вверх': 0,
+                        'верх': 0}
+    """Словарь направлений, в которых может пойти герой."""
+    
+    _poison_base_protection_die = 5
+    """Кубик, который кидается чтобы определить базовую защиту от отравления."""
+
+    _poison_additional_protection_die = 5
+    """
+    Кубик, который кидается чтобы определить дополнительную защиту от яда
+    когда у героя или монстра ядовитые доспехи или щит.
+
+    """
     
     def __init__(self,
                  game,
@@ -41,6 +90,7 @@ class Hero:
         self.intel = intel
         self.start_intel = self.intel
         self.health = health
+        self.trap_mastery = 0
         if weapon is None:
             self.weapon = self.game.no_weapon
         else:
@@ -77,6 +127,7 @@ class Hero:
         self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
+        self.wounds = {}
         self.weapon_mastery = {'рубящее': {
                                         'counter': 0,
                                         'level': 0
@@ -117,6 +168,7 @@ class Hero:
                             'сменить': self.change,
                             'поменять': self.change,
                             'test': self.test,
+                            'обезвредить': self.trap,
                             'улучшить': self.enchant}
 
     
@@ -133,11 +185,136 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def disarm(self, what:str) -> bool:
+        """
+        Пытается обезвредить указанный объект. В текущей реализации поддерживается обезвреживание ловушек.
+        
+        :param what: Строка, указывающая, что нужно обезвредить. Поддерживаются значения 'ловушку', 'ловушка', и пустая строка для обезвреживания ловушки.
+        :return: Возвращает True, если удалось обезвредить объект, иначе False.
+        """
+        if what in ['ловушку', 'ловушка', '']:
+            return self.disarm_trap()
+    
+    
+    def disarm_trap(self) -> bool:
+        """
+        Пытается обезвредить ловушку в текущем помещении.
+
+        Метод проверяет наличие ловушки в текущем помещении (`current_position`). Если ловушка отсутствует,
+        выводит сообщение о том, что герой не видит ловушек, и возвращает `False`. В случае обнаружения ловушки
+        формирует сообщение о попытке обезвреживания и вызывает метод `try_to_disarm_trap()` для попытки обезвреживания.
+        Результат работы `try_to_disarm_trap()` добавляется к сообщению, которое затем выводится.
+
+        :return: Возвращает `True`, если ловушка успешно обезврежена, иначе `False`.
+        """
+        trap = self.current_position.get_trap()
+        if not trap:
+            tprint(self.game, f'{self.name} не видит в этом помещении никаких ловушек.')
+            return False
+        message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where.lexemes['dat']}.']
+        message.extend(self.try_to_disarm_trap())
+        tprint(self.game, message)
+    
+    
+    def try_to_disarm_trap(self, trap) -> list[str]:
+        """
+        Пытается обезвредить ловушку, с которой столкнулся герой.
+
+        Этот метод сначала рассчитывает шанс героя на успешное обезвреживание ловушки, 
+        затем сравнивает его со сложностью ловушки. Если шанс обезвреживания меньше сложности ловушки, 
+        ловушка срабатывает, вызывая соответствующий метод. В противном случае ловушка считается успешно обезвреженной, 
+        и герой получает опыт в обезвреживании ловушек.
+
+        Параметры:
+            - trap: Объект ловушки, которую необходимо обезвредить.
+
+        Возвращает:
+            Список строк, описывающих результат попытки обезвреживания ловушки.
+        """
+        disarm_chance = self.get_disarm_trap_chance()
+        trap_difficulty = trap.get_difficulty()
+        if disarm_chance < trap_difficulty:
+            return trap.trigger(self)
+        message = trap.disarm()
+        message.append(f'{self.name} теперь лучше понимает, какую опасность представляют ловушки, и как с ними правильно обращаться.')
+        self.increase_trap_mastery()
+        return message
+    
+    
+    def increase_trap_mastery(self):
+        """
+        Увеличивает мастерство героя в обезвреживании ловушек на 1.
+        
+        Этот метод увеличивает значение атрибута `trap_mastery` на единицу, что отражает улучшение навыков героя в обнаружении и обезвреживании ловушек.
+        """
+        self.trap_mastery += 1    
+
+
+    def get_disarm_trap_chance(self) -> int:
+        """
+        Рассчитывает и возвращает шанс героя на успешное обезвреживание ловушки.
+        
+        Шанс обезвреживания ловушки зависит от ловкости (`dext`) героя и его мастерства обезвреживания ловушек (`trap_mastery`).
+        Значение шанса определяется путем броска кубика с параметрами, зависящими от указанных атрибутов.
+        
+        :return: Целое число, представляющее шанс на успешное обезвреживание ловушки.
+        """
+        return roll([self.dext, self.trap_mastery])
+                
+        
+    def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
+        if not in_action:
+            if self.fear >= Hero._fear_limit:
+                return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
+            elif not self.current_position.light:
+                return False, f'В комнате слишком темно чтобы разглядывать карту'
+            else:
+                return True, f'{self.name} смотрит на карту этажа замка.'
+        else:
+            return False, 'Во время боя это совершенно неуместно!'
+    
+    
+    def intel_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на интеллект, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
+        wound = self.wounds.get('intel', 0)
+        self.wounds['intel'] = wound + 1
+        return f'{self.name} получает удар по голове, что отрицательно сказывается на {self.g(["его", "ее"])} способности к здравым рассуждениям.'
+    
+    
+    def stren_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на силу, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
+        wound = self.wounds.get('stren', 0)
+        self.wounds['stren'] = wound + 1
+        return f'{self.name} получает ранение и теряет много крови. Из-за раны {self.g(["он", "она"])} сильно слабеет.'
+    
+    
+    def dex_wound(self) -> str:
+        """
+        Наносит персонажу ранение, влияющее на ловкость, увеличивая счетчик таких ранений на 1.
+        Возвращает строку, описывающую получение ранения персонажем.
+        
+        :return: Строка с описанием получения ранения.
+        """
+        wound = self.wounds.get('dex', 0)
+        self.wounds['dex'] = wound + 1
+        return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
+            
+       
     def get_weakness(self, weapon:Weapon) -> float:
         return 1
     
     
-    def get_shield(self) -> Shield:
+    def get_shield(self) -> Shield|None:
         """Метод возвращает щит героя."""
         
         if not self.shield.empty:
@@ -183,7 +360,7 @@ class Hero:
             c(full_command[1])
 
     
-    def poison_enemy(self, target:Monster) -> str:
+    def poison_enemy(self, target:Monster) -> str|None:
         """
         Метод проводит проверку, отравил герой противника при атаке, или нет.
         
@@ -195,13 +372,13 @@ class Hero:
         if target.poisoned or target.venomous:
             return None
         if self.weapon.is_poisoned():
-            poison_die = dice(1, s_weapon_poison_level)
+            poison_die = roll([Weapon._poison_level])
         else:
             poison_die = 0
-        base_protection_die = dice(1, s_poison_base_protection_die)
+        base_protection_die = roll([Hero._poison_base_protection_die])
         additional_protection_die = 0
         if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = dice(1, s_poison_additional_protection_die)
+            additional_protection_die = roll([Hero._poison_additional_protection_die])
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
@@ -209,10 +386,25 @@ class Hero:
         return None
     
     
-    def hit_chance(self):
+    def hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
-        return self.dext + self.weapon_mastery[self.weapon.type]['level']
+        dext_wound = self.wounds.get('dext', 0)
+        wound_modifier = roll([dext_wound])
+        return self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+    
+    
+    def parry_chance(self) -> int:
+        """Метод рассчитывает и возвращает значение шанса парирования атаки."""
+        
+        dext_wound = self.wounds.get('dext', 0)
+        wound_modifier = roll([dext_wound])
+        chance = self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+        if self.poisoned:
+            chance -= self.dext // 2
+        if chance < 0:
+            chance = 0
+        return chance
     
     
     def change(self, what:str=None):
@@ -417,11 +609,11 @@ class Hero:
         """Метод моделирует сон героя во время отдыха."""
         
         message = []
-        dream_count = dice(1, s_nightmare_probability)
+        dream_count = roll([Hero._nightmare_probability])
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
                            Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
-            self.fear = self.fear // s_nightmare_divider
+            self.fear = self.fear // Hero._nightmare_divider
         else:
             message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
             self.fear = 0
@@ -438,7 +630,7 @@ class Hero:
         
         """
         
-        steal_count = dice(1, s_steal_probability)
+        steal_count = roll([Hero._steal_probability])
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
@@ -608,7 +800,7 @@ class Hero:
         """
         
         room = self.current_position
-        a = dice(1, 2)
+        a = roll([2])
         if a == 1 and not self.weapon.empty:
             if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
@@ -636,8 +828,9 @@ class Hero:
         
         room = self.current_position
         items_list = []
-        a = dice(0, self.backpack.count_items())
-        if a > 0:
+        items_quantity = self.backpack.count_items()
+        a = roll([items_quantity + 1])
+        if a < items_quantity:
             items_list.append(f'{self.name} бежит настолько быстро, что не замечает, как теряет:')
             for _ in range(a):
                 item = self.backpack.get_random_item()
@@ -672,7 +865,7 @@ class Hero:
         if self.check_light():
             direction = randomitem(available_directions)
         else:
-            direction = dice(0, 3)
+            direction = roll([4]) - 1
             if direction not in available_directions:
                 message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
                 tprint(self.game, message)
@@ -703,35 +896,34 @@ class Hero:
         """Метод генерирует значение ярости героя."""
         
         if self.check_light():
-            if self.rage > 1:
-                rage = dice(2, self.rage)
-            else:
-                rage = 1
-        else:
-            rage = 1
-        return rage
+            return roll([self.rage])
+        return 1
     
     
-    def generate_poison_strength(self) -> int:
+    def generate_poison_effect(self) -> int:
         """Метод генерирует значение силы отравления, которое испытывает герой."""
         
         if self.poisoned:
-            poison_strength = dice(1, self.stren // 2)
-        else:
-            poison_strength = 0
-        return poison_strength
+            return roll([self.stren // 2])
+        return 0
     
+    
+    def get_real_strength(self) -> int:
+        strength_wound = self.wounds.get('stren', 0)
+        wound_modifier = roll([strength_wound])
+        poison_effect = self.generate_poison_effect()
+        return self.stren - wound_modifier - poison_effect
+        
     
     def generate_mele_attack(self) -> int:
         """Метод генерирует значение атаки голыми руками."""
         
         rage = self.generate_rage()
-        poison_strength = self.generate_poison_strength()
+        strength = self.get_real_strength()
+        strength_die = roll([strength])
         if self.check_light():
-            mele_attack = dice(1, self.stren - poison_strength) * rage
-        else:
-            mele_attack = dice(1, self.stren - poison_strength) // dice(1, s_dark_damage_divider_dice)
-        return mele_attack
+            return strength_die * rage
+        return strength_die // roll([Hero._dark_damage_divider_die])
                 
     
     def generate_weapon_attack(self, target:Monster) -> int:
@@ -742,9 +934,9 @@ class Hero:
             return target.health
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
-        critical_probability = weapon_mastery * s_critical_step
-        if dice(1, 100) <= critical_probability and not self.poisoned:
-            weapon_attack = weapon_attack * s_critical_multiplier
+        critical_probability = weapon_mastery * Hero._critical_step
+        if roll([100]) <= critical_probability and not self.poisoned:
+            weapon_attack = weapon_attack * Hero._critical_multiplier
         return weapon_attack
     
     
@@ -782,7 +974,7 @@ class Hero:
             return None
         weapon_type = self.weapon.type
         mastery = self.weapon_mastery.get(weapon_type)
-        mastery['counter'] += dice(1, 10)/100
+        mastery['counter'] += roll([10])/100
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
             mastery['level'] += 1
@@ -875,7 +1067,7 @@ class Hero:
         
         game = self.game
         if self.shield.empty:
-            tprint(self.game, 'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self.g(["он", "она"])} не может.')
+            tprint(self.game, f'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self.g(["он", "она"])} не может.')
         else:
             tprint(game, showsides(self, target, self.floor))
             self.hide = True
@@ -964,11 +1156,9 @@ class Hero:
         """Метод проверки, удалось ли персонажу увернуться от удара врага."""
         
         weapon = attacker.weapon
-        parry_chance = self.dext + self.weapon_mastery[weapon.type]['level']
-        if self.poisoned:
-            parry_chance -= self.dext // 2
-        parry_die = dice(1, parry_chance)
-        hit_die = dice(1, (attacker.hit_chance + weapon.hit_chance))
+        parry_chance = self.parry_chance()
+        parry_die = roll([parry_chance])
+        hit_die = roll([attacker.hit_chance + weapon.hit_chance])
         if parry_die > hit_die:
             return True
         return False
@@ -1093,10 +1283,10 @@ class Hero:
         """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
         room = self.current_position
-        door = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[Hero._doors_dict[direction]]
         if door.empty:
             message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
-        elif self.fear >= s_fear_limit:
+        elif self.fear >= Hero._fear_limit:
             message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
             what_position = room.position + self.floor.directions_dict[direction]
@@ -1136,9 +1326,34 @@ class Hero:
         room = self.current_position
         message = []
         for i in room.furniture:
-            if i.lexemes["accus"] == what:
+            if i.lexemes["accus"].find(what) != -1:
                 message += (i.show())
+                message.append(self.get_trap_text(i))
         return message
+    
+    
+    def get_trap_text(self, item) -> str|None:
+        trap = item.trap
+        if trap.activated and self.detect_trap(trap):
+            return trap.get_detection_text()
+        return None
+    
+    
+    def detect_trap(self, trap) -> bool:
+        """
+        Пытается обнаружить ловушку, основываясь на интеллекте героя, его мастерстве обнаружения ловушек и ранениях.
+        
+        :param trap: Объект ловушки, который необходимо обнаружить.
+        :return: Возвращает True, если ловушка обнаружена, иначе False.
+        """
+        if trap.seen:
+            self.current_position.last_seen_trap = trap
+            return True
+        detection = roll([self.intel]) - roll([self.wounds['intel']]) + self.trap_mastery
+        if detection > trap.difficulty:
+            trap.seen = True
+            self.current_position.last_seen_trap = trap
+        return trap.seen
     
     
     def look(self, what:str=None):
@@ -1170,7 +1385,7 @@ class Hero:
             tprint(game, self.look_at_shield())
         if self.armor.check_name(what):
             tprint(game, self.look_at_armor())
-        if [f for f in room.furniture if f.lexemes["accus"] == what]:
+        if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
             tprint(game, self.look_at_furniture(what=what))
 
     
@@ -1192,7 +1407,7 @@ class Hero:
         """Метод обрабатывает команду "идти". """
         
         game = self.game
-        door = self.current_position.doors[s_hero_doors_dict[direction]]
+        door = self.current_position.doors[Hero._doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
             tprint(game, f'{self.name} не знает такого направления!')
             return False
@@ -1236,7 +1451,7 @@ class Hero:
         if agressive:
             who_first = 2
         else:
-            who_first = dice(1, 2)
+            who_first = roll([2])
         if who_first == 1:
             tprint(game, f'{game.player.name} начинает схватку!', 'fight')
             self.attack(who_is_fighting, 'атаковать')
@@ -1286,7 +1501,7 @@ class Hero:
         if enemy_in_room:
             tprint(game, f'{enemy_in_room.name} мешает толком осмотреть комнату.')
             return False
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
                 Страх сковал {self.g(["его", "ее"])} по рукам и ногам.')
             return False
@@ -1354,6 +1569,10 @@ class Hero:
             return False
         if what_to_search.locked:
             tprint(game, f'Нельзя обыскать {what_to_search.lexemes["accus"]}. Там заперто.')
+            return False
+        if what_to_search.check_trap():
+            tprint(game, f'К несчастью в {what_to_search.lexemes["prep"]} кто-то установил ловушку.')
+            what_to_search.trap.trigger(self)
             return False
         if self.check_monster_in_ambush(place=what_to_search):
             return False
@@ -1460,7 +1679,7 @@ class Hero:
         
         """
         
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             if print_message:
                 tprint(self.game, f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
             return True
@@ -1512,10 +1731,13 @@ class Hero:
             tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
             return False
         if len(what_is_locked) > 1:
-            tprint(game, f'В комнате слишком много запертых вещей. \
-                {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
+            tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
             return False
         furniture = what_is_locked[0]
+        if furniture.check_trap():
+            tprint(game, f'К несчастью в {furniture.lexemes["prep"]} кто-то установил ловушку.')
+            furniture.trap.trigger(self)
+            return False
         self.backpack.remove(key)
         furniture.locked = False
         tprint(game, f'{self.name} отпирает {furniture.lexemes["accus"]} ключом.')
@@ -1528,7 +1750,7 @@ class Hero:
         game = self.game
         room = self.current_position
         key = self.backpack.get_first_item_by_class(Key)
-        door = room.doors[s_hero_doors_dict[direction]]
+        door = room.doors[Hero._doors_dict[direction]]
         if  not door.locked:
             tprint(game, 'В той стороне нечего открывать.')
             return False
@@ -1544,7 +1766,7 @@ class Hero:
         
         if not self.check_if_hero_can_open():
             return False
-        if item == '' or not s_hero_doors_dict.get(item, False):
+        if item == '' or not Hero._doors_dict.get(item, False):
             return self.open_furniture(what=item)
         else:
             return self.open_door(direction=item)
@@ -1600,7 +1822,7 @@ class Hero:
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
             return False
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, \
                 но ничего не получается.')
             return False
@@ -1679,7 +1901,7 @@ class Hero:
         """Метод проверки, может ли герой сейчас читать."""
         
         game = self.game
-        if self.fear >= s_fear_limit:
+        if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.')
             return False
         if not self.check_light():
@@ -1694,11 +1916,11 @@ class Hero:
         room = self.current_position
         if room.light:
             return True
-        if self.weapon.element() in s_glowing_elements:
+        if self.weapon.element() in Rune._glowing_elements:
             return True
-        if self.shield.element() in s_glowing_elements:
+        if self.shield.element() in Rune._glowing_elements:
             return True
-        if self.armor.element() in s_glowing_elements:
+        if self.armor.element() in Rune._glowing_elements:
             return True
         return False
         
@@ -1736,7 +1958,10 @@ class Hero:
             message = [book.text]
             message.append(book.get_mastery_string(self))
             message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-            self.weapon_mastery[book.weapon_type]['level'] += 1
+            if book.type in [0, 1, 2]:
+                self.increase_weapon_mastery_after_reading(book.type)
+            if book.type == 3:
+                self.increase_trap_mastery_after_reading()
             self.backpack.remove(book)
         else:
             message = 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.'
@@ -1744,6 +1969,13 @@ class Hero:
         self.decrease_restless(2)
         return True
     
+    
+    def increase_weapon_mastery_after_reading(self, book_type):
+        self.weapon_mastery[book_type]['level'] += 1
+    
+    
+    def increase_trap_mastery_after_reading(self):
+        self.trap_mastery += 1
     
     def decrease_restless(self, number:int) -> bool:
         """Метод уменьшает значение непоседливости героя. Герой не может отдыхать когда непоседливость больше 0."""

@@ -3,7 +3,7 @@ from random import randint as dice
 
 
 class Potion:
-    
+     
     def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
         self.game = game
         self.name = name

@@ -15,6 +15,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states":
     [
@@ -47,6 +48,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
       "висит",
@@ -77,6 +79,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
       "висит",
@@ -107,6 +110,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": true,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
         "висит",
@@ -137,6 +141,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
       "висит",
@@ -165,6 +170,7 @@
     "lockable": true,
     "can_hide": false,
     "can_contain_weapon": true,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
         "висит",
@@ -193,6 +199,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
       "висит",
@@ -223,6 +230,7 @@
     "lockable": false,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": false,
     "can_rest": false,
     "states": [
       "висит криво",
@@ -252,6 +260,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states":
     [
@@ -283,6 +292,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
       "стоит",
@@ -312,6 +322,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
         "стоит",
@@ -340,6 +351,7 @@
     "lockable": true,
     "can_hide": false,
     "can_contain_weapon": false,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
         "стоит"
@@ -365,6 +377,7 @@
     "lockable": true,
     "can_hide": false,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
         "накренился",
@@ -393,6 +406,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
         "стоит",
@@ -419,6 +433,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states":
     [
@@ -449,6 +464,7 @@
     "lockable": true,
     "can_hide": true,
     "can_contain_weapon": true,
+    "can_contain_trap": true,
     "can_rest": false,
     "states": [
       "стоит",
@@ -477,6 +493,7 @@
         "lockable": true,
         "can_hide": true,
         "can_contain_weapon": true,
+        "can_contain_trap": true,
         "can_rest": false,
         "states": [
           "стоит"
@@ -503,6 +520,7 @@
         "lockable": true,
         "can_hide": true,
         "can_contain_weapon": true,
+        "can_contain_trap": true,
         "can_rest": false,
         "states": [
           "стоит",
@@ -531,6 +549,7 @@
         "lockable": true,
         "can_hide": false,
         "can_contain_weapon": false,
+        "can_contain_trap": true,
         "can_rest": false,
         "states": [
           "стоит",
@@ -559,6 +578,7 @@
         "lockable": true,
         "can_hide": false,
         "can_contain_weapon": true,
+        "can_contain_trap": true,
         "can_rest": false,
         "states": [
           "стоит",
@@ -587,6 +607,7 @@
         "lockable": true,
         "can_hide": true,
         "can_contain_weapon": true,
+        "can_contain_trap": true,
         "can_rest": false,
         "states": [
           "стоит",

@@ -2,10 +2,315 @@
 from random import randint as dice
 
 from functions import randomitem, tprint
-from settings import *
-
 
 class Protection:
+    
+    _elements_dictionary = {1: 'огня',
+                        2: 'пламени',
+                        3: 'воздуха',
+                        4: 'света',
+                        6: 'ветра',
+                        7: 'земли',
+                        8: 'лавы',
+                        10: 'пыли',
+                        12: 'воды',
+                        13: 'пара',
+                        14: 'камня',
+                        15: 'дождя',
+                        19: 'грязи',
+                        24: 'потопа'}
+    """Словарь стихий."""
+    
+    _weak_weapon_multiplier = 0.67
+    """Множитель защиты когда бьют оружием со слабыми рунами."""
+    
+    _strong_weapon_multiplier = 1.5
+    """Множитель защиты когда бьют оружием с сильными рунами."""
+
+    _weakness_dictionary = {1: [3, 3],
+                            2: [3, 6],
+                            3: [7, 7],
+                            4: [3, 7],
+                            6: [7, 14],
+                            7: [12, 12],
+                            8: [3, 12],
+                            10: [7, 12],
+                            12: [1, 1],
+                            13: [1, 3],
+                            14: [12, 24],
+                            15: [1, 7],
+                            19: [1, 12],
+                            24: [1, 2]}
+    """Словарь слабостей. Каждой стихии соответствует список слабых стихий."""
+
+    _armor_decorators = {
+    "кованый":
+    [
+        {
+        "protection_modifier": 2,
+        0: 
+            {
+            "nom": "Сияющий",
+            "accus": "Сияющего",
+            "gen": "Сияющего",
+            "dat": "Сияющему",
+            "prep": "Сияющем",
+            "inst": "Сияющим",
+            }, 
+        1: 
+            {
+            "nom": "Сияющая",
+            "accus": "Сияющую",
+            "gen": "Сияющей",
+            "dat": "Сияющей",
+            "prep": "Сияющей",
+            "inst": "Сияющей",
+            }, 
+        2: 
+            {
+            "nom": "Сияющее",
+            "accus": "Сияющее",
+            "gen": "Сияющего",
+            "dat": "Сияющему",
+            "prep": "Сияющем",
+            "inst": "Сияющим",
+        }
+        },
+        {
+        "protection_modifier": -2,
+        0: {
+            "nom": "Ржавый",
+            "accus": "Ржавого",
+            "gen": "Ржавого",
+            "dat": "Ржавому",
+            "prep": "Ржавом",
+            "inst": "Ржавым"
+        },
+        1: {
+            "nom": "Ржавая",
+            "accus": "Ржавую",
+            "gen": "Ржавой",
+            "dat": "Ржавой",
+            "prep": "Ржавой",
+            "inst": "Ржавой"
+        },
+        2: {
+            "nom": "Ржавое",
+            "accus": "Ржавое",
+            "gen": "Ржавого",
+            "dat": "Ржавому",
+            "prep": "Ржавом",
+            "inst": "Ржавым"
+        }
+        },
+        {
+        "protection_modifier": 0,
+        0: {
+            "nom": "Новый",
+            "accus": "Нового",
+            "gen": "Нового",
+            "dat": "Новому",
+            "prep": "Новом",
+            "inst": "Новым"
+        },
+        1: {
+            "nom": "Новая",
+            "accus": "Новую",
+            "gen": "Новой",
+            "dat": "Новой",
+            "prep": "Новой",
+            "inst": "Новой"
+        },
+        2: {
+            "nom": "Новое",
+            "accus": "Новое",
+            "gen": "Нового",
+            "dat": "Новому",
+            "prep": "Новом",
+            "inst": "Новым"
+        }
+        },
+        {
+        "protection_modifier": -1,
+        0: 
+            {
+            "nom": "Помятый",
+            "accus": "Помятого",
+            "gen": "Помятого",
+            "dat": "Помятому",
+            "prep": "Помятом",
+            "inst": "Помятым",
+            }, 
+        1: 
+            {
+            "nom": "Помятая",
+            "accus": "Помятую",
+            "gen": "Помятой",
+            "dat": "Помятой",
+            "prep": "Помятой",
+            "inst": "Помятой",
+            }, 
+        2: 
+            {
+            "nom": "Помятое",
+            "accus": "Помятое",
+            "gen": "Помятого",
+            "dat": "Помятому",
+            "prep": "Помятом",
+            "inst": "Помятым",
+        }
+        },
+        {
+        "protection_modifier": 1,
+        0: 
+            {
+            "nom": "крепкий",
+            "accus": "крепкого",
+            "gen": "крепкого",
+            "dat": "крепкому",
+            "prep": "о крепком",
+            "inst": "крепким",
+            }, 
+        1: 
+            {
+            "nom": "крепкая",
+            "accus": "крепкую",
+            "gen": "крепкой",
+            "dat": "крепкой",
+            "prep": "о крепкой",
+            "inst": "крепкой",
+            }, 
+        2: 
+            {
+            "nom": "крепкое",
+            "accus": "крепкое",
+            "gen": "крепкого",
+            "dat": "крепкому",
+            "prep": "о крепком",
+            "inst": "крепким",
+        }
+        }
+    ],
+    "кожаный":
+    [
+        {
+        "protection_modifier": 0,
+        0: {
+            "nom": "Новый",
+            "accus": "Нового",
+            "gen": "Нового",
+            "dat": "Новому",
+            "prep": "Новом",
+            "inst": "Новым"
+        },
+        1: {
+            "nom": "Новая",
+            "accus": "Новую",
+            "gen": "Новой",
+            "dat": "Новой",
+            "prep": "Новой",
+            "inst": "Новой"
+        },
+        2: {
+            "nom": "Новое",
+            "accus": "Новое",
+            "gen": "Нового",
+            "dat": "Новому",
+            "prep": "Новом",
+            "inst": "Новым"
+        }
+        },
+        {
+        "protection_modifier": 1,
+        0: 
+            {
+            "nom": "крепкий",
+            "accus": "крепкого",
+            "gen": "крепкого",
+            "dat": "крепкому",
+            "prep": "о крепком",
+            "inst": "крепким",
+            }, 
+        1: 
+            {
+            "nom": "крепкая",
+            "accus": "крепкую",
+            "gen": "крепкой",
+            "dat": "крепкой",
+            "prep": "о крепкой",
+            "inst": "крепкой",
+            }, 
+        2: 
+            {
+            "nom": "крепкое",
+            "accus": "крепкое",
+            "gen": "крепкого",
+            "dat": "крепкому",
+            "prep": "о крепком",
+            "inst": "крепким",
+        }
+        },
+        {
+        "protection_modifier": 2,
+        0: 
+            {
+            "nom": "Мощный",
+            "accus": "Мощного",
+            "gen": "Мощного",
+            "dat": "Мощному",
+            "prep": "Мощном",
+            "inst": "Мощным",
+            }, 
+        1: 
+            {
+            "nom": "Мощная",
+            "accus": "Мощную",
+            "gen": "Мощной",
+            "dat": "Мощной",
+            "prep": "Мощной",
+            "inst": "Мощной",
+            }, 
+        2: 
+            {
+            "nom": "Мощное",
+            "accus": "Мощное",
+            "gen": "Мощного",
+            "dat": "Мощному",
+            "prep": "Мощном",
+            "inst": "Мощным",
+        }
+        },
+        {
+        "protection_modifier": -1,
+        0: {
+            "nom": "дырявый",
+            "accus": "дырявого",
+            "gen": "дырявого",
+            "dat": "дырявому",
+            "prep": "дырявом",
+            "inst": "дырявым"
+        },
+        1: {
+            "nom": "дырявая",
+            "accus": "дырявую",
+            "gen": "дырявой",
+            "dat": "дырявой",
+            "prep": "дырявой",
+            "inst": "дырявой"
+        },
+        2: {
+            "nom": "дырявое",
+            "accus": "дырявое",
+            "gen": "дырявого",
+            "dat": "дырявому",
+            "prep": "дырявом",
+            "inst": "дырявым"
+        }
+        }
+    ]
+    }
+    """Словарь декораторов для защины"""
+    
     def __init__(self, game, name='', protection=1, actions='', empty=False, enchantable=True):
         self.game = game
         self.name = name
@@ -15,6 +320,7 @@ class Protection:
         self.runes = []
         self.protection = int(protection)
         self.user = None
+        self.enchantable = enchantable
 
     def __str__(self):
         protection_string = str(self.protection)
@@ -73,15 +379,15 @@ class Protection:
             element = 0
             for i in self.runes:
                 element += int(i.element)
-            return ' ' + s_elements_dictionary[element]
+            return ' ' + Protection._elements_dictionary[element]
 
     def protect(self, who):
         multiplier = 1
         if not who.weapon.empty and who.weapon.element() != 0 and self.element() != 0:
-            if who.weapon.element() in s_weakness_dictionary[self.element()]:
-                multiplier = s_protection_strong_weapon_multiplier
-            elif self.element() in s_weakness_dictionary[who.weapon.element()]:
-                multiplier = s_protection_weak_weapon_multiplier
+            if who.weapon.element() in Protection._weakness_dictionary[self.element()]:
+                multiplier = Protection._strong_weapon_multiplier
+            elif self.element() in Protection._weakness_dictionary[who.weapon.element()]:
+                multiplier = Protection._weak_weapon_multiplier
         if who.hide:
             who.hide = False
             return self.protection + self.perm_protection()
@@ -129,7 +435,7 @@ class Protection:
     
     
     def get_element_decorator(self) -> str|None:
-        return s_elements_dictionary.get(self.element(), None)
+        return Protection._elements_dictionary.get(self.element(), None)
         
         
     def get_element_names(self, key:str=None) -> str|dict|None:
@@ -171,7 +477,7 @@ class Armor(Protection):
 
     
     def decorate(self) -> bool:
-        decorators = s_armor_decorators.get(self.type, [])
+        decorators = Protection._armor_decorators.get(self.type, [])
         decorator = randomitem(decorators)
         if not decorator:
             return False
@@ -227,6 +533,66 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
+    
+    _crushed_upper_limit = 10
+    """Верхняя планка случайных значений при проверке того, что щит сломан."""
+    
+    _damage_when_hiding_min = 50
+    """Нижняя планка случайных значений при генерации ущерба щиту когда персонаж спрятался."""
+    
+    _damage_when_hiding_max = 75
+    """Верхняя планка случайных значений при генерации ущерба щиту когда персонаж спрятался."""
+    
+    _damage_min = 10
+    """Нижняя планка случайных значений при генерации ущерба щиту в обычных условиях."""
+    
+    _damage_max = 25
+    """Верхняя планка случайных значений при генерации ущерба щиту в обычных условиях."""
+    
+    _repair_multiplier = 10 
+    """Множитель, на который умножается накопленный урон щита чтобы определить стоимость его починки."""
+    
+    _states_dictionary = {
+                                1: 
+                                    {
+                                    "nom": "Поцарапанный",
+                                    "accus": "Поцарапанного",
+                                    "gen": "Поцарапанного",
+                                    "dat": "Поцарапанному",
+                                    "prep": "Поцарапанном",
+                                    "inst": "Поцарапанным",
+                                    },
+                                2: 
+                                    {
+                                    "nom": "Потрепанный",
+                                    "accus": "Потрепанного",
+                                    "gen": "Потрепанного",
+                                    "dat": "Потрепанному",
+                                    "prep": "Потрепанном",
+                                    "inst": "Потрепанным",
+                                    },
+                                3: 
+                                    {
+                                    "nom": "Почти сломанный",
+                                    "accus": "Почти сломанного",
+                                    "gen": "Почти сломанного",
+                                    "dat": "Почти сломанному",
+                                    "prep": "Почти сломанном",
+                                    "inst": "Почти сломанным",
+                                    },
+                                4: 
+                                    {
+                                    "nom": "Еле живой",
+                                    "accus": "Еле живого",
+                                    "gen": "Еле живого",
+                                    "dat": "Еле живому",
+                                    "prep": "Еле живом",
+                                    "inst": "Еле живым",
+                                    }
+                                }
+    """Словарь состояний щита."""
+
+    
     def __init__(self, 
                  game, 
                  name:str='', 
@@ -279,11 +645,11 @@ class Shield (Protection):
           
     
     def get_damage_decorator(self) -> list|None:
-        return s_shield_states_dictionary.get(self.accumulated_damage // 1, None)
+        return Shield._states_dictionary.get(self.accumulated_damage // 1, None)
     
     
     def check_if_broken(self, attack:int=0) -> bool:
-        damage_limit = dice(1, s_shield_crushed_upper_limit)
+        damage_limit = dice(1, Shield._crushed_upper_limit)
         damage_to_shield = attack * self.accumulated_damage
         if damage_limit < damage_to_shield:
             self.game.all_shields.remove(self)
@@ -294,14 +660,14 @@ class Shield (Protection):
     
     def take_damage(self, is_hiding:bool=False) -> None:
         if is_hiding:
-            dice_result = dice(s_shield_damage_when_hiding_min, s_shield_damage_when_hiding_max) / 100
+            dice_result = dice(Shield._damage_when_hiding_min, Shield._damage_when_hiding_max) / 100
         else:
-            dice_result = dice(s_shield_damage_min, s_shield_damage_max) / 100
+            dice_result = dice(Shield._damage_min, Shield._damage_max) / 100
         self.accumulated_damage += dice_result
     
     
     def get_repair_price(self):
-        return self.accumulated_damage * s_shield_repair_multiplier // 1
+        return self.accumulated_damage * Shield._repair_multiplier // 1
     
     
     def repair(self) -> bool:

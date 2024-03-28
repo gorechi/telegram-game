@@ -1,6 +1,4 @@
 from functions import howmany, tprint
-from settings import s_money_groups, s_money_piles
-from class_backpack import Backpack
 
 
 class Loot:
@@ -91,6 +89,46 @@ class Loot:
 
 
 class Money:
+    
+    _groups = (10, 20, 30)
+    """Значения для разделения денег на кучки."""
+
+    _piles = (
+        {
+            "nom": "несколько монет",
+            "accus": "несколько монет",
+            "gen": "нескольких монет",
+            "dat": "нескольким монетам",
+            "prep": "нескольких монетах",
+            "inst": "несколькими монетами"
+        },
+        {
+            "nom": "кучка монет",
+            "accus": "кучку монет",
+            "gen": "кучки монет",
+            "dat": "кучке монет",
+            "prep": "кучке монет",
+            "inst": "кучкой монет"
+        },
+        {
+            "nom": "груда монет",
+            "accus": "груду монет",
+            "gen": "груды монет",
+            "dat": "груде монет",
+            "prep": "груде монет",
+            "inst": "грудой монет"
+        },
+        {
+            "nom": "много монет",
+            "accus": "много монет",
+            "gen": "много монет",
+            "dat": "много монет",
+            "prep": "много монет",
+            "inst": "много монет"
+        },
+    )
+    """Текстовые обозначения для кучек с разным количеством монет"""
+    
     def __init__(self, game, how_much_money):
         self.game = game
         self.how_much_money = how_much_money
@@ -100,12 +138,12 @@ class Money:
     
     def generate_name(self):
         piles = {
-            0 <= self.how_much_money and self.how_much_money <= s_money_groups[0]: 0,
-            s_money_groups[0] < self.how_much_money and self.how_much_money <= s_money_groups[1]: 1,
-            s_money_groups[1] < self.how_much_money and self.how_much_money <= s_money_groups[2]: 2, 
-            s_money_groups[2] < self.how_much_money: 3
+            0 <= self.how_much_money and self.how_much_money <= Money._groups[0]: 0,
+            Money._groups[0] < self.how_much_money and self.how_much_money <= Money._groups[1]: 1,
+            Money._groups[1] < self.how_much_money and self.how_much_money <= Money._groups[2]: 2, 
+            Money._groups[2] < self.how_much_money: 3
         }
-        self.lexemes = s_money_piles[piles[True]]
+        self.lexemes = Money._piles[piles[True]]
         self.name = self.lexemes['nom']
 
     

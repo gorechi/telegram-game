@@ -1,20 +1,38 @@
 from random import randint as dice
 
-from class_basic import Money, Loot
-from class_items import Key, Map, Matches, Rune
+from class_basic import Money
+from class_items import Key, Map, Matches, Rune, Book
 from class_room import Door, Room
 from functions import pprint, randomitem
-from class_monsters import Corpse
-from settings import *
 
 
 class Floor:
+    
+    _dark_rooms_ratio = 8
+    """Какая часть комнат замка будет темными (если 5, то будет каждая пятая комната)."""
+    
+    _locked_rooms_ratio = 8
+    """Какая часть комнат замка будет заперта (если 5, то будет каждая пятая комната)."""
+    
+    _min_money_in_locked_room = 15
+    """Минимальное количество денег в запертой комнате."""
+    
+    _max_money_in_locked_room = 40
+    """Максимальное количество денег в запертой комнате."""
+    
+    _map_width_coefficient = 72
+    """Коэффициент для расчета ширины карты."""
+    
+    _map_height_coefficient = 90
+    """Коэффициент для расчета высоты карты."""
+    
     def __init__(self, game, floor_number:int, data:dict):
         self.game = game
         self.floor_number = floor_number
         print(f'floor number = {self.floor_number}')
         self.rows = data['rows']
         self.rooms = data['rooms']
+        self.traps_difficulty = data['traps_difficulty']
         self.directions_dict = {0: (0 - self.rooms),
                                1: 1,
                                2: self.rooms,
@@ -126,20 +144,99 @@ class Floor:
         game = self.game
         
         # Создаем мебель и разбрасываем по замку
-        self.all_furniture = game.create_objects_from_json(file='furniture.json',
-                                        how_many=self.how_many['мебель'],
-                                        random=True)
-        for furniture in self.all_furniture:
-            furniture.place(self)
+        self.place_furniture(game)
         
         # Создаем очаги и разбрасываем по замку
-        self.all_rest_places = game.create_objects_from_json(file='furniture-rest.json',
-                                        how_many=self.how_many['очаг'],)
-        self.all_rest_places[0].place(self, room_to_place=self.plan[0])
-        for rest_place in self.all_rest_places[1:]:
-            rest_place.place(self)
+        self.place_rest_places(game)
         
         # Читаем монстров из файла и разбрасываем по замку
+        self.place_monsters(game)
+        
+        # Читаем оружие из файла и разбрасываем по замку
+        self.place_weapons(game)
+        
+        # Читаем щиты из файла и разбрасываем по замку
+        self.place_shields(game)
+        
+        # Читаем доспехи из файла и разбрасываем по замку
+        self.place_armor(game)
+        
+        # Читаем зелья из файла и разбрасываем по замку
+        self.place_potions(game)
+        
+        # Создаем руны и разбрасываем по замку
+        self.place_runes()
+        
+        # Создаем книги и разбрасываем по замку
+        self.place_books(game)
+        
+        self.place_map(game) 
+        self.place_matches(game)
+
+    
+    def place_matches(self, game):
+        matches = Matches(game)
+        matches.place(self)
+
+    
+    def place_map(self, game):
+        new_map = Map(game)
+        new_map.place(self)
+
+    
+    def place_books(self, game):
+        for _ in range(self.how_many['книга']):
+            new_book = Book(self.game)
+            new_book.place(self)
+
+    
+    def place_runes(self):
+        self.all_runes = [Rune(self.game) for _ in range(self.how_many['руна'])]
+        for rune in self.all_runes:
+            rune.place(self)
+    
+    
+    def activate_traps(self):
+        all_furnitures = [f for f in self.all_furniture if f.can_contain_trap and not f.trap.activated]
+        furnitures = randomitem(all_furnitures, how_many=self.how_many['ловушка'])
+        for f in furnitures:
+            f.trap.activate()
+            f.trap.set_difficulty(self.traps_difficulty)
+
+    
+    def place_potions(self, game):
+        self.all_potions = game.create_objects_from_json(file='potions.json',
+                                      how_many=self.how_many['зелье'], 
+                                      random=True)
+        for potion in self.all_potions:
+            potion.place(self)
+
+    
+    def place_armor(self, game):
+        self.all_armor = game.create_objects_from_json(file='armor.json',
+                                    how_many=self.how_many['доспех'],
+                                    random=True)
+        for armor in self.all_armor:
+            armor.place(self)
+
+    
+    def place_shields(self, game):
+        self.all_shields = game.create_objects_from_json(file='shields.json',
+                                      how_many=self.how_many['щит'],
+                                      random=True)
+        for shield in self.all_shields:
+            shield.place(self)
+
+    
+    def place_weapons(self, game):
+        self.all_weapon = game.create_objects_from_json(file='weapon.json',
+                                     how_many=self.how_many['оружие'],
+                                     random=True)
+        for weapon in self.all_weapon:
+            weapon.place(self)
+
+    
+    def place_monsters(self, game):
         self.all_monsters = game.create_objects_from_json(file='monsters.json',
                                        how_many=self.how_many['монстры'],
                                        random=True,
@@ -147,54 +244,22 @@ class Floor:
         for monster in self.all_monsters:
             monster.place(self)
             self.game.how_many_monsters += 1
-        
-        # Читаем оружие из файла и разбрасываем по замку
-        self.all_weapon = game.create_objects_from_json(file='weapon.json',
-                                     how_many=self.how_many['оружие'],
-                                     random=True)
-        for weapon in self.all_weapon:
-            weapon.place(self)
-        
-        # Читаем щиты из файла и разбрасываем по замку
-        self.all_shields = game.create_objects_from_json(file='shields.json',
-                                      how_many=self.how_many['щит'],
-                                      random=True)
-        for shield in self.all_shields:
-            shield.place(self)
-        
-        # Читаем доспехи из файла и разбрасываем по замку
-        self.all_armor = game.create_objects_from_json(file='armor.json',
-                                    how_many=self.how_many['доспех'],
-                                    random=True)
-        for armor in self.all_armor:
-            armor.place(self)
-        
-        # Читаем зелья из файла и разбрасываем по замку
-        self.all_potions = game.create_objects_from_json(file='potions.json',
-                                      how_many=self.how_many['зелье'], 
-                                      random=True)
-        for potion in self.all_potions:
-            potion.place(self)
-        
-        # Создаем руны и разбрасываем по замку
-        self.all_runes = [Rune(self.game) for _ in range(self.how_many['руна'])]
-        for rune in self.all_runes:
-            rune.place(self)
-        
-        # Создаем книги и разбрасываем по замку
-        self.all_books = game.create_objects_from_json(file='books.json',
-                                    how_many=self.how_many['книга'],
-                                    random=True)
-        for book in self.all_books:
-            book.place(self)
-        new_map = Map(game)
-        new_map.place(self) 
-        matches = Matches(game)
-        matches.place(self)
-        for _ in range(5):
-            new_key = Key(game)
-            self.plan[0].loot.add(new_key)
-        new_key = Key(game)
+
+    
+    def place_rest_places(self, game):
+        self.all_rest_places = game.create_objects_from_json(file='furniture-rest.json',
+                                        how_many=self.how_many['очаг'],)
+        self.all_rest_places[0].place(self, room_to_place=self.plan[0])
+        for rest_place in self.all_rest_places[1:]:
+            rest_place.place(self)
+
+    
+    def place_furniture(self, game):
+        self.all_furniture = game.create_objects_from_json(file='furniture.json',
+                                        how_many=self.how_many['мебель'],
+                                        random=True)
+        for furniture in self.all_furniture:
+            furniture.place(self)
 
     
     def secret_rooms(self):
@@ -252,7 +317,7 @@ class Floor:
         
         """
         
-        self.how_many_dark_rooms = len(self.plan) // s_dark_rooms_ratio
+        self.how_many_dark_rooms = len(self.plan) // Floor._dark_rooms_ratio
         dark_rooms = randomitem(self.plan, False, self.how_many_dark_rooms)
         for room in dark_rooms:
             room.light = False
@@ -265,10 +330,10 @@ class Floor:
         
         """
         
-        how_many_locked_rooms = len(self.plan) // s_locked_rooms_ratio
+        how_many_locked_rooms = len(self.plan) // Floor._locked_rooms_ratio
         for _ in range(how_many_locked_rooms):
             room = randomitem([r for r in self.plan[1::] if not r.locked])
-            new_money = Money(self.game, dice(s_min_money_in_locked_room, s_max_money_in_locked_room))
+            new_money = Money(self.game, dice(Floor._min_money_in_locked_room, Floor._max_money_in_locked_room))
             room.lock()
             monster = room.monsters('random')
             if not monster:
@@ -310,7 +375,7 @@ class Floor:
             text.append(line1)
             text.append('║' + '     ║' * r)
             text.append(line2 + '=')
-        pprint(game, text, r*s_map_width_coefficient, f*s_map_height_coefficient)
+        pprint(game, text, r*Floor._map_width_coefficient, f*Floor._map_height_coefficient)
         
     
     def get_random_room_with_furniture(self) -> Room:
@@ -319,6 +384,7 @@ class Floor:
     
         rooms = [a for a in self.plan if a.furniture]
         return randomitem(rooms, False)
+    
     
     def get_random_unlocked_room(self) -> Room:
         
