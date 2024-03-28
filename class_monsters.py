@@ -447,32 +447,20 @@ class Monster:
         return None
     
     
-    def attack(self, target):
+    def attack(self, target) ->bool:
         """
         Осуществляет атаку на цель. В зависимости от условий освещенности, использует имя монстра или общее название в темноте.
         Генерирует атаку в ближнем бою и атаку оружием, суммирует их и вычитает защиту цели. Рассчитывает общий урон и применяет его к цели.
         В случае смерти цели, обновляет состояние игры и выводит соответствующее сообщение. Возвращает результат атаки.
         """
         game = self.game
-        message = []
-        if target.check_light():
-            self_name = self.name
-        else:
-            self_name = Monster._names_in_darkness['nom']
-        mele_attack = self.generate_mele_attack(target)
-        weapon_attack = self.generate_weapon_attack(target=target)
-        if weapon_attack > 0:
-            message.append(f'{self_name} {self.action()} {target.lexemes["accus"]} используя {self.weapon.lexemes["accus"]} и '
-                        f'наносит {str(mele_attack)}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона. ')
-        else:
-            message.append(f'{self_name} бьет {target.lexemes["accus"]} не используя оружия и '
-                        f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона. ')
+        self_name = self.get_name_in_darkness(target)
+        total_attack, message = self.generate_attack(target)
         target_defence = target.defence(self)
         if target_defence < 0:
             message.append(f'{target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
             tprint(game, message)
             return False
-        total_attack = weapon_attack + mele_attack
         total_damage = total_attack - target_defence
         if total_damage > 0:
             message.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
@@ -494,6 +482,27 @@ class Monster:
         else:
             tprint(game, message)
         return True
+
+    
+    def generate_attack(self, target) -> list[int, list[str]]:
+        message = []
+        self_name = self.get_name_in_darkness(target)
+        mele_attack = self.generate_mele_attack(target)
+        weapon_attack = self.generate_weapon_attack(target=target)
+        total_attack = weapon_attack + mele_attack
+        if weapon_attack > 0:
+            message.append(f'{self_name} {self.action()} {target.lexemes["accus"]} используя {self.weapon.lexemes["accus"]} и '
+                        f'наносит {mele_attack}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона.')
+        else:
+            message.append(f'{self_name} бьет {target.lexemes["accus"]} не используя оружия и '
+                        f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона.')
+        return total_attack, message
+    
+    
+    def get_name_in_darkness(self, target):
+        if target.check_light():
+            return self.name
+        return Monster._names_in_darkness['nom']
     
     
     def hit_chance(self):
