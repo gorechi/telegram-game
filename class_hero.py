@@ -5,6 +5,7 @@ from class_room import Furniture, Room
 from class_weapon import Weapon
 from class_backpack import Backpack
 from functions import howmany, normal_count, randomitem, showsides, tprint, roll
+from enum import Enum
 
 
 class Hero:
@@ -62,6 +63,39 @@ class Hero:
 
     """
     
+    _level_up_commands = ('здоровье',
+                            '?',
+                            'силу',
+                            'ловкость',
+                            'интеллект')
+    """Список дополнительных комманд при прокачке уровня персонажа."""
+
+    _fight_commands = ('ударить',
+                        '?',
+                        'защититься',
+                        'бежать',
+                        'сменить оружие',
+                        'сменить',
+                        'поменять',
+                        'использовать')
+    """Список комманд во время схватки."""
+    
+    class _state(Enum):
+        """
+        Текущее состояние персонажа:
+        - NO_STATE - обычное состояние. Персонаж ходит, исследует и т.п.
+        - FIGHT - происходит бой
+        - ENCHANT - персонаж что-то улучшает
+        - LEVEL_UP - персонаж поднимает уровень
+        - USE_IN_FIGHT - персонадж использует вещь во время боя
+        """
+        NO_STATE = 0
+        FIGHT = 1
+        ENCHANT = 2
+        LEVEL_UP = 3
+        USE_IN_FIGHT = 4
+
+
     def __init__(self,
                  game,
                  name:str = None,
@@ -110,9 +144,12 @@ class Hero:
             self.backpack = backpack
         self.money = Money(self.game, 0)
         self.current_position = None
+        self.state = Hero._state.NO_STATE
         self.game_is_over = False
         self.start_health = self.health
         self.weakness = {}
+        self.can_use_in_fight = []
+        self.rune_list = []
         self.restless = 0
         self.wins = 0
         self.rage = 0
@@ -171,7 +208,7 @@ class Hero:
                             'обезвредить': self.disarm,
                             'улучшить': self.enchant}
 
-    
+        
     def on_create(self):
         return None
     
@@ -184,6 +221,126 @@ class Hero:
         self.game.test(self)
         tprint(self.game, 'Тестирование началось')
         
+    
+    def action(self, command:str, message:str):
+        
+        """Метод обработки комманд от игрока."""
+        
+        answer = message.lower()
+        if command in self.command_dict.keys() and self.state == Hero._state.NO_STATE:
+            if not self.game_over('killall'):
+                self.do(answer)
+            return True
+        elif command in Hero._level_up_commands and self.state == Hero._state.LEVEL_UP:
+            self.levelup(command)
+            return True
+        elif self.state == Hero._state.ENCHANT:
+            return self.rune_actions(answer=answer)
+        elif self.state == Hero._state.USE_IN_FIGHT:
+            return self.in_fight_actions(answer=answer)
+        elif command in Hero._fight_commands and self.state == Hero._state.FIGHT:
+            return self.fight_actions(answer=answer)
+        tprint (self, f'{self.name} такого не умеет.', 'direction')
+        return False
+
+
+    def rune_actions(self, answer:str) -> bool:
+        
+        """
+        Метод обрабатывает команды игрока когда он улучшает предметы при помощи рун.
+        
+        Возвращает:
+        - True - если удалось улучшить предмет
+        - False - если предмет по любой причине не улучшился
+        
+        """
+        
+        rune_list = self.rune_list
+        self.state = Hero._state.NO_STATE
+        if answer == 'отмена':
+            self.state = Hero._state.NO_STATE
+            return False
+        if not answer.isdigit():
+            tprint(self, f'Чтобы все заработало {self.name.lexemes["dat"]} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
+            return False
+        answer = int(answer) - 1
+        if not answer < len(rune_list):
+            tprint(self, f'{self.name} не находит такую руну у себя в карманах.', 'direction')
+            return False
+        if not self.selected_item:
+            tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g(["он хотел", "она хотела"])} ее поместить.', 'direction')
+            self.state = Hero._state.NO_STATE
+            return False
+        chosen_rune = rune_list[answer]
+        rune_is_placed = self.selected_item.enchant(chosen_rune)
+        if not rune_is_placed:
+            tprint(self, f'Похоже, что {self.name} не может вставить руну в {self.selected_item.lexemes["occus"]}.', 'direction')
+            self.state = Hero._state.NO_STATE
+            return False
+        tprint(self, f'{self.name} улучшает {self.selected_item.lexemes["occus"]} новой руной.', 'direction')
+        self.backpack.remove(chosen_rune)
+        self.rune_list = self.backpack.get_items_by_class(Rune)
+        self.state = Hero._state.NO_STATE
+        return True
+    
+    
+    def in_fight_actions(self, answer:str) -> bool:
+        
+        """
+        Метод обрабатывает команды игрока когда он что-то использует во время боя.
+        
+        Возвращает:
+        - True - если удалось использовать предмет
+        - False - если предмет по любой причине не был использован
+        
+        """
+        if answer == 'отмена':
+            tprint(self, f'{self.name} продолжает бой.', 'fight')
+            self.state = Hero._state.FIGHT
+            return False
+        if not answer.isdigit():
+            tprint(self, f'Чтобы все заработало {self.name.lexemes["dat"]} нужно просто выбрать вещь по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
+            return False
+        items = self.can_use_in_fight
+        answer = int(answer) - 1
+        if not answer < len(items):
+            tprint(self, f'{self.name} не находит такую вещь у себя в карманах.', 'fight')
+            return False
+        item = items[answer]
+        item_is_used = item.use(who_using=self, in_action=True)
+        if not item_is_used:
+            tprint(self, f'Похоже, что {self.name} не может использовать {item.lexemes["occus"]}.', 'fight')
+            self.state = Hero._state.FIGHT
+            return False    
+        self.state = Hero._state.FIGHT
+        return True
+    
+    
+    def fight_actions(self, answer:str) -> bool:
+        
+        """
+        Метод обрабатывает команды игрока когда он дерется с монстром.
+                
+        """
+
+        enemy = self.current_position.monsters('first')
+        tprint(self.game, self.attack(enemy, answer))
+        if self.run:
+            self.run = False
+            self.look()
+            self.state = Hero._state.NO_STATE
+        elif enemy.run:
+            self.state = Hero._state.NO_STATE
+        elif enemy.health > 0 and self.state == Hero._state.FIGHT:
+            enemy.attack(self)
+        elif self.state == Hero._state.FIGHT:
+            tprint(self.game, f'{self.name} побеждает в бою!', 'off')
+            self.state = Hero._state.NO_STATE
+            enemy.lose(self)
+            self.win(enemy)
+        return True
+
+    
     
     def disarm(self, what:str) -> bool:
         """
@@ -212,7 +369,7 @@ class Hero:
             tprint(self.game, f'{self.name} не видит в этом помещении никаких ловушек.')
             return False
         message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where.lexemes["dat"]}.']
-        message.extend(self.try_to_disarm_trap())
+        message.extend(self.try_to_disarm_trap(trap))
         tprint(self.game, message)
     
     
@@ -1048,17 +1205,16 @@ class Hero:
         """
         
         game = self.game
-        can_use = self.backpack.get_items_for_fight()
-        if len(can_use) == 0:
+        self.can_use_in_fight = self.backpack.get_items_for_fight()
+        if not self.can_use_in_fight:
             tprint(game, f'{self.name} не может ничего использовать. В рюкзаке нет вещей, которые были бы полезны в бою.')
             return
         message = []
         message.append(f'{self.name} может использовать следующие предметы:')
-        for item in can_use:
-            message.append(f'{str(can_use.index(item) + 1)}: {item.lexemes["accus"]}')
+        for item in self.can_use_in_fight:
+            message.append(f'{str(self.can_use_in_fight.index(item) + 1)}: {item.lexemes["accus"]}')
         message.append('Выберите номер предмета или скажите "отмена" для прекращения.')
-        game.selected_item = can_use
-        game.state = 4
+        self.state = Hero._state.USE_IN_FIGHT
         tprint(game, message, 'use_in_fight')
     
     
@@ -1844,28 +2000,21 @@ class Hero:
         """
         
         game = self.game
-        game.selected_item = game.empty_thing
-        selected_item = None
         if item == 'оружие' and not self.weapon.empty:
-            game.selected_item = self.weapon
-            return True
+            return self.weapon
         if item == 'щит':
             if not self.shield.empty:
-                game.selected_item = self.shield
-                return True
+                return self.shield
             elif not self.removed_shield.empty:
-                game.selected_item = self.removed_shield
-                return True
+                return self.removed_shield
         if item in ['дооспех', 'доспехи'] and not self.armor.empty:
-            game.selected_item = self.armor
-            return True
+            return self.armor
         if item.isdigit():
             selected_item = self.backpack.get_item_by_number(int(item))
         else:
             selected_item = self.backpack.get_first_item_by_name(item)
         if isinstance(selected_item, Weapon):
-                    game.selected_item = selected_item
-                    return True
+                return selected_item
         tprint(game, f'{self.name} не умеет улучшать такую штуку.')
         return False
     
@@ -1883,18 +2032,15 @@ class Hero:
         
         """
         game = self.game
-        if not self.check_if_hero_can_enchant(item=item):
-            return False
-        if not self.chose_what_to_enchant(item=item):
-            return False
-        rune_list = self.backpack.get_items_by_class(Rune)
-        text = []
-        text.append(f'{self.name} может использовать следующие руны:')
-        for rune in rune_list:
-            text.append(f'{str(rune_list.index(rune) + 1)}: {str(rune)}')
-        text.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
-        game.state = 2
-        tprint(game, text, 'enchant')
+        self.rune_list = self.backpack.get_items_by_class(Rune)
+        message = []
+        self.selected_item = self.chose_what_to_enchant(item)
+        message.append(f'{self.name} может использовать следующие руны:')
+        for rune in self.rune_list:
+            message.append(f'{str(self.rune_list.index(rune) + 1)}: {str(rune)}')
+        message.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
+        self.state = Hero._state.ENCHANT
+        tprint(game, message, 'enchant')
 
     
     def check_if_hero_can_read(self) -> bool:

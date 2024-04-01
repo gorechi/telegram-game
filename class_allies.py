@@ -6,14 +6,6 @@ from functions import randomitem, tprint, roll
 class Trader:
     """Класс Торговец"""
     
-    _types = (
-        'books',
-        'runes'
-    )
-    
-    _how_many_books_trader_can_have = 5
-    """Кубик, который надо кинуть чтобы определить количество книг у торговца"""
-
     _how_many_runes_trader_can_have = 4
     """Кубик, который надо кинуть чтобы определить количество рун у торговца"""
 
@@ -28,21 +20,17 @@ class Trader:
 
     
     def __init__(self,
-                 floor,
                  game,
-                 name,
-                 lexeme,
-                 gender):
+                 floor,
+                 name:str = '',
+                 lexemes:dict = None):
         self.game = game
         self.floor = floor
         self.name = name
         self.room = None
-        self.lexeme = lexeme
-        self.gender = gender
+        self.lexemes = lexemes
         self.shop = []
         self.place()
-        self.type = randomitem(Trader._types)
-        self.get_items()
         self.money = self.generate_money()    
     
     
@@ -60,44 +48,7 @@ class Trader:
         money_amount = Trader._minimum_money + roll([delta])
         new_money = Money(self.game, money_amount)
         return new_money
-    
-    
-    def get_items(self) -> bool:
-        """
-        Получает предметы для магазина торговца в зависимости от его типа.
-
-        Метод определяет тип торговца (книги или руны) и вызывает соответствующий метод для получения предметов этого типа.
-        Если тип торговца не поддерживается, метод возвращает False.
-
-        Returns:
-            bool: Возвращает True, если предметы успешно получены и добавлены в магазин торговца, иначе False.
-        """
-        actions = {
-            'books': self.get_books,
-            'runes': self.get_runes
-        }
-        if not actions.get(self.type):
-            return False
-        return actions[self.type]()
-    
-    
-    def get_books(self) -> bool:
-        """
-        Получает книги для магазина торговца.
-
-        Метод определяет случайное количество книг, которое может иметь торговец, используя настройку `_how_many_books_trader_can_have`.
-        Затем создает указанное количество книг, загружая их из файла 'books.json' в случайном порядке, и добавляет их в магазин торговца.
-
-        Returns:
-            bool: Всегда возвращает True, так как предполагается, что операция добавления книг в магазин всегда успешна.
-        """
-        how_many_books = roll([Trader._how_many_books_trader_can_have])
-        books = self.game.create_objects_from_json(file='books.json',
-                                    how_many=how_many_books,
-                                    random=True)
-        self.shop += books
-        return True
-    
+      
     
     def get_runes(self) -> bool:
         """
@@ -132,11 +83,7 @@ class Trader:
     
     
     def show(self) -> str:
-        descriptions = {
-            'books': 'У стены, под лампой среди пыльных томов сидит торговец книгами.',
-            'runes': 'Перед окном стоит яркий прилавок, из-за которого еле видно торговца рунами.'
-        }
-        return descriptions[self.type]
+        return 
     
     
     def get_item_by_number(self, number:str):
@@ -166,3 +113,55 @@ class Trader:
             message.append(self.money.show())
         tprint(self.game, message)
         return True
+    
+class Scribe(Trader):
+    """Класс Книжник"""
+    
+    _books_quantity_die = 10
+    """Кубик, который надо кинуть чтобы определить количество книг у книжника"""
+
+    _lexemes = {
+        "nom": "Книжник",
+        "accus": "Книжника",
+        "gen": "Книжника",
+        "dat": "Книжнику",
+        "prep": "Книжнике",
+        "inst": "Книжником"
+    }
+    
+    def __init__(self,
+                 game,
+                 floor,
+                 name:str = '',
+                 lexemes:dict = None
+                 ):
+        super().__init__(game, floor, name, lexemes)
+        self.name = name
+        if not self.name:
+            self.name = 'Книжник'
+        self.lexemes = lexemes
+        if not self.lexemes:
+            self.lexemes = Scribe._lexemes
+        self.get_books()
+    
+    
+    def get_books(self) -> bool:
+        """
+        Получает книги для магазина торговца.
+
+        Метод определяет случайное количество книг, которое может иметь торговец, используя настройку `_books_quantity_die` класса Scribe.
+        Затем создает указанное количество книг, загружая их из файла 'books.json' в случайном порядке, и добавляет их в магазин торговца.
+
+        Returns:
+            bool: Всегда возвращает True, так как предполагается, что операция добавления книг в магазин всегда успешна.
+        """
+        how_many_books = roll([Scribe._books_quantity_die])
+        books = self.game.create_objects_from_json(file='books.json',
+                                    how_many=how_many_books,
+                                    random=True)
+        self.shop.extend(books)
+        return True
+
+
+    def show(self) -> str:
+        return 'У стены, под лампой среди пыльных томов сидит торговец книгами.'

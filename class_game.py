@@ -35,51 +35,7 @@ class Game():
     Содержит методы создания объектов игры, а также методы обработки комманд игрока.
     
     """
-    
-    _common_commands = ('?',
-                        'осмотреть',
-                        'идти',
-                        'атаковать',
-                        'напасть',
-                        'взять',
-                        'забрать',
-                        'подобрать',
-                        'обыскать',
-                        'открыть',
-                        'использовать',
-                        'применить',
-                        'читать',
-                        'прочитать',
-                        'чинить',
-                        'починить',
-                        'убрать',
-                        'улучшить',
-                        'отдохнуть',
-                        'отдыхать',
-                        'бросить',
-                        'сменить',
-                        'поменять',
-                        'test',
-                        'выбросить')
-    """Список комманд, которые может выполнять персонаж игры."""
-
-    _level_up_commands = ('здоровье',
-                            '?',
-                            'силу',
-                            'ловкость',
-                            'интеллект')
-    """Список дополнительных комманд при прокачке уровня персонажа."""
-
-    _fight_commands = ('ударить',
-                        '?',
-                        'защититься',
-                        'бежать',
-                        'сменить оружие',
-                        'сменить',
-                        'поменять',
-                        'использовать')
-    """Список комманд во время схватки."""
-    
+        
     _castle_floors_sizes = {
         1: {
         'rows': 5, 
@@ -141,17 +97,6 @@ class Game():
             }
         self.empty_thing = Empty()
         self.how_many_monsters = 0
-        self.state = 0
-        """
-        Текущее состояние игры:
-        - 0 - обычное состояние. Персонаж ходит, исследует и т.п.
-        - 1 - происходит бой
-        - 2 - персонаж что-то улучшает
-        - 3 - персонаж поднимает уровень
-        - 4 - персонадж использует вещь во время боя
-        
-        TODO: Перевести параметр на ENUM. 
-        """
         self.selected_item = self.empty_thing
         self.chat_id = chat_id
         self.bot = bot
@@ -281,118 +226,7 @@ class Game():
             vars(new_object)[param] = json_object[param]
         new_object.on_create()
         return new_object
-    
-    
-    def action(self, command:str, message:str):
         
-        """Метод обработки комманд от игрока."""
-        
-        answer = message.lower()
-        player = self.player
-        if command in Game._common_commands and self.state == 0:
-            if not player.game_over('killall'):
-                player.do(message.lower())
-            return True
-        elif command in Game._level_up_commands and self.state == 3:
-            player.levelup(command)
-            return True
-        elif self.state == 2:
-            return self.rune_actions(answer=answer)
-        elif self.state == 4:
-            return self.in_fight_actions(answer=answer)
-        elif command in Game._fight_commands and self.state == 1:
-            return self.fight_actions(answer=answer)
-        tprint (self, f'{player.name} такого не умеет.', 'direction')
-
-    
-    def rune_actions(self, answer:str) -> bool:
-        
-        """
-        Метод обрабатывает команды игрока когда он улучшает предметы при помощи рун.
-        
-        Возвращает:
-        - True - если удалось улучшить предмет
-        - False - если предмет по любой причине не улучшился
-        
-        """
-        
-        player = self.player
-        rune_list = self.player.backpack.get_items_by_class(Rune)
-        if answer == 'отмена':
-            self.state = 0
-            return False
-        elif answer.isdigit() and int(answer)  <= len(rune_list):
-            chosen_rune = rune_list[int(answer) - 1]
-            if self.selected_item.enchant(chosen_rune):
-                tprint(self, f'{player.name} улучшает {self.selected_item.lexemes["occus"]} новой руной.', 'direction')
-                player.backpack.remove(chosen_rune)
-                self.state = 0
-                return True
-            else:
-                tprint(self, f'Похоже, что {player.name} не может вставить руну в {self.selected_item.lexemes["occus"]}.', 'direction')
-                self.state = 0
-                return False
-        else:
-            tprint(self, f'{player.name} не находит такую руну у себя в карманах.', 'direction')
-        return True
-    
-    
-    def in_fight_actions(self, answer:str) -> bool:
-        
-        """
-        Метод обрабатывает команды игрока когда он что-то использует во время боя.
-        
-        Возвращает:
-        - True - если удалось использовать предмет
-        - False - если предмет по любой причине не был использован
-        
-        """
-
-        player = self.player
-        can_use = self.selected_item
-        if answer == 'отмена':
-            self.state = 1
-            tprint(self, f'{player.name} продолжает бой.', 'fight')
-            return False
-        elif answer.isdigit() and int(answer) - 1 < len(can_use):
-            item = can_use[int(answer) - 1]
-            if item.use(who_using=self.player, in_action=True):
-                self.selected_item.remove(item)
-                return True
-            else:
-                tprint(self, f'Похоже, что {player.name} не может использовать {item.lexemes["occus"]}.', 'fight')
-                self.state = 1
-                return False
-        else:
-            tprint(self, f'{player.name} не находит такую вкщь у себя в карманах.', 'fight')
-        return True
-    
-    
-    def fight_actions(self, answer:str) -> bool:
-        
-        """
-        Метод обрабатывает команды игрока когда он дерется с монстром.
-                
-        """
-
-        player = self.player
-        enemy = self.player.current_position.monsters('first')
-        tprint(self, player.attack(enemy, answer))
-        if player.run:
-            player.run = False
-            player.look()
-            self.state = 0
-        elif enemy.run:
-            self.state = 0
-        elif enemy.health > 0 and self.state == 1:
-            enemy.attack(player)
-        elif self.state == 1:
-            tprint(self, f'{player.name} побеждает в бою!', 'off')
-            self.state = 0
-            enemy.lose(player)
-            player.win(enemy)
-        return True
-    
     
     def monsters(self):
         return self.how_many_monsters

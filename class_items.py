@@ -592,7 +592,9 @@ class Book:
         0
     )
     
-    _book_maximum_price = 10
+    _base_price = 7
+    
+    _base_price_die = 8
     
     def __init__(self, game):
         self.game = game
@@ -624,7 +626,8 @@ class Book:
             
     
     def define_base_price(self) -> int:
-        return Book._book_maximum_price
+        dice = [Book._base_price_die]
+        return Book._base_price + roll(dice)
            
    
     def create_description(self):
