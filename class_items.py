@@ -594,7 +594,7 @@ class Book:
     
     _base_price = 7
     
-    _base_price_die = 8
+    _base_price_die = [8]
     
     def __init__(self, game):
         self.game = game
@@ -626,9 +626,8 @@ class Book:
             
     
     def define_base_price(self) -> int:
-        dice = [Book._base_price_die]
-        return Book._base_price + roll(dice)
-           
+        return Book._base_price + roll(Book._base_price_die)
+               
    
     def create_description(self):
         description_dict = randomitem(Book._descriptions)
@@ -652,7 +651,7 @@ class Book:
     
     
     def show(self):
-        return self.description
+        return self.lexemes['nom']
     
     
     def use(self, who_using, in_action:bool=False):

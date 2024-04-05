@@ -1,4 +1,5 @@
 from functions import howmany, tprint
+from typing import Union
 
 
 class Loot:
@@ -159,15 +160,42 @@ class Money:
         return self.how_much_money
 
     
-    def __eq__(self, other:int) -> bool:
-        return self.how_much_money == other
+    def __eq__(self, other:Union[int, 'Money']) -> bool:
+        if isinstance(other, int):
+            return self.how_much_money == other
+        if isinstance(other, Money):
+            return self.how_much_money == other.how_much_money
 
     
-    def __ge__(self, other:int) -> bool:
-        return self.how_much_money >= other
+    def __ge__(self, other:Union[int, 'Money']) -> bool:
+        if isinstance(other, int):
+            return self.how_much_money >= other
+        if isinstance(other, Money):
+            return self.how_much_money >= other.how_much_money
+    
+    
+    def __gt__(self, other:Union[int, 'Money']) -> bool:
+        if isinstance(other, int):
+            return self.how_much_money > other
+        if isinstance(other, Money):
+            return self.how_much_money > other.how_much_money
+    
+    
+    def __le__(self, other:Union[int, 'Money']) -> bool:
+        if isinstance(other, int):
+            return self.how_much_money <= other
+        if isinstance(other, Money):
+            return self.how_much_money <= other.how_much_money
+    
+    
+    def __lt__(self, other:Union[int, 'Money']) -> bool:
+        if isinstance(other, int):
+            return self.how_much_money < other
+        if isinstance(other, Money):
+            return self.how_much_money < other.how_much_money
 
     
-    def __add__(self, other):
+    def __add__(self, other:Union[int, 'Money']) -> 'Money':
         if isinstance(other, int):
             self.how_much_money += other
         elif isinstance(other, Money):
@@ -176,7 +204,7 @@ class Money:
         return self
 
     
-    def __sub__(self, other):
+    def __sub__(self, other:Union[int, 'Money']) -> 'Money':
         if isinstance(other, int):
             self.how_much_money -= other
         elif isinstance(other, Money):
@@ -196,3 +224,7 @@ class Money:
             return howmany(self.how_much_money, 'монету,монеты,монет')
         else:
             return 'Денег нет'
+        
+
+    def get_sum(self) ->int:
+        return self.how_much_money

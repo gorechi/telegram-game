@@ -8,7 +8,7 @@ from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corps
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
-from class_allies import Trader
+from class_allies import Trader, Scribe
 from class_backpack import Backpack
 from functions import randomitem, tprint
 
@@ -84,6 +84,7 @@ class Game():
             'руна': Rune,
             'заклинание': Spell,
             'торговец': Trader,
+            'книжник': Scribe,
             'рюкзак': Backpack,
             'зелье исцеления': HealPotion,
             'зелье здоровья': HealthPotion,
@@ -173,6 +174,9 @@ class Game():
         - file - имя файла, содержащего данные;
         - random - нужно ли создавать случайный набор объектов из прочитанных данных?
         - how_many - сколько объектов нужно прочитать из файла и вернуть?
+        - obj_class - объекты какого класса нужно начитывать?
+        - floor - некоторые объекты могут появиться только на определенном этаже и выше. 
+        Параметр указывает, объекты какого этажа нужно начитывать.
         
         Очевидно, что передавать random без how_many не имеет смысла.
         
@@ -181,19 +185,21 @@ class Game():
         objects = []
         with open(file, encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
+        if not parsed_data:
+            raise FileExistsError(f'Не удалось прочитать данные из файла {file}')
         if obj_class and isinstance(obj_class, str):
             parsed_data = [i for i in parsed_data if i['class'] == obj_class]
         if floor and isinstance(floor, int):
             parsed_data = [i for i in parsed_data if int(i.get('floor')) >= floor]
-        if random:
+        if random and how_many:
             for _ in range(how_many):
                 i = randomitem(parsed_data)
                 new_game_object = self.object_from_json(json_object=i)
                 objects.append(new_game_object)
-        else:
-            for i in parsed_data:
-                new_game_object = self.object_from_json(json_object=i)
-                objects.append(new_game_object)
+            return objects
+        for i in parsed_data:
+            new_game_object = self.object_from_json(json_object=i)
+            objects.append(new_game_object)
         return objects
     
           
@@ -233,5 +239,10 @@ class Game():
     
     
     def test(self, hero:Hero):
+        floor = self.current_floor
+        room = floor.plan[0]
+        new_trader = Scribe(self, floor)
+        new_trader.place(room)
+        hero.money += 100
         return None
             

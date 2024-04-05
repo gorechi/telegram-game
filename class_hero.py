@@ -4,7 +4,7 @@ from class_protection import Armor, Shield
 from class_room import Furniture, Room
 from class_weapon import Weapon
 from class_backpack import Backpack
-from functions import howmany, normal_count, randomitem, showsides, tprint, roll
+from functions import howmany, normal_count, randomitem, showsides, tprint, roll, split_actions
 from enum import Enum
 
 
@@ -94,6 +94,7 @@ class Hero:
         ENCHANT = 2
         LEVEL_UP = 3
         USE_IN_FIGHT = 4
+        TRADE = 5
 
 
     def __init__(self,
@@ -125,6 +126,7 @@ class Hero:
         self.start_intel = self.intel
         self.health = health
         self.trap_mastery = 0
+        self.trader = None
         if weapon is None:
             self.weapon = self.game.no_weapon
         else:
@@ -206,6 +208,7 @@ class Hero:
                             'поменять': self.change,
                             'test': self.test,
                             'обезвредить': self.disarm,
+                            'торговать': self.trade,
                             'улучшить': self.enchant}
 
         
@@ -226,25 +229,30 @@ class Hero:
         
         """Метод обработки комманд от игрока."""
         
-        answer = message.lower()
+        message = message.lower()
         if command in self.command_dict.keys() and self.state == Hero._state.NO_STATE:
             if not self.game_over('killall'):
-                self.do(answer)
+                self.do(message)
             return True
-        elif command in Hero._level_up_commands and self.state == Hero._state.LEVEL_UP:
+        actions = {
+            Hero._state.ENCHANT: self.rune_actions,
+            Hero._state.TRADE: self.trade_actions,
+            Hero._state.USE_IN_FIGHT: self.in_fight_actions,
+            Hero._state.FIGHT: self.fight_actions
+        }
+        if command in Hero._level_up_commands and self.state == Hero._state.LEVEL_UP:
             self.levelup(command)
             return True
-        elif self.state == Hero._state.ENCHANT:
-            return self.rune_actions(answer=answer)
-        elif self.state == Hero._state.USE_IN_FIGHT:
-            return self.in_fight_actions(answer=answer)
-        elif command in Hero._fight_commands and self.state == Hero._state.FIGHT:
-            return self.fight_actions(answer=answer)
-        tprint (self, f'{self.name} такого не умеет.', 'direction')
+        action = actions.get(self.state, None)
+        if action:
+            return action(message)
+        """ elif command in Hero._fight_commands and self.state == Hero._state.FIGHT:
+            return self.fight_actions(answer=answer) """
+        tprint (self.game, f'{self.name} такого не умеет.', 'direction')
         return False
 
 
-    def rune_actions(self, answer:str) -> bool:
+    def rune_actions(self, message:str) -> bool:
         
         """
         Метод обрабатывает команды игрока когда он улучшает предметы при помощи рун.
@@ -257,21 +265,21 @@ class Hero:
         
         rune_list = self.rune_list
         self.state = Hero._state.NO_STATE
-        if answer == 'отмена':
+        if message == 'отмена':
             self.state = Hero._state.NO_STATE
             return False
-        if not answer.isdigit():
+        if not message.isdigit():
             tprint(self, f'Чтобы все заработало {self.name.lexemes["dat"]} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
             return False
-        answer = int(answer) - 1
-        if not answer < len(rune_list):
+        message = int(message) - 1
+        if not message < len(rune_list):
             tprint(self, f'{self.name} не находит такую руну у себя в карманах.', 'direction')
             return False
         if not self.selected_item:
             tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g(["он хотел", "она хотела"])} ее поместить.', 'direction')
             self.state = Hero._state.NO_STATE
             return False
-        chosen_rune = rune_list[answer]
+        chosen_rune = rune_list[message]
         rune_is_placed = self.selected_item.enchant(chosen_rune)
         if not rune_is_placed:
             tprint(self, f'Похоже, что {self.name} не может вставить руну в {self.selected_item.lexemes["occus"]}.', 'direction')
@@ -284,7 +292,7 @@ class Hero:
         return True
     
     
-    def in_fight_actions(self, answer:str) -> bool:
+    def in_fight_actions(self, message:str) -> bool:
         
         """
         Метод обрабатывает команды игрока когда он что-то использует во время боя.
@@ -294,19 +302,19 @@ class Hero:
         - False - если предмет по любой причине не был использован
         
         """
-        if answer == 'отмена':
+        if message == 'отмена':
             tprint(self, f'{self.name} продолжает бой.', 'fight')
             self.state = Hero._state.FIGHT
             return False
-        if not answer.isdigit():
+        if not message.isdigit():
             tprint(self, f'Чтобы все заработало {self.name.lexemes["dat"]} нужно просто выбрать вещь по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
             return False
         items = self.can_use_in_fight
-        answer = int(answer) - 1
-        if not answer < len(items):
+        message = int(message) - 1
+        if not message < len(items):
             tprint(self, f'{self.name} не находит такую вещь у себя в карманах.', 'fight')
             return False
-        item = items[answer]
+        item = items[message]
         item_is_used = item.use(who_using=self, in_action=True)
         if not item_is_used:
             tprint(self, f'Похоже, что {self.name} не может использовать {item.lexemes["occus"]}.', 'fight')
@@ -316,7 +324,7 @@ class Hero:
         return True
     
     
-    def fight_actions(self, answer:str) -> bool:
+    def fight_actions(self, message:str) -> bool:
         
         """
         Метод обрабатывает команды игрока когда он дерется с монстром.
@@ -324,7 +332,7 @@ class Hero:
         """
 
         enemy = self.current_position.monsters('first')
-        tprint(self.game, self.attack(enemy, answer))
+        tprint(self.game, self.attack(enemy, message))
         if self.run:
             self.run = False
             self.look()
@@ -339,7 +347,59 @@ class Hero:
             enemy.lose(self)
             self.win(enemy)
         return True
-
+    
+    
+    def trade_actions(self, message:str) -> bool:
+        action, target = split_actions(message)
+        if not self.trader:
+            tprint(self.game, 'Похоже, торговец отказывается общаться и торговля сейчас невозможна.')
+            self.state = Hero._state.NO_STATE
+            return False
+        if action in ['закончить', 'отмена', 'уйти']:
+            return self.leave_shop()
+        if action in ['купить', 'покупать'] and target:
+            return self.buy_item(target)
+        if action in ['продать', 'продавать'] and target:
+            return self.sell_item(target)
+        tprint(self.game, 'Герой сейчас находится в лавке торговца, а здесь такие выкрутасы недопустимы.')
+        return False
+    
+    
+    def leave_shop(self):
+        self.state = Hero._state.NO_STATE
+        tprint(self.game, f'{self.name} покидает лавку {self.trader.lexemes["gen"]}.')
+        self.trader = None
+        return True
+    
+    
+    def buy_item(self, target:str) -> bool:
+        result = self.trader.sell(target, self)
+        if result:
+            tprint(self.game, self.trader.get_prices(self.backpack))
+    
+    
+    def sell_item(self, target:str) -> bool:
+        result = self.trader.buy(target, self)
+        if result:
+            tprint(self.game, self.trader.get_prices(self.backpack))
+            
+            
+    def trade(self, what:str=None) -> bool:
+        """
+        Метод обрабатывает команду "торговать".        
+        """
+        game = self.game
+        room = self.current_position
+        trader = room.trader
+        if not trader:
+            tprint(game, 'В этой комнате не с кем торговать')
+            return False
+        message = [f'{self.name} подходит к {trader.lexemes["dat"]} и начинат изучать товары.']
+        message.extend(trader.get_prices(self.backpack))
+        tprint(game, message)
+        self.state = Hero._state.TRADE
+        self.trader = trader
+        return True
     
     
     def disarm(self, what:str) -> bool:

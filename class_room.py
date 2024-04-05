@@ -225,7 +225,7 @@ class Room:
         self.visited:str = ' '
         self.rune_place = self.game.empty_thing
         self.light:bool = True
-        self.traider:bool = False
+        self.trader = None
         self.morgue:list = []
         self.furniture:list = []
         self.stink:int = 0
@@ -234,6 +234,8 @@ class Room:
         self.secret_word = self.get_secret_word()
         self.last_seen_trap:Trap = None
 
+    
+    
     def set_torch(self):
         if not self.light or roll([Room._torch_die]) != Room._torch_die:
             return False
@@ -405,8 +407,8 @@ class Room:
             message.append(f'{player.name} попадает в {decoration1} '
                            f'комнату {self.decoration2}. {self.decoration4}')
             message += self.show_furniture()
-            if self.traider:
-                message.append(self.traider.show())
+            if self.trader:
+                message.append(self.trader.show())
             message += self.show_corpses()
             message.append(who_is_here)
             if self.stink > 0:
@@ -481,7 +483,7 @@ class Room:
         """
         monsters = self.monsters()
         for monster in monsters:
-            monster.place(self.floor)           
+            monster.place(self.floor, old_place=self)           
     
     
     def monsters(self, mode=None):
@@ -494,7 +496,7 @@ class Room:
             else:
                 return all_monsters
         else:
-            return False
+            return []
         
     
     def monster_in_ambush(self):

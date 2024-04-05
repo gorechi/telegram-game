@@ -774,7 +774,7 @@ class Monster:
         else:
             empty_rooms = [a for a in floor.plan if (not a.monsters() 
                                                      and not a.monster_in_ambush()
-                                                     and not a.traider 
+                                                     and not a.trader 
                                                      and a != old_place 
                                                      and a.position != 0)]
             if not bool(empty_rooms):
