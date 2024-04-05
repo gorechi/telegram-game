@@ -294,7 +294,7 @@ class Scribe(Trader):
             return False
         books_list = []
         for book in books:
-            price = book.base_price + roll(Scribe._buy_price_modifier)
+            price = book.base_price - roll(Scribe._buy_price_modifier)
             new_book = Trader.ItemInShop(item=book, price=price)
             books_list.append(new_book)
         self.update_index(books_list)
