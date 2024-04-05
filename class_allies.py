@@ -81,7 +81,7 @@ class Trader:
     def buy(self, item_text:str, who) -> bool:
         item_to_buy = self.get_item_by_text(item_text, 'buy')
         if not item_to_buy:
-            tprint(self.game, f'{self.lexemes["nom"]} на такое предложение даже не поднимает глаз от фолианта, лежащего у него на коленях. Ему не нужен подобный хлам.')
+            tprint(self.game, f'{self.lexemes["nom"]} на такое предложение даже не поднимает глаз от какого-то документа. Ему не нужен подобный хлам.')
             return False
         item = item_to_buy.item
         item_price = item_to_buy.price
@@ -304,3 +304,93 @@ class Scribe(Trader):
     
     def show(self) -> str:
         return 'У стены, под лампой среди пыльных томов сидит торговец книгами.'
+
+
+class RuneMerchant(Trader):
+    """Класс Торговец рунами"""
+    
+    _runes_quantity_die = 15
+    """Кубик, который надо кинуть чтобы определить количество книг у книжника"""
+
+    _lexemes = {
+        "nom": "Торговец рунами",
+        "accus": "Торговца рунами",
+        "gen": "Торговца рунами",
+        "dat": "Торговцу рунами",
+        "prep": "Торговце рунами",
+        "inst": "Торговцем рунами"
+    }
+    
+    _buy_price_modifier = [8]
+    
+    _sell_price_modifier = [5]
+    
+    
+    def __init__(self,
+                 game,
+                 floor,
+                 name:str = 'Торговец рунами',
+                 lexemes:dict = None
+                 ):
+        super().__init__(game, floor, name, lexemes)
+        self.name = name
+        self.lexemes = lexemes
+        if not self.lexemes:
+            self.lexemes = RuneMerchant._lexemes
+        self.get_runes()
+    
+    
+    def get_runes(self) -> bool:
+        how_many_runes = roll([RuneMerchant._runes_quantity_die])
+        for _ in range(how_many_runes):
+            rune = Rune(self.game)
+            price = self.evaluate(rune)
+            new_rune = Trader.ItemInShop(item=rune, price=price)
+            self.shop.append(new_rune)
+        self.update_index(self.shop)
+        return True
+
+    
+    def evaluate(self, rune:Rune) -> int:
+        return rune.base_price + roll(RuneMerchant._sell_price_modifier)
+
+
+    def generate_selling_text(self) -> list[str]:
+        if not self.shop:
+            return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
+        message = ['Перед торговцем на прилавке разложены следующие руны:']
+        for item in self.shop:
+            name = item.item.lexemes['nom']
+            price_text = howmany(item.price, 'монета,монеты,монет')
+            message.append(f'{item.index} - {name}: {price_text}')
+        return message
+
+
+    def generate_buying_text(self) -> list[str]:
+        if not self.goods_to_buy:
+            return ['Торговец рунами не хочет ничего покупать у героя.']
+        message = ['Торговец рунами с удовольствием приобрел бы у героя следующие руны:']
+        for item in self.goods_to_buy:
+            name = item.item.lexemes['nom']
+            price_text = howmany(item.price, 'монета,монеты,монет')
+            message.append(f'{item.index} - {name}: {price_text}')
+        return message
+        
+    
+    def evaluate_items(self, backpack:Backpack) -> bool:
+        runes:list[Rune] = backpack.get_items_by_class(Rune)
+        if not runes:
+            self.goods_to_buy.clear()
+            return False
+        runes_list = []
+        for rune in runes:
+            price = rune.base_price - roll(Scribe._buy_price_modifier)
+            new_rune = Trader.ItemInShop(item=rune, price=price)
+            runes_list.append(new_rune)
+        self.update_indexes()
+        self.goods_to_buy = runes_list
+        return True
+    
+    
+    def show(self) -> str:
+        return 'Посреди комнаты стоит прилавок торговца рунами. Сам он суетится вокруг.'

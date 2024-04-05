@@ -8,7 +8,7 @@ from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corps
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
-from class_allies import Trader, Scribe
+from class_allies import Trader, Scribe, RuneMerchant
 from class_backpack import Backpack
 from functions import randomitem, tprint
 
@@ -85,6 +85,7 @@ class Game():
             'заклинание': Spell,
             'торговец': Trader,
             'книжник': Scribe,
+            'торговец рунами': RuneMerchant,
             'рюкзак': Backpack,
             'зелье исцеления': HealPotion,
             'зелье здоровья': HealthPotion,
