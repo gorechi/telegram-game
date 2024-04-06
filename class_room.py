@@ -235,6 +235,17 @@ class Room:
         self.last_seen_trap:Trap = None
 
     
+    def get_symbol_for_map(self) -> str:
+        game = self.game
+        cant_rest, rest_place = self.can_rest()
+        if game.player.current_position == self:    
+            return game.player.name[0]
+        if self.trader:
+            return '₽'
+        if rest_place and self.visited != ' ':
+            return '#'
+        return self.visited
+    
     
     def set_torch(self):
         if not self.light or roll([Room._torch_die]) != Room._torch_die:
