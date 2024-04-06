@@ -19,13 +19,7 @@ class Floor:
     
     _max_money_in_locked_room = 40
     """Максимальное количество денег в запертой комнате."""
-    
-    _map_width_coefficient = 72
-    """Коэффициент для расчета ширины карты."""
-    
-    _map_height_coefficient = 90
-    """Коэффициент для расчета высоты карты."""
-    
+        
     def __init__(self, game, floor_number:int, data:dict):
         self.game = game
         self.floor_number = floor_number
@@ -343,33 +337,6 @@ class Floor:
             new_key = Key(self.game)
             new_key.place(self)
         return True
-
-    
-    def map(self):
-        
-        """
-        Функция генерирует и выводит в чат карту этажа замка.
-        
-        """
-        
-        f = self.rows
-        r = self.rooms
-        game = self.game
-        text = []
-        text.append('======' * r + '=')
-        for i in range(f):
-            text.append('║' + '     ║' * r)
-            line1 = '║'
-            line2 = ''
-            for j in range(r):
-                room = self.plan[i*r+j]
-                symbol = room.get_symbol_for_map()
-                line1 += f'  {symbol}  {room.doors[1].vertical_symbol()}'
-                line2 += f'==={room.doors[2].horizontal_symbol()}=='
-            text.append(line1)
-            text.append('║' + '     ║' * r)
-            text.append(line2 + '=')
-        pprint(game, text, r*Floor._map_width_coefficient, f*Floor._map_height_coefficient)
         
     
     def get_random_room_with_furniture(self) -> Room:
