@@ -3,7 +3,7 @@ from random import randint as dice
 from typing import Any, NoReturn
 
 from class_basic import *
-from functions import howmany, randomitem, tprint, roll
+from functions import howmany, randomitem, tprint, roll, pprint
 
 
 class Rune:
@@ -349,7 +349,13 @@ class Matches:
   
 
 class Map:
+
+    _width_coefficient = 72
+    """Коэффициент для расчета ширины карты."""
     
+    _height_coefficient = 90
+    """Коэффициент для расчета высоты карты."""
+
     def __init__(self, game):
         self.game = game
         self.can_use_in_fight = False
@@ -364,24 +370,26 @@ class Map:
         }
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
+        self.floor = None
 
     
     def check_name(self, message:str) -> bool:
         return message.lower() in ['карта', 'карту']
     
     
-    def place(self, castle, room=None) -> bool:
+    def place(self, floor, room=None) -> bool:
         
         """ Метод размещения карты в замке. """
         
         if not room:
-            rooms = castle.plan
+            rooms = floor.plan
             room = randomitem(rooms)
         if room.furniture:
             furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
+        self.floor = floor
         return True
 
     
@@ -403,13 +411,39 @@ class Map:
 
         """
         game = self.game
-        floor = who.floor
         read_map, map_text = who.generate_map_text(in_action)
         tprint(game, map_text, 'direction')
         if read_map:    
-            floor.map()
+            self.show_map()
             return True
         return False
+
+    
+    def show_map(self):
+        
+        """
+        Функция генерирует и выводит в чат карту этажа замка.
+        
+        """
+        
+        rows = self.floor.rows
+        rooms = self.floor.rooms
+        game = self.game
+        text = []
+        text.append('======' * rooms + '=')
+        for i in range(rows):
+            text.append('║' + '     ║' * rooms)
+            line1 = '║'
+            line2 = ''
+            for j in range(rooms):
+                room = self.plan[i*rooms+j]
+                symbol = room.get_symbol_for_map()
+                line1 += f'  {symbol}  {room.doors[1].vertical_symbol()}'
+                line2 += f'==={room.doors[2].horizontal_symbol()}=='
+            text.append(line1)
+            text.append('║' + '     ║' * rooms)
+            text.append(line2 + '=')
+        pprint(game, text, rooms*Map._width_coefficient, rows*Map._height_coefficient)
 
     
     def take(self, who) -> NoReturn:
