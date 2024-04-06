@@ -463,7 +463,7 @@ class Monster:
             return False
         total_damage = total_attack - target_defence
         if total_damage > 0:
-            message.append(f'{target.name} теряет {howmany(total_damage, "жизнь,жизни,жизней")}.')
+            message.append(f'{target.name} теряет {howmany(total_damage, ["жизнь", "жизни", "жизней"])}.')
             message += [
                 self.break_enemy_shield(target=target, total_attack=total_attack),
                 self.poison_enemy(target=target),
@@ -492,10 +492,10 @@ class Monster:
         total_attack = weapon_attack + mele_attack
         if weapon_attack > 0:
             message.append(f'{self_name} {self.action()} {target.lexemes["accus"]} используя {self.weapon.lexemes["accus"]} и '
-                        f'наносит {mele_attack}+{howmany(weapon_attack, "единицу,единицы,единиц")} урона.')
+                        f'наносит {mele_attack}+{howmany(weapon_attack, ["единицу", "единицы", "единиц"])} урона.')
         else:
             message.append(f'{self_name} бьет {target.lexemes["accus"]} не используя оружия и '
-                        f'наносит {howmany(mele_attack, "единицу,единицы,единиц")} урона.')
+                        f'наносит {howmany(mele_attack, ["единицу", "единицы", "единиц"])} урона.')
         return total_attack, message
     
     
@@ -689,7 +689,7 @@ class Monster:
         self.stren -= weakness_amount
         self.health = self.start_health
         text = f'{self.get_self_name_in_room(self)} остается в живых и истекает кровью, теряя при ' \
-                        f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы. '
+                        f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы. '
         text += self.try_to_run_away()
         tprint(self.game, text)
         return True
@@ -705,8 +705,8 @@ class Monster:
         self.stren += strengthening_amount
         self.health = self.start_health - ill_amount
         text = f'{self.get_self_name_in_room(self)} остается в живых и приходит в ярость, получая при ' \
-                        f'этом {howmany(strengthening_amount, "единицу,единицы,единиц")} силы и ' \
-                        f'теряя {howmany(ill_amount, "жизнь,жизни,жизней")}. '
+                        f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и ' \
+                        f'теряя {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}. '
         text += self.try_to_run_away()
         tprint(self.game, text)
         return True
@@ -722,8 +722,8 @@ class Monster:
         self.stren -= weakness_amount
         self.health = self.start_health + health_boost_amount
         text = f'{self.get_self_name_in_room(self)} остается в живых и получает контузию, теряя при ' \
-                        f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы и ' \
-                        f'получая {howmany(health_boost_amount, "жизнь,жизни,жизней")}. '
+                        f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы и ' \
+                        f'получая {howmany(health_boost_amount, ["жизнь", "жизни", "жизней"])}. '
         text += self.try_to_run_away()
         tprint(self.game, text)
         return True
@@ -739,8 +739,8 @@ class Monster:
         self.stren -= weakness_amount
         self.health = self.start_health - ill_amount
         tprint(self.game, f'{self.get_self_name_in_room(self)} остается в живых и получает ранение в ногу и не может двигаться, теряя при ' \
-                            f'этом {howmany(weakness_amount, "единицу,единицы,единиц")} силы ' \
-                            f'и {howmany(ill_amount, "жизнь,жизни,жизней")}.')
+                            f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы ' \
+                            f'и {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}.')
         return True
     
     
@@ -1103,7 +1103,7 @@ class Vampire(Monster):
         
         sucked = total_damage // Vampire._suck_coefficient
         self.health += sucked
-        return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, "жизнь,жизни,жизней")}.'
+        return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, ["жизнь", "жизни", "жизней"])}.'
     
     
     def place(self, floor, room_to_place = None, old_place = None):

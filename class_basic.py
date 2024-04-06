@@ -84,7 +84,7 @@ class Loot:
             if items_dict[item] == 1:
                 sorted_list.append(item)
             else:
-                quantity = howmany(items_dict[item], 'штука,штуки,штук')
+                quantity = howmany(items_dict[item], ['штука', 'штуки', 'штук'])
                 sorted_list.append(f'{item} ({quantity})')
         return sorted_list 
 
@@ -215,13 +215,13 @@ class Money:
 
     def take(self, lucky_one):
         lucky_one.money.how_much_money += self.how_much_money
-        tprint(self.game, f'{lucky_one.name} {lucky_one.g(["забрал", "забрала"])} {howmany(self.how_much_money, "монету,монеты,монет")}')
+        tprint(self.game, f'{lucky_one.name} {lucky_one.g(["забрал", "забрала"])} {howmany(self.how_much_money, ["монету", "монеты", "монет"])}')
         self.generate_name()
 
 
     def show(self):
         if self >= 1:
-            return howmany(self.how_much_money, 'монету,монеты,монет')
+            return howmany(self.how_much_money, ["монета", "монеты", "монет"])
         else:
             return 'Денег нет'
         
