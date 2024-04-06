@@ -1210,7 +1210,7 @@ class Hero:
         total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
             action = randomitem(self.weapon.actions)
-            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.lexemes["accus"]} и наносит {total_attack}+{howmany(total_attack, "единицу,единицы,единиц")} урона.'
+            hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon.lexemes["accus"]} и наносит {total_attack}+{howmany(total_attack, ["единицу", "единицы", "единиц"])} урона.'
         else:
             hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
         message.append(hit_string)
@@ -1300,7 +1300,7 @@ class Hero:
         money_text = self.show_me_money()
         message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. ' 
                        f'{self.g(["Его", "Ее"])} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
-                       f' у {self.g(["него", "нее"])} {howmany(self.health, "единица,единицы,единиц")} здоровья, что составляет '
+                       f' у {self.g(["него", "нее"])} {howmany(self.health, ["единица", "единицы", "единиц"])} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         message.append(self.show_weapon())
         message.append(self.show_protection())
@@ -1326,7 +1326,7 @@ class Hero:
         """Метод генерирует описание денег персонажа."""
         
         if self.money >= 2:
-            money_text = f'В кошельке звенят {howmany(self.money.how_much_money, "монета,монеты,монет")}.'
+            money_text = f'В кошельке звенят {howmany(self.money.how_much_money, ["монета", "монеты", "монет"])}.'
         elif self.money == 1:
             money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
@@ -1426,7 +1426,7 @@ class Hero:
         self.dext = self.start_dext
         self.intel = self.start_intel
         self.wins += 1
-        tprint(self.game, f'{self.name} получает {howmany(loser.exp, "единицу,единицы,единиц")} опыта!')
+        tprint(self.game, f'{self.name} получает {howmany(loser.exp, ["единицу", "единицы", "единиц"])} опыта!')
         self.gain_experience(exp=loser.exp)
         self.restless = 0
 

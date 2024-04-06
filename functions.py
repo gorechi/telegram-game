@@ -121,15 +121,13 @@ def randomitem(items_list, how_many:int=1, need_number:bool=False):
     return sample(items_list, how_many)
 
 
-def howmany(a, string):
-    b = string.split(',')
-    a1, a2 = int(a % 10), int(a % 100)
-    if a1 == 1 and a2 != 11:
-        return str(a) + ' ' + b[0]
-    elif 1 < a1 < 5 and (a2 < 12 or a2 > 14):
-        return str(a) + ' ' + b[1]
-    else:
-        return str(a) + ' ' + b[2]
+def howmany(number:int, options_list:list[str]) -> str:
+    last_digit, last_two_digits = int(number % 10), int(number % 100)
+    if last_digit == 1 and last_two_digits != 11:
+        return f'{number} {options_list[0]}'
+    if 1 < last_digit < 5 and (last_two_digits < 12 or last_two_digits > 14):
+        return f'{number} {options_list[1]}'
+    return f'{number} {options_list[2]}'
 
 
 def readitems(what_kind, how_many, classes):
