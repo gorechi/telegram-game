@@ -8,7 +8,7 @@ from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corps
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
-from class_allies import Trader
+from class_allies import Trader, Scribe, RuneMerchant
 from class_backpack import Backpack
 from functions import randomitem, tprint
 
@@ -59,6 +59,7 @@ class Game():
     _how_many_traders = 1
     """Сколько торговцев в игре"""
 
+    _traders_update_counter = 30
 
 
     def __init__(self, chat_id:str, bot, hero:Hero=None):
@@ -84,6 +85,8 @@ class Game():
             'руна': Rune,
             'заклинание': Spell,
             'торговец': Trader,
+            'книжник': Scribe,
+            'торговец рунами': RuneMerchant,
             'рюкзак': Backpack,
             'зелье исцеления': HealPotion,
             'зелье здоровья': HealthPotion,
@@ -101,6 +104,7 @@ class Game():
         self.chat_id = chat_id
         self.bot = bot
         self.all_corpses = []
+        self.all_traders = []
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
@@ -113,13 +117,28 @@ class Game():
         new_key = Key(self)
         self.player.backpack + new_key
         self.game_is_on = False
+        self.traders_update_counter = Game._traders_update_counter
         
 
     def trigger_on_movement(self):
         """Метод обрабатывает событие движения героя"""
-        
         self.raise_dead()
-        
+        self.check_traders_update()
+
+    
+    def check_traders_update(self) -> bool:
+        if self.trader_update_counter > 0:
+            self.traders_update_counter -= 1
+            return False
+        self.update_traders()
+        return True
+    
+    
+    def update_traders(self) -> bool:
+        for trader in self.all_traders:
+            trader.get_goods()
+        return True
+    
     
     def raise_dead(self):
         """Метод воскрешения мертвецов"""
@@ -173,6 +192,9 @@ class Game():
         - file - имя файла, содержащего данные;
         - random - нужно ли создавать случайный набор объектов из прочитанных данных?
         - how_many - сколько объектов нужно прочитать из файла и вернуть?
+        - obj_class - объекты какого класса нужно начитывать?
+        - floor - некоторые объекты могут появиться только на определенном этаже и выше. 
+        Параметр указывает, объекты какого этажа нужно начитывать.
         
         Очевидно, что передавать random без how_many не имеет смысла.
         
@@ -181,19 +203,21 @@ class Game():
         objects = []
         with open(file, encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
+        if not parsed_data:
+            raise FileExistsError(f'Не удалось прочитать данные из файла {file}')
         if obj_class and isinstance(obj_class, str):
             parsed_data = [i for i in parsed_data if i['class'] == obj_class]
         if floor and isinstance(floor, int):
             parsed_data = [i for i in parsed_data if int(i.get('floor')) >= floor]
-        if random:
+        if random and how_many:
             for _ in range(how_many):
                 i = randomitem(parsed_data)
                 new_game_object = self.object_from_json(json_object=i)
                 objects.append(new_game_object)
-        else:
-            for i in parsed_data:
-                new_game_object = self.object_from_json(json_object=i)
-                objects.append(new_game_object)
+            return objects
+        for i in parsed_data:
+            new_game_object = self.object_from_json(json_object=i)
+            objects.append(new_game_object)
         return objects
     
           
@@ -233,5 +257,10 @@ class Game():
     
     
     def test(self, hero:Hero):
+        floor = self.current_floor
+        room = floor.plan[0]
+        new_trader = Scribe(self, floor)
+        new_trader.place(room)
+        hero.money += 100
         return None
             

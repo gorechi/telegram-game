@@ -363,14 +363,8 @@ class Floor:
             line2 = ''
             for j in range(r):
                 room = self.plan[i*r+j]
-                cant_rest, rest_place = room.can_rest()
-                if game.player.current_position.position == i * r + j:    
-                    a = game.player.name[0]
-                elif rest_place and not room.visited == ' ':
-                    a = '#'
-                else: 
-                    a = room.visited
-                line1 += f'  {a}  {room.doors[1].vertical_symbol()}'
+                symbol = room.get_symbol_for_map()
+                line1 += f'  {symbol}  {room.doors[1].vertical_symbol()}'
                 line2 += f'==={room.doors[2].horizontal_symbol()}=='
             text.append(line1)
             text.append('║' + '     ║' * r)

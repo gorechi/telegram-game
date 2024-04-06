@@ -1,16 +1,6 @@
-from functions import roll
+from class_basic import Money
 
-dex = 4
-intel = 1
-stren = 10
-mastery = 1
-base_price = 7
-base_price_die = 8
-dice = []
-for _ in range(mastery):
-    dice.append(base_price_die)
+game = 1
+money = Money(game, 10)
 
-
-
-for _ in range (50):
-    print(roll(dice) + base_price)
+print(money <= 40)

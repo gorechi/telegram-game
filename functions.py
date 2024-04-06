@@ -2,9 +2,32 @@ from random import randint, sample
 
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
+from typing import Tuple, Optional
 
 
-def roll(dice:list) -> int:
+def split_actions(message:str) -> Tuple[str, Optional[str]]:
+    """
+    Разделяет входящее сообщение на действие и цель.
+
+    Принимает строку сообщения, где ожидается, что первое слово будет действием,
+    а оставшаяся часть строки - целью действия. Если сообщение содержит только одно слово,
+    оно считается действием, а цель устанавливается в None.
+
+    Parameters:
+    message (str): Входящее сообщение, которое необходимо разделить.
+
+    Returns:
+    Tuple[str, Optional[str]]: Кортеж, содержащий действие (строка) и цель (строка или None, если цель отсутствует).
+    """
+    try:
+        action, target = message.split(' ', 1)
+    except ValueError:
+        action = message
+        target = None
+    return action, target
+            
+            
+def roll(dice:list|tuple) -> int:
     """Функция имитирует бросок нескольких кубиков сразу
 
     Args:
