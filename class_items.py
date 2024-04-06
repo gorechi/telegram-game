@@ -21,7 +21,7 @@ class Rune:
             "inst": "руной"
             }
     
-    _poison_probability = 3
+    _poison_probability = (3)
     """
     Вероятность того, что руна будет отравленной. 
     Цифра указывает на количество граней кубика, который надо кинуть. 
@@ -45,15 +45,14 @@ class Rune:
                         24: 'потопа'}
     """Словарь стихий."""
 
-    _glowing_elements = [1, 2, 4]
+    _glowing_elements = (1, 2, 4)
     """Массив стихий, которые заставляют оружие светиться в темноте"""
 
-    _minimum_price = 20
-    """Минимальная цена руны"""
-
-    _maximum_price = 30
-    """Максимальная цена руны"""
-
+    _base_price = 15
+    
+    _base_price_die = (15)
+    
+    _poison_price_modifier = (5)
     
     def __init__(self, game):
         self.game = game
@@ -65,8 +64,8 @@ class Rune:
         self.lexemes = self.generate_lexemes()
         self.description = f'{self.name} {Rune._elements_dictionary[self.element]}'
         self.empty = False
-        self.check_if_poisoned()
         self.base_price = self.define_base_price()
+        self.check_if_poisoned()
         
          
     def generate_lexemes(self) -> dict:
@@ -94,16 +93,17 @@ class Rune:
     
     
     def define_base_price(self) -> int:
-        return Rune._maximum_price
+        return Rune._base_price + roll(Rune._base_price_die)
 
     
     def check_if_poisoned(self) -> NoReturn:    
         
         """ Метод определяет, ядовитая руна, или нет. """
         
-        if roll([Rune._poison_probability]) == 1:
+        if roll(Rune._poison_probability) == 1:
             self.poison = True
             self.description = f'ядовитая {self.description}'
+            self.base_price += roll(Rune._poison_price_modifier)
         else:
             self.poison = False
 

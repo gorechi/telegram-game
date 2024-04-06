@@ -27,7 +27,7 @@ def split_actions(message:str) -> Tuple[str, Optional[str]]:
     return action, target
             
             
-def roll(dice:list) -> int:
+def roll(dice:list|tuple) -> int:
     """Функция имитирует бросок нескольких кубиков сразу
 
     Args:

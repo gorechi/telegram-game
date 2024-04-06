@@ -57,7 +57,8 @@ class Trader:
         self.shop = []
         self.goods_to_buy = []
         self.place()
-        self.money = self.generate_money()    
+        self.money = self.generate_money()
+        self.game.all_traders.append(self)    
     
     
     def sell(self, item_text:str, who) -> bool:
@@ -166,23 +167,7 @@ class Trader:
     def update_indexes(self) -> None:
         self.update_index(self.goods_to_buy)
         self.update_index(self.shop)
- 
-    
-    def get_runes(self) -> bool:
-        """
-        Получает руны для магазина торговца.
-
-        Этот метод определяет количество рун, которые может иметь торговец, на основе настройки `_how_many_runes_trader_can_have`.
-        Затем он создает указанное количество рун, инстанцируя класс `Rune`, и добавляет их в магазин торговца.
-
-        Возвращает:
-            bool: Возвращает True, если руны успешно получены и добавлены в магазин, иначе False.
-        """
-        how_many_runes = roll([Trader._how_many_runes_trader_can_have])
-        runes = [Rune(self.game) for _ in range(how_many_runes)]
-        self.shop.extend(runes)
-        return True
-    
+     
     
     def place(self, room=None):
         if room:
@@ -201,10 +186,6 @@ class Trader:
     
     def show_through_key_hole(self) -> str|list:
         return 'Видно кусок витрины, наполненной разноцветными непонятными вещицами.'
-    
-    
-    def show(self) -> str:
-        return
     
     
     def get_prices(self, backpack:Backpack) -> list[str]:
@@ -247,10 +228,11 @@ class Scribe(Trader):
         self.lexemes = lexemes
         if not self.lexemes:
             self.lexemes = Scribe._lexemes
-        self.get_books()
+        self.get_goods()
     
     
-    def get_books(self) -> bool:
+    def get_goods(self) -> bool:
+        self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
         for _ in range(how_many_books):
             book = Book(self.game)
@@ -337,10 +319,11 @@ class RuneMerchant(Trader):
         self.lexemes = lexemes
         if not self.lexemes:
             self.lexemes = RuneMerchant._lexemes
-        self.get_runes()
+        self.get_goods()
     
     
-    def get_runes(self) -> bool:
+    def get_goods(self) -> bool:
+        self,shop = []
         how_many_runes = roll([RuneMerchant._runes_quantity_die])
         for _ in range(how_many_runes):
             rune = Rune(self.game)

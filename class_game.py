@@ -59,6 +59,7 @@ class Game():
     _how_many_traders = 1
     """Сколько торговцев в игре"""
 
+    _traders_update_counter = 30
 
 
     def __init__(self, chat_id:str, bot, hero:Hero=None):
@@ -103,6 +104,7 @@ class Game():
         self.chat_id = chat_id
         self.bot = bot
         self.all_corpses = []
+        self.all_traders = []
         self.no_weapon = Weapon(self, empty=True)
         self.no_shield = Shield(self, empty=True)
         self.no_armor = Armor(self, empty=True)
@@ -115,13 +117,28 @@ class Game():
         new_key = Key(self)
         self.player.backpack + new_key
         self.game_is_on = False
+        self.traders_update_counter = Game._traders_update_counter
         
 
     def trigger_on_movement(self):
         """Метод обрабатывает событие движения героя"""
-        
         self.raise_dead()
-        
+        self.check_traders_update()
+
+    
+    def check_traders_update(self) -> bool:
+        if self.trader_update_counter > 0:
+            self.traders_update_counter -= 1
+            return False
+        self.update_traders()
+        return True
+    
+    
+    def update_traders(self) -> bool:
+        for trader in self.all_traders:
+            trader.get_goods()
+        return True
+    
     
     def raise_dead(self):
         """Метод воскрешения мертвецов"""
