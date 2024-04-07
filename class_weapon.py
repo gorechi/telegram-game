@@ -420,6 +420,10 @@ class Weapon:
         self.gender = gender
 
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def on_create(self) -> bool:
         self.decorate()
         return True
@@ -561,11 +565,11 @@ class Weapon:
     
     def take(self, who):
         game = self.game
-        message = [f'{who.name} берет {self.lexemes["accus"]}.']
+        message = [f'{who.name} берет {self:accus}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
             who.weapon = self
-            message.append(f'{who.name} теперь использует {self.lexemes["accus"]} в качестве оружия.')
+            message.append(f'{who.name} теперь использует {self:accus} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
                 shield = who.shield
                 who.shield = self.game.no_shield
@@ -602,7 +606,7 @@ class Weapon:
             who.backpack.append(who.weapon)
             who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self.lexemes["accus"]} в качестве оружия.']
+            message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
             if not who.shield.empty and self.twohanded:
                 shield = who.shield
                 who.removed_shield = shield

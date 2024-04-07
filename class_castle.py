@@ -6,6 +6,11 @@ from class_room import Door, Room
 from functions import pprint, randomitem
 
 
+class Ladder:
+    def __init__(self):
+        return
+
+
 class Floor:
     
     _dark_rooms_ratio = 8

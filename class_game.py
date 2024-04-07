@@ -1,6 +1,6 @@
 import json
 
-from class_castle import Floor
+from class_castle import Floor, Ladder
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
@@ -66,6 +66,8 @@ class Game():
         self.classes = { 
             'монстр': Monster,
             'мертвец': WalkingDead,
+            'этаж': Floor,
+            'лестница': Ladder,
             'герой': Hero,
             'оружие': Weapon,
             'щит': Shield,

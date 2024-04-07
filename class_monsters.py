@@ -137,6 +137,10 @@ class Monster:
         ]
 
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def get_weaker(self) -> bool:
         """
         Метод уменьшает силу и здоровье монстра на случайное значение, 
@@ -471,7 +475,7 @@ class Monster:
             ]
         else:
             total_damage = 0
-            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target.lexemes["accus"]}.')
+            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target:accus}.')
         target.health -= total_damage
         if target.health <= 0:
             game.state = 0
@@ -491,10 +495,10 @@ class Monster:
         weapon_attack = self.generate_weapon_attack(target=target)
         total_attack = weapon_attack + mele_attack
         if weapon_attack > 0:
-            message.append(f'{self_name} {self.action()} {target.lexemes["accus"]} используя {self.weapon.lexemes["accus"]} и '
+            message.append(f'{self_name} {self.action()} {target:accus} используя {self.weapon:accus} и '
                         f'наносит {mele_attack}+{howmany(weapon_attack, ["единицу", "единицы", "единиц"])} урона.')
         else:
-            message.append(f'{self_name} бьет {target.lexemes["accus"]} не используя оружия и '
+            message.append(f'{self_name} бьет {target:accus} не используя оружия и '
                         f'наносит {howmany(mele_attack, ["единицу", "единицы", "единиц"])} урона.')
         return total_attack, message
     

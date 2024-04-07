@@ -78,6 +78,10 @@ class Rune:
     def __str__(self) -> str:
         return f'{self.name} {Rune._elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
+    
+    
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
       
     def check_name(self, message:str) -> bool:
@@ -146,7 +150,7 @@ class Rune:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
 
     
     def show(self) -> str:
@@ -192,6 +196,10 @@ class Spell:
     
     def __str__(self):
         return self.name
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
     
     def take(self, who=''):
@@ -250,6 +258,10 @@ class Matches:
         self.room = None
         self.empty = False
         self.quantity = self.get_quantity()
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
         
  
     def check_name(self, message:str) -> bool:
@@ -317,7 +329,7 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False
 
@@ -371,6 +383,10 @@ class Map:
         self.empty = False
         self.description = 'Карта, показывающая расположение комнат замка'
         self.floor = None
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
     
     def check_name(self, message:str) -> bool:
@@ -452,7 +468,7 @@ class Map:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
 
 
 class Key:
@@ -471,6 +487,10 @@ class Key:
         }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
     
     def check_name(self, message:str) -> bool:
@@ -642,6 +662,10 @@ class Book:
         self.can_use_in_fight = False
         self.base_price = self.define_base_price()
 
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
     
     def __str__(self):
         return self.name
@@ -699,6 +723,6 @@ class Book:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False

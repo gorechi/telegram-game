@@ -104,6 +104,10 @@ class Furniture:
         return self.where + ' ' + self.state + ' ' + self.name
     
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def on_create(self):
         self.state = randomitem(self.states)
         self.where = randomitem(self.wheres)

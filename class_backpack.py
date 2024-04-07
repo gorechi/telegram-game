@@ -22,6 +22,10 @@ class Backpack:
         }
 
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def check_name(self, message:str) -> bool:
         return message.lower() in [self.name, self.lexemes["accus"]]
     

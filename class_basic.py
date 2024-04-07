@@ -152,6 +152,10 @@ class Money:
         return message.lower() in ['деньги', self.lexemes["nom"], self.lexemes["accus"]]
     
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def __repr__(self):
         return str(self.how_much_money)
 
