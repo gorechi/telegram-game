@@ -2,22 +2,17 @@ from random import randint as dice
 
 from class_basic import Money
 from class_items import Key, Map, Matches, Rune, Book
-from class_room import Door, Room
+from class_room import Door, Room, Ladder
 from functions import pprint, randomitem
-
-
-class Ladder:
-    def __init__(self):
-        return
 
 
 class Floor:
     
     _dark_rooms_ratio = 8
-    """Какая часть комнат замка будет темными (если 5, то будет каждая пятая комната)."""
+    """Какая часть комнат этажа будет темными (если 5, то будет каждая пятая комната)."""
     
     _locked_rooms_ratio = 8
-    """Какая часть комнат замка будет заперта (если 5, то будет каждая пятая комната)."""
+    """Какая часть комнат этажа будет заперта (если 5, то будет каждая пятая комната)."""
     
     _min_money_in_locked_room = 15
     """Минимальное количество денег в запертой комнате."""
@@ -54,6 +49,26 @@ class Floor:
         self.lights_off()
         self.inhabit()
                 
+    
+    def create_ladders(self) -> bool:
+        next_floor = self.game.get_floor_by_number(self.floor_number + 1)
+        if not next_floor:
+            return False
+        for _ in range(self.how_many['лестницы']):
+            room = self.get_room_to_place_ladder_up()
+            room_to_go = next_floor.get_room_to_place_ladder_down()
+            new_ladder = Ladder(room, room_to_go)
+        return True
+    
+    
+    def get_room_to_place_ladder_up(self) -> Room:
+        rooms = [room for room in self.plan if not room.ladder_up]
+        return randomitem(rooms)
+    
+    
+    def get_room_to_place_ladder_down(self) -> Room:
+        rooms = [room for room in self.plan if not room.ladder_down]
+        return randomitem(rooms)
     
     def create_rooms(self, f:int, r:int):    
         

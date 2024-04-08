@@ -162,5 +162,5 @@ class Backpack:
             return False
         who.backpack = self
         self.owner = who
-        tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who.g(["он", "она"])} может носить с собой необходимые вещи.')
+        tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.')
         return True

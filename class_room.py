@@ -4,13 +4,31 @@ from typing import NoReturn
 from class_basic import Loot, Money
 from class_items import Key
 from functions import pprint, randomitem, readfile, tprint, roll
+from typing import Optional
+
+
+class Ladder:
+    def __init__(self, room_down:'Room', room_up:Optional['Room']=None):
+        self.room_up = room_up
+        self.room_down = room_down
+        self.place()
+    
+    
+    def place(self) -> bool:
+        if not isinstance(self.room_down, Room):
+            raise TypeError(f'К лестнице привязан неправильный объект {self.room_down.__class__.__name__} в качестве нижней комнаты.')
+        self.room_down.ladder_up = self
+        if not isinstance(self.room_up, Room):
+            self.room_up = self.get_random_room_up()
+        self.room_up.ladder_down = self
+        return True
 
 
 class Door:
     """Класс дверей."""
     
     
-    def __init__(self, game=None):
+    def __init__(self, game):
         self.empty = True
         self.game = game
 
@@ -53,7 +71,7 @@ class Furniture:
     """Верхний лимит денег в мебели при генерации."""
 
     
-    def __init__(self, game, name='', furniture_type=0, can_rest=False):
+    def __init__(self, game, name:str='', furniture_type:int=0, can_rest:bool=False):
         """
         Инициализирует объект класса мебели
 
@@ -82,22 +100,22 @@ class Furniture:
         """
 
         self.game = game
-        self.loot = Loot(self.game)
-        self.locked = False
-        self.lockable = False
-        self.opened = True
-        self.trap = Trap(self.game, self)
-        self.can_contain_trap = True
-        self.can_contain_weapon = True
-        self.can_hide = False
-        self.can_rest = can_rest
-        self.name = name
-        self.empty = False
-        self.empty_text = 'пусто'
-        self.state = 'стоит'
-        self.where = 'в углу'
-        self.room = None
-        self.type = furniture_type
+        self.loot:Loot = Loot(self.game)
+        self.locked:bool = False
+        self.lockable:bool = False
+        self.opened:bool = True
+        self.trap:Trap = Trap(self.game, self)
+        self.can_contain_trap:bool = True
+        self.can_contain_weapon:bool = True
+        self.can_hide:bool = False
+        self.can_rest:bool = can_rest
+        self.name:str = name
+        self.empty:bool = False
+        self.empty_text:str = 'пусто'
+        self.state:str = 'стоит'
+        self.where:str = 'в углу'
+        self.room:'Room' = None
+        self.type:int = furniture_type
 
     
     def __str__(self):
@@ -221,34 +239,50 @@ class Room:
         self.floor = floor
         self.doors = doors
         self.money:int = 0
-        self.decorate()
         self.loot:Loot = Loot(self.game)
         self.secret_loot:Loot = Loot(self.game)
-        self.locked = False
+        self.locked:bool = False
         self.position:int = -1
-        self.visited:str = ' '
+        self.visited:bool = False
         self.rune_place = self.game.empty_thing
         self.light:bool = True
         self.trader = None
         self.morgue:list = []
         self.furniture:list = []
         self.stink:int = 0
-        self.stink_levels = Room._stink_levels
+        self.ledder_up:Ladder = None
+        self.ledder_down:Ladder = None
+        self.last_seen_trap:Trap = None
         self.torch = self.set_torch()
         self.secret_word = self.get_secret_word()
-        self.last_seen_trap:Trap = None
+        self.decorate()
 
     
     def get_symbol_for_map(self) -> str:
+        """
+        Определяет символ для отображения комнаты на карте.
+
+        Возвращает символ, представляющий комнату в зависимости от её состояния:
+        - ' ' (пробел), если комната не была посещена;
+        - Первую букву имени игрока, если игрок находится в данной комнате;
+        - '₽', если в комнате есть торговец;
+        - '◊', если в комнате можно отдохнуть;
+        - '+', во всех остальных случаях.
+
+        Returns:
+            str: Символ, представляющий комнату на карте.
+        """
         game = self.game
         cant_rest, rest_place = self.can_rest()
+        if not self.visited:
+            return ' '
         if game.player.current_position == self:    
             return game.player.name[0]
         if self.trader:
             return '₽'
-        if rest_place and self.visited != ' ':
-            return '#'
-        return self.visited
+        if rest_place:
+            return '◊'
+        return '+'
     
     
     def set_torch(self):
@@ -281,6 +315,12 @@ class Room:
 
     
     def get_trap(self):
+        """
+        Возвращает активированную ловушку, последнюю увиденную в комнате, если таковая имеется.
+
+        Возвращает:
+            Trap|None: Объект ловушки, если в комнате есть активированная последняя увиденная ловушка. В противном случае возвращает None.
+        """
         if self.last_seen_trap:
             if self.last_seen_trap.activated:
                 return self.last_seen_trap
@@ -408,7 +448,7 @@ class Room:
         else:
             monster = None
         if self.stink > 0:
-            stink_text = f'{self.stink_levels[self.stink]} воняет чем-то очень неприятным.'
+            stink_text = f'{Room._stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
             if self.torch:
                 decoration1 = f'освещенную факелом {self.decoration1}'
@@ -462,7 +502,7 @@ class Room:
         else:
             message.append(f'{who.name} заглядывает в замочную скважину двери и {monster.key_hole}')
         if self.stink > 0:
-            message.append(f'Из замочной скважины {self.stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
+            message.append(f'Из замочной скважины {Room._stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
         return message
 
     
@@ -526,25 +566,43 @@ class Room:
     def map(self):
         if not self.light:
             return False
-        game=self.game
-        monsters = self.monsters()
-        if monsters:
-            monster = monsters[0]
-        else:
-            monster = None
-        string1 = '=={0}=='.format(self.doors[0].horizontal_symbol())
-        string2 = '║   ║'
-        string3 = '{0} '.format(self.doors[3].vertical_symbol())
-        if monster:
-            string3 += monster.name[0]
-        else:
-            string3 += ' '
-        string3 += ' {0}'.format(self.doors[1].vertical_symbol())
-        string4 = '=={0}=='.format(self.doors[2].horizontal_symbol())
-        pprint(game, string1 + '\n' + string2 + '\n' + string3 + '\n' + string2 + '\n' + string4,
-                Room._plan_picture_width, Room._plan_picture_height)
+        message = []
+        game = self.game
+        top_door:str = self.doors[0].horizontal_symbol()
+        left_door:str = self.doors[3].vertical_symbol()
+        right_door:str = self.doors[1].vertical_symbol()
+        bottom_door:str = self.doors[2].horizontal_symbol()
+        symbol:str = self.get_symbol_for_plan()
+        second_line = self.get_second_line_for_plan()
+        fourth_line = self.get_fourth_line_for_plan()
+        message.append(f'=={top_door}==')
+        message.append(second_line)
+        message.append(f'{left_door} {symbol} {right_door}')
+        message.append(fourth_line)
+        message.append(f'=={bottom_door}==')
+        pprint(game, message, Room._plan_picture_width, Room._plan_picture_height)
         return True
 
+    
+    def get_symbol_for_plan(self) -> str:
+        monster = self.monsters('first')
+        if monster:
+            return monster.name[0]
+        if self.trader:
+            return '₽'
+        return ' '
+    
+    
+    def get_second_line_for_plan(self) -> str:
+        if self.ledder_up:
+            return '║  #║'
+        return '║   ║'
+    
+    
+    def get_fourth_line_for_plan(self) -> str:
+        if self.ledder_down:
+            return '║#  ║'
+        return '║   ║'
     
     def lock(self):
         for door in self.doors:

@@ -21,7 +21,7 @@ class Rune:
             "inst": "руной"
             }
     
-    _poison_probability = (3)
+    _poison_probability = (3,)
     """
     Вероятность того, что руна будет отравленной. 
     Цифра указывает на количество граней кубика, который надо кинуть. 
@@ -50,9 +50,9 @@ class Rune:
 
     _base_price = 15
     
-    _base_price_die = (15)
+    _base_price_die = (15,)
     
-    _poison_price_modifier = (5)
+    _poison_price_modifier = (5,)
     
     def __init__(self, game):
         self.game = game
@@ -239,7 +239,7 @@ class Matches:
     
     """ Класс Спички. """
     
-    _max_quantity = 10
+    _max_quantity = (10,)
     """Кубик, который нужно кинуть чтобы определить, сколько спичек в коробке"""
     
     def __init__(self, game):
@@ -269,7 +269,7 @@ class Matches:
     
     
     def get_quantity(self) -> int:
-        return roll([Matches._max_quantity])
+        return roll(Matches._max_quantity)
 
     
     def get_quantity_text(self, quantity:int) -> str:

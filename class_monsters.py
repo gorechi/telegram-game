@@ -138,6 +138,10 @@ class Monster:
 
     
     def __format__(self, format:str) -> str:
+        if format == 'pronoun':
+            if self.gender == 0:
+                return 'он'
+            return 'она'
         return self.lexemes.get(format, '')
     
     

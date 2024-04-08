@@ -217,6 +217,10 @@ class Hero:
     
     
     def __format__(self, format:str) -> str:
+        if format == 'pronoun':
+            if self.gender == 0:
+                return 'он'
+            return 'она'
         return self.lexemes.get(format, '')
          
     
@@ -516,7 +520,7 @@ class Hero:
         """
         wound = self.wounds.get('stren', 0)
         self.wounds['stren'] = wound + 1
-        return f'{self.name} получает ранение и теряет много крови. Из-за раны {self.g(["он", "она"])} сильно слабеет.'
+        return f'{self.name} получает ранение и теряет много крови. Из-за раны {self:pronoun} сильно слабеет.'
     
     
     def dex_wound(self) -> str:
@@ -603,7 +607,7 @@ class Hero:
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target:pronoun} теперь неважно себя чувствует.'
         return None
     
     
@@ -662,7 +666,7 @@ class Hero:
             self.shield = self.game.no_shield
             message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
-            message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self.g(["он", "она"])} может достать щит из-за спины.')
+            message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
         self.backpack.remove(second_weapon, self)
         self.backpack.append(self.weapon)
         self.weapon = second_weapon
@@ -1093,7 +1097,7 @@ class Hero:
                 return
         new_position = self.current_position.position + self.floor.directions_dict[direction]
         self.current_position = self.floor.plan[new_position]
-        self.current_position.visited = '+'
+        self.current_position.visited = True
         self.run = True
         message.append('На этом схватка заканчивается.')
         self.restless = 0
@@ -1287,7 +1291,7 @@ class Hero:
         
         game = self.game
         if self.shield.empty:
-            tprint(self.game, f'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self.g(["он", "она"])} не может.')
+            tprint(self.game, f'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self:pronoun} не может.')
         else:
             tprint(game, showsides(self, target, self.floor))
             self.hide = True
@@ -1647,7 +1651,7 @@ class Hero:
             self.game.trigger_on_movement()
             new_position = self.current_position.position + self.floor.directions_dict[direction]
             self.current_position = self.floor.plan[new_position]
-            self.current_position.visited = '+'
+            self.current_position.visited = True
             self.current_position.show(self)
             self.current_position.map()
             self.decrease_restless(1)
@@ -1868,7 +1872,7 @@ class Hero:
             backpacks[0].take(self)
             current_loot.remove(backpacks[0])
             return True
-        tprint(self.game, f'У {self.g(["героя", "героини"])} нет рюкзака, поэтому {self.g(["он", "она"])} может взять только то, что может нести в руках')
+        tprint(self.game, f'У {self.g(["героя", "героини"])} нет рюкзака, поэтому {self:pronoun} может взять только то, что может нести в руках')
         return False
     
     
