@@ -8,11 +8,64 @@ from typing import Optional
 
 
 class Ladder:
+    
+    _lexemes:dict = {
+            "nom": "лестница",
+            "accus": "лестницу",
+            "gen": "лестницы",
+            "dat": "лестнице",
+            "prep": "лестнице",
+            "inst": "лестницой"
+        }
+    
+    _first_decorators:tuple[dict[str, str]] = (
+        {
+            "nom": "крутая",
+            "accus": "крутую",
+            "gen": "крутой",
+            "dat": "крутой",
+            "prep": "крутой",
+            "inst": "крутой"
+        },
+        {
+            "nom": "грязная",
+            "accus": "грязную",
+            "gen": "грязной",
+            "dat": "грязной",
+            "prep": "грязной",
+            "inst": "грязной"
+        }
+    )
+    
+    _second_decorators:tuple[dict[str, str]] = (
+        {
+            "nom": "каменная",
+            "accus": "каменную",
+            "gen": "каменной",
+            "dat": "каменной",
+            "prep": "каменной",
+            "inst": "каменной"
+        },
+        {
+            "nom": "деревянная",
+            "accus": "деревянную",
+            "gen": "деревянной",
+            "dat": "деревянной",
+            "prep": "деревянной",
+            "inst": "деревянной"
+        }
+    )
+    
     def __init__(self, room_down:'Room', room_up:Optional['Room']=None):
         self.room_up = room_up
         self.room_down = room_down
+        self.decorate()
         self.place()
     
+    
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
     
     def place(self) -> bool:
         if not isinstance(self.room_down, Room):
@@ -22,6 +75,16 @@ class Ladder:
             self.room_up = self.get_random_room_up()
         self.room_up.ladder_down = self
         return True
+    
+    
+    def decorate(self) -> None:
+        self.lexemes = {}
+        first_words = randomitem(Ladder._first_decorators)
+        second_words = randomitem(Ladder._second_decorators)
+        for key in Ladder._lexemes:
+            description = f'{first_words[key]} {second_words[key]} {Ladder._lexemes[key]}'
+            self.lexemes[key] = description
+        
 
 
 class Door:
@@ -424,58 +487,56 @@ class Room:
 
         Возвращает:
             None
-
-        Метод сначала проверяет, есть ли в комнате монстры. Если есть, первому монстру присваивается переменная 'monster', в противном случае присваивается None.
-        Если в комнате уровень вони больше 0, переменной 'stink_text' присваивается текст о вони.
-        Если в комнате светло, переменной 'decoration1' присваивается соответствующее описание декорации в зависимости от того, горит ли факел.
-        Если в комнате нет монстра, переменной 'who_is_here' присваивается строка 'Не видно ничего интересного.', в противном случае 'who_is_here' присваивается описание монстра.
-        Затем метод создает список под названием 'message' и добавляет в него следующие строки:
-        - Имя игрока, за которым следует 'попадает в' и описание комнаты.
-        - Описания мебели в комнате.
-        - Описание торговца, если он есть.
-        - Описания трупов в комнате.
-        - Описание того, кто находится в комнате.
-        - Текст о вони, если уровень вони больше 0.
-        Если в комнате не светло, 'message' присваивается строка, указывающая на отсутствие источника света в комнате.
-        Если в комнате есть монстр, в 'message' добавляется строка, указывающая, что в темноте слышны странные звуки.
-        Если уровень вони больше 0, в 'message' добавляется текст о вони.
-        Наконец, метод вызывает функцию 'tprint' для вывода списка 'message' в чат игры.
         """
-        game = self.game
-        monsters = self.monsters()
-        if monsters:
-            monster = monsters[0]
-        else:
-            monster = None
-        if self.stink > 0:
-            stink_text = f'{Room._stink_levels[self.stink]} воняет чем-то очень неприятным.'
         if self.light:
-            if self.torch:
-                decoration1 = f'освещенную факелом {self.decoration1}'
-            else:
-                decoration1 = self.decoration1
-            if not monster:
-                who_is_here = 'Не видно ничего интересного.'
-            else:
-                who_is_here = f'{self.decoration3} {monster.state} {monster.name}.'
-            message = []
-            message.append(f'{player.name} попадает в {decoration1} '
-                           f'комнату {self.decoration2}. {self.decoration4}')
-            message += self.show_furniture()
-            if self.trader:
-                message.append(self.trader.show())
-            message += self.show_corpses()
-            message.append(who_is_here)
-            if self.stink > 0:
-                message.append(stink_text)
+            message = self.show_with_light_on(player)
         else:
-            message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
-            if monster:
-                message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
-            if self.stink > 0:
-                message.append(stink_text)
-        tprint(game, message, state='direction')
+            message = self.show_with_light_off()
+        tprint(self.game, message, state='direction')
 
+    
+    def show_with_light_off(self) -> list[str]:
+        monster = self.monsters('first')
+        message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
+        if monster:
+            message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
+        message.append(self.get_stink_text())
+        return message
+    
+    
+    def show_with_light_on(self, player) -> list[str]:
+        message = []
+        decoration = self.get_decoration_for_show()
+        monster_text = self.get_monster_text_for_show()
+        message.append(f'{player.name} попадает в {decoration} '
+                       f'комнату {self.decoration2}. {self.decoration4}')
+        message.extend(self.show_furniture())
+        if self.trader:
+            message.append(self.trader.show())
+        message += self.show_corpses()
+        message.append(monster_text)
+        message.append(self.get_stink_text())
+        return message
+        
+
+    def get_monster_text_for_show(self) -> str:
+        monster = self.monsters('first')
+        if not monster:
+            return 'Не видно ничего интересного.'
+        return f'{self.decoration3} {monster.state} {monster.name}.'
+    
+    
+    def get_decoration_for_show(self) -> str:
+        if self.torch:
+            return f'освещенную факелом {self.decoration1}'
+        return self.decoration1
+    
+    
+    def get_stink_text(self) -> str|None:
+        if self.stink > 0:
+            return f'{Room._stink_levels[self.stink]} воняет чем-то очень неприятным.'
+        return None
+    
     
     def show_through_key_hole(self, who):
         """
