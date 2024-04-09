@@ -56,9 +56,10 @@ class Ladder:
         }
     )
     
-    def __init__(self, room_down:'Room', room_up:Optional['Room']=None):
+    def __init__(self, room_down:'Room', room_up:Optional['Room']=None, locked:bool=False):
         self.room_up = room_up
         self.room_down = room_down
+        self.locked = locked
         self.decorate()
         self.place()
     
@@ -84,7 +85,18 @@ class Ladder:
         for key in Ladder._lexemes:
             description = f'{first_words[key]} {second_words[key]} {Ladder._lexemes[key]}'
             self.lexemes[key] = description
+
+    
+    def show_in_room_as_ladder_down(self) -> str:
+        if self.locked:
+            return f'В полу имеется квадратный люк, плотно закрытый крышкой.'
+        return f'{self:nom} спускается вниз в темноту.'.capitalize()
         
+
+    def show_in_room_as_ladder_up(self) -> str:
+        if self.locked:
+            return f'{self:nom} поднимается к люку в потолке, закрытому тяжелой крышкой.'.capitalize()
+        return f'{self:nom} ведет куда-то вверх.'.capitalize()
 
 
 class Door:
@@ -511,6 +523,7 @@ class Room:
         message.append(f'{player.name} попадает в {decoration} '
                        f'комнату {self.decoration2}. {self.decoration4}')
         message.extend(self.show_furniture())
+        message.extend(self.get_ladders_text())
         if self.trader:
             message.append(self.trader.show())
         message += self.show_corpses()
@@ -519,6 +532,15 @@ class Room:
         return message
         
 
+    def get_ladders_text(self) -> list[str]:
+        message = []
+        if self.ladder_down:
+            message.append(self.ladder_down.show_in_room_as_ladder_down())
+        if self.ladder_up:
+            message.append(self.ladder_up.show_in_room_as_ladder_up())
+        return message
+    
+    
     def get_monster_text_for_show(self) -> str:
         monster = self.monsters('first')
         if not monster:
