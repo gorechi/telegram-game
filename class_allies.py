@@ -61,20 +61,23 @@ class Trader:
         self.game.all_traders.append(self)    
     
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
     def sell(self, item_text:str, who) -> bool:
         item_in_shop = self.get_item_by_text(item_text, 'sell')
         if not item_in_shop:
-            tprint(self.game, f'{self.lexemes["nom"]} растерянно качает головой, явно не понимая, о чем идет речь.')
+            tprint(self.game, f'{self:nom} растерянно качает головой, явно не понимая, о чем идет речь.')
             return False
         item = item_in_shop.item
         item_price = item_in_shop.price
         available_money = who.money.get_sum()
         if item_price > available_money:
-            tprint(self.game, f'У {who.lexemes["gen"]} не хватает денег чтобы купить {item.lexemes["accus"]}.')
+            tprint(self.game, f'У {who:gen} не хватает денег чтобы купить {item:accus}.')
             return False
         self.take_money(who, item_price)
         self.give_item(who, item_in_shop)
-        tprint(self.game, f'{who.lexemes["gen"]} платит {howmany(item_price, ["монета", "монеты", "монет"])} и кладет {item.lexemes["accus"]} в свой рюкзак')
+        tprint(self.game, f'{who:gen} платит {howmany(item_price, ["монета", "монеты", "монет"])} и кладет {item:accus} в свой рюкзак')
         self.update_indexes()
         return True
      
@@ -82,16 +85,16 @@ class Trader:
     def buy(self, item_text:str, who) -> bool:
         item_to_buy = self.get_item_by_text(item_text, 'buy')
         if not item_to_buy:
-            tprint(self.game, f'{self.lexemes["nom"]} на такое предложение даже не поднимает глаз от какого-то документа. Ему не нужен подобный хлам.')
+            tprint(self.game, f'{self:nom} на такое предложение даже не поднимает глаз от какого-то документа. Ему не нужен подобный хлам.')
             return False
         item = item_to_buy.item
         item_price = item_to_buy.price
         if self.money < item_price:
-            tprint(self.game, f'{self.lexemes["nom"]} не может позволить себе купить такую дорогую вещь.')
+            tprint(self.game, f'{self:nom} не может позволить себе купить такую дорогую вещь.')
             return False
         self.give_money(who, item_price)
         self.take_item(who, item_to_buy)
-        tprint(self.game, f'{who.lexemes["gen"]} продает {item.lexemes["accus"]} {self.lexemes["dat"]} и получает {howmany(item_price, ["монета", "монеты", "монет"])}.')
+        tprint(self.game, f'{who:gen} продает {item:accus} {self:dat} и получает {howmany(item_price, ["монета", "монеты", "монет"])}.')
         self.update_indexes()
         return True
    
@@ -252,7 +255,7 @@ class Scribe(Trader):
             return ['На полках торговца пусто. Ему нечего предложить на продажу.']
         message = ['В лавке торговца на полках стоят следующие книги:']
         for item in self.shop:
-            name = item.item.lexemes['nom']
+            name = f'{item.item:nom}'
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
@@ -263,7 +266,7 @@ class Scribe(Trader):
             return ['Книжник не хочет ничего покупать у героя.']
         message = ['Книжник с удовольствием приобрел бы у героя следующие вещи по сходной цене:']
         for item in self.goods_to_buy:
-            name = item.item.lexemes['nom']
+            name = f'{item.item:nom}'
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
@@ -343,7 +346,7 @@ class RuneMerchant(Trader):
             return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
         message = ['Перед торговцем на прилавке разложены следующие руны:']
         for item in self.shop:
-            name = item.item.lexemes['nom']
+            name = f'{item.item:nom}'
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
@@ -354,7 +357,7 @@ class RuneMerchant(Trader):
             return ['Торговец рунами не хочет ничего покупать у героя.']
         message = ['Торговец рунами с удовольствием приобрел бы у героя следующие руны:']
         for item in self.goods_to_buy:
-            name = item.item.lexemes['nom']
+            name = f'{item.item:nom}'
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message

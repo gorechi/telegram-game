@@ -321,6 +321,11 @@ class Protection:
         self.protection = int(protection)
         self.user = None
         self.enchantable = enchantable
+    
+    
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
 
     def __str__(self):
         protection_string = str(self.protection)
@@ -400,10 +405,10 @@ class Protection:
     def take(self, who):
         if who.shield == '':
             who.shield = self
-            tprint(self.game, f'{who.name} использует {self.lexemes["accus"]} как защиту.')
+            tprint(self.game, f'{who.name} использует {self:accus} как защиту.')
         else:
             self.game.player.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
 
     
     def show(self) -> str:
@@ -431,7 +436,7 @@ class Protection:
             who_using.backpack.append(who_using.shield)
             who_using.shield = self
             who_using.backpack.remove(self, who_using)
-        tprint(self.game, f'{who_using.name} теперь использует {self.lexemes["accus"]} в качестве защиты!')
+        tprint(self.game, f'{who_using.name} теперь использует {self:accus} в качестве защиты!')
     
     
     def get_element_decorator(self) -> str|None:
@@ -522,9 +527,9 @@ class Armor(Protection):
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
         old_armor = who.armor
-        message = [f'{who.name} использует {self.lexemes["accus"]} как защиту.']
+        message = [f'{who.name} использует {self:accus} как защиту.']
         if not old_armor.empty:
-            message.append(f'При этом он снимает {old_armor.lexemes["accus"]} и оставляет валяться на полу.')
+            message.append(f'При этом он снимает {old_armor:accus} и оставляет валяться на полу.')
             who.drop(old_armor.name)
         who.armor = self
         self.user = who

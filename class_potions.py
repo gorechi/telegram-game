@@ -13,6 +13,10 @@ class Potion:
         self.owner = None
 
     
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+    
+    
     def __str__(self):
         return self.description
 
@@ -53,7 +57,7 @@ class Potion:
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             self.owner = who
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False
 
@@ -79,7 +83,7 @@ class HealPotion(Potion):
         else:
             heal = dice(1, self.effect)
         owner.health += heal
-        text = f'{owner.lexemes["nom"]} восполняет {howmany(heal, ["единицу жизни", "единицы жизни", "диниц жизни"])}'
+        text = f'{owner:nom} восполняет {howmany(heal, ["единицу жизни", "единицы жизни", "диниц жизни"])}'
         if owner.poisoned:
             owner.poisoned = False
             text += ' и излечивается от отравления'

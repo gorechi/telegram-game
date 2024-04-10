@@ -1,6 +1,6 @@
 import json
 
-from class_castle import Floor
+from class_castle import Floor, Ladder
 from class_hero import Hero
 from class_items import Book, Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
@@ -25,6 +25,10 @@ class Empty():
         self.empty = True
         self.frightening = False
         self.agressive = False
+        self.locked = False
+    
+    def __bool__(self):
+        return False
 
 
 class Game():
@@ -51,7 +55,25 @@ class Game():
             'книга': 5,
             'очаг': 2,
             'руна': 10,
+            'лестницы': 2,
             'ловушка': 3}
+        },
+        2: {
+        'rows': 3, 
+        'rooms': 3,
+        'traps_difficulty': 4, 
+        'how_many': {
+            'монстры': 5,
+            'оружие': 3,
+            'щит': 2,
+            'доспех': 2,
+            'зелье': 5,
+            'мебель': 6,
+            'книга': 2,
+            'очаг': 1,
+            'руна': 3,
+            'лестницы': 0,
+            'ловушка': 2}
         }
     }
     """Размеры этажей замка. Каждый подмассив - это этаж замка."""
@@ -66,6 +88,8 @@ class Game():
         self.classes = { 
             'монстр': Monster,
             'мертвец': WalkingDead,
+            'этаж': Floor,
+            'лестница': Ladder,
             'герой': Hero,
             'оружие': Weapon,
             'щит': Shield,
@@ -110,16 +134,26 @@ class Game():
         self.no_armor = Armor(self, empty=True)
         self.no_backpack = Backpack(self, no_backpack=True)
         self.castle_floors = self.create_floors()
+        self.create_ladders()
         self.current_floor = self.castle_floors[0]
         self.player = self.check_hero(hero=hero)
         self.player.current_position = self.current_floor.plan[0]
-        self.current_floor.plan[0].visited = '+'
+        self.current_floor.plan[0].visited = True
         new_key = Key(self)
         self.player.backpack + new_key
         self.game_is_on = False
         self.traders_update_counter = Game._traders_update_counter
         
 
+    def create_lsdders(self):
+        for floor in self.castle_floors[:-1]:
+            floor.create_ladders()
+            
+
+    def get_floor_by_number(self, number:int) -> Floor:
+        return next((floor for floor in self.castle_floors if floor.floor_number == number), None)
+    
+    
     def trigger_on_movement(self):
         """Метод обрабатывает событие движения героя"""
         self.raise_dead()

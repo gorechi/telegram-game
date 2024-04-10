@@ -21,7 +21,7 @@ class Rune:
             "inst": "руной"
             }
     
-    _poison_probability = (3)
+    _poison_probability = (3,)
     """
     Вероятность того, что руна будет отравленной. 
     Цифра указывает на количество граней кубика, который надо кинуть. 
@@ -50,9 +50,9 @@ class Rune:
 
     _base_price = 15
     
-    _base_price_die = (15)
+    _base_price_die = (15,)
     
-    _poison_price_modifier = (5)
+    _poison_price_modifier = (5,)
     
     def __init__(self, game):
         self.game = game
@@ -78,6 +78,10 @@ class Rune:
     def __str__(self) -> str:
         return f'{self.name} {Rune._elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
+    
+    
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
       
     def check_name(self, message:str) -> bool:
@@ -146,7 +150,7 @@ class Rune:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
 
     
     def show(self) -> str:
@@ -193,6 +197,10 @@ class Spell:
     def __str__(self):
         return self.name
 
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
     
     def take(self, who=''):
         if who == '':
@@ -231,7 +239,7 @@ class Matches:
     
     """ Класс Спички. """
     
-    _max_quantity = 10
+    _max_quantity = (10,)
     """Кубик, который нужно кинуть чтобы определить, сколько спичек в коробке"""
     
     def __init__(self, game):
@@ -250,6 +258,10 @@ class Matches:
         self.room = None
         self.empty = False
         self.quantity = self.get_quantity()
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
         
  
     def check_name(self, message:str) -> bool:
@@ -257,7 +269,7 @@ class Matches:
     
     
     def get_quantity(self) -> int:
-        return roll([Matches._max_quantity])
+        return roll(Matches._max_quantity)
 
     
     def get_quantity_text(self, quantity:int) -> str:
@@ -317,7 +329,7 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False
 
@@ -356,8 +368,9 @@ class Map:
     _height_coefficient = 90
     """Коэффициент для расчета высоты карты."""
 
-    def __init__(self, game):
+    def __init__(self, game, floor):
         self.game = game
+        self.floor = floor
         self.can_use_in_fight = False
         self.name = 'карта'
         self.lexemes = {
@@ -369,27 +382,35 @@ class Map:
             "inst": "картой"
         }
         self.empty = False
-        self.description = 'Карта, показывающая расположение комнат замка'
-        self.floor = None
+        self.decorate()
+    
 
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
+    
+    def decorate(self) -> None:
+        self.description = f'Карта, показывающая расположение комнат {self.floor.floor_number} этажа замка'
+        for lexeme in self.lexemes:
+            self.lexemes[lexeme] += f' {self.floor.floor_number} этажа'
+    
     
     def check_name(self, message:str) -> bool:
         return message.lower() in ['карта', 'карту']
     
     
-    def place(self, floor, room=None) -> bool:
+    def place(self, room=None) -> bool:
         
         """ Метод размещения карты в замке. """
         
         if not room:
-            rooms = floor.plan
+            rooms = self.floor.plan
             room = randomitem(rooms)
         if room.furniture:
             furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
-        self.floor = floor
         return True
 
     
@@ -452,7 +473,7 @@ class Map:
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
 
 
 class Key:
@@ -471,6 +492,10 @@ class Key:
         }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
+
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
 
     
     def check_name(self, message:str) -> bool:
@@ -642,6 +667,10 @@ class Book:
         self.can_use_in_fight = False
         self.base_price = self.define_base_price()
 
+
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
     
     def __str__(self):
         return self.name
@@ -699,6 +728,6 @@ class Book:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.lexemes["accus"]} себе.')
+            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False
