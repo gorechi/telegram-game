@@ -1,7 +1,7 @@
 from class_items import Book, Key, Money, Rune
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
-from class_room import Furniture, Room
+from class_room import Furniture, Room, Ladder
 from class_weapon import Weapon
 from class_backpack import Backpack
 from functions import howmany, normal_count, randomitem, showsides, tprint, roll, split_actions
@@ -2062,10 +2062,32 @@ class Hero:
         
         if not self.check_if_hero_can_open():
             return False
-        if item == '' or not Hero._doors_dict.get(item, False):
-            return self.open_furniture(what=item)
-        else:
+        if Hero._doors_dict.get(item, False):
             return self.open_door(direction=item)
+        if item in ['люк', 'лестницу']:
+            return self.open_ladder()
+        return self.open_furniture(what=item)     
+        
+    
+    def open_ladder(self) -> bool:
+        ladder, direction_string = self.choose_ladder_to_open()
+        key = self.backpack.get_first_item_by_class(Key)
+        if not ladder:
+            tprint(self.game, f'В этой комнате нет лестниц, которые нужно было бы отпирать.')
+            return False
+        self.backpack.remove(key)
+        ladder.locked = False
+        tprint(self.game, f'{self.name} отпирает {ladder:accus}, ведущую {direction_string}, ключом.')
+        return True
+        
+        
+    def choose_ladder_to_open(self) -> tuple[Ladder|None, str]:
+        room = self.current_position
+        if room.ladder_up and room.ladder_up.locked:
+            return room.ladder_up, 'вверх'
+        if room.ladder_down and room.ladder_down.locked:
+            return room.ladder_down, 'вниз'
+        return None, ''
 
     
     def take_out_shield(self) -> bool:
