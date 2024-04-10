@@ -25,6 +25,10 @@ class Empty():
         self.empty = True
         self.frightening = False
         self.agressive = False
+        self.locked = False
+    
+    def __bool__(self):
+        return False
 
 
 class Game():

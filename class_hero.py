@@ -185,6 +185,10 @@ class Hero:
                                         }
                                }
         self.command_dict = {'осмотреть': self.look,
+                            'подняться': self.go_up,
+                            'подниматься': self.go_up,
+                            'спуститься': self.go_down,
+                            'спускаться': self.go_down,
                             'идти': self.go,
                             'атаковать': self.fight,
                             'напасть': self.fight,
@@ -233,6 +237,61 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def go_down(self, what:str) -> bool:
+        if not self.check_light():
+            return self.go_down_with_light_off()
+        return self.go_down_with_light_on()
+    
+    
+    def go_down_with_light_off(self) -> bool:
+        room = self.current_position
+        if not room.ladder_down or room.ledder_down.locked:
+            tprint (self.game, f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.')
+            return False
+        room_to_go = room.ladder_down.room_down
+        return self.move(room_to_go)
+    
+    
+    def go_down_with_light_on(self) -> bool:
+        room = self.current_position
+        if not room.ladder_down:
+            tprint (self.game, f'{self:nom} в недоумении смотрит на абсолютно ровный пол.' 
+                    f'Как только {self.g(['ему', 'ей'])} могла прийти в голову такая идея?')
+            return False
+        if room.ladder_down.locked:
+           tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
+           return False
+        room_to_go = room.ladder_down.room_down
+        return self.move(room_to_go)
+    
+    
+    def go_up(self, what:str) -> bool:
+        if not self.check_light():
+            return self.go_up_with_light_off()
+        return self.go_up_with_light_on()
+    
+    
+    def go_up_with_light_off(self) -> bool:
+        room = self.current_position
+        if not room.ladder_up or room.ledder_up.locked:
+            tprint (self.game, f'{self:nom} ничего не может разглядеть в такой темноте.')
+            return False
+        room_to_go = room.ladder_up.room_up
+        return self.move(room_to_go)
+    
+    
+    def go_up_with_light_on(self) -> bool:
+        room = self.current_position
+        if not room.ladder_up:
+            tprint (self.game, f'{self:nom} и {self.g(['хотел', 'хотела'])} бы забраться повыше, но в этой комнате нет такой возможности.')
+            return False
+        if room.ladder_up.locked:
+           tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
+           return False
+        room_to_go = room.ladder_up.room_up
+        return self.move(room_to_go)
+
+         
     def action(self, command:str, message:str):
         
         """Метод обработки комманд от игрока."""
@@ -1630,34 +1689,47 @@ class Hero:
     def go(self, direction:str):
         """Метод обрабатывает команду "идти". """
         
-        game = self.game
-        door = self.current_position.doors[Hero._doors_dict[direction]]
         if not self.floor.directions_dict.get(direction):
-            tprint(game, f'{self.name} не знает такого направления!')
+            tprint(self.game, f'{self.name} не знает такого направления!')
             return False
-        elif door.empty:
-            if self.check_light():
-                tprint(game, f'Там нет двери. {self.name} не может туда пройти!')
-            else:
-                tprint(game, f'В темноте {self.name} врезается во что-то носом.')
+        if self.check_light():
+            return self.go_with_light_on(direction)
+        return self.go_with_light_off(direction)
+    
+    
+    def go_with_light_on(self, direction:str) -> bool:
+        door = self.current_position.doors[Hero._doors_dict[direction]]
+        if door.empty:
+            tprint(self.game, f'Там нет двери. {self.name} не может туда пройти!')
             return False
-        elif door.locked:
-            if self.check_light():
-                tprint(game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
-            else:
-                tprint(game, f'В темноте {self.name} врезается во что-то носом.')
+        if door.locked:
+            tprint(self.game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
             return False
-        else:
-            self.game.trigger_on_movement()
-            new_position = self.current_position.position + self.floor.directions_dict[direction]
-            self.current_position = self.floor.plan[new_position]
-            self.current_position.visited = True
-            self.current_position.show(self)
-            self.current_position.map()
-            self.decrease_restless(1)
-            self.check_monster_and_figth()
-            return True
-
+        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
+        new_position = self.floor.plan[new_room_number]
+        return self.move(new_position)
+    
+    
+    def go_with_light_off(self, direction:str) -> bool:
+        door = self.current_position.doors[Hero._doors_dict[direction]]
+        if door.empty or door.locked:
+            tprint(self.game, f'В темноте {self.name} врезается во что-то носом.')
+            return False
+        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
+        new_position = self.floor.plan[new_room_number]
+        return self.move(new_position)
+    
+    
+    def move(self, new_position:Room) -> bool:
+        self.game.trigger_on_movement()
+        self.current_position = new_position
+        self.current_position.visited = True
+        self.current_position.show(self)
+        self.current_position.map()
+        self.decrease_restless(1)
+        self.check_monster_and_figth()
+        return True
+    
     
     def fight(self, enemy, agressive=False):
         """Метод обрабатывает команду "атаковать". """

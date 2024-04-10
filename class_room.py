@@ -325,8 +325,8 @@ class Room:
         self.morgue:list = []
         self.furniture:list = []
         self.stink:int = 0
-        self.ledder_up:Ladder = None
-        self.ledder_down:Ladder = None
+        self.ledder_up:Ladder = self.game.empty_thing
+        self.ledder_down:Ladder = self.game.empty_thing
         self.last_seen_trap:Trap = None
         self.torch = self.set_torch()
         self.secret_word = self.get_secret_word()
