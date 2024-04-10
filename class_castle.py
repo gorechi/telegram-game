@@ -194,8 +194,8 @@ class Floor:
 
     
     def place_map(self, game):
-        new_map = Map(game)
-        new_map.place(self)
+        new_map = Map(game, self)
+        new_map.place()
 
     
     def place_books(self, game):

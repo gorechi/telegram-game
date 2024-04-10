@@ -1,4 +1,4 @@
-from class_items import Book, Key, Money, Rune
+from class_items import Book, Key, Money, Rune, Map
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room, Ladder
@@ -2111,6 +2111,8 @@ class Hero:
         if item_string.isdigit():
             number = int(item_string)
             item = self.backpack.get_item_by_number(number)
+        elif item_string in ['карту', 'карта', 'картой']:
+            item = self.get_map()
         else:
             item = self.backpack.get_first_item_by_name(item_string)
         if item:
@@ -2118,6 +2120,11 @@ class Hero:
             return True
         tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
         return False
+    
+    
+    def get_map(self) -> Map|None:
+        maps = self.backpack.get_items_by_class(Map)
+        return next((map for map in maps if map.floor == self.floor), None)
     
     
     def use(self, item:str=None) -> bool:

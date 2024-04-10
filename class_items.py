@@ -368,8 +368,9 @@ class Map:
     _height_coefficient = 90
     """Коэффициент для расчета высоты карты."""
 
-    def __init__(self, game):
+    def __init__(self, game, floor):
         self.game = game
+        self.floor = floor
         self.can_use_in_fight = False
         self.name = 'карта'
         self.lexemes = {
@@ -381,31 +382,35 @@ class Map:
             "inst": "картой"
         }
         self.empty = False
-        self.description = 'Карта, показывающая расположение комнат замка'
-        self.floor = None
-
+        self.decorate()
+    
 
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
 
     
+    def decorate(self) -> None:
+        self.description = f'Карта, показывающая расположение комнат {self.floor.floor_number} этажа замка'
+        for lexeme in self.lexemes:
+            self.lexemes[lexeme] += f' {self.floor.floor_number} этажа'
+    
+    
     def check_name(self, message:str) -> bool:
         return message.lower() in ['карта', 'карту']
     
     
-    def place(self, floor, room=None) -> bool:
+    def place(self, room=None) -> bool:
         
         """ Метод размещения карты в замке. """
         
         if not room:
-            rooms = floor.plan
+            rooms = self.floor.plan
             room = randomitem(rooms)
         if room.furniture:
             furniture = randomitem(room.furniture)
             furniture.put(self)
         else:
             room.loot.add(self)
-        self.floor = floor
         return True
 
     
