@@ -838,15 +838,13 @@ class Plant(Monster):
         self.can_resurrect=False
 
 
-    def grow(self, room):
+    def grow_in_room(self, room):
         """
         Метод для размножения растения. Создает новый экземпляр растения в указанной комнате.
         """
         new_plant = Plant(self.game, self.name, self.lexemes, self.stren, self.health, 'бьет', 'растет', False, False, False)
-        new_plant.room = room
-        self.floor.all_monsters.append(new_plant)
+        new_plant.place(floor=room.floor, room_to_place=room)
         self.game.how_many_monsters += 1
-        return True
 
     
     def win(self, loser=None):
@@ -855,22 +853,16 @@ class Plant(Monster):
         и пытается размножиться в соседние комнаты.
         """
         self.health = self.start_health
-        room = self.current_position
-        floor = self.floor
-        new_rooms = []
-        for i in range(4):
-            if room.doors[i] == 1:
-                if i == 0: 
-                    new_rooms.append(floor.plan[room.position - floor.rooms])
-                elif i == 1: 
-                    new_rooms.append(floor.plan[room.position + 1])
-                elif i == 2:
-                    new_rooms.append(floor.plan[room.position + floor.rooms])
-                elif i == 3:
-                    new_rooms.append(floor.plan[room.position - 1])
-        for i in new_rooms:
-            if not i.monster():
-                self.grow(i)
+        self.grow()
+
+
+    def grow(self):
+        available_rooms = self.floor.get_rooms_around(self.current_position)
+        roms_without_monsters = [room for room in available_rooms if not room.has_a_monster()]
+        target_rooms = randomitem(roms_without_monsters, how_many=2)
+        for room in target_rooms:
+            self.grow_in_room(room)
+
 
     def place(self, floor, room_to_place = None, old_place = None):
         """

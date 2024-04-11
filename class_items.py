@@ -459,8 +459,8 @@ class Map:
             for j in range(rooms):
                 room = self.plan[i*rooms+j]
                 symbol = room.get_symbol_for_map()
-                line1 += f'  {symbol}  {room.doors[1].vertical_symbol()}'
-                line2 += f'==={room.doors[2].horizontal_symbol()}=='
+                line1 += f'  {symbol}  {room.doors[1]:vertical}'
+                line2 += f'==={room.doors[2]:horizontal}=='
             text.append(line1)
             text.append('║' + '     ║' * rooms)
             text.append(line2 + '=')
