@@ -627,6 +627,11 @@ class Room:
             return []
         
     
+    def has_a_monster(self) -> bool:
+        monsters = self.floor.monsters_in_rooms[self]
+        return bool(monsters)
+    
+    
     def monster_in_ambush(self):
         monsters = self.monsters()
         if monsters:

@@ -64,7 +64,7 @@ class Floor:
                 available_rooms.append(room.ladder_down.room_down)
             if room.ladder_up and not room.ladder_up.locked:
                 available_rooms.append(room.ladder_up.room_up)
-        return True
+        return available_rooms
     
     def create_ladders(self) -> bool:
         next_floor = self.game.get_floor_by_number(self.floor_number + 1)
