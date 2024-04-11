@@ -106,6 +106,27 @@ class Door:
     def __init__(self, game):
         self.empty = True
         self.game = game
+    
+    
+    def __bool__(self):
+        return not self.empty
+    
+    
+    def __format__(self, format_string:str):
+        if format_string == 'horizontal':
+            if self.empty:
+                return '='
+            elif self.locked:
+                return '-'
+            else:
+                return ' '
+        if format_string == 'vertical':
+            if self.empty:
+                return '║'
+            elif self.locked:
+                return '|'
+            else:
+                return ' '
 
     
     def activate(self):
@@ -113,21 +134,6 @@ class Door:
         self.locked = False
         self.closed = True
         
-    def horizontal_symbol(self) -> str:
-        if self.empty:
-            return '='
-        elif self.locked:
-            return '-'
-        else:
-            return ' '       
-
-    def vertical_symbol(self) -> str:
-        if self.empty:
-            return '║'
-        elif self.locked:
-            return '|'
-        else:
-            return ' '
 
 class Furniture:
     """Класс мебели."""
@@ -651,10 +657,10 @@ class Room:
             return False
         message = []
         game = self.game
-        top_door:str = self.doors[0].horizontal_symbol()
-        left_door:str = self.doors[3].vertical_symbol()
-        right_door:str = self.doors[1].vertical_symbol()
-        bottom_door:str = self.doors[2].horizontal_symbol()
+        top_door:str = f'{self.doors[0]:horizontal}'
+        left_door:str = f'{self.doors[3]:vertical}'
+        right_door:str = f'{self.doors[1]:vertical}'
+        bottom_door:str = f'{self.doors[2]:horizontal}'
         symbol:str = self.get_symbol_for_plan()
         second_line = self.get_second_line_for_plan()
         fourth_line = self.get_fourth_line_for_plan()

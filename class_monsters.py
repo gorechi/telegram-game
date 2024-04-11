@@ -838,7 +838,7 @@ class Plant(Monster):
         self.can_resurrect=False
 
 
-    def grow(self, room):
+    def grow_in_room(self, room):
         """
         Метод для размножения растения. Создает новый экземпляр растения в указанной комнате.
         """
@@ -855,6 +855,10 @@ class Plant(Monster):
         и пытается размножиться в соседние комнаты.
         """
         self.health = self.start_health
+        self.grow()
+
+
+    def grow(self):
         room = self.current_position
         floor = self.floor
         new_rooms = []
@@ -871,6 +875,7 @@ class Plant(Monster):
         for i in new_rooms:
             if not i.monster():
                 self.grow(i)
+
 
     def place(self, floor, room_to_place = None, old_place = None):
         """

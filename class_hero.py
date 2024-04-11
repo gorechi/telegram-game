@@ -256,7 +256,7 @@ class Hero:
         room = self.current_position
         if not room.ladder_down:
             tprint (self.game, f'{self:nom} в недоумении смотрит на абсолютно ровный пол.' 
-                    f'Как только {self.g(['ему', 'ей'])} могла прийти в голову такая идея?')
+                    f'Как только {self.g(["ему", "ей"])} могла прийти в голову такая идея?')
             return False
         if room.ladder_down.locked:
            tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
@@ -283,7 +283,7 @@ class Hero:
     def go_up_with_light_on(self) -> bool:
         room = self.current_position
         if not room.ladder_up:
-            tprint (self.game, f'{self:nom} и {self.g(['хотел', 'хотела'])} бы забраться повыше, но в этой комнате нет такой возможности.')
+            tprint (self.game, f'{self:nom} и {self.g(["хотел", "хотела"])} бы забраться повыше, но в этой комнате нет такой возможности.')
             return False
         if room.ladder_up.locked:
            tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
