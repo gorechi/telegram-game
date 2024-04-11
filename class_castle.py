@@ -50,6 +50,22 @@ class Floor:
         self.inhabit()
                 
     
+    def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
+        directions = {0: -self.rooms,
+                      1: 1,
+                      2: self.rooms,
+                      3: -1}
+        available_rooms = []
+        for i, door in enumerate(room.doors):
+            if door and not door.locked:
+                available_rooms.append(self.plan[room.position + directions[i]])
+        if ladders:
+            if room.ladder_down and not room.ladder_down.locked:
+                available_rooms.append(room.ladder_down.room_down)
+            if room.ladder_up and not room.ladder_up.locked:
+                available_rooms.append(room.ladder_up.room_up)
+        return True
+    
     def create_ladders(self) -> bool:
         next_floor = self.game.get_floor_by_number(self.floor_number + 1)
         if not next_floor:
@@ -291,21 +307,13 @@ class Floor:
             - stink_level - Начальный уровень вони
 
         """
-        directions = {0: (0 - self.rooms),
-                           1: 1,
-                           2: self.rooms,
-                           3: (0 - 1)}
-        available_directions = []
-        if room.stink != 0:
+        if room.stink >= stink_level:
             return True
         else:
             room.stink = stink_level
-        for i, door in enumerate(room.doors):
-            if not door.empty:
-                available_directions.append(i)
+        available_rooms = self.get_rooms_around(room)
         if stink_level > 1:
-            for direction in available_directions:
-                next_room = self.plan[room.position + directions[direction]]
+            for next_room in available_rooms:
                 self.stink(next_room, stink_level - 1)
         return True
 
