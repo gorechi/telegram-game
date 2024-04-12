@@ -1,4 +1,5 @@
-from class_items import Book, Money, Rune, Matches
+from class_items import Money, Rune, Matches
+from class_book import Book
 from class_potions import Potion
 from class_backpack import Backpack
 from class_room import Furniture, Room
@@ -238,7 +239,7 @@ class Scribe(Trader):
         self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
         for _ in range(how_many_books):
-            book = Book(self.game)
+            book = Book.random_book(self.game)
             price = self.evaluate(book)
             new_book = Trader.ItemInShop(item=book, price=price)
             self.shop.append(new_book)

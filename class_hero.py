@@ -1,4 +1,5 @@
-from class_items import Book, Key, Money, Rune, Map
+from class_items import Key, Money, Rune, Map
+from class_book import Book
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield
 from class_room import Furniture, Room, Ladder
@@ -245,7 +246,7 @@ class Hero:
     
     def go_down_with_light_off(self) -> bool:
         room = self.current_position
-        if not room.ladder_down or room.ledder_down.locked:
+        if not room.ladder_down or room.ladder_down.locked:
             tprint (self.game, f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.')
             return False
         room_to_go = room.ladder_down.room_down
@@ -273,7 +274,7 @@ class Hero:
     
     def go_up_with_light_off(self) -> bool:
         room = self.current_position
-        if not room.ladder_up or room.ledder_up.locked:
+        if not room.ladder_up or room.ladder_up.locked:
             tprint (self.game, f'{self:nom} ничего не может разглядеть в такой темноте.')
             return False
         room_to_go = room.ladder_up.room_up
@@ -2269,28 +2270,15 @@ class Hero:
         if not self.check_if_hero_can_read():
             return False
         book = self.get_book(item=what)
-        if book:
-            message = [book.text]
-            message.append(book.get_mastery_string(self))
-            message.append(f'{self.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-            if book.type in [0, 1, 2]:
-                self.increase_weapon_mastery_after_reading(book.type)
-            if book.type == 3:
-                self.increase_trap_mastery_after_reading()
-            self.backpack.remove(book)
-        else:
-            message = 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.'
+        if not book:
+            tprint(self.game, 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')
+            return False
+        message = book.use(self)
+        self.backpack.remove(book)           
         tprint(self.game, message)
         self.decrease_restless(2)
         return True
     
-    
-    def increase_weapon_mastery_after_reading(self, book_type):
-        self.weapon_mastery[book_type]['level'] += 1
-    
-    
-    def increase_trap_mastery_after_reading(self):
-        self.trap_mastery += 1
     
     def decrease_restless(self, number:int) -> bool:
         """Метод уменьшает значение непоседливости героя. Герой не может отдыхать когда непоседливость больше 0."""

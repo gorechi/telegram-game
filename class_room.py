@@ -315,12 +315,13 @@ class Room:
         self.morgue:list = []
         self.furniture:list = []
         self.stink:int = 0
-        self.ledder_up:Ladder = self.game.empty_thing
-        self.ledder_down:Ladder = self.game.empty_thing
+        self.ladder_up:Ladder = self.game.empty_thing
+        self.ladder_down:Ladder = self.game.empty_thing
         self.last_seen_trap:Trap = None
         self.torch = self.set_torch()
-        self.secret_word = self.get_secret_word()
         self.decorate()
+        self.secret_word = self.get_secret_word()
+        
 
     
     def get_symbol_for_map(self) -> str:
@@ -672,13 +673,13 @@ class Room:
     
     
     def get_second_line_for_plan(self) -> str:
-        if self.ledder_up:
+        if self.ladder_up:
             return '║  #║'
         return '║   ║'
     
     
     def get_fourth_line_for_plan(self) -> str:
-        if self.ledder_down:
+        if self.ladder_down:
             return '║#  ║'
         return '║   ║'
     
@@ -715,7 +716,8 @@ class Room:
     def get_random_unlocked_furniture(self) -> Furniture:
         if self.furniture:
             furniture_list = [f for f in self.furniture if not f.locked]
-            return randomitem(furniture_list)
+            if furniture_list:
+                return randomitem(furniture_list)
         return None
 
 

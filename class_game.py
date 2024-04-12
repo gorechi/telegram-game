@@ -1,8 +1,9 @@
 import json
 
 from class_castle import Floor, Ladder
+from class_book import Book, ThrustingWeaponBook
 from class_hero import Hero
-from class_items import Book, Key, Map, Matches, Rune, Spell
+from class_items import Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
 from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal, WalkingDead
 from class_protection import Armor, Shield
@@ -105,6 +106,7 @@ class Game():
             'карта': Map,
             'спички': Matches,
             'книга': Book,
+            'книга о колющем оружии': ThrustingWeaponBook,
             'зелье': Potion,
             'руна': Rune,
             'заклинание': Spell,
@@ -145,7 +147,7 @@ class Game():
         self.traders_update_counter = Game._traders_update_counter
         
 
-    def create_lsdders(self):
+    def create_ladders(self):
         for floor in self.castle_floors[:-1]:
             floor.create_ladders()
             
