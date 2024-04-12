@@ -1,4 +1,5 @@
-from class_items import Book, Money, Rune, Matches
+from class_items import Money, Rune, Matches
+from class_book import Book
 from class_potions import Potion
 from class_backpack import Backpack
 from class_room import Furniture, Room

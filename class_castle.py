@@ -1,7 +1,8 @@
 from random import randint as dice
 
 from class_basic import Money
-from class_items import Key, Map, Matches, Rune, Book
+from class_book import Book
+from class_items import Key, Map, Matches, Rune
 from class_room import Door, Room, Ladder
 from functions import pprint, randomitem
 
@@ -216,7 +217,8 @@ class Floor:
     
     def place_books(self, game):
         for _ in range(self.how_many['книга']):
-            new_book = Book(self.game)
+            new_book = Book.random_book(self.game)
+            print(new_book, new_book.__class__)
             new_book.place(self)
 
     
@@ -341,8 +343,11 @@ class Floor:
         
         self.how_many_dark_rooms = len(self.plan) // Floor._dark_rooms_ratio
         dark_rooms = randomitem(self.plan, self.how_many_dark_rooms)
-        for room in dark_rooms:
-            room.light = False
+        if isinstance(dark_rooms, list):
+            for room in dark_rooms:
+                room.light = False
+        if isinstance(dark_rooms, Room):
+            dark_rooms.light = False
 
     
     def lock_doors(self):
