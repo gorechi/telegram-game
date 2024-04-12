@@ -239,7 +239,7 @@ class Scribe(Trader):
         self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
         for _ in range(how_many_books):
-            book = Book(self.game)
+            book = Book.random_book(self.game)
             price = self.evaluate(book)
             new_book = Trader.ItemInShop(item=book, price=price)
             self.shop.append(new_book)
