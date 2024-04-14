@@ -345,7 +345,7 @@ class Matches:
             tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
             return False
         if who_is_using.check_fear(print_message=False) and roll([2]) == 1:
-            tprint(self.game, f'От страха пальцы {who_is_using.g(["героя", "героини"])} не слушаются. Спичка ломается и падает на пол.')    
+            tprint(self.game, f'От страха пальцы {who_is_using.g("героя", "героини")} не слушаются. Спичка ломается и падает на пол.')    
         else:
             room.turn_on_light(who_is_using)
         self.quantity -= 1

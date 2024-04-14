@@ -574,8 +574,8 @@ class Weapon:
                 shield = who.shield
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
-                message.append(f'Из-за того, что {who.g(["герой взял", "героиня взяла"])} двуручное оружие, '
-                               f'{who.g(["ему", "ей"])} пришлось убрать {shield.get_full_name("accus")} за спину.')
+                message.append(f'Из-за того, что {who.g("герой взял", "героиня взяла")} двуручное оружие, '
+                               f'{who.g("ему", "ей")} пришлось убрать {shield.get_full_name("accus")} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
@@ -617,7 +617,7 @@ class Weapon:
                 who.shield = shield
                 who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g(["герой", "героиня"])} теперь держит во второй руке {shield.get_full_name("occus")}.')
+                               f'{who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("occus")}.')
         tprint(game, message)
 
     
