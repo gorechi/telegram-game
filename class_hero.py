@@ -243,7 +243,7 @@ class Hero:
     
     def examine(self, what:str) -> bool:
         if not self.check_light():
-            tprint(self.game, f'В этой комнате так темно, что {self.g(['герой', 'героиня'])} не может изучить даже собственную ладонь.')
+            tprint(self.game, f'В этой комнате так темно, что {self.g('герой', 'героиня')} не может изучить даже собственную ладонь.')
             return False
         items_list = self.find_what_to_examine()
         if not items_list:
@@ -292,7 +292,7 @@ class Hero:
         room = self.current_position
         if not room.ladder_down:
             tprint (self.game, f'{self:nom} в недоумении смотрит на абсолютно ровный пол.' 
-                    f'Как только {self.g(["ему", "ей"])} могла прийти в голову такая идея?')
+                    f'Как только {self.g("ему", "ей")} могла прийти в голову такая идея?')
             return False
         if room.ladder_down.locked:
            tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
@@ -319,7 +319,7 @@ class Hero:
     def go_up_with_light_on(self) -> bool:
         room = self.current_position
         if not room.ladder_up:
-            tprint (self.game, f'{self:nom} и {self.g(["хотел", "хотела"])} бы забраться повыше, но в этой комнате нет такой возможности.')
+            tprint (self.game, f'{self:nom} и {self.g("хотел", "хотела")} бы забраться повыше, но в этой комнате нет такой возможности.')
             return False
         if room.ladder_up.locked:
            tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
@@ -379,7 +379,7 @@ class Hero:
             tprint(self, f'{self.name} не находит такую руну у себя в карманах.', 'direction')
             return False
         if not self.selected_item:
-            tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g(["он хотел", "она хотела"])} ее поместить.', 'direction')
+            tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
             self.state = Hero._state.NO_STATE
             return False
         chosen_rune = rune_list[message]
@@ -603,7 +603,7 @@ class Hero:
         """
         wound = self.wounds.get('intel', 0)
         self.wounds['intel'] = wound + 1
-        return f'{self.name} получает удар по голове, что отрицательно сказывается на {self.g(["его", "ее"])} способности к здравым рассуждениям.'
+        return f'{self.name} получает удар по голове, что отрицательно сказывается на {self.g("его", "ее")} способности к здравым рассуждениям.'
     
     
     def stren_wound(self) -> str:
@@ -745,9 +745,9 @@ class Hero:
         elif self.weapon.empty and not second_weapon.empty:
             self.take_out_weapon()
         elif not self.weapon.empty and second_weapon.empty:
-            tprint(self.game, f'{self.name} не может сменить оружие из-за того, что оно у {self.g(["него", "нее"])} одно.')
+            tprint(self.game, f'{self.name} не может сменить оружие из-за того, что оно у {self.g("него", "нее")} одно.')
         else:
-            tprint(self.game, f'{self.name} не может сменить оружие. У {self.g(["него", "нее"])} и оружия-то нет.')
+            tprint(self.game, f'{self.name} не может сменить оружие. У {self.g("него", "нее")} и оружия-то нет.')
     
        
     def change_weapon(self):
@@ -761,7 +761,7 @@ class Hero:
             self.shield = self.game.no_shield
             message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
         elif not second_weapon.twohanded and not self.removed_shield.empty:
-            message.append(f'У {self.g(["героя", "героини"])} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
+            message.append(f'У {self.g("героя", "героини")} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
         self.backpack.remove(second_weapon, self)
         self.backpack.append(self.weapon)
         self.weapon = second_weapon
@@ -783,16 +783,17 @@ class Hero:
         tprint(self.game, message)
         
     
-    def g(self, words_list:list) -> str:
+    def g(self, he_word:str, she_word:str) -> str:
         """
-        Метод получает на вход список из двух слов и
+        Метод получает на вход два слова и
         выбирает нужное слово в зависимости от пола игрока. 
-        В списке первым должно идти слово, соответствующее мужскому полу, 
+        Первым должно идти слово, соответствующее мужскому полу, 
         а вторым - соответствующее женскому.
         
         """
-        
-        return words_list[self.gender]
+        if self.gender == 0:
+            return he_word
+        return she_word
     
     
     def drop(self, item:str=None) -> bool:
@@ -803,7 +804,7 @@ class Hero:
         shield_in_hand = not self.shield.empty
         shield_removed = not self.removed_shield.empty
         if not item or item in ['все', 'всё']:
-            tprint(game, f'{self.name} {self.g(["хотел", "хотела"])} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
+            tprint(game, f'{self.name} {self.g("хотел", "хотела")} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
         elif item.isdigit():
             return self.drop_digit(item)
         else:
@@ -836,7 +837,7 @@ class Hero:
             tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
             return True
         else:
-            tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
+            tprint(game, f'{self.name} не {self.g("нашел", "нашла")} такой вещи у себя в рюкзаке.')
             return False
     
     
@@ -932,7 +933,7 @@ class Hero:
         dream_count = roll([Hero._nightmare_probability])
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
-                           Так толком и не отдохнув {self.g(["герой", "героиня"])} просыпается с тревогой в душе.')
+                           Так толком и не отдохнув {self.g("герой", "героиня")} просыпается с тревогой в душе.')
             self.fear = self.fear // Hero._nightmare_divider
         else:
             message.append(f'{self.name} ложится спать и спит так сладко, что все страхи и тревоги уходят прочь.')
@@ -992,7 +993,7 @@ class Hero:
             monster.hiding_place = None
             message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self:occus}.')
             if monster.frightening:
-                message.append(f'{monster.name} очень {monster.g(["страшный", "страшная"])} и {self.name} пугается до икоты.')
+                message.append(f'{monster.name} очень {monster.g("страшный", "страшная")} и {self.name} пугается до икоты.')
                 self.fear += 1
             tprint(self.game, message)
             self.fight(monster.name, True)
@@ -1006,7 +1007,7 @@ class Hero:
         cant_rest, rest_place = room.can_rest()
         message = []
         if self.restless > 0:
-            cant_rest.append(f'У {self.g(["героя", "героини"])} столько нерастраченной энергии, что {self.g(["ему", "ей"])} не сидится на месте')
+            cant_rest.append(f'У {self.g("героя", "героини")} столько нерастраченной энергии, что {self.g("ему", "ей")} не сидится на месте')
         if not rest_place or len(cant_rest) > 0:
             message.append('В этой комнате нельзя этого делать.')
             message.append(randomitem(cant_rest))
@@ -1062,7 +1063,7 @@ class Hero:
         game = self.game
         shield = self.get_shield()
         if not shield:
-            tprint(game, f'У {self.g(["героя", "героини"])} нет щита, так что и ремонтировать нечего.')
+            tprint(game, f'У {self.g("героя", "героини")} нет щита, так что и ремонтировать нечего.')
             return False
         repair_price = shield.get_repair_price()
         if repair_price == 0:
@@ -1075,7 +1076,7 @@ class Hero:
             self.decrease_restless(1)
             return True
         else:
-            tprint(game, f'{self.name} и {self.g(["рад", "рада"])} бы починить {shield:accus}, но {self.g(["ему", "ей"])} не хватает денег на запчасти.')
+            tprint(game, f'{self.name} и {self.g("рад", "рада")} бы починить {shield:accus}, но {self.g("ему", "ей")} не хватает денег на запчасти.')
             return False
         
     
@@ -1298,7 +1299,7 @@ class Hero:
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
             mastery['level'] += 1
-            return f' {self.g(["Герой", "Героиня"])} теперь немного лучше знает, как использовать {weapon_type} оружие.'
+            return f' {self.g("Герой", "Героиня")} теперь немного лучше знает, как использовать {weapon_type} оружие.'
         return None
        
     
@@ -1319,9 +1320,9 @@ class Hero:
         message.append(hit_string)
         total_damage, target_defence = self.generate_total_damage(target=target, total_attack=total_attack)
         if target_defence < 0:
-            message.append(f' {target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
+            message.append(f' {target.name} {target.g("смог", "смогла")} увернуться от атаки и не потерять ни одной жизни.')
         elif total_damage == 0:
-            message.append(f'{self.name} не {self.g(["смог", "смогла"])} пробить защиту {target_name_accusative}.')
+            message.append(f'{self.name} не {self.g("смог", "смогла")} пробить защиту {target_name_accusative}.')
         elif total_damage > 0:
             damage_string = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
             message += [
@@ -1386,7 +1387,7 @@ class Hero:
         
         game = self.game
         if self.shield.empty:
-            tprint(self.game, f'У {self.g(["героя", "героини"])} нет щита, так что защищаться {self:pronoun} не может.')
+            tprint(self.game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
         else:
             tprint(game, showsides(self, target, self.floor))
             self.hide = True
@@ -1401,9 +1402,9 @@ class Hero:
         """
         message = []
         money_text = self.show_me_money()
-        message.append(f'{self.name} - это {self.g(["смелый герой", "смелая героиня"])} {str(self.level)} уровня. ' 
-                       f'{self.g(["Его", "Ее"])} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
-                       f' у {self.g(["него", "нее"])} {howmany(self.health, ["единица", "единицы", "единиц"])} здоровья, что составляет '
+        message.append(f'{self.name} - это {self.g("смелый герой", "смелая героиня")} {str(self.level)} уровня. ' 
+                       f'{self.g("Его", "Ее")} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
+                       f' у {self.g("него", "нее")} {howmany(self.health, ["единица", "единицы", "единиц"])} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         message.append(self.show_weapon())
         message.append(self.show_protection())
@@ -1420,7 +1421,7 @@ class Hero:
                 mastery_text += f' {mastery} ({self.weapon_mastery[mastery]["level"]})'
         if mastery_text:
             mastery_text = mastery_text[1::]
-            text = f'{self.g(["Герой", "Героиня"])} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
+            text = f'{self.g("Герой", "Героиня")} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
             return text
         return ''
     
@@ -1433,7 +1434,7 @@ class Hero:
         elif self.money == 1:
             money_text = f'Одна-единственная монета оттягивает карман героя.'
         else:
-            money_text = f'{self.name} {self.g(["беден", "бедна"])}, как церковная мышь.'
+            money_text = f'{self.name} {self.g("беден", "бедна")}, как церковная мышь.'
         return money_text
     
     
@@ -1441,7 +1442,7 @@ class Hero:
         """Метод генерирует описание оружия персонажа."""
         
         if not self.weapon.empty:
-            weapon_text = f'{self.weapon.get_full_names("nom")} в руке {self.g(["героя", "героини"])} добавляет к {self.g(["его", "ее"])} силе ' \
+            weapon_text = f'{self.weapon.get_full_names("nom")} в руке {self.g("героя", "героини")} добавляет к {self.g("его", "ее")} силе ' \
                           f'{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
@@ -1453,7 +1454,7 @@ class Hero:
         
         shield_text = self.shield.show()
         armor_text = self.armor.show()
-        protection_text = f'{self.g(["Героя", "Героиню"])} '
+        protection_text = f'{self.g("Героя", "Героиню")} '
         if not self.shield.empty and not self.armor.empty:
             protection_text += f'защищают {shield_text} и {armor_text}.'
         elif not self.shield.empty and self.armor.empty:
@@ -1461,7 +1462,7 @@ class Hero:
         elif self.shield.empty and not self.armor.empty:
             protection_text += f'защищает {armor_text}.'
         else:
-            protection_text = f'У {self.g(["героя", "героини"])} нет ни щита, ни доспехов.'
+            protection_text = f'У {self.g("героя", "героини")} нет ни щита, ни доспехов.'
         return protection_text
     
     
@@ -1576,7 +1577,7 @@ class Hero:
         
         if goal_type == 'killall':
             if self.game.monsters() == 0:
-                tprint(self.game, f'{self.name} {self.g(["убил", "убила"])} всех монстров в замке и {self.g(["выиграл", "выиграла"])} в этой игре!')
+                tprint(self.game, f'{self.name} {self.g("убил", "убила")} всех монстров в замке и {self.g("выиграл", "выиграла")} в этой игре!')
                 return True
             else:
                 return False
@@ -1593,7 +1594,7 @@ class Hero:
             message += self.backpack.show(self)
             message.append(self.money.show())
             if not self.removed_shield.empty:
-                message.append(f'За спиной у {self.g(["героя", "героини"])} висит {self.removed_shield.get_full_names("nom")}')
+                message.append(f'За спиной у {self.g("героя", "героини")} висит {self.removed_shield.get_full_names("nom")}')
         tprint(self.game, message)
         return True
     
@@ -1835,7 +1836,7 @@ class Hero:
             return False
         if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
-                Страх сковал {self.g(["его", "ее"])} по рукам и ногам.')
+                Страх сковал {self.g("его", "ее")} по рукам и ногам.')
             return False
         return True
     
@@ -1980,7 +1981,7 @@ class Hero:
             backpacks[0].take(self)
             current_loot.remove(backpacks[0])
             return True
-        tprint(self.game, f'У {self.g(["героя", "героини"])} нет рюкзака, поэтому {self:pronoun} может взять только то, что может нести в руках')
+        tprint(self.game, f'У {self.g("героя", "героини")} нет рюкзака, поэтому {self:pronoun} может взять только то, что может нести в руках')
         return False
     
     
@@ -2063,7 +2064,7 @@ class Hero:
             tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
             return False
         if len(what_is_locked) > 1:
-            tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g(["ему", "ей"])} нужно открыть.')
+            tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g("ему", "ей")} нужно открыть.')
             return False
         furniture = what_is_locked[0]
         if furniture.check_trap():
@@ -2142,7 +2143,7 @@ class Hero:
         
         game = self.game
         if self.backpack.no_backpack:
-            tprint(game, f'{self.name} где-то {self.g(["потерял", "потеряла"])} свой рюкзак и не может ничего использовать.')
+            tprint(game, f'{self.name} где-то {self.g("потерял", "потеряла")} свой рюкзак и не может ничего использовать.')
             return False
         if item_string.isdigit():
             number = int(item_string)
@@ -2154,7 +2155,7 @@ class Hero:
         if item:
             item.use(self, in_action=False)
             return True
-        tprint(game, f'{self.name} не {self.g(["нашел", "нашла"])} такой вещи у себя в рюкзаке.')
+        tprint(game, f'{self.name} не {self.g("нашел", "нашла")} такой вещи у себя в рюкзаке.')
         return False
     
     
@@ -2168,7 +2169,7 @@ class Hero:
         
         game = self.game
         if not item:
-            tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо использовать.')
+            tprint(game, f'{self.name} не понимает, что {self.g("ему", "ей")} надо использовать.')
             return False
         if self.removed_shield.check_name(item):
             return self.take_out_shield()
@@ -2181,7 +2182,7 @@ class Hero:
         game = self.game
         rune_list = self.backpack.get_items_by_class(Rune)
         if item == '':
-            tprint(game, f'{self.name} не понимает, что {self.g(["ему", "ей"])} надо улучшить.')
+            tprint(game, f'{self.name} не понимает, что {self.g("ему", "ей")} надо улучшить.')
             return False
         if self.fear >= Hero._fear_limit:
             tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, \

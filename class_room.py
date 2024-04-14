@@ -819,7 +819,7 @@ class Trap:
         message = [f'От неловкого прикосновения в ловушка начинает противно щелкать, а потом взрывается.']
         while True:
             if not types:
-                message.append(f'{target.name} настолько {target.g(["некчемен", "некчемна"])},' 
+                message.append(f'{target.name} настолько {target.g("некчемен", "некчемна")},' 
                                f' что ловушка не может причинить еще какой-то дополнительный урон.')
                 return message
             action_type = randomitem(types)

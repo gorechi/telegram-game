@@ -150,7 +150,7 @@ class Book:
     def use(self, who, in_action:bool=False) -> list[str]:
         message = [self.text]
         message.append(self.increase_mastery(who))
-        message.append(f'{who.g(["Он", "Она"])} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+        message.append(f'{who.g("Он", "Она")} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
         self.increase_mastery(who)
         return message
 
@@ -304,4 +304,4 @@ class TrapsBook(Book):
             
     def increase_mastery(self, who) -> str:
         who.intel += 1
-        return f'{who.name} чувствует, что {who.g(['стал', 'стала'])} немного умнее'
+        return f'{who.name} чувствует, что {who.g('стал', 'стала')} немного умнее'

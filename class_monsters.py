@@ -226,14 +226,18 @@ class Monster:
         return self.name
         
     
-    def g(self, words_list:list) -> str:
+    def g(self, he_word:str, she_word:str) -> str:
         """
-        Метод выбирает слово из полученного списка
-        в зависимости от пола монстра.
+        Метод получает на вход два слова и
+        выбирает нужное слово в зависимости от пола монстра. 
+        Первым должно идти слово, соответствующее мужскому полу, 
+        а вторым - соответствующее женскому.
         
         """
-        
-        return words_list[self.gender]
+        if self.gender == 0:
+            return he_word
+        return she_word
+
 
     
     def check_name(self, message:str) -> bool:
@@ -295,7 +299,7 @@ class Monster:
         protection = base_protection_die + additional_protection_die
         if poison_die > protection:
             target.poisoned = True
-            return f'{target.name} получает отравление, {target.g(["он", "она"])} теперь неважно себя чувствует.'
+            return f'{target.name} получает отравление, {target.g("он", "она")} теперь неважно себя чувствует.'
         return None
         
             
@@ -519,7 +523,7 @@ class Monster:
         total_attack, message = self.generate_attack(target)
         target_defence = target.defence(self)
         if target_defence < 0:
-            message.append(f'{target.name} {target.g(["смог", "смогла"])} увернуться от атаки и не потерять ни одной жизни.')
+            message.append(f'{target.name} {target.g("смог", "смогла")} увернуться от атаки и не потерять ни одной жизни.')
             tprint(game, message)
             return False
         total_damage = total_attack - target_defence
@@ -532,7 +536,7 @@ class Monster:
             ]
         else:
             total_damage = 0
-            message.append(f'{self_name} не {self.g(["смог", "смогла"])} пробить защиту {target:accus}.')
+            message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
         if target.health <= 0:
             game.state = 0
@@ -1070,7 +1074,7 @@ class Shapeshifter(Monster):
             else:
                 weapon_string = ''
             tprint(self.game, f'{self.name} меняет форму и становится точь в точь как {attacker.name}. '
-                              f'У {self.g(["него", "нее"])} теперь сила {str(self.stren)}{weapon_string}')
+                              f'У {self.g("него", "нее")} теперь сила {str(self.stren)}{weapon_string}')
         result = 0
         if not self.shield.empty:
             result += self.shield.protect(attacker)
