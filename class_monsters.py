@@ -71,6 +71,58 @@ class Monster:
     _weak_health_die = 6
     """Кубик, определяющий, какая часть здоровья теряется монстром при ослаблении"""
     
+    _types = {
+        'basic': {
+            "nom": "обычные противники",
+            "accus": "обычных противников",
+            "gen": "обычных противников",
+            "dat": "обычным противникам",
+            "prep": "обычных противниках",
+            "inst": "обычными противниками"
+        },
+        'shapeshifter': {
+            "nom": "оборотни",
+            "accus": "оборотней",
+            "gen": "оборотней",
+            "dat": "оборотням",
+            "prep": "оборотнях",
+            "inst": "оборотнями"
+        },
+        'undead': {
+            "nom": "мертвецы",
+            "accus": "мертвецов",
+            "gen": "мертвецов",
+            "dat": "мертвецам",
+            "prep": "мертвецах",
+            "inst": "мертвецами"
+        },
+        'plant': {
+            "nom": "растения",
+            "accus": "растения",
+            "gen": "растений",
+            "dat": "растениям",
+            "prep": "растениях",
+            "inst": "растениями"
+        },
+        'animal': {
+            "nom": "животные",
+            "accus": "животных",
+            "gen": "животных",
+            "dat": "животным",
+            "prep": "животных",
+            "inst": "животными"
+        },
+        'vampire': {
+            "nom": "вампиры",
+            "accus": "вампиров",
+            "gen": "вампиров",
+            "dat": "вампирам",
+            "prep": "вампирах",
+            "inst": "вампирами"
+        }
+    }
+    """Лексемы разных типов противников"""
+    
     def __init__(self,
                  game,
                  name='',
@@ -89,6 +141,7 @@ class Monster:
                  can_resurrect=False):
         self.game = game
         self.name = name
+        self.monster_type = 'basic'
         self.lexemes = lexemes
         self.stren = stren
         self.health = health
@@ -591,7 +644,7 @@ class Monster:
         if not self.corpse:
             return False
         self.gather_loot()
-        corpse_name = f'труп {self.get_name("gen")}'
+        corpse_name = f'труп {self:gen}'
         new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)
         return True
         
@@ -1253,10 +1306,11 @@ class Corpse():
         self.name = name
         self.loot = loot
         self.room = room
+        self.examined:bool = False
         self.creature = creature
-        self.description = self.generate_description()
+        self.description:str = self.generate_description()
         self.place(room)
-        self.can_resurrect = can_resurrect
+        self.can_resurrect:bool = can_resurrect
         
     
     def try_to_rise(self) -> bool:
@@ -1275,7 +1329,6 @@ class Corpse():
         self.creature.take_loot(self.loot)
         self.room.morgue.remove(self)
         self.game.all_corpses.remove(self)
-        tprint(self.game, f'В комнате {self.room.position} труп воосстал из мертвых.')
         return True
     
     
@@ -1293,3 +1346,17 @@ class Corpse():
         depiction = choice(Corpse._depiction)
         description = f'{place} {state} {depiction} {self.name}'
         return description
+    
+    def check_name(self, message:str) -> bool:
+        return message.lower() == self.name
+    
+    
+    def get_examined(self, who) -> bool:
+        if self.examined:
+            return False
+        if self.try_to_rise():
+            tprint (self.game, f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.')
+            return False
+        return who.increase_monster_knowledge(self.creature.monster_type)
+        
+        

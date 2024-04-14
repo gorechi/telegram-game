@@ -151,6 +151,7 @@ class Hero:
         self.game_is_over = False
         self.start_health = self.health
         self.weakness = {}
+        self.monster_knowledge = {}
         self.can_use_in_fight = []
         self.rune_list = []
         self.restless = 0
@@ -214,6 +215,8 @@ class Hero:
                             'test': self.test,
                             'обезвредить': self.disarm,
                             'торговать': self.trade,
+                            'изучить': self.examine,
+                            'изучать': self.examine,
                             'улучшить': self.enchant}    
     
     
@@ -237,6 +240,38 @@ class Hero:
         self.game.test(self)
         tprint(self.game, 'Тестирование началось')
         
+    
+    def examine(self, what:str) -> bool:
+        if not self.check_light():
+            tprint(self.game, f'В этой комнате так темно, что {self.g(['герой', 'героиня'])} не может изучить даже собственную ладонь.')
+            return False
+        items_list = self.find_what_to_examine()
+        if not items_list:
+            tprint(self.game, f'В этой комнате нечего изучать. Это довольно скучная комната.')
+            return False
+        if what:
+            items_list = [item for item in items_list if item.check_name(what)]
+            if not items_list:
+                tprint(self.game, f'Эту штуку нельзя изучить.')
+                return False
+        for item in items_list:
+            item.get_examined(self)
+        return True 
+    
+    
+    def increase_monster_knowledge(self, monster_type) -> bool:
+        knowledge = self.monster_knowledge.get(monster_type, '0')
+        self.monster_knowledge[monster_type] = knowledge + 1
+        tprint(self.game, f'{self.name} больше узнает про {Monster._types[monster_type]['accus']}')
+        return True       
+                   
+    
+    def find_what_to_examine(self) -> list:
+        items = []
+        if self.current_position.has_a_corpse():
+            items.extend(self.current_position.morgue)
+        return [item for item in items if not item.examined]
+    
     
     def go_down(self, what:str) -> bool:
         if not self.check_light():
