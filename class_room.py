@@ -236,7 +236,7 @@ class Furniture:
         return message
 
     
-    def place(self, castle=None, room_to_place=None):
+    def place(self, floor=None, room_to_place=None):
         if room_to_place:
             if self.type not in room_to_place.furniture_types():
                 room_to_place.furniture.append(self)
@@ -246,7 +246,7 @@ class Furniture:
         else:
             can_place = False
             while not can_place:
-                room = randomitem(castle.plan)
+                room = randomitem(floor.plan)
                 if self.type not in room.furniture_types():
                     can_place = True
             room.furniture.append(self)
@@ -254,7 +254,7 @@ class Furniture:
         if dice(1, Furniture._locked_possibility) == 1 and self.lockable:
             self.locked = True
             very_new_key = Key(self.game)
-            very_new_key.place(castle)
+            very_new_key.place(floor)
         if dice(1, 100) <= 50:
             new_money = Money(self.game, dice(1, Furniture._initial_money_maximum))
             self.loot.pile.append(new_money)
