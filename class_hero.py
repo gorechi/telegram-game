@@ -225,6 +225,11 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def check_if_sneak_past_monster(self, monster: Monster) -> bool:
+        die = [8 + roll([self.dext]) - monster.size]
+        return roll(die) > 5
+    
+    
     def examine(self, what:str) -> bool:
         if not self.check_light():
             tprint(self.game, f'В этой комнате так темно, что {self.g("герой", "героиня")} не может изучить даже собственную ладонь.')

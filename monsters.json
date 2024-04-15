@@ -30,6 +30,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 2,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -68,6 +69,7 @@
     "prefered_weapon": "ударное",
     "venomous": 0,
     "gender": 0,
+    "size": 4,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -104,6 +106,7 @@
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -140,6 +143,7 @@
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 1,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -175,6 +179,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_rmor": true
@@ -210,6 +215,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 1,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -245,6 +251,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "shapeshifter",
     "wear_armor": true
@@ -280,6 +287,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 2,
     "corpse": false,
     "monster_type": "shapeshifter",
     "wear_armor": false
@@ -315,6 +323,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": false,
     "monster_type": "shapeshifter",
     "wear_armor": true
@@ -350,6 +359,7 @@
     "carry_shield": false,
     "venomous": 2,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "can_resurrect": true,
     "resurrection_die": 6,
@@ -396,6 +406,7 @@
     "carry_shield": false,
     "venomous": 4,
     "gender": 1,
+    "size": 2,
     "corpse": false,
     "monster_type": "plant",
     "wear_armor": false
@@ -440,6 +451,7 @@
     "carry_shield": false,
     "venomous": 5,
     "gender": 1,
+    "size": 1,
     "monster_type": "plant",
     "wear_armor": false
   },
@@ -474,6 +486,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": false,
     "monster_type": "vampire",
     "wear_armor": true
@@ -509,6 +522,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": false,
     "monster_type": "vampire",
     "wear_armor": true
@@ -544,6 +558,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 4,
     "corpse": true,
     "monster_type": "animal",
     "wear_armor": false
@@ -579,6 +594,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 4,
     "corpse": true,
     "monster_type": "animal",
     "wear_armor": false
@@ -615,6 +631,7 @@
     "prefered_weapon": "рубящее",
     "venomous": 0,
     "gender": 0,
+    "size": 2,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -650,6 +667,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -685,6 +703,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 4,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -720,6 +739,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 4,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -755,6 +775,7 @@
     "carry_shield": true,
     "venomous": 0,
     "gender": 0,
+    "size": 5,
     "corpse": true,
     "monster_type": "plant",
     "wear_armor": true
@@ -791,6 +812,7 @@
     "prefered_weapon": "колющее",
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": true
@@ -826,6 +848,7 @@
     "carry_shield": false,
     "venomous": 0,
     "gender": 0,
+    "size": 3,
     "corpse": true,
     "monster_type": "basic",
     "wear_armor": false
