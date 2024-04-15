@@ -1739,20 +1739,39 @@ class Hero:
         new_room_number = self.current_position.position + self.floor.directions_dict[direction]
         new_position = self.floor.plan[new_room_number]
         self.last_move = move_enum.get_move_by_number(direction)
-        print(self.last_move)
         return self.move(new_position)
     
     
     def go_with_light_off(self, direction:int) -> bool:
         door = self.current_position.doors[direction]
+        going_back = self.check_if_going_back(direction)
+        if not going_back:
+            sneak = self.sneak_through_dark_room()
+            if not sneak:
+                return False
         if door.empty or door.locked:
             tprint(self.game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         new_room_number = self.current_position.position + self.floor.directions_dict[direction]
         new_position = self.floor.plan[new_room_number]
         self.last_move = move_enum.get_move_by_number(direction)
-        print(self.last_move)
         return self.move(new_position)
+    
+    
+    def sneak_through_dark_room(self) -> bool:
+        room = self.current_position
+        if room.has_a_monster():
+            for monster in room.monsters():
+                if not self.check_if_sneak_past_monster(monster):
+                    tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
+                    self.fight(monster.name, True)
+                    return False
+        
+        return True
+    
+    
+    def check_if_going_back(self, direction:int) -> bool:
+        return direction == self.last_move.countermove
        
     
     def move(self, new_position:Room) -> bool:

@@ -393,6 +393,9 @@ class Room:
         return None
 
     
+    def has_furniture(self) -> bool:
+        return 
+    
     def show_furniture(self) -> list:
         """
         Возвращает список описаний мебели в комнате.
