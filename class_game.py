@@ -163,7 +163,7 @@ class Game():
 
     
     def check_traders_update(self) -> bool:
-        if self.trader_update_counter > 0:
+        if self.traders_update_counter > 0:
             self.traders_update_counter -= 1
             return False
         self.update_traders()

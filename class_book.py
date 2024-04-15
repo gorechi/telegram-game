@@ -304,4 +304,4 @@ class TrapsBook(Book):
             
     def increase_mastery(self, who) -> str:
         who.intel += 1
-        return f'{who.name} чувствует, что {who.g('стал', 'стала')} немного умнее'
+        return f'{who.name} чувствует, что {who.g("стал", "стала")} немного умнее'
