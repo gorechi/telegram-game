@@ -230,6 +230,10 @@ class Hero:
         return roll(die) > 5
     
     
+    def check_if_sneak_past_furniture(self) -> bool:
+        return roll([3 + self.dext]) > 2
+    
+    
     def examine(self, what:str) -> bool:
         if not self.check_light():
             tprint(self.game, f'В этой комнате так темно, что {self.g("герой", "героиня")} не может изучить даже собственную ладонь.')
@@ -1766,9 +1770,16 @@ class Hero:
                     tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
                     self.fight(monster.name, True)
                     return False
+        if room.has_furniture() and not self.check_if_sneak_past_furniture():
+            self.generate_noise(2)
+            tprint(self.game, f'{self.name} в темноте врезается в какую-то мебель. Раздается оглушительный грохот.')
+            return False
         
         return True
     
+    
+    def generate_noise(self, noise_level:int) -> None:
+        return
     
     def check_if_going_back(self, direction:int) -> bool:
         return direction == self.last_move.countermove

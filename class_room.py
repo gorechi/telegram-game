@@ -394,7 +394,8 @@ class Room:
 
     
     def has_furniture(self) -> bool:
-        return 
+        return bool(self.furniture)
+    
     
     def show_furniture(self) -> list:
         """
