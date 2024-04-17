@@ -277,6 +277,10 @@ class Hero:
         if not room.ladder_down or room.ladder_down.locked:
             tprint (self.game, f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.')
             return False
+        return self.descend(room)
+
+
+    def descend(self, room) -> bool:
         room_to_go = room.ladder_down.room_down
         self.last_move = move_enum.DOWNSTAIRS
         return self.move(room_to_go)
@@ -291,9 +295,7 @@ class Hero:
         if room.ladder_down.locked:
            tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
            return False
-        room_to_go = room.ladder_down.room_down
-        self.last_move = move_enum.DOWNSTAIRS
-        return self.move(room_to_go)
+        return self.descend(room)
     
     
     def go_up(self, what:str) -> bool:
@@ -307,6 +309,10 @@ class Hero:
         if not room.ladder_up or room.ladder_up.locked:
             tprint (self.game, f'{self:nom} ничего не может разглядеть в такой темноте.')
             return False
+        return self.ascend(room)
+
+
+    def ascend(self, room):
         room_to_go = room.ladder_up.room_up
         self.last_move = move_enum.UPSTAIRS
         return self.move(room_to_go)
@@ -320,9 +326,7 @@ class Hero:
         if room.ladder_up.locked:
            tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
            return False
-        room_to_go = room.ladder_up.room_up
-        self.last_move = move_enum.UPSTAIRS
-        return self.move(room_to_go)
+        return self.ascend(room)
 
          
     def action(self, command:str, message:str):
@@ -1770,16 +1774,27 @@ class Hero:
                     tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
                     self.fight(monster.name, True)
                     return False
+        if room.ladder_down:
+            stayed = self.try_not_to_fall_down()
+            if not stayed:
+                return False
         if room.has_furniture() and not self.check_if_sneak_past_furniture():
             self.generate_noise(2)
             tprint(self.game, f'{self.name} в темноте врезается в какую-то мебель. Раздается оглушительный грохот.')
+        return True
+    
+    
+    def try_not_to_fall_down(self) -> bool:
+        if not roll([3 + self.dext]) > 2:
+            tprint(self.game, f'{self.name} медленно пробирается через темноту, но в какой-то момент перестает чувствовать пол под ногами и кубарем скатывается по лестнице вниз.')
+            self.descend(self.current_position)
             return False
-        
         return True
     
     
     def generate_noise(self, noise_level:int) -> None:
         return
+    
     
     def check_if_going_back(self, direction:int) -> bool:
         return direction == self.last_move.countermove
