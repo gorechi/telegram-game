@@ -220,6 +220,9 @@ class Hero:
         return f'<Hero: name = {self.name}>'
 
     
+    def is_hero(self) -> bool:
+        return True
+    
     def test(self, commands:list):
         self.game.test(self)
         tprint(self.game, 'Тестирование началось')
@@ -630,7 +633,7 @@ class Hero:
         self.wounds['dex'] = wound + 1
         return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
             
-       
+#TODO       
     def get_weakness(self, weapon:Weapon) -> float:
         return 1
     
@@ -1094,6 +1097,30 @@ class Hero:
         return self.game.no_weapon
 
     
+    def generate_in_fight_description(self) -> str:
+        line = f'{self.name}: сила - d{str(self.stren)}'
+        line += self.generate_weapon_text()
+        line += self.generate_protection_text()
+        line += f', жизней - {str(self.health)}. '
+        return line
+    
+    
+    def generate_weapon_text(self) -> str:
+        if not self.weapon.empty:
+            return f'+d{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}'
+        return ''
+    
+    
+    def generate_protection_text(self) -> str:
+        if not self.shield.empty and self.armor.empty:
+            return f', защита - d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
+        elif self.shield.empty and not self.armor.empty:
+            line += f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())}'
+        elif not self.shield.empty and not self.armor.empty:
+            line += f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())} + d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
+        return ''
+     
+        
     def generate_run_away_text(self, target:Monster) -> str:
         """
         Метод генерирует текст, который выводится в чат если 

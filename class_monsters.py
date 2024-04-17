@@ -198,6 +198,36 @@ class Monster:
         return self.lexemes.get(format, '')
     
     
+    def is_hero(self) -> bool:
+        return False
+    
+    
+    def generate_in_fight_description(self) -> str:
+        if self.current_position.light:
+            line = f'{self.name}: сила - d{self.stren}'
+            line += self.generate_weapon_text()
+            line += self.generate_protection_text()
+            line += f', жизней - {self.health}. '
+            return line
+        return Monster._names_in_darkness['nom']
+    
+    
+    def generate_weapon_text(self) -> str:
+        if not self.weapon.empty:
+            return f'+d{self.weapon.damage}+{self.weapon.perm_damage()}'
+        return ''
+    
+    
+    def generate_protection_text(self) -> str:
+        if not self.shield.empty and self.armor.empty:
+            return f', защита - d{self.shield.protection}+{self.shield.perm_protection()}'
+        elif self.shield.empty and not self.armor.empty:
+            line += f', защита - d{self.armor.protection}+{self.armor.perm_protection()}'
+        elif not self.shield.empty and not self.armor.empty:
+            line += f', защита - d{self.armor.protection}+{self.armor.perm_protection()} + d{self.shield.protection}+{self.shield.perm_protection()}'
+        return ''
+
+    
     def get_weaker(self) -> bool:
         """
         Метод уменьшает силу и здоровье монстра на случайное значение, 
