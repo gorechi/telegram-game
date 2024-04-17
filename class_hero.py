@@ -6,7 +6,7 @@ from class_room import Furniture, Room, Ladder
 from class_weapon import Weapon
 from class_backpack import Backpack
 from functions import howmany, normal_count, randomitem, showsides, tprint, roll, split_actions
-from enum import Enum
+from enums import state_enum, move_enum
 
 
 class Hero:
@@ -81,23 +81,6 @@ class Hero:
                         'использовать')
     """Список комманд во время схватки."""
     
-    class _state(Enum):
-        """
-        Текущее состояние персонажа:
-        - NO_STATE - обычное состояние. Персонаж ходит, исследует и т.п.
-        - FIGHT - происходит бой
-        - ENCHANT - персонаж что-то улучшает
-        - LEVEL_UP - персонаж поднимает уровень
-        - USE_IN_FIGHT - персонадж использует вещь во время боя
-        """
-        NO_STATE = 0
-        FIGHT = 1
-        ENCHANT = 2
-        LEVEL_UP = 3
-        USE_IN_FIGHT = 4
-        TRADE = 5
-
-
     def __init__(self,
                  game,
                  name:str = None,
@@ -147,7 +130,7 @@ class Hero:
             self.backpack = backpack
         self.money = Money(self.game, 0)
         self.current_position = None
-        self.state = Hero._state.NO_STATE
+        self.state = state_enum.NO_STATE
         self.game_is_over = False
         self.start_health = self.health
         self.weakness = {}
@@ -169,6 +152,7 @@ class Hero:
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
         self.wounds = {}
+        self.last_move = None
         self.weapon_mastery = {'рубящее': {
                                         'counter': 0,
                                         'level': 0
@@ -241,9 +225,18 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def check_if_sneak_past_monster(self, monster: Monster) -> bool:
+        die = [8 + roll([self.dext]) - monster.size]
+        return roll(die) > 5
+    
+    
+    def check_if_sneak_past_furniture(self) -> bool:
+        return roll([3 + self.dext]) > 2
+    
+    
     def examine(self, what:str) -> bool:
         if not self.check_light():
-            tprint(self.game, f'В этой комнате так темно, что {self.g('герой', 'героиня')} не может изучить даже собственную ладонь.')
+            tprint(self.game, f'В этой комнате так темно, что {self.g("герой", "героиня")} не может изучить даже собственную ладонь.')
             return False
         items_list = self.find_what_to_examine()
         if not items_list:
@@ -262,7 +255,7 @@ class Hero:
     def increase_monster_knowledge(self, monster_type) -> bool:
         knowledge = self.monster_knowledge.get(monster_type, '0')
         self.monster_knowledge[monster_type] = knowledge + 1
-        tprint(self.game, f'{self.name} больше узнает про {Monster._types[monster_type]['accus']}')
+        tprint(self.game, f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}')
         return True       
                    
     
@@ -284,7 +277,12 @@ class Hero:
         if not room.ladder_down or room.ladder_down.locked:
             tprint (self.game, f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.')
             return False
+        return self.descend(room)
+
+
+    def descend(self, room) -> bool:
         room_to_go = room.ladder_down.room_down
+        self.last_move = move_enum.DOWNSTAIRS
         return self.move(room_to_go)
     
     
@@ -297,8 +295,7 @@ class Hero:
         if room.ladder_down.locked:
            tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
            return False
-        room_to_go = room.ladder_down.room_down
-        return self.move(room_to_go)
+        return self.descend(room)
     
     
     def go_up(self, what:str) -> bool:
@@ -312,7 +309,12 @@ class Hero:
         if not room.ladder_up or room.ladder_up.locked:
             tprint (self.game, f'{self:nom} ничего не может разглядеть в такой темноте.')
             return False
+        return self.ascend(room)
+
+
+    def ascend(self, room):
         room_to_go = room.ladder_up.room_up
+        self.last_move = move_enum.UPSTAIRS
         return self.move(room_to_go)
     
     
@@ -324,8 +326,7 @@ class Hero:
         if room.ladder_up.locked:
            tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
            return False
-        room_to_go = room.ladder_up.room_up
-        return self.move(room_to_go)
+        return self.ascend(room)
 
          
     def action(self, command:str, message:str):
@@ -333,23 +334,23 @@ class Hero:
         """Метод обработки комманд от игрока."""
         
         message = message.lower()
-        if command in self.command_dict.keys() and self.state == Hero._state.NO_STATE:
+        if command in self.command_dict.keys() and self.state == state_enum.NO_STATE:
             if not self.game_over('killall'):
                 self.do(message)
             return True
         actions = {
-            Hero._state.ENCHANT: self.rune_actions,
-            Hero._state.TRADE: self.trade_actions,
-            Hero._state.USE_IN_FIGHT: self.in_fight_actions,
-            Hero._state.FIGHT: self.fight_actions
+            state_enum.ENCHANT: self.rune_actions,
+            state_enum.TRADE: self.trade_actions,
+            state_enum.USE_IN_FIGHT: self.in_fight_actions,
+            state_enum.FIGHT: self.fight_actions
         }
-        if command in Hero._level_up_commands and self.state == Hero._state.LEVEL_UP:
+        if command in Hero._level_up_commands and self.state == state_enum.LEVEL_UP:
             self.levelup(command)
             return True
         action = actions.get(self.state, None)
         if action:
             return action(message)
-        """ elif command in Hero._fight_commands and self.state == Hero._state.FIGHT:
+        """ elif command in Hero._fight_commands and self.state == state_enum.FIGHT:
             return self.fight_actions(answer=answer) """
         tprint (self.game, f'{self.name} такого не умеет.', 'direction')
         return False
@@ -367,9 +368,9 @@ class Hero:
         """
         
         rune_list = self.rune_list
-        self.state = Hero._state.NO_STATE
+        self.state = state_enum.NO_STATE
         if message == 'отмена':
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
             tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
@@ -380,18 +381,18 @@ class Hero:
             return False
         if not self.selected_item:
             tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
             return False
         chosen_rune = rune_list[message]
         rune_is_placed = self.selected_item.enchant(chosen_rune)
         if not rune_is_placed:
             tprint(self, f'Похоже, что {self.name} не может вставить руну в {self.selected_item:occus}.', 'direction')
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
             return False
         tprint(self, f'{self.name} улучшает {self.selected_item:occus} новой руной.', 'direction')
         self.backpack.remove(chosen_rune)
         self.rune_list = self.backpack.get_items_by_class(Rune)
-        self.state = Hero._state.NO_STATE
+        self.state = state_enum.NO_STATE
         return True
     
     
@@ -407,7 +408,7 @@ class Hero:
         """
         if message == 'отмена':
             tprint(self, f'{self.name} продолжает бой.', 'fight')
-            self.state = Hero._state.FIGHT
+            self.state = state_enum.FIGHT
             return False
         if not message.isdigit():
             tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать вещь по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
@@ -421,9 +422,9 @@ class Hero:
         item_is_used = item.use(who_using=self, in_action=True)
         if not item_is_used:
             tprint(self, f'Похоже, что {self.name} не может использовать {item:occus}.', 'fight')
-            self.state = Hero._state.FIGHT
+            self.state = state_enum.FIGHT
             return False    
-        self.state = Hero._state.FIGHT
+        self.state = state_enum.FIGHT
         return True
     
     
@@ -439,14 +440,14 @@ class Hero:
         if self.run:
             self.run = False
             self.look()
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
         elif enemy.run:
-            self.state = Hero._state.NO_STATE
-        elif enemy.health > 0 and self.state == Hero._state.FIGHT:
+            self.state = state_enum.NO_STATE
+        elif enemy.health > 0 and self.state == state_enum.FIGHT:
             enemy.attack(self)
-        elif self.state == Hero._state.FIGHT:
+        elif self.state == state_enum.FIGHT:
             tprint(self.game, f'{self.name} побеждает в бою!', 'off')
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
             enemy.lose(self)
             self.win(enemy)
         return True
@@ -456,7 +457,7 @@ class Hero:
         action, target = split_actions(message)
         if not self.trader:
             tprint(self.game, 'Похоже, торговец отказывается общаться и торговля сейчас невозможна.')
-            self.state = Hero._state.NO_STATE
+            self.state = state_enum.NO_STATE
             return False
         if action in ['закончить', 'отмена', 'уйти']:
             return self.leave_shop()
@@ -469,7 +470,7 @@ class Hero:
     
     
     def leave_shop(self):
-        self.state = Hero._state.NO_STATE
+        self.state = state_enum.NO_STATE
         tprint(self.game, f'{self.name} покидает лавку {self.trader:gen}.')
         self.trader = None
         return True
@@ -500,7 +501,7 @@ class Hero:
         message = [f'{self.name} подходит к {trader:dat} и начинат изучать товары.']
         message.extend(trader.get_prices(self.backpack))
         tprint(game, message)
-        self.state = Hero._state.TRADE
+        self.state = state_enum.TRADE
         self.trader = trader
         return True
     
@@ -1378,7 +1379,7 @@ class Hero:
         for item in self.can_use_in_fight:
             message.append(f'{str(self.can_use_in_fight.index(item) + 1)}: {item:accus}')
         message.append('Выберите номер предмета или скажите "отмена" для прекращения.')
-        self.state = Hero._state.USE_IN_FIGHT
+        self.state = state_enum.USE_IN_FIGHT
         tprint(game, message, 'use_in_fight')
     
     
@@ -1476,8 +1477,8 @@ class Hero:
         """Метод проверки, удалось ли персонажу увернуться от удара врага."""
         
         weapon = attacker.weapon
-        parry_chance = self.parry_chance()
-        parry_die = roll([parry_chance])
+        chance = [self.parry_chance()]
+        parry_die = roll(chance)
         hit_die = roll([attacker.hit_chance + weapon.hit_chance])
         if parry_die > hit_die:
             return True
@@ -1726,16 +1727,17 @@ class Hero:
     def go(self, direction:str):
         """Метод обрабатывает команду "идти". """
         
-        if not self.floor.directions_dict.get(direction):
+        direction_number = Hero._doors_dict.get(direction, False)
+        if not direction_number:
             tprint(self.game, f'{self.name} не знает такого направления!')
             return False
         if self.check_light():
-            return self.go_with_light_on(direction)
-        return self.go_with_light_off(direction)
+            return self.go_with_light_on(direction_number)
+        return self.go_with_light_off(direction_number)
     
     
-    def go_with_light_on(self, direction:str) -> bool:
-        door = self.current_position.doors[Hero._doors_dict[direction]]
+    def go_with_light_on(self, direction:int) -> bool:
+        door = self.current_position.doors[direction]
         if door.empty:
             tprint(self.game, f'Там нет двери. {self.name} не может туда пройти!')
             return False
@@ -1744,18 +1746,59 @@ class Hero:
             return False
         new_room_number = self.current_position.position + self.floor.directions_dict[direction]
         new_position = self.floor.plan[new_room_number]
+        self.last_move = move_enum.get_move_by_number(direction)
         return self.move(new_position)
     
     
-    def go_with_light_off(self, direction:str) -> bool:
-        door = self.current_position.doors[Hero._doors_dict[direction]]
+    def go_with_light_off(self, direction:int) -> bool:
+        door = self.current_position.doors[direction]
+        going_back = self.check_if_going_back(direction)
+        if not going_back:
+            sneak = self.sneak_through_dark_room()
+            if not sneak:
+                return False
         if door.empty or door.locked:
             tprint(self.game, f'В темноте {self.name} врезается во что-то носом.')
             return False
         new_room_number = self.current_position.position + self.floor.directions_dict[direction]
         new_position = self.floor.plan[new_room_number]
+        self.last_move = move_enum.get_move_by_number(direction)
         return self.move(new_position)
     
+    
+    def sneak_through_dark_room(self) -> bool:
+        room = self.current_position
+        if room.has_a_monster():
+            for monster in room.monsters():
+                if not self.check_if_sneak_past_monster(monster):
+                    tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
+                    self.fight(monster.name, True)
+                    return False
+        if room.ladder_down:
+            stayed = self.try_not_to_fall_down()
+            if not stayed:
+                return False
+        if room.has_furniture() and not self.check_if_sneak_past_furniture():
+            self.generate_noise(2)
+            tprint(self.game, f'{self.name} в темноте врезается в какую-то мебель. Раздается оглушительный грохот.')
+        return True
+    
+    
+    def try_not_to_fall_down(self) -> bool:
+        if not roll([3 + self.dext]) > 2:
+            tprint(self.game, f'{self.name} медленно пробирается через темноту, но в какой-то момент перестает чувствовать пол под ногами и кубарем скатывается по лестнице вниз.')
+            self.descend(self.current_position)
+            return False
+        return True
+    
+    
+    def generate_noise(self, noise_level:int) -> None:
+        return
+    
+    
+    def check_if_going_back(self, direction:int) -> bool:
+        return direction == self.last_move.countermove
+       
     
     def move(self, new_position:Room) -> bool:
         self.game.trigger_on_movement()
@@ -2245,7 +2288,7 @@ class Hero:
         for rune in self.rune_list:
             message.append(f'{str(self.rune_list.index(rune) + 1)}: {str(rune)}')
         message.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
-        self.state = Hero._state.ENCHANT
+        self.state = state_enum.ENCHANT
         tprint(game, message, 'enchant')
 
     
