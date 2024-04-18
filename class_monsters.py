@@ -71,6 +71,10 @@ class Monster:
     _weak_health_die = 6
     """Кубик, определяющий, какая часть здоровья теряется монстром при ослаблении"""
     
+    _initiative_die = 20
+    """Кубик инициативы"""
+
+    
     _types = {
         'basic': {
             "nom": "обычные противники",
@@ -197,6 +201,10 @@ class Monster:
             return 'она'
         return self.lexemes.get(format, '')
     
+    
+    def generate_initiative(self) -> int:
+        return roll([Monster._initiative_die]) + self.initiative
+
     
     def is_hero(self) -> bool:
         return False

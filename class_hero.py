@@ -82,6 +82,9 @@ class Hero:
                         'использовать')
     """Список комманд во время схватки."""
     
+    _initiative_die = 20
+    """Кубик инициативы"""
+    
     def __init__(self,
                  game,
                  name:str = None,
@@ -223,6 +226,11 @@ class Hero:
     
     def is_hero(self) -> bool:
         return True
+    
+    
+    def generate_initiative(self) -> int:
+        return roll([Hero._initiative_die]) + self.dext
+        
     
     def test(self, commands:list):
         self.game.test(self)
