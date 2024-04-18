@@ -1,4 +1,5 @@
 from functions import tprint
+from collections import deque
 
 class Fight:
     
@@ -11,7 +12,7 @@ class Fight:
         self.game = game
         self.who_started = who_started
         self.fighters = fighters
-        self.create_queue()
+        self.queue = self.create_queue()
         self.hero_in_fight = self.check_hero_in_fight()
     
     
@@ -21,7 +22,14 @@ class Fight:
         
     
     def create_queue(self) -> None:
-        return
+        queue = deque()
+        fighters = self.fighters.copy()
+        queue.append(self.who_started)
+        fighters.remove(self.who_started)
+        fighters.sort(key = lambda fighter: fighter.generate_initiative(), reverse=True)
+        for fighter in fighters:
+            queue.append(fighter)
+        return queue
     
     
     def check_hero_in_fight(self) -> bool:
@@ -31,7 +39,7 @@ class Fight:
             return False
     
     
-    def showsides(self) -> list:
+    def show_sides(self) -> list:
         message = ['В схватке участвуют:']
         for fighter in self.fighters:
             message.append(fighter.generate_in_fight_description())
