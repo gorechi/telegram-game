@@ -6,10 +6,12 @@ class Fight:
     def __init__(
         self,
         game,
+        hero,
         who_started,
         fighters:list
     ):
         self.game = game
+        self.hero = hero
         self.who_started = who_started
         self.fighters = fighters
         self.queue = self.create_queue()

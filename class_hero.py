@@ -5,6 +5,7 @@ from class_protection import Armor, Shield
 from class_room import Furniture, Room, Ladder
 from class_weapon import Weapon
 from class_backpack import Backpack
+from class_fight import Fight
 from functions import howmany, normal_count, randomitem, showsides, tprint, roll, split_actions
 from enums import state_enum, move_enum
 
@@ -1838,34 +1839,33 @@ class Hero:
         return True
     
     
-    def fight(self, enemy, agressive=False):
+    def fight(self, enemy:None):
         """Метод обрабатывает команду "атаковать". """
         
-        game = self.game
         room = self.current_position
-        who_is_fighting = room.monsters(mode='first')
-        if not who_is_fighting:
-            tprint(game, 'Не нужно кипятиться. Тут некого атаковать')
+        monsters_in_room = room.monsters(mode='first')
+        if not monsters_in_room:
+            tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
-        if not enemy in [who_is_fighting.name, who_is_fighting.get_name("accus"), who_is_fighting.name[0]] and enemy != '':
-            tprint(game, f'{self.name} не может атаковать. В комнате нет такого существа.')
+        monsters_to_fight = []
+        if enemy:
+            for monster in monsters_in_room:
+                if monster.check_name(enemy):
+                    monsters_to_fight.append(monster)
+        if not monsters_to_fight:
+            tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
             return False
-        game.state = 1
-        if agressive:
-            who_first = 2
-        else:
-            who_first = roll([2])
-        if who_first == 1:
-            tprint(game, f'{game.player.name} начинает схватку!', 'fight')
-            self.attack(who_is_fighting, 'атаковать')
-        else:
-            if self.check_light():
-                message = [f'{who_is_fighting.name} начинает схватку!']
-            else:
-                message = ['Что-то жуткое и непонятное нападает первым из темноты.']
-            tprint(game, message, 'fight')
-            who_is_fighting.attack(self)
-            return True
+        if not enemy:
+            monsters_to_fight = monsters_in_room
+        monsters_to_fight.append(self)
+        new_fight = Fight(
+            game=self.game, 
+            hero=self, 
+            who_started=self, 
+            fighters=monsters_to_fight
+            )
+        new_fight.start()
+        return True
 
     
     def search_room(self) -> bool:
