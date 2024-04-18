@@ -1,5 +1,6 @@
 from functions import tprint
 from collections import deque
+from enums import state_enum
 
 class Fight:
     
@@ -14,12 +15,13 @@ class Fight:
         self.hero = hero
         self.who_started = who_started
         self.fighters = fighters
+        self.finished = False
         self.queue = self.create_queue()
         self.hero_in_fight = self.check_hero_in_fight()
     
     
     def tprint(self, message:str|list[str]) -> None:
-        if self.hero_in_fight:
+        if self.hero:
             tprint(self.game, message)
         
     
@@ -46,3 +48,29 @@ class Fight:
         for fighter in self.fighters:
             message.append(fighter.generate_in_fight_description())
         self.tprint(message)
+        
+        
+    def start(self) -> None:
+        self.hero.current_fight = self
+        self.hero.state = state_enum.FIGHT
+        message = ['Начинается жестокая схватка!']
+        message.extend(self.show_sides())
+        self.tprint(message)
+        self.sequence()
+    
+    
+    def sequence(self):
+        while self.queue[0] != self.hero:
+            fighter = self.queue[0]
+            targets = self.fighters.copy().remove(fighter)
+            if not targets:
+                return
+            fighter.fight(targets)
+    
+    
+    def remove_fighter(self, fighter) -> bool:
+        self.fighters.remove(fighter)
+        if fighter == self.hero:
+            self.hero = None
+        self.queue.remove(fighter)
+        return True            
