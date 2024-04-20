@@ -6,6 +6,7 @@ from class_basic import Loot, Money
 from class_items import Rune
 from class_protection import Armor, Shield
 from class_weapon import Weapon
+from class_fight import Fight
 from functions import howmany, randomitem, tprint, roll
 
 
@@ -129,20 +130,20 @@ class Monster:
     
     def __init__(self,
                  game,
-                 name='',
-                 lexemes={},
-                 stren=5,
-                 health=10,
-                 actions=['бьет'],
-                 state='стоит',
-                 agressive=False,
-                 carry_weapon=True,
-                 carry_shield=False,
-                 wear_armor=False,
-                 hit_chance=5,
-                 parry_chance=2,
-                 corpse=True,
-                 can_resurrect=False):
+                 name:str='',
+                 lexemes:dict[str, str]={},
+                 stren:int=5,
+                 health:int=10,
+                 actions:list[str]=['бьет'],
+                 state:str='стоит',
+                 agressive:bool=False,
+                 carry_weapon:bool=True,
+                 carry_shield:bool=False,
+                 wear_armor:bool=False,
+                 hit_chance:int=5,
+                 parry_chance:int=2,
+                 corpse:bool=True,
+                 can_resurrect:bool=False):
         self.game = game
         self.name = name
         self.monster_type = 'basic'
@@ -210,9 +211,9 @@ class Monster:
         return False
     
     
-    def generate_in_fight_description(self) -> str:
+    def generate_in_fight_description(self, index:int) -> str:
         if self.current_position.light:
-            line = f'{self.name}: сила - d{self.stren}'
+            line = f'{index}: {self.name}: сила - d{self.stren}'
             line += self.generate_weapon_text()
             line += self.generate_protection_text()
             line += f', жизней - {self.health}. '
@@ -550,13 +551,49 @@ class Monster:
         return None
     
     
-    def attack(self, targets:list) -> bool:
-        target = self.shoose_target(targets)
+    def attack(self, fight:Fight) -> list[str]:
+        target = self.choose_target(fight)
+        hero = fight.hero
+        self_name = self.get_name_in_darkness(hero)
+        if not target:
+            return False
+        total_attack, message = self.generate_attack(target, self_name)
+        target_defence = target.defence(self)
+        if target_defence < 0:
+            message.append(f'{target.name} {target.g("смог", "смогла")} увернуться от атаки и не потерять ни одной жизни.')
+            return message
+        total_damage = total_attack - target_defence
+        if total_damage > 0:
+            message.append(f'{target.name} теряет {howmany(total_damage, ["жизнь", "жизни", "жизней"])}.')
+            message += [
+                self.break_enemy_shield(target=target, total_attack=total_attack),
+                self.poison_enemy(target=target),
+                self.vampire_suck(total_damage=total_damage)
+            ]
+        else:
+            total_damage = 0
+            message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
+        target.health -= total_damage
+        if target.health <= 0:
+            lose_message = target.lose(fight)
+            message.extend(lose_message)
+        return message
+        
+        
+    def choose_target(self, fight:Fight):
+        targets = fight.fighters.copy().remove(self)
+        if not targets:
+            return False
+        if self.last_attacker and self.last_attacker in targets:
+            return self.last_attacker
+        if fight.hero:
+            return fight.hero
+        return randomitem(targets)
+        
 
     
-    def generate_attack(self, target) -> list[int, list[str]]:
+    def generate_attack(self, target, self_name:str) -> list[int, list[str]]:
         message = []
-        self_name = self.get_name_in_darkness(target)
         mele_attack = self.generate_mele_attack(target)
         weapon_attack = self.generate_weapon_attack(target=target)
         total_attack = weapon_attack + mele_attack
@@ -570,6 +607,8 @@ class Monster:
     
     
     def get_name_in_darkness(self, target):
+        if not target:
+            return self.name
         if target.check_light():
             return self.name
         return Monster._names_in_darkness['nom']
@@ -603,7 +642,7 @@ class Monster:
         return result
 
     
-    def finally_die(self) -> bool:
+    def finally_die(self, fight:Fight) -> bool:
         """
         Обрабатывает смерть монстра, удаляя его из списка монстров на этаже и в комнате, уменьшая общее количество монстров.
         Монстр становится мертвым и превращается в труп навсегда.
@@ -614,6 +653,7 @@ class Monster:
         self.game.how_many_monsters -= 1
         self.alive = False
         self.become_a_corpse(for_good=True)
+        fight.remove_fighter(self)
         return True
     
     
@@ -674,7 +714,7 @@ class Monster:
             loot.add(self.weapon)
 
         
-    def lose(self, winner=None):
+    def lose(self, fight:Fight) -> list[str]:
         """
         Обрабатывает поражение монстра. Определяет, умрет ли монстр, станет зомби или получит ранение в зависимости от результата броска кубика.
         """
@@ -684,9 +724,9 @@ class Monster:
             die = 10
         result = dice(1, die)
         if result < 6 or self.wounded or not self.can_run:
-            return self.finally_die()
+            return self.finally_die(fight)
         else:
-            return self.get_wounded()
+            return self.get_wounded(fight)
             
             
     def lose_weapon_text(self) -> str:
@@ -722,35 +762,34 @@ class Monster:
             return 'Противник'
     
     
-    def get_wounded(self) -> bool:        
+    def get_wounded(self, fight:Fight) -> list[str]:        
         """
         Обрабатывает получение ранения монстром. Может привести к различным последствиям, включая превращение в зомби.
         """
         self.wounded = True
         wound = randomitem(self.wounds_list)
-        return wound()
+        return wound(fight)
         
         
-    def hand_wound(self) -> bool:
+    def hand_wound(self, fight:Fight) -> list[str]:
         """
         Обрабатывает получение ранения в руку. Если у монстра есть оружие или щит, он их теряет.
         Возвращает True, указывая на то, что монстр остается в живых.
         """
+        message = [f'{self.get_self_name_in_room(self)} остается в живых иполучает ранение в руку. ']
         if not self.weapon.empty:
-            alive_text += self.lose_weapon_text()
+            message.append(self.lose_weapon_text())
             self.current_position.loot.add(self.weapon)
             self.weapon = self.game.no_weapon
         elif not self.shield.empty:
-            alive_text += self.lose_shield_text()
+            message.append(self.lose_shield_text())
             self.current_position.loot.add(self.shield)
             self.shield = self.game.no_shield
-        text = f'{self.get_self_name_in_room(self)} остается в живых иполучает легкое ранение в руку. '
-        text += self.try_to_run_away()
-        tprint(self.game, text)
-        return True
+        message.append(self.try_to_run_away(fight))
+        return message
         
         
-    def bleed(self) -> bool:
+    def bleed(self, fight:Fight) -> list[str]:
         """
         Обрабатывает ситуацию, когда монстр истекает кровью. Это приводит к потере силы,
         но здоровье восстанавливается до начального уровня. Возвращает True.
@@ -758,14 +797,13 @@ class Monster:
         weakness_amount = ceil(self.stren * Monster._wounded_monster_strength_coefficient)
         self.stren -= weakness_amount
         self.health = self.start_health
-        text = f'{self.get_self_name_in_room(self)} остается в живых и истекает кровью, теряя при ' \
-                        f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы. '
-        text += self.try_to_run_away()
-        tprint(self.game, text)
-        return True
+        message = [f'{self.get_self_name_in_room(self)} остается в живых и истекает кровью, теряя при ' \
+                        f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы.']
+        message.append(self.try_to_run_away(fight))
+        return message
         
     
-    def rage(self) -> bool:
+    def rage(self, fight:Fight) -> list[str]:
         """
         Обрабатывает вход в состояние ярости. Монстр получает увеличение силы, но теряет часть здоровья.
         Возвращает True.
@@ -774,15 +812,14 @@ class Monster:
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.stren += strengthening_amount
         self.health = self.start_health - ill_amount
-        text = f'{self.get_self_name_in_room(self)} остается в живых и приходит в ярость, получая при ' \
-                        f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и ' \
-                        f'теряя {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}. '
-        text += self.try_to_run_away()
-        tprint(self.game, text)
-        return True
+        message = [f'{self.get_self_name_in_room(self)} остается в живых и приходит в ярость, получая при '
+                   f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и '
+                   f'теряя {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}.']
+        message.append(self.try_to_run_away(fight))
+        return message
     
     
-    def contusion(self) -> bool:
+    def contusion(self, fight:Fight) -> list[str]:
         """
         Обрабатывает получение контузии. Монстр теряет силу, но получает дополнительное здоровье.
         Возвращает True.
@@ -791,15 +828,14 @@ class Monster:
         health_boost_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.stren -= weakness_amount
         self.health = self.start_health + health_boost_amount
-        text = f'{self.get_self_name_in_room(self)} остается в живых и получает контузию, теряя при ' \
-                        f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы и ' \
-                        f'получая {howmany(health_boost_amount, ["жизнь", "жизни", "жизней"])}. '
-        text += self.try_to_run_away()
-        tprint(self.game, text)
-        return True
+        message = [f'{self.get_self_name_in_room(self)} остается в живых и получает контузию, теряя при '
+                   f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы и '
+                   f'получая {howmany(health_boost_amount, ["жизнь", "жизни", "жизней"])}.']
+        message.append(self.try_to_run_away(fight))
+        return message
 
     
-    def leg_wound(self) -> bool:
+    def leg_wound(self, fight:Fight) -> list[str]:
         """
         Обрабатывает получение ранения в ногу. Монстр теряет силу и часть здоровья, а также не может двигаться.
         Возвращает True.
@@ -814,16 +850,17 @@ class Monster:
         return True
     
     
-    def try_to_run_away(self) -> str:
+    def try_to_run_away(self, fight) -> str:
         """
         Пытается убежать из комнаты. Если удачно, возвращает сообщение об убегании.
         В противном случае монстр умирает, врезавшись в стену.
         """
         name = self.get_self_name_in_room()
         if self.place(self.floor, old_place = self.current_position):
+            fight.remove_fighter(self)
             return f'{name} убегает из комнаты.'
         else:
-            self.finally_die()
+            self.finally_die(fight)
             return f'Пытаясь убежать {name.lower()} на всей скорости врезается в стену и умирает.'
 
     

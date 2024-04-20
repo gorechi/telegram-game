@@ -48,24 +48,19 @@ class Fight:
         for fighter in self.fighters:
             message.append(fighter.generate_in_fight_description())
         self.tprint(message)
-        
-        
-    def start(self) -> None:
-        self.hero.current_fight = self
-        self.hero.state = state_enum.FIGHT
-        message = ['Начинается жестокая схватка!']
-        message.extend(self.show_sides())
-        self.tprint(message)
         self.sequence()
+    
+    
+    def to_the_end_of_the_queue(self, fighter) -> None:
+        self.queue.append(fighter)
+        self.queue.popleft()
     
     
     def sequence(self):
         while self.queue[0] != self.hero:
             fighter = self.queue[0]
-            targets = self.fighters.copy().remove(fighter)
-            if not targets:
-                return
-            fighter.fight(targets)
+            self.tprint(fighter.attack(self))
+            self.to_the_end_of_the_queue(fighter)
     
     
     def remove_fighter(self, fighter) -> bool:

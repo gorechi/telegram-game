@@ -294,9 +294,32 @@ class Game():
     
     def test(self, hero:Hero):
         floor = self.current_floor
-        room = floor.plan[0]
-        new_trader = Scribe(self, floor)
-        new_trader.place(room)
-        hero.money += 100
+        room = floor.plan[1]
+        new_monster1 = Monster(
+            self,
+            name = 'Монстр1',
+            lexemes = {
+                "nom": "монстр1",
+                "accus": "монстра1",
+                "gen": "монстра1",
+                "dat": "монстру1",
+                "prep": "монстре1",
+                "inst": "моснтром1"
+            }
+        )
+        new_monster2 = Monster(
+            self,
+            name = 'Монстр2',
+            lexemes = {
+                "nom": "монстр2",
+                "accus": "монстра2",
+                "gen": "монстра2",
+                "dat": "монстру2",
+                "prep": "монстре2",
+                "inst": "моснтром2"
+            }
+        )
+        new_monster1.place(floor=floor, room_to_place=room)
+        new_monster2.place(floor=floor, room_to_place=room)
         return None
             

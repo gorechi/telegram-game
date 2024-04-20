@@ -6,7 +6,7 @@ from class_room import Furniture, Room, Ladder
 from class_weapon import Weapon
 from class_backpack import Backpack
 from class_fight import Fight
-from functions import howmany, normal_count, randomitem, showsides, tprint, roll, split_actions
+from functions import howmany, normal_count, randomitem, tprint, roll, split_actions
 from enums import state_enum, move_enum
 
 
@@ -1106,8 +1106,8 @@ class Hero:
         return self.game.no_weapon
 
     
-    def generate_in_fight_description(self) -> str:
-        line = f'{self.name}: сила - d{str(self.stren)}'
+    def generate_in_fight_description(self, index:int) -> str:
+        line = f'{index}: {self.name}: сила - d{str(self.stren)}'
         line += self.generate_weapon_text()
         line += self.generate_protection_text()
         line += f', жизней - {str(self.health)}. '
@@ -1346,7 +1346,6 @@ class Hero:
         message = []
         game = self.game
         target_name, target_name_accusative = self.get_target_name(target=target)
-        tprint(game, showsides(self, target, self.floor))
         self.hide = False
         total_attack = self.generate_total_attack(target=target)
         if not self.weapon.empty:
@@ -1426,7 +1425,6 @@ class Hero:
         if self.shield.empty:
             tprint(self.game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
         else:
-            tprint(game, showsides(self, target, self.floor))
             self.hide = True
             self.rage += 1
             tprint(self.game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
@@ -1733,9 +1731,6 @@ class Hero:
             self.show_backpack()
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
-        if monster and what: 
-            if monster.check_name(what):
-                tprint(game, showsides(self, monster, self.floor))
         if self.weapon.check_name(what):
             tprint(game, self.look_at_weapon())
         if self.shield.check_name(what):
