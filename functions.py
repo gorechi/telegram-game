@@ -162,10 +162,24 @@ def get_markup(game, state:str):
         return get_direction_markup()
     elif state == 'levelup':
         return get_levelup_markup()
-    elif state in ['enchant', 'use_in_fight']:
+    elif state in ['enchant', 'use_in_fight', 'trade']:
         return get_cancel_markup()
     else:
         return ''
+
+
+def cprint(text:str):
+    if not text:
+        return False
+    if isinstance(text, str):
+        text_to_print = text
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            if line:
+                final_text = final_text + str(line) + '\n'
+        text_to_print = final_text.rstrip('\n')
+    print(text_to_print)
 
 
 def tprint(game, text, state=''):

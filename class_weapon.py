@@ -429,6 +429,10 @@ class Weapon:
         return True
 
     
+    def get_hit_chance(self) -> int:
+        return self.hit_chance
+    
+    
     def decorate(self) -> bool:
         decorators = Weapon._decorators.get(self.type, [])
         decorator = randomitem(decorators)

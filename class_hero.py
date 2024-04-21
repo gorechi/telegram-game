@@ -156,7 +156,7 @@ class Hero:
         self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
         self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
         self.wounds = {}
-        self.last_move = None
+        self.last_move = move_enum.DOWN
         self.weapon_mastery = {'рубящее': {
                                         'counter': 0,
                                         'level': 0
@@ -719,7 +719,7 @@ class Hero:
         return None
     
     
-    def hit_chance(self) -> int:
+    def get_hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
         dext_wound = self.wounds.get('dext', 0)
@@ -732,7 +732,9 @@ class Hero:
         
         dext_wound = self.wounds.get('dext', 0)
         wound_modifier = roll([dext_wound])
-        chance = self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+        weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
+        weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
+        chance = self.dext + weapon_mastery_level - wound_modifier
         if self.poisoned:
             chance -= self.dext // 2
         if chance < 0:
@@ -1511,9 +1513,9 @@ class Hero:
         """Метод проверки, удалось ли персонажу увернуться от удара врага."""
         
         weapon = attacker.weapon
-        chance = [self.parry_chance()]
-        parry_die = roll(chance)
-        hit_die = roll([attacker.hit_chance + weapon.hit_chance])
+        chance = self.parry_chance()
+        parry_die = roll([chance])
+        hit_die = roll([attacker.get_hit_chance() + weapon.get_hit_chance()])
         if parry_die > hit_die:
             return True
         return False
@@ -1846,7 +1848,7 @@ class Hero:
         """Метод обрабатывает команду "атаковать". """
         
         room = self.current_position
-        monsters_in_room = room.monsters(mode='first')
+        monsters_in_room = room.monsters()
         if not monsters_in_room:
             tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
             return False
@@ -1855,9 +1857,9 @@ class Hero:
             for monster in monsters_in_room:
                 if monster.check_name(enemy):
                     monsters_to_fight.append(monster)
-        if not monsters_to_fight:
-            tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
-            return False
+            if not monsters_to_fight:
+                tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
+                return False
         if not enemy:
             monsters_to_fight = monsters_in_room
         monsters_to_fight.append(self)

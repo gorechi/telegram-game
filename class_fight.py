@@ -1,4 +1,4 @@
-from functions import tprint
+from functions import tprint, cprint
 from collections import deque
 from enums import state_enum
 
@@ -16,20 +16,36 @@ class Fight:
         self.who_started = who_started
         self.fighters = fighters
         self.finished = False
+        self.light = self.check_light()
+        print(f'Light: {self.light}')
         self.queue = self.create_queue()
         self.hero_in_fight = self.check_hero_in_fight()
+        print(self)
+    
+    
+    def __repr__(self) -> str:
+        return f'Схватка: {self.fighters}, начал {self.who_started}'
     
     
     def tprint(self, message:str|list[str]) -> None:
         if self.hero:
-            tprint(self.game, message)
+            tprint(self.game, message, 'fight')
+            return
+        cprint(message)
         
+    
+    def check_light(self) -> bool:
+        for fighter in self.fighters:
+            if fighter.check_light():
+                return True
+        return False    
+    
     
     def create_queue(self) -> None:
         queue = deque()
         fighters = self.fighters.copy()
-        queue.append(self.who_started)
-        fighters.remove(self.who_started)
+        #queue.append(self.who_started)
+        #fighters.remove(self.who_started)
         fighters.sort(key = lambda fighter: fighter.generate_initiative(), reverse=True)
         for fighter in fighters:
             queue.append(fighter)
@@ -40,15 +56,14 @@ class Fight:
         for fighter in self.fighters:
             if fighter.is_hero():
                 return True
-            return False
+        return False
     
     
     def show_sides(self) -> list:
         message = ['В схватке участвуют:']
-        for fighter in self.fighters:
-            message.append(fighter.generate_in_fight_description())
+        for index, fighter in enumerate(self.queue):
+            message.append(fighter.generate_in_fight_description(index))
         self.tprint(message)
-        self.sequence()
     
     
     def to_the_end_of_the_queue(self, fighter) -> None:
@@ -59,9 +74,22 @@ class Fight:
     def sequence(self):
         while self.queue[0] != self.hero:
             fighter = self.queue[0]
-            self.tprint(fighter.attack(self))
+            message = fighter.attack(self)
+            self.tprint(message)
             self.to_the_end_of_the_queue(fighter)
+            if self.check_for_the_end():
+                return
     
+    
+    def check_for_the_end(self) -> bool:
+        if len(self.fighters) > 1:
+            if self.hero:
+                return False
+            for fighter in self.fighters:
+                if not fighter == self.hero and fighter.choose_target(self):
+                    return False
+        return True
+        
     
     def remove_fighter(self, fighter) -> bool:
         self.fighters.remove(fighter)
@@ -69,3 +97,10 @@ class Fight:
             self.hero = None
         self.queue.remove(fighter)
         return True            
+
+
+    def start(self):
+        if self.hero:
+            self.hero.state = state_enum.FIGHT
+        self. show_sides()
+        self.sequence()

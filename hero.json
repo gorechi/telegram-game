@@ -16,7 +16,6 @@
     "intel": 1,
     "health": 20,
     "hit_chance": 4,
-    "parry_chance": 2,
     "can_hide": true,
     "can_run": true,
     "actions":
