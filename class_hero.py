@@ -134,6 +134,7 @@ class Hero:
             self.backpack = backpack
         self.money = Money(self.game, 0)
         self.current_position = None
+        self.current_fight = None
         self.state = state_enum.NO_STATE
         self.game_is_over = False
         self.start_health = self.health
@@ -362,8 +363,6 @@ class Hero:
         action = actions.get(self.state, None)
         if action:
             return action(message)
-        """ elif command in Hero._fight_commands and self.state == state_enum.FIGHT:
-            return self.fight_actions(answer=answer) """
         tprint (self.game, f'{self.name} такого не умеет.', 'direction')
         return False
 
@@ -447,23 +446,34 @@ class Hero:
                 
         """
 
-        enemy = self.current_position.monsters('first')
-        tprint(self.game, self.attack(enemy, message))
-        if self.run:
-            self.run = False
-            self.look()
-            self.state = state_enum.NO_STATE
-        elif enemy.run:
-            self.state = state_enum.NO_STATE
-        elif enemy.health > 0 and self.state == state_enum.FIGHT:
-            enemy.attack(self)
-        elif self.state == state_enum.FIGHT:
-            tprint(self.game, f'{self.name} побеждает в бою!', 'off')
-            self.state = state_enum.NO_STATE
-            enemy.lose(self)
-            self.win(enemy)
+        fight = self.current_fight
+        action, enemy_text = split_actions(message)
+        enemy = self.select_enemy(enemy_text)
+        message = self.attack(enemy, action)
+        fight.tprint(message)
+        self.current_fight.continue_after_hero()
         return True
     
+    
+    def select_enemy(self, enemy_text:str):
+        enemies = self.current_fight.fighters.copy()
+        if str(enemy_text).isdigit():
+            try:
+                enemy = enemies[int(enemy_text)-1]
+            except:
+                tprint(self.game, 'В схватке нет такого врага.')
+                return False
+            if enemy == self:
+                tprint(self.game, 'Герой не может атаковать сам себя.')
+                return False
+            return enemy
+        enemies.remove(self)
+        if not enemy_text:
+            return randomitem(enemies)
+        for enemy in enemies:
+            if enemy.check_name(enemy_text.lower()):
+                return enemy
+        
     
     def trade_actions(self, message:str) -> bool:
         action, target = split_actions(message)
@@ -724,7 +734,9 @@ class Hero:
         
         dext_wound = self.wounds.get('dext', 0)
         wound_modifier = roll([dext_wound])
-        return self.dext + self.weapon_mastery[self.weapon.type]['level'] - wound_modifier
+        weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
+        weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
+        return self.dext + weapon_mastery_level - wound_modifier
     
     
     def parry_chance(self) -> int:
@@ -1255,7 +1267,7 @@ class Hero:
     def generate_rage(self) -> int:
         """Метод генерирует значение ярости героя."""
         
-        if self.check_light():
+        if self.check_light() and self.rage > 0:
             return roll([self.rage])
         return 1
     
@@ -1342,7 +1354,7 @@ class Hero:
         return None
        
     
-    def hit_enemy(self, target:Monster) -> int:
+    def hit_enemy(self, target:Monster) -> None:
         """Метод моделирует удар героя по врагу во время схватки."""
         
         message = []
@@ -1354,7 +1366,7 @@ class Hero:
             action = randomitem(self.weapon.actions)
             hit_string = f'{self.name} {action} {target_name_accusative} используя {self.weapon:accus} и наносит {total_attack}+{howmany(total_attack, ["единицу", "единицы", "единиц"])} урона.'
         else:
-            hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, "единицу,единицы,единиц")} урона. '
+            hit_string = f'{self.name} бьет {target_name_accusative} не используя оружие и наносит {howmany(total_attack, ["единицу", "единицы", "единиц"])} урона. '
         message.append(hit_string)
         total_damage, target_defence = self.generate_total_damage(target=target, total_attack=total_attack)
         if target_defence < 0:
@@ -1362,7 +1374,7 @@ class Hero:
         elif total_damage == 0:
             message.append(f'{self.name} не {self.g("смог", "смогла")} пробить защиту {target_name_accusative}.')
         elif total_damage > 0:
-            damage_string = f'{target_name} не имеет защиты и теряет {howmany(total_damage, "жизнь,жизни,жизней")}.'
+            damage_string = f'{target_name} не имеет защиты и теряет {howmany(total_damage, ["жизнь", "жизни", "жизней"])}.'
             message += [
                 damage_string,
                 self.break_enemy_shield(target=target, total_attack=total_attack),
@@ -1372,25 +1384,26 @@ class Hero:
         target.health -= total_damage
         self.rage = 0
         tprint(game, message)
+        
     
     
-    def attack(self, target, action):
+    def attack(self, target:Monster, action:str) -> bool:
         """Метод обрабатывает команду "атаковать". """
         
         self.run = False
         if action == '' or action == 'у' or action == 'ударить':
             self.hit_enemy(target=target)
             return
-        elif action in ['з', 'защититься', 'защита']:
+        if action in ['з', 'защититься', 'защита']:
             self.use_shield(target)
             return
-        elif action in ['б', 'бежать', 'убежать']:
+        if action in ['б', 'бежать', 'убежать']:
             self.run_away(target)
             return
-        elif action in ['и', 'использовать']:
+        if action in ['и', 'использовать']:
             self.use_in_fight()
             return
-        elif action in ['с', 'сменить оружие', 'сменить']:
+        if action in ['с', 'сменить оружие', 'сменить']:
             self.change_weapon()
             tprint(self.game, f'\n{self.name} продолжает бой.')
             return
@@ -1543,7 +1556,7 @@ class Hero:
         return result
 
     
-    def lose(self, winner:Monster=None):
+    def lose(self, fight:Fight) -> list[str]:
         """
         Метод сбрасывает состояние героя при его проигрыше в бою
 
@@ -1557,6 +1570,7 @@ class Hero:
         self.intel = self.start_intel
         self.current_position = self.save_room
         self.restless = 0
+        return [f'{self.name} терпит сокрушительное поражение. Каким-то чудом {self:gender} приходит в себя на последнем месте отдыха.']
     
     
     def win(self, loser):

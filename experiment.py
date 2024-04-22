@@ -63,4 +63,4 @@ monsters.append(Monster('Бомж', 1))
 
 monsters.sort(key = lambda monster: monster.generate_initiative(), reverse=True)
 print(monsters)
-        
+print(str(None))        

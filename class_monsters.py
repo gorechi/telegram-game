@@ -302,7 +302,7 @@ class Monster:
         if room.light:
             names_list = self.get_names_list(['nom', "accus"])
         else:
-            names_list =  ['противник']
+            names_list =  ['противник', 'противника']
         return message.lower() in names_list
     
     
@@ -593,8 +593,7 @@ class Monster:
             message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
         if target.health <= 0:
-            lose_message = target.lose(fight)
-            message.extend(lose_message)
+            message.extend(target.lose(fight))
         return message
         
         
@@ -749,11 +748,8 @@ class Monster:
         """
         Обрабатывает поражение монстра. Определяет, умрет ли монстр, станет зомби или получит ранение в зависимости от результата броска кубика.
         """
-        if self.can_resurrect:
-            die = 15
-        else:
-            die = 10
-        result = dice(1, die)
+        die = 15 if self.can_resurrect else 10
+        result = roll([die])
         if result < 6 or self.wounded or not self.can_run:
             return self.finally_die(fight)
         else:

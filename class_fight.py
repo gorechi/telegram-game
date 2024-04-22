@@ -44,9 +44,11 @@ class Fight:
     def create_queue(self) -> None:
         queue = deque()
         fighters = self.fighters.copy()
-        #queue.append(self.who_started)
-        #fighters.remove(self.who_started)
-        fighters.sort(key = lambda fighter: fighter.generate_initiative(), reverse=True)
+        fighters.remove(self.who_started)
+        fighters.sort(key = lambda fighter: fighter.generate_initiative())
+        fighters.append(self.who_started)
+        fighters.reverse()
+        self.fighters = fighters
         for fighter in fighters:
             queue.append(fighter)
         return queue
@@ -62,7 +64,7 @@ class Fight:
     def show_sides(self) -> list:
         message = ['В схватке участвуют:']
         for index, fighter in enumerate(self.queue):
-            message.append(fighter.generate_in_fight_description(index))
+            message.append(fighter.generate_in_fight_description(index+1))
         self.tprint(message)
     
     
@@ -94,13 +96,23 @@ class Fight:
     def remove_fighter(self, fighter) -> bool:
         self.fighters.remove(fighter)
         if fighter == self.hero:
+            self.hero.current_fight = None
+            self.hero.state = state_enum.NO_STATE
             self.hero = None
         self.queue.remove(fighter)
+        self.show_sides()
         return True            
 
 
     def start(self):
         if self.hero:
             self.hero.state = state_enum.FIGHT
-        self. show_sides()
+            self.hero.current_fight = self
+        self.show_sides()
+        self.sequence()
+        
+    
+    def continue_after_hero(self):
+        self.to_the_end_of_the_queue(self.hero)
+        self.show_sides()
         self.sequence()
