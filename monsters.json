@@ -33,6 +33,7 @@
     "size": 2,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 6,
     "wear_armor": true
   },
   {
@@ -72,6 +73,7 @@
     "size": 4,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 2,
     "wear_armor": true
   },
   {
@@ -109,6 +111,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 5,
     "wear_armor": true
   },
   {
@@ -118,7 +121,7 @@
       "nom": "разбойница",
       "accus": "разбойницу",
       "gen": "разбойницы",
-      "dat": "разбойницк",
+      "dat": "разбойнице",
       "prep": "разбойнице",
       "inst": "разбойницей"
     },
@@ -146,6 +149,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 5,
     "wear_armor": true
   },
   {
@@ -182,6 +186,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 4,
     "wear_rmor": true
   },
   {
@@ -218,6 +223,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 4,
     "wear_armor": true
   },
   {
@@ -254,6 +260,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "shapeshifter",
+    "initiative": 4,
     "wear_armor": true
   },
   {
@@ -290,6 +297,7 @@
     "size": 2,
     "corpse": false,
     "monster_type": "shapeshifter",
+    "initiative": 1,
     "wear_armor": false
   },
   {
@@ -326,6 +334,7 @@
     "size": 3,
     "corpse": false,
     "monster_type": "shapeshifter",
+    "initiative": 4,
     "wear_armor": true
   },
   {
@@ -364,6 +373,7 @@
     "can_resurrect": true,
     "resurrection_die": 6,
     "monster_type": "undead",
+    "initiative": 2,
     "wear_armor": true
   },
   {
@@ -409,6 +419,7 @@
     "size": 2,
     "corpse": false,
     "monster_type": "plant",
+    "initiative": 0,
     "wear_armor": false
   },
   {
@@ -453,6 +464,7 @@
     "gender": 1,
     "size": 1,
     "monster_type": "plant",
+    "initiative": 0,
     "wear_armor": false
   },
   {
@@ -489,6 +501,7 @@
     "size": 3,
     "corpse": false,
     "monster_type": "vampire",
+    "initiative": 6,
     "wear_armor": true
   },
   {
@@ -525,6 +538,7 @@
     "size": 3,
     "corpse": false,
     "monster_type": "vampire",
+    "initiative": 5,
     "wear_armor": true
   },    
   {
@@ -561,6 +575,7 @@
     "size": 4,
     "corpse": true,
     "monster_type": "animal",
+    "initiative": 2,
     "wear_armor": false
   },
   {
@@ -597,6 +612,7 @@
     "size": 4,
     "corpse": true,
     "monster_type": "animal",
+    "initiative": 3,
     "wear_armor": false
   },
   {
@@ -634,6 +650,7 @@
     "size": 2,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 5,
     "wear_armor": true
   },
   {
@@ -670,6 +687,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 10,
     "wear_armor": true
   },
   {
@@ -706,6 +724,7 @@
     "size": 4,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 7,
     "wear_armor": true
   },
   {
@@ -742,6 +761,7 @@
     "size": 4,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 3,
     "wear_armor": true
   },
   {
@@ -778,6 +798,7 @@
     "size": 5,
     "corpse": true,
     "monster_type": "plant",
+    "initiative": 0,
     "wear_armor": true
   },
   {
@@ -815,6 +836,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 5,
     "wear_armor": true
   },
   {
@@ -851,6 +873,7 @@
     "size": 3,
     "corpse": true,
     "monster_type": "basic",
+    "initiative": 2,
     "wear_armor": false
   }
 ]

@@ -54,46 +54,6 @@ def readfile(filename, divide, divider='|'):
     return filelines
 
 
-def showsides(side1, side2, castle) -> list:
-    
-    """
-    Функция генерирует описание сторон схватки. 
-    На вход получает объекты сторон (например, героя и монстра), 
-    а также замок, в котором происходит схватка. 
-    Возвращает список, состоящий из строк, описывающих стороны схватки.
-    
-    """
-    
-    room = side1.current_position
-    message = []
-    line = f'{side1.name}: сила - d{str(side1.stren)}'
-    if not side1.weapon.empty:
-        line += f'+d{str(side1.weapon.damage)}+{str(side1.weapon.perm_damage())}'
-    if not side1.shield.empty and side1.armor.empty:
-        line += f', защита - d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
-    elif side1.shield.empty and not side1.armor.empty:
-        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.perm_protection())}'
-    elif not side1.shield.empty and not side1.armor.empty:
-        line += f', защита - d{str(side1.armor.protection)}+{str(side1.armor.perm_protection())} + d{str(side1.shield.protection)}+{str(side1.shield.perm_protection())}'
-    line += f', жизней - {str(side1.health)}. '
-    message.append(line)
-    if room.light:
-        line = f'{side2.name}: сила - d{str(side2.stren)}'
-        if not side2.weapon.empty:
-            line += f'+d{str(side2.weapon.damage)}+{str(side2.weapon.perm_damage())}'
-        if not side2.shield.empty and side2.armor.empty:
-            line += f', защита - d{str(side2.shield.protection)}+{str(side2.shield.perm_protection())}'
-        elif side2.shield.empty and not side2.armor.empty:
-            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.perm_protection())}'
-        elif not side2.shield.empty and not side2.armor.empty:
-            line += f', защита - d{str(side2.armor.protection)}+{str(side2.armor.perm_protection())} + d{str(side2.shield.protection)}+{str(side2.shield.perm_protection())}'
-        line += f', жизней - {str(side2.health)}.'
-        message.append(line)
-    else:
-        message.append(f'В темноте кто-то есть, но {side1.name} не понимает кто это.')
-    return message
-
-
 def randomitem(items_list, how_many:int=1, need_number:bool=False):
     """Возвращает случайные элементы списка
 
@@ -202,10 +162,24 @@ def get_markup(game, state:str):
         return get_direction_markup()
     elif state == 'levelup':
         return get_levelup_markup()
-    elif state in ['enchant', 'use_in_fight']:
+    elif state in ['enchant', 'use_in_fight', 'trade']:
         return get_cancel_markup()
     else:
         return ''
+
+
+def cprint(text:str):
+    if not text:
+        return False
+    if isinstance(text, str):
+        text_to_print = text
+    elif isinstance(text, list):
+        final_text = ''
+        for line in text:
+            if line:
+                final_text = final_text + str(line) + '\n'
+        text_to_print = final_text.rstrip('\n')
+    print(text_to_print)
 
 
 def tprint(game, text, state=''):
