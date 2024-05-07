@@ -16,6 +16,7 @@ class Fight:
         self.who_started = who_started
         self.fighters = fighters
         self.finished = False
+        self.exp:int = 0
         self.light = self.check_light()
         print(f'Light: {self.light}')
         self.queue = self.create_queue()
@@ -78,6 +79,7 @@ class Fight:
             fighter = self.queue[0]
             message = fighter.attack(self)
             self.tprint(message)
+            self.check_for_losses()
             self.to_the_end_of_the_queue(fighter)
             if self.check_for_the_end():
                 return
@@ -116,3 +118,44 @@ class Fight:
         self.to_the_end_of_the_queue(self.hero)
         self.show_sides()
         self.sequence()
+    
+    
+    def check_for_losses(self):
+        for fighter in self.fighters:
+            if fighter == self.hero and fighter.health <= 0:
+                self.hero_loses()
+            if not fighter == self.hero and fighter.health <= 0:
+                self.monster_loses(fighter)
+        if self.check_for_the_end():
+            self.end()
+                     
+        
+    def hero_loses(self) -> bool:
+        self.tprint(self.hero.lose(self))
+        return self.remove_fighter(self.hero)
+    
+    
+    def monster_loses(self, fighter) -> bool:
+        self.tprint(fighter.lose(self))
+        if fighter.last_attacker == self.hero:
+            self.accumulate_experience(fighter)
+        return self.remove_fighter(fighter)
+    
+    
+    def accumulate_experience(self, fighter) -> None:
+        self.exp += fighter.exp
+        print(f'exp = {self.exp}')
+        
+    
+    def get_strongest_fighter(self, who=None):
+        filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
+        return max(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+    
+    
+    def get_healthiest_fighter(self, who=None):
+        filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
+        return max(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+    
+    
+    def get_targets(self, who) ->list:
+        return [fighter for fighter in self.fighters if fighter != who]

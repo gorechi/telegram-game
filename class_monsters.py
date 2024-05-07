@@ -132,7 +132,7 @@ class Monster:
                  game,
                  name:str='',
                  lexemes:dict[str, str]={},
-                 stren:int=5,
+                 stren:int=50,
                  health:int=10,
                  actions:list[str]=['бьет'],
                  state:str='стоит',
@@ -592,14 +592,11 @@ class Monster:
             total_damage = 0
             message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
-        if target.health <= 0:
-            message.extend(target.lose(fight))
         return message
         
         
     def choose_target(self, fight:Fight):
-        targets = fight.fighters.copy()
-        targets.remove(self)
+        targets = fight.get_targets(self)
         if not targets:
             return False
         if self.last_attacker and self.last_attacker in targets:
@@ -607,7 +604,6 @@ class Monster:
         if fight.hero:
             return fight.hero
         return randomitem(targets)
-        
 
     
     def generate_attack(self, target, self_name:str) -> list[int, list[str]]:
@@ -677,11 +673,10 @@ class Monster:
         self.game.how_many_monsters -= 1
         self.alive = False
         self.become_a_corpse(for_good=True)
-        fight.remove_fighter(self)
-        return True
+        return f'{self:nom} падает замертво на пол комнаты.'
     
     
-    def become_a_zombie(self) -> bool:
+    def become_a_zombie(self, fight:Fight) -> bool:
         """
         Обрабатывает превращение монстра в зомби, удаляя его из списка монстров на этаже и в комнате, уменьшая общее количество монстров.
         Монстр становится мертвым, но может быть воскрешен.
@@ -871,10 +866,10 @@ class Monster:
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.stren -= weakness_amount
         self.health = self.start_health - ill_amount
-        tprint(self.game, f'{self.get_self_name_in_room()} остается в живых и получает ранение в ногу и не может двигаться, теряя при ' \
-                            f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы ' \
-                            f'и {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}.')
-        return True
+        message =  [f'{self.get_self_name_in_room()} остается в живых, получает ранение в ногу и отползает куда-то в темный угол, теряя при ' 
+                    f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы '
+                    f'и {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}.']
+        return message
     
     
     def try_to_run_away(self, fight) -> str:
@@ -884,7 +879,6 @@ class Monster:
         """
         name = self.get_self_name_in_room()
         if self.place(self.floor, old_place = self.current_position):
-            fight.remove_fighter(self)
             return f'{name} убегает из комнаты.'
         else:
             self.finally_die(fight)
@@ -990,6 +984,13 @@ class Plant(Monster):
             self.grow_in_room(room)
 
 
+    def choose_target(self, fight:Fight):
+        targets = fight.get_targets(self)
+        if self.last_attacker and self.last_attacker in targets:
+            return self.last_attacker
+        return False
+    
+    
     def place(self, floor, room_to_place = None, old_place = None):
         """
         Метод для размещения растения в комнате. Если комната не указана, выбирается случайная комната без монстров.
@@ -1072,6 +1073,13 @@ class Berserk(Monster):
         else:
             poison_stren = 0
         return dice(1, (self.stren + self.rage - poison_stren))
+    
+    
+    def choose_target(self, fight:Fight):
+        targets = fight.get_targets(self)
+        if targets:
+            return randomitem(targets)
+        return False
 
 
 class Shapeshifter(Monster):

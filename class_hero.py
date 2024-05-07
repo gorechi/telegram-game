@@ -202,6 +202,7 @@ class Hero:
                             'сменить': self.change,
                             'поменять': self.change,
                             'test': self.test,
+                            'тест': self.test,
                             'обезвредить': self.disarm,
                             'торговать': self.trade,
                             'изучить': self.examine,
@@ -450,13 +451,12 @@ class Hero:
         action, enemy_text = split_actions(message)
         enemy = self.select_enemy(enemy_text)
         message = self.attack(enemy, action)
-        fight.tprint(message)
         self.current_fight.continue_after_hero()
         return True
     
     
     def select_enemy(self, enemy_text:str):
-        enemies = self.current_fight.fighters.copy()
+        enemies = self.current_fight.get_targets(self)
         if str(enemy_text).isdigit():
             try:
                 enemy = enemies[int(enemy_text)-1]
@@ -1582,7 +1582,6 @@ class Hero:
         self.intel = self.start_intel
         self.wins += 1
         tprint(self.game, f'{self.name} получает {howmany(loser.exp, ["единицу", "единицы", "единиц"])} опыта!')
-        self.gain_experience(exp=loser.exp)
         self.restless = 0
 
     
