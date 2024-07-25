@@ -147,15 +147,31 @@ class Fight:
         print(f'exp = {self.exp}')
         
     
-    def get_strongest_fighter(self, who=None):
-        filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
-        return max(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+    def get_fighter_by_strength(self, who=None, exclude:list[str]=[], mode:str='Max'):
+        filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        if mode == 'Max':
+            return max(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+        if mode == 'Min':
+            return min(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+        return False
     
     
-    def get_healthiest_fighter(self, who=None):
-        filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
-        return max(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+    def get_fighter_by_health(self, who=None, exclude:list[str]=[], mode:str='Max'):
+        filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        if mode == 'Max':
+            return max(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+        if mode == 'Min':
+            return min(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+        return False
     
     
-    def get_targets(self, who) ->list:
+    def get_targets(self, who) -> list:
         return [fighter for fighter in self.fighters if fighter != who]
+    
+    
+    def get_targets_exclude_classes(self, classes:list[str]) -> list:
+        return [fighter for fighter in self.fighters if type(fighter).__name__ not in classes]
+    
+    
+    def get_targets_by_class(self, classes:list[str]) -> list:
+        return [fighter for fighter in self.fighters if type(fighter).__name__ in classes]

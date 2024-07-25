@@ -592,6 +592,7 @@ class Monster:
             total_damage = 0
             message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
+        self.last_attacker == None
         return message
         
         
@@ -1225,6 +1226,15 @@ class Vampire(Monster):
                          wear_armor)
         self.empty = False
         self.can_run = True
+
+    
+    def choose_target(self, fight:Fight):
+        classes_to_exclude = [
+            'Vampire',
+            'Plant',
+            'WalkingDead'
+        ]
+        return fight.get_fighter_by_health(self, classes_to_exclude, 'Min')
 
     
     def vampire_suck(self, total_damage):
