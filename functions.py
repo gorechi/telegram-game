@@ -162,7 +162,7 @@ def get_markup(game, state:str):
         return get_direction_markup()
     elif state == 'levelup':
         return get_levelup_markup()
-    elif state in ['enchant', 'use_in_fight', 'trade']:
+    elif state in ['enchant', 'use_in_fight', 'trade', 'read']:
         return get_cancel_markup()
     else:
         return ''
