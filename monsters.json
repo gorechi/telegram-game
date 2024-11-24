@@ -301,43 +301,6 @@
     "wear_armor": false
   },
   {
-    "class": "притворщик",
-    "name": "Перевёртыш",
-    "lexemes": {
-      "nom": "перевертыш",
-      "accus": "перевертыша",
-      "gen": "перевертыша",
-      "dat": "перевертышу",
-      "prep": "перевертыше",
-      "inst": "перевертышем"
-    },
-    "stren": 10,
-    "health": 18,
-    "floor":1,
-    "hit_chance": 5,
-    "parry_chance": 4,
-    "can_hide": true,
-    "can_run": true,
-    "actions":
-      [
-      "крушит",
-      "бьет",
-      "шарахает"
-      ],
-    "state": "прячется",
-    "frightening": false,
-    "agressive": true,
-    "carry_weapon": false,
-    "carry_shield": true,
-    "venomous": 0,
-    "gender": 0,
-    "size": 3,
-    "corpse": false,
-    "monster_type": "shapeshifter",
-    "initiative": 4,
-    "wear_armor": true
-  },
-  {
     "class": "мертвец",
     "name": "Зомби",
     "lexemes": {

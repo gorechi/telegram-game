@@ -96,7 +96,6 @@ class Game():
             'оружие': Weapon,
             'щит': Shield,
             'доспех': Armor,
-            'притворщик': Shapeshifter,
             'мебель': Furniture,
             'вампир': Vampire,
             'берсерк': Berserk,
