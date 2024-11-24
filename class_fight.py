@@ -17,10 +17,9 @@ class Fight:
         self.fighters = fighters
         self.finished = False
         self.exp:int = 0
-        self.light = self.check_light()
-        print(f'Light: {self.light}')
+        self.light:bool = self.check_light()
         self.queue = self.create_queue()
-        self.hero_in_fight = self.check_hero_in_fight()
+        self.hero_in_fight:bool = self.check_hero_in_fight()
         print(self)
     
     

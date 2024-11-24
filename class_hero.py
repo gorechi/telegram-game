@@ -1602,25 +1602,44 @@ class Hero:
         Метод обрабатывает команды, приходящие от игрока во время увеличения уровня героя.
         
         """
-        if message == 'здоровье':
-            self.health += 3
-            self.start_health += 3
-            tprint(self, f'{self.name} получает 3 единицы здоровья.', 'direction')
-        elif message == 'силу':
-            self.stren += 1
-            self.start_stren += 1
-            tprint(self.game, f'{self.name} увеличивает свою силу на 1.', 'direction')
-        elif message == 'ловкость':
-            self.dext += 1
-            self.start_dext += 1
-            tprint(self.game, f'{self.name} увеличивает свою ловкость на 1.', 'direction')
-        elif message == 'интеллект':
-            self.intel += 1
-            self.start_intel += 1
-            tprint(self.game, f'{self.name} увеличивает свой интеллект на 1.', 'direction')
-        self.game.state = 0
+        actions = {
+            'здоровье': self.increase_health,
+            'силу': self.increase_strength,
+            'ловкость': self.increase_dexterity,
+            'интеллект': self.increase_intelligence
+        }
+        action = actions.get(message, False)
+        if not action:
+            return False
+        action()
+        self.state = state_enum.NO_STATE
         return True
 
+    
+    def increase_health(self, amount:int=3) -> bool:
+        self.health += amount
+        self.start_health += amount
+        tprint(self.game, f'{self.name} получает {howmany(amount, ['единица', 'единицы', 'единиц'])} здоровья.', 'direction')
+        return True
+    
+    
+    def increase_strength(self, amount:int=1) -> bool:
+        self.stren += amount
+        self.start_stren += amount
+        tprint(self.game, f'{self.name} увеличивает свою силу на {amount}.', 'direction')
+    
+    
+    def increase_dexterity(self, amount:int=1) -> bool:
+        self.dext += amount
+        self.start_dext += amount
+        tprint(self.game, f'{self.name} увеличивает свою ловкость на {amount}.', 'direction')
+    
+    
+    def increase_intelligence(self, amount:int=1) -> bool:
+        self.intel += amount
+        self.start_intel += amount
+        tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
+    
     
     def game_over(self, goal_type, goal=None):
         """Метод проверяет, не произошло ли событие окончания игры."""
