@@ -1,6 +1,6 @@
 from functions import roll
 
-def prob(text, dex, monster_size, basis, weight):
+""" def prob(text, dex, monster_size, basis, weight):
 
     _range = 1000
     #basis = 9
@@ -38,3 +38,29 @@ for w in weights:
     print(prob('{Средний герой, большой монстр}', 5, 5, basis, weight))
     print(prob('{Ловкий герой, большой монстр}', 10, 5, basis, weight))
     print(prob('{Очень ловкий герой, большой монстр}', 15, 1, basis, weight))
+ """
+ 
+class Monster:
+    
+    def __init__(self, name:str, initiative:int):
+        self.name = name
+        self.initiative = initiative
+        
+    def __repr__(self):
+        return f'{self.name}: {self.initiative}, {self.current_initiative}'
+    
+    def generate_initiative(self) -> int:
+        self.current_initiative = roll([self.initiative])
+        return self.current_initiative
+
+
+monsters = []
+monsters.append(Monster('Крестьянин', 2))
+monsters.append(Monster('Разбойник', 4))
+monsters.append(Monster('Рыцарь', 8))
+monsters.append(Monster('Монах', 6))
+monsters.append(Monster('Бомж', 1))
+
+monsters.sort(key = lambda monster: monster.generate_initiative(), reverse=True)
+print(monsters)
+print(str(None))        

@@ -16,7 +16,6 @@ load_dotenv(find_dotenv())
 token = os.getenv('TelegramGameToken')
 bot = telebot.TeleBot(token)
 
-
 #Функции бота
 
 @bot.message_handler(commands=['start', 'старт', 's'])

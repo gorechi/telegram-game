@@ -522,7 +522,7 @@ class Room:
         if self.trader:
             message.append(self.trader.show())
         message += self.show_corpses()
-        message.append(monster_text)
+        message.extend(monster_text)
         message.append(self.get_stink_text())
         return message
         
@@ -536,11 +536,14 @@ class Room:
         return message
     
     
-    def get_monster_text_for_show(self) -> str:
-        monster = self.monsters('first')
-        if not monster:
-            return 'Не видно ничего интересного.'
-        return f'{self.decoration3} {monster.state} {monster.name}.'
+    def get_monster_text_for_show(self) -> list[str]:
+        monsters = self.monsters()
+        message = []
+        if not monsters:
+            return ['Не видно ничего интересного.']
+        for monster in monsters:
+            message.append(f'{randomitem(Room.decor3)} {monster.state} {monster.name}.')
+        return message
     
     
     def get_decoration_for_show(self) -> str:

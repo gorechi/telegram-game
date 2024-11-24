@@ -11,6 +11,7 @@ from class_room import Furniture
 from class_weapon import Weapon
 from class_allies import Trader, Scribe, RuneMerchant
 from class_backpack import Backpack
+from class_fight import Fight
 from functions import randomitem, tprint
 
 
@@ -294,9 +295,55 @@ class Game():
     
     def test(self, hero:Hero):
         floor = self.current_floor
-        room = floor.plan[0]
-        new_trader = Scribe(self, floor)
-        new_trader.place(room)
-        hero.money += 100
+        room = floor.plan[1]
+        new_monster1 = Monster(
+            self,
+            name = 'Монстр1',
+            lexemes = {
+                "nom": "монстр1",
+                "accus": "монстра1",
+                "gen": "монстра1",
+                "dat": "монстру1",
+                "prep": "монстре1",
+                "inst": "моснтром1"
+            }
+        )
+        new_monster2 = Monster(
+            self,
+            name = 'Монстр2',
+            lexemes = {
+                "nom": "монстр2",
+                "accus": "монстра2",
+                "gen": "монстра2",
+                "dat": "монстру2",
+                "prep": "монстре2",
+                "inst": "моснтром2"
+            }
+        )
+        new_monster3 = Monster(
+            self,
+            name = 'Монстр3',
+            lexemes = {
+                "nom": "монстр3",
+                "accus": "монстра3",
+                "gen": "монстра3",
+                "dat": "монстру3",
+                "prep": "монстре3",
+                "inst": "моснтром3"
+            }
+        )
+        new_monster1.initiative = 100
+        new_monster2.initiative = 100
+        new_monster3.initiative = 100
+        new_monster1.place(floor=floor, room_to_place=room)
+        new_monster2.place(floor=floor, room_to_place=room)
+        new_monster3.place(floor=floor, room_to_place=room)
+        """ new_fight = Fight(
+            game=self, 
+            hero=None, 
+            who_started=new_monster1, 
+            fighters=[new_monster1, new_monster2, new_monster3]
+            )
+        new_fight.start() """
         return None
             
