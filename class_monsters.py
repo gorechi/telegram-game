@@ -600,12 +600,18 @@ class Monster:
         targets = fight.get_targets(self)
         if not targets:
             return False
+        if not fight.check_light():
+            return self.choose_target_in_darkness(targets)
         if self.last_attacker and self.last_attacker in targets:
             return self.last_attacker
         if fight.hero:
             return fight.hero
         return randomitem(targets)
 
+    
+    def choose_target_in_darkness(self, targets:list):
+        return randomitem(targets)
+    
     
     def generate_attack(self, target, self_name:str) -> list[int, list[str]]:
         message = []
