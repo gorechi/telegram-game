@@ -8,6 +8,8 @@ class state_enum(Enum):
     - ENCHANT - персонаж что-то улучшает
     - LEVEL_UP - персонаж поднимает уровень
     - USE_IN_FIGHT - персонадж использует вещь во время боя
+    - TRADE - персонаж торгует
+    - READ - персонаж выбирает что ему почитать
     """
     NO_STATE = 0
     FIGHT = 1
@@ -15,6 +17,7 @@ class state_enum(Enum):
     LEVEL_UP = 3
     USE_IN_FIGHT = 4
     TRADE = 5
+    READ = 6
 
 class move_enum(Enum):
     """
