@@ -5,7 +5,7 @@ from class_book import Book, ThrustingWeaponBook
 from class_hero import Hero
 from class_items import Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
-from class_monsters import Berserk, Monster, Plant, Shapeshifter, Vampire, Corpse, Animal, WalkingDead
+from class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
@@ -293,7 +293,7 @@ class Game():
     
     
     def test(self, hero:Hero):
-        floor = self.current_floor
+        """ floor = self.current_floor
         room = floor.plan[1]
         new_monster1 = Monster(
             self,
@@ -337,12 +337,16 @@ class Game():
         new_monster1.place(floor=floor, room_to_place=room)
         new_monster2.place(floor=floor, room_to_place=room)
         new_monster3.place(floor=floor, room_to_place=room)
-        """ new_fight = Fight(
+        new_fight = Fight(
             game=self, 
             hero=None, 
             who_started=new_monster1, 
             fighters=[new_monster1, new_monster2, new_monster3]
             )
-        new_fight.start() """
-        return None
-            
+        new_fight.start()
+        return None """
+        book1 = Book.random_book(self)
+        book2 = Book.random_book(self)
+        self.player.backpack + book1
+        self.player.backpack + book2
+        print('Тестирование чтения книг')
