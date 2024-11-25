@@ -139,8 +139,7 @@ class Game():
         self.create_ladders()
         self.current_floor = self.castle_floors[0]
         self.player = self.check_hero(hero=hero)
-        self.player.current_position = self.current_floor.plan[0]
-        self.current_floor.plan[0].visited = True
+        self.player.place(self.current_floor.plan[0])
         new_key = Key(self)
         self.player.backpack + new_key
         self.game_is_on = False
