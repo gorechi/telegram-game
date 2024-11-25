@@ -2,8 +2,7 @@ from math import floor, sqrt
 from random import randint as dice
 from typing import Any, NoReturn
 
-from class_basic import *
-from functions import howmany, randomitem, tprint, roll, pprint
+from functions import randomitem, tprint, roll, pprint
 
 
 class Rune:

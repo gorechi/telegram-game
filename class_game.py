@@ -11,8 +11,7 @@ from class_room import Furniture
 from class_weapon import Weapon
 from class_allies import Trader, Scribe, RuneMerchant
 from class_backpack import Backpack
-from class_fight import Fight
-from functions import randomitem, tprint
+from functions import randomitem
 
 
 class Empty():

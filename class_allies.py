@@ -2,7 +2,7 @@ from class_items import Money, Rune, Matches
 from class_book import Book
 from class_potions import Potion
 from class_backpack import Backpack
-from class_room import Furniture, Room
+from class_room import Furniture
 from functions import randomitem, tprint, roll, howmany
 from dataclasses import dataclass
 from typing import Union, Literal, Optional
@@ -327,7 +327,7 @@ class RuneMerchant(Trader):
     
     
     def get_goods(self) -> bool:
-        self,shop = []
+        self.shop = []
         how_many_runes = roll([RuneMerchant._runes_quantity_die])
         for _ in range(how_many_runes):
             rune = Rune(self.game)

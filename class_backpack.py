@@ -1,4 +1,4 @@
-from functions import howmany, normal_count, randomitem, tprint, roll
+from functions import randomitem, tprint
 from class_weapon import Weapon
 
 class Backpack:

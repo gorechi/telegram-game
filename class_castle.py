@@ -4,7 +4,7 @@ from class_basic import Money
 from class_book import Book
 from class_items import Key, Map, Matches, Rune
 from class_room import Door, Room, Ladder
-from functions import pprint, randomitem
+from functions import randomitem
 
 
 class Floor:
@@ -74,7 +74,7 @@ class Floor:
         for _ in range(self.how_many['лестницы']):
             room = self.get_room_to_place_ladder_up()
             room_to_go = next_floor.get_room_to_place_ladder_down()
-            new_ladder = Ladder(room, room_to_go)
+            new_ladder = Ladder(room, room_to_go)  # noqa: F841
         return True
     
     

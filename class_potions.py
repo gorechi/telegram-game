@@ -1,4 +1,4 @@
-from functions import howmany, randomitem, tprint, roll
+from functions import howmany, randomitem, tprint
 from random import randint as dice
 
 

@@ -249,9 +249,9 @@ class Monster:
         if not self.shield.empty and self.armor.empty:
             return f', защита - d{self.shield.protection}+{self.shield.perm_protection()}'
         elif self.shield.empty and not self.armor.empty:
-            line += f', защита - d{self.armor.protection}+{self.armor.perm_protection()}'
+            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()}'
         elif not self.shield.empty and not self.armor.empty:
-            line += f', защита - d{self.armor.protection}+{self.armor.perm_protection()} + d{self.shield.protection}+{self.shield.perm_protection()}'
+            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()} + d{self.shield.protection}+{self.shield.perm_protection()}'
         return ''
 
     
@@ -411,7 +411,7 @@ class Monster:
         
         all_weapons = loot.get_items_by_class(Weapon)
         if self.prefered_weapon:
-            weapons = [i for i in weapons if i.type == self.prefered_weapon]
+            weapons = [i for i in all_weapons if i.type == self.prefered_weapon]
         else:
             weapons = all_weapons
         if not self.weapon.empty or not self.carry_weapon or not weapons:
@@ -592,7 +592,7 @@ class Monster:
             total_damage = 0
             message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
-        self.last_attacker == None
+        self.last_attacker = None
         return message
         
         
@@ -726,7 +726,7 @@ class Monster:
             return False
         self.gather_loot()
         corpse_name = f'труп {self:gen}'
-        new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)
+        new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)  # noqa: F841
         return True
         
     

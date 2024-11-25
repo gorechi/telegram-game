@@ -260,12 +260,12 @@ class Hero:
             return False
         items_list = self.find_what_to_examine()
         if not items_list:
-            tprint(self.game, f'В этой комнате нечего изучать. Это довольно скучная комната.')
+            tprint(self.game, 'В этой комнате нечего изучать. Это довольно скучная комната.')
             return False
         if what:
             items_list = [item for item in items_list if item.check_name(what)]
             if not items_list:
-                tprint(self.game, f'Эту штуку нельзя изучить.')
+                tprint(self.game, 'Эту штуку нельзя изучить.')
                 return False
         for item in items_list:
             item.get_examined(self)
@@ -313,7 +313,7 @@ class Hero:
                     f'Как только {self.g("ему", "ей")} могла прийти в голову такая идея?')
             return False
         if room.ladder_down.locked:
-           tprint (self.game, f'Крышка люка в полу не открывается. Похоже, она заперта.')
+           tprint (self.game, 'Крышка люка в полу не открывается. Похоже, она заперта.')
            return False
         return self.descend(room)
     
@@ -458,7 +458,7 @@ class Hero:
         action, enemy_text = split_actions(message)
         enemy = self.select_enemy(enemy_text)
         message = self.attack(enemy, action)
-        self.current_fight.continue_after_hero()
+        fight.continue_after_hero()
         return True
     
     
@@ -467,7 +467,7 @@ class Hero:
         if str(enemy_text).isdigit():
             try:
                 enemy = enemies[int(enemy_text)-1]
-            except:
+            except Exception:
                 tprint(self.game, 'В схватке нет такого врага.')
                 return False
             if enemy == self:
@@ -617,7 +617,7 @@ class Hero:
             if self.fear >= Hero._fear_limit:
                 return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
             elif not self.current_position.light:
-                return False, f'В комнате слишком темно чтобы разглядывать карту'
+                return False, 'В комнате слишком темно чтобы разглядывать карту'
             else:
                 return True, f'{self.name} смотрит на карту этажа замка.'
         else:
@@ -1140,9 +1140,9 @@ class Hero:
         if not self.shield.empty and self.armor.empty:
             return f', защита - d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
         elif self.shield.empty and not self.armor.empty:
-            line += f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())}'
+            return f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())}'
         elif not self.shield.empty and not self.armor.empty:
-            line += f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())} + d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
+            return f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())} + d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
         return ''
      
         
@@ -1440,11 +1440,11 @@ class Hero:
         
         game = self.game
         if self.shield.empty:
-            tprint(self.game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
+            tprint(game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
         else:
             self.hide = True
             self.rage += 1
-            tprint(self.game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
+            tprint(game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
 
     
     def show(self):
@@ -1484,7 +1484,7 @@ class Hero:
         if self.money >= 2:
             money_text = f'В кошельке звенят {howmany(self.money.how_much_money, ["монета", "монеты", "монет"])}.'
         elif self.money == 1:
-            money_text = f'Одна-единственная монета оттягивает карман героя.'
+            money_text = 'Одна-единственная монета оттягивает карман героя.'
         else:
             money_text = f'{self.name} {self.g("беден", "бедна")}, как церковная мышь.'
         return money_text
@@ -1661,7 +1661,7 @@ class Hero:
         
         message = []
         if not self.check_light():
-            message.append(f'В комнате слишком темно чтобы рыться в рюкзаке')
+            message.append('В комнате слишком темно чтобы рыться в рюкзаке')
         else:
             message += self.backpack.show(self)
             message.append(self.money.show())
@@ -1691,7 +1691,7 @@ class Hero:
         """Метод генерирует текст осмотра своего щита."""
         
         if not self.check_light():
-            return f'Из-за темноты нельзя осмотреть даже собственный щит.'
+            return 'Из-за темноты нельзя осмотреть даже собственный щит.'
         else:
             return self.shield.show()
     
@@ -1699,7 +1699,7 @@ class Hero:
         """Метод генерирует текст осмотра собственного оружия."""
         
         if not self.check_light():
-            return f'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
+            return 'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
         else:
             return self.weapon.show()
         
@@ -1753,11 +1753,10 @@ class Hero:
         
         game = self.game
         room = self.current_position
-        monster = room.monsters(mode='first')
         if what:
             what = what.lower()
         if not self.check_light():
-            tprint(game, f'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
+            tprint(game, 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
             return
         if not what:
             room.show(game.player)
@@ -2220,7 +2219,7 @@ class Hero:
         ladder, direction_string = self.choose_ladder_to_open()
         key = self.backpack.get_first_item_by_class(Key)
         if not ladder:
-            tprint(self.game, f'В этой комнате нет лестниц, которые нужно было бы отпирать.')
+            tprint(self.game, 'В этой комнате нет лестниц, которые нужно было бы отпирать.')
             return False
         self.backpack.remove(key)
         ladder.locked = False
@@ -2417,7 +2416,7 @@ class Hero:
         game = self.game
         self.book_list = self.backpack.get_items_by_class(Book)
         if not self.book_list:
-            tprint(game, f'В рюкзаке нет ни одной книги.', 'direction')
+            tprint(game, 'В рюкзаке нет ни одной книги.', 'direction')
             return False
         message = []
         message.append(f'{self.name} может прочитать следующие книги:')

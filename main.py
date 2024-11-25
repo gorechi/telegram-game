@@ -53,7 +53,7 @@ def all_commands(message):
         player.current_position.map()
         return True
     if not game:
-        bot.reply_to(message, f'В этом чате нет активной игры, начните новую игру командой "Новая игра".')
+        bot.reply_to(message, 'В этом чате нет активной игры, начните новую игру командой "Новая игра".')
         return False
     game.player.action(command, text)
     return True

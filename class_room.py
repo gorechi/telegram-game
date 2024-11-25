@@ -89,7 +89,7 @@ class Ladder:
     
     def show_in_room_as_ladder_down(self) -> str:
         if self.locked:
-            return f'В полу имеется квадратный люк, плотно закрытый крышкой.'
+            return 'В полу имеется квадратный люк, плотно закрытый крышкой.'
         return f'{self:nom} спускается вниз в темноту.'.capitalize()
         
 
@@ -823,7 +823,7 @@ class Trap:
             Список строк с сообщениями о последствиях активации ловушки.
         """
         types = Trap.types.copy()
-        message = [f'От неловкого прикосновения в ловушка начинает противно щелкать, а потом взрывается.']
+        message = ['От неловкого прикосновения в ловушка начинает противно щелкать, а потом взрывается.']
         while True:
             if not types:
                 message.append(f'{target.name} настолько {target.g("некчемен", "некчемна")},' 
@@ -847,7 +847,7 @@ class Trap:
         self.deactivate()
         self.seen = True
         self.triggered = False
-        return [f'Ловушка тихонько щелкает и больше не издает ни звука. Похоже, она больше не опасна.']
+        return ['Ловушка тихонько щелкает и больше не издает ни звука. Похоже, она больше не опасна.']
     
     
     def damage_intel(self, target) -> str:
