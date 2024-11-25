@@ -234,7 +234,7 @@ class Hero:
         return roll([Hero._initiative_die]) + self.dext
         
     
-    def test(self, commands:list):
+    def test(self, commands:list=None):
         self.game.test(self)
         tprint(self.game, 'Тестирование началось')
         
@@ -356,7 +356,8 @@ class Hero:
             state_enum.ENCHANT: self.rune_actions,
             state_enum.TRADE: self.trade_actions,
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
-            state_enum.FIGHT: self.fight_actions
+            state_enum.FIGHT: self.fight_actions,
+            state_enum.READ: self.read_actions
         }
         if command in Hero._level_up_commands and self.state == state_enum.LEVEL_UP:
             self.levelup(command)
@@ -385,11 +386,11 @@ class Hero:
             self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
-            tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
+            tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'enchant')
             return False
         message = int(message) - 1
         if not message < len(rune_list):
-            tprint(self, f'{self.name} не находит такую руну у себя в карманах.', 'direction')
+            tprint(self, f'{self.name} не находит такую руну у себя в рюкзаке.', 'enchant')
             return False
         if not self.selected_item:
             tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
@@ -681,12 +682,7 @@ class Hero:
         - command - команда от пользователя, полученная из чата игры
         
         """
-        a = command.find(' ')
-        full_command = []
-        if a < 0:
-            a = len(command)
-        full_command.append(command[:a])
-        full_command.append(command[a + 1:])
+        full_command = command.split(' ')
         if full_command[0] == '?':
             text = []
             text.append(f'{self.name} может:')
@@ -2407,19 +2403,52 @@ class Hero:
         return None 
     
     
-    def read(self, what:str) -> bool:
-        """Метод обрабатывает команду "читать". """
+    def read(self) -> bool:
+        """
+        Метод обрабатывает команду "читать".       
+        """
+        game = self.game
+        self.book_list = self.backpack.get_items_by_class(Book)
+        if not self.book_list:
+            tprint(game, f'В рюкзаке нет ни одной книги.', 'direction')
+            return False
+        message = []
+        message.append(f'{self.name} может прочитать следующие книги:')
+        for book in self.book_list:
+            message.append(f'{str(self.book_list.index(book) + 1)}: {str(book)}')
+        message.append('Выберите номер книги или скажите "отмена" чтобы ничего не читать')
+        self.state = state_enum.READ
+        tprint(game, message, 'read')
+        return True
         
-        if not self.check_if_hero_can_read():
+    
+    def read_actions(self, message:str) -> bool:
+        
+        """
+        Метод обрабатывает команды игрока когда он читает книги.
+        
+        Возвращает:
+        - True - если удалось прочитать книгу
+        - False - если по любой причине книгу прочитать не удалось
+        
+        """
+        
+        book_list = self.book_list
+        if message == 'отмена':
+            self.state = state_enum.NO_STATE
             return False
-        book = self.get_book(item=what)
-        if not book:
-            tprint(self.game, 'В рюкзаке нет ни одной книги. Грустно, когда нечего почитать.')
+        if not message.isdigit():
+            tprint(self.game, f'Чтобы прочитать книгу {self:dat} нужно выбрать ее по ее номеру.', 'read')
             return False
-        message = book.use(self)
+        message = int(message) - 1
+        if not message < len(book_list):
+            tprint(self.game, f'У {self:gen} нет столько книг.', 'read')
+            return False
+        book = book_list[message]
         self.backpack.remove(book)           
-        tprint(self.game, message)
+        tprint(self.game, book.use(self), 'direction')
         self.decrease_restless(2)
+        self.state = state_enum.NO_STATE
         return True
     
     
