@@ -244,6 +244,12 @@ class Hero:
         return roll(die) > 5
     
     
+    def place(self, room):
+        self.current_position = room
+        room.visited = True
+        self.last_move = move_enum.START
+    
+    
     def check_if_sneak_past_furniture(self) -> bool:
         return roll([3 + self.dext]) > 2
     
@@ -1566,6 +1572,7 @@ class Hero:
         self.intel = self.start_intel
         self.current_position = self.save_room
         self.restless = 0
+        self.last_move = move_enum.START
         return [f'{self.name} терпит сокрушительное поражение. Каким-то чудом {self:gender} приходит в себя на последнем месте отдыха.']
     
     
@@ -1782,7 +1789,7 @@ class Hero:
         monster = room.monsters('first')
         if monster:
             if monster.agressive and self.check_light():
-                self.fight(monster.name, True)
+                self.fight(monster.name)
     
     
     def go(self, direction:str):

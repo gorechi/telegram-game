@@ -29,6 +29,7 @@ class move_enum(Enum):
     LEFT = (3, 1)
     UPSTAIRS = (4, 5)
     DOWNSTAIRS = (5, 4)
+    START = (100, 100)
 
     def __init__(self, index:int, countermove:int):
         self.index = index
