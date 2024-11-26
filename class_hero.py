@@ -2409,11 +2409,13 @@ class Hero:
         return None 
     
     
-    def read(self) -> bool:
+    def read(self, what:str=None) -> bool:
         """
         Метод обрабатывает команду "читать".       
         """
         game = self.game
+        if what.lower() in ['карту', 'карта']:
+            return self.use_item_from_backpack('карта')
         self.book_list = self.backpack.get_items_by_class(Book)
         if not self.book_list:
             tprint(game, 'В рюкзаке нет ни одной книги.', 'direction')
