@@ -2,6 +2,7 @@ from random import randint as dice
 
 from class_basic import Money
 from class_book import Book
+from class_potions import Potion
 from class_items import Key, Map, Matches, Rune
 from class_room import Door, Room, Ladder
 from functions import randomitem
@@ -201,10 +202,13 @@ class Floor:
         # Создаем книги и разбрасываем по замку
         self.place_books(game)
         
+        # Помещаем на этаж карту
         self.place_map(game) 
+        
+        # Помещаем на этаж спички
         self.place_matches(game)
 
-    
+     
     def place_matches(self, game):
         matches = Matches(game)
         matches.place(self)
@@ -218,7 +222,6 @@ class Floor:
     def place_books(self, game):
         for _ in range(self.how_many['книга']):
             new_book = Book.random_book(self.game)
-            print(new_book, new_book.__class__)
             new_book.place(self)
 
     
@@ -237,11 +240,11 @@ class Floor:
 
     
     def place_potions(self, game):
-        self.all_potions = game.create_objects_from_json(file='potions.json',
-                                      how_many=self.how_many['зелье'], 
-                                      random=True)
-        for potion in self.all_potions:
-            potion.place(self)
+        self.all_potions = [] 
+        for _ in range(self.how_many['зелье']):
+            new_potion = Potion.random_potion(self.game)
+            self.all_potions.append(new_potion)
+            new_potion.place(self)
 
     
     def place_armor(self, game):

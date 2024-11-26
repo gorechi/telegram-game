@@ -1,4 +1,5 @@
-from class_items import Money, Rune, Matches
+from class_items import Rune, Matches
+from class_basic import Money
 from class_book import Book
 from class_potions import Potion
 from class_backpack import Backpack
@@ -296,7 +297,7 @@ class RuneMerchant(Trader):
     """Класс Торговец рунами"""
     
     _runes_quantity_die = 15
-    """Кубик, который надо кинуть чтобы определить количество книг у книжника"""
+    """Кубик, который надо кинуть чтобы определить количество рун у торговца"""
 
     _lexemes = {
         "nom": "Торговец рунами",
@@ -371,7 +372,7 @@ class RuneMerchant(Trader):
             return False
         runes_list = []
         for rune in runes:
-            price = rune.base_price - roll(Scribe._buy_price_modifier)
+            price = rune.base_price - roll(RuneMerchant._buy_price_modifier)
             new_rune = Trader.ItemInShop(item=rune, price=price)
             runes_list.append(new_rune)
         self.update_indexes()
@@ -381,3 +382,94 @@ class RuneMerchant(Trader):
     
     def show(self) -> str:
         return 'Посреди комнаты стоит прилавок торговца рунами. Сам он суетится вокруг.'
+    
+    
+class PotionsMerchant(Trader):
+    """Класс Торговец зельями"""
+    
+    _potions_quantity_die = 10
+    """Кубик, который надо кинуть чтобы определить количество зелий у торговца"""
+
+    _lexemes = {
+        "nom": "Торговец зельями",
+        "accus": "Торговца зельями",
+        "gen": "Торговца зельями",
+        "dat": "Торговцу зельями",
+        "prep": "Торговце зельями",
+        "inst": "Торговцем зельями"
+    }
+    
+    _buy_price_modifier = [5]
+    
+    _sell_price_modifier = [5]
+    
+    
+    def __init__(self,
+                 game,
+                 floor,
+                 name:str = 'Торговец зельями',
+                 lexemes:dict = None
+                 ):
+        super().__init__(game, floor, name, lexemes)
+        self.name = name
+        self.lexemes = lexemes
+        if not self.lexemes:
+            self.lexemes = PotionsMerchant._lexemes
+        self.get_goods()
+    
+    
+    def get_goods(self) -> bool:
+        self.shop = []
+        how_many_potions = roll([PotionsMerchant._potions_quantity_die])
+        for _ in range(how_many_potions):
+            potion = Potion.random_potion(self.game)
+            price = self.evaluate(potion)
+            new_potion = Trader.ItemInShop(item= potion, price=price)
+            self.shop.append(new_potion)
+        self.update_index(self.shop)
+        return True
+
+    
+    def evaluate(self, potion:Potion) -> int:
+        return potion.base_price + roll(PotionsMerchant._sell_price_modifier)
+
+
+    def generate_selling_text(self) -> list[str]:
+        if not self.shop:
+            return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
+        message = ['На витрине стоят бутылочки с различными зельями:']
+        for item in self.shop:
+            name = f'{item.item:nom}'
+            price_text = howmany(item.price, ["монета", "монеты", "монет"])
+            message.append(f'{item.index} - {name}: {price_text}')
+        return message
+
+
+    def generate_buying_text(self) -> list[str]:
+        if not self.goods_to_buy:
+            return ['Торговец зельями не хочет ничего покупать у героя.']
+        message = ['Торговец зельями с удовольствием приобрел бы у героя следующие напитки:']
+        for item in self.goods_to_buy:
+            name = f'{item.item:nom}'
+            price_text = howmany(item.price, ["монета", "монеты", "монет"])
+            message.append(f'{item.index} - {name}: {price_text}')
+        return message
+        
+    
+    def evaluate_items(self, backpack:Backpack) -> bool:
+        potions:list[Potion] = backpack.get_items_by_class(Potion)
+        if not potions:
+            self.goods_to_buy.clear()
+            return False
+        potions_list = []
+        for potion in potions:
+            price = potion.base_price - roll(PotionsMerchant._buy_price_modifier)
+            new_potion = Trader.ItemInShop(item=potion, price=price)
+            potions_list.append(new_potion)
+        self.update_indexes()
+        self.goods_to_buy = potions_list
+        return True
+    
+    
+    def show(self) -> str:
+        return 'Посреди комнаты стоит прилавок торговца зельями. Торговец занимается приготовлением какой-то микстуры.'

@@ -1,4 +1,5 @@
-from class_items import Key, Money, Rune, Map
+from class_items import Key, Rune, Map
+from class_basic import Money
 from class_book import Book
 from class_monsters import Monster, Vampire
 from class_protection import Armor, Shield

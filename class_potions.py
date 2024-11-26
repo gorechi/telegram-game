@@ -3,12 +3,20 @@ from random import randint as dice
 
 
 class Potion:
+    
+    
+    @classmethod
+    def random_potion(cls, game) -> 'Potion':
+        potion_class = randomitem(cls.__subclasses__())
+        new_potion = potion_class(game)
+        return new_potion
+    
      
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
+    def __init__(self, game):
         self.game = game
-        self.name = name
-        self.effect = effect
-        self.can_use_in_fight = can_use_in_fight
+        self.name = self.get_name()
+        self.effect = self.get_effect()
+        self.can_use_in_fight = self.get_in_fight_permition()
         self.empty = False
         self.owner = None
 
@@ -20,6 +28,18 @@ class Potion:
     def __str__(self):
         return self.description
 
+    
+    def get_name(self):
+        return self.__class__._name
+    
+    
+    def get_effect(self):
+        return self.__class__._effect
+    
+    
+    def get_in_fight_permition(self):
+        return self.__class__._can_use_in_fight
+    
     
     def check_name(self, message:str) -> bool:
         names_list = self.get_names_list(['nom', "accus"])
@@ -60,19 +80,42 @@ class Potion:
             tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             return True
         return False
+    
+    
+    def check_if_can_be_used(self, in_action: bool) -> bool:
+        game = self.game
+        if not in_action and self.can_use_in_fight:
+            tprint(game, 'Это зелье можно использовать только в бою!')
+            return False
+        if in_action and not self.can_use_in_fight:
+            tprint(game, 'Это зелье нельзя использовать в бою!')
+            return False
+        return True
+
 
 
 class HealPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье исцеления"
+    
+    _effect:int = 10
+    
+    _can_use_in_fight:bool = True
+
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Лечебное зелье, лечит раны и восстанавливает некоторое количество единиц здоровья."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье исцеления",
+            "accus": "зелье исцеления",
+            "gen": "зелья исцеления",
+            "dat": "зелью исцеления",
+            "prep": "зелье исцеления",
+            "inst": "зельем исцеления"
+        }
+        self.base_price = 10
         
-    
-    def on_create(self):
-        return True
-    
     
     def use(self, who_using, in_action:bool) -> bool:
         owner = self.owner
@@ -90,33 +133,28 @@ class HealPotion(Potion):
         tprint(self.game, text)
         return True
     
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if not in_action:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        return True
-    
 
 class HealthPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье здоровья"
+    
+    _effect:int = 1
+    
+    _can_use_in_fight:bool = False
 
-        
-    def on_create(self):
-        return True
-    
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if in_action:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
+
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье здоровья увеличивает максимальный запас здоровья персонажа."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье здоровья",
+            "accus": "зелье здоровья",
+            "gen": "зелья здоровья",
+            "dat": "зелью здоровья",
+            "prep": "зелье здоровья",
+            "inst": "зельем здоровья"
+        }
+        self.base_price = 20
     
     
     def use(self, who_using, in_action:bool) -> bool:
@@ -131,23 +169,26 @@ class HealthPotion(Potion):
 
 class StrengthPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
-        
+    _name:str = "Зелье силы"
     
-    def on_create(self):
-        return True
+    _effect:int = 1
     
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if in_action:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
-    
+    _can_use_in_fight:bool = False
+      
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье силы увеличивает максимальное значение силы персонажа."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье силы",
+            "accus": "зелье силы",
+            "gen": "зелья силы",
+            "dat": "зелью силы",
+            "prep": "зелье силы",
+            "inst": "зельем силы"
+        }
+        self.base_price = 30
+       
     
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
@@ -161,24 +202,27 @@ class StrengthPotion(Potion):
 
 class StrengtheningPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье усиления"
     
+    _effect:int = 5
     
-    def on_create(self):
-        return True
-    
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if not in_action:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        return True
-    
-    
+    _can_use_in_fight:bool = True
+      
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье усиления временно добавляет персонажу силы."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье усиления",
+            "accus": "зелье усиления",
+            "gen": "зелья усиления",
+            "dat": "зелью усиления",
+            "prep": "зелье усиления",
+            "inst": "зельем усиления"
+        }
+        self.base_price = 15
+
+        
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
@@ -189,23 +233,26 @@ class StrengtheningPotion(Potion):
 
 class DexterityPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
-        
+    _name:str = "Зелье ловкости"
     
-    def on_create(self):
-        return True
+    _effect:int = 1
     
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if in_action:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
-    
+    _can_use_in_fight:bool = False
+
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье ловкости увеличивает максимальное значение ловкости персонажа."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье ловкости",
+            "accus": "зелье ловкости",
+            "gen": "зелья ловкости",
+            "dat": "зелью ловкости",
+            "prep": "зелье ловкости",
+            "inst": "зельем ловкости"
+        }
+        self.base_price = 20
+
     
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
@@ -219,24 +266,27 @@ class DexterityPotion(Potion):
 
 class EvasionPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье увертливости"
     
+    _effect:int = 5
     
-    def on_create(self):
-        return True
+    _can_use_in_fight:bool = True
     
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if not in_action:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        return True
-    
-    
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье увертливости временно добавляет персонажу ловкости."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье увертливости",
+            "accus": "зелье увертливости",
+            "gen": "зелья увертливости",
+            "dat": "зелью увертливости",
+            "prep": "зелье увертливости",
+            "inst": "зельем увертливости"
+        }
+        self.base_price = 15
+        
+     
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
@@ -248,23 +298,26 @@ class EvasionPotion(Potion):
     
 class IntelligencePotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье ума"
+    
+    _effect:int = 1
+    
+    _can_use_in_fight:bool = False
+            
+    
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье ума увеличивает максимальное значение силы интеллекта."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье ума",
+            "accus": "зелье ума",
+            "gen": "зелья ума",
+            "dat": "зелью ума",
+            "prep": "зелье ума",
+            "inst": "зельем ума"
+        }
+        self.base_price = 25
         
-    
-    def on_create(self):
-        return True
-    
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if in_action:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
-    
     
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
@@ -277,23 +330,26 @@ class IntelligencePotion(Potion):
 
 class EnlightmentPotion(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Зелье просветления"
     
+    _effect:int = 5
     
-    def on_create(self):
-        return True
+    _can_use_in_fight:bool = True
     
-    
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if not in_action:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        return True
-    
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Зелье просветления временно добавляет персонажу интеллекта."
+        self.lexemes:dict[str, str] = {
+            "nom": "зелье просветления",
+            "accus": "зелье просветления",
+            "gen": "зелья просветления",
+            "dat": "зелью просветления",
+            "prep": "зелье просветления",
+            "inst": "зельем просветления"
+        }
+        self.base_price = 10
+        
     
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
@@ -305,16 +361,27 @@ class EnlightmentPotion(Potion):
 
 class Antidote(Potion):
     
-    def __init__(self, game, name='Зелье', effect=0, can_use_in_fight=True):
-        super().__init__(game, name, effect, can_use_in_fight)
-        self.empty = False
-        self.owner = None
+    _name:str = "Противоядие"
     
+    _effect:int = 1
     
-    def on_create(self):
-        return True
-    
-    
+    _can_use_in_fight:bool = True
+
+            
+    def __init__(self, game):
+        super().__init__(game)
+        self.description:str = "Противоядие лечит отравление и прочие отрицательные эффекты. На основе алкоголя."
+        self.lexemes:dict[str, str] = {
+            "nom": "противоядие",
+            "accus": "противоядие",
+            "gen": "противоядия",
+            "dat": "противоядию",
+            "prep": "противоядие",
+            "inst": "противоядием"
+        }
+        self.base_price = 5
+
+        
     def check_if_can_be_used(self, in_action: bool) -> bool:
         game = self.game
         if not self.owner.poisoned and self.owner.fear == 0:
