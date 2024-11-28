@@ -85,14 +85,6 @@ class Monster:
             "prep": "обычных противниках",
             "inst": "обычными противниками"
         },
-        'shapeshifter': {
-            "nom": "оборотни",
-            "accus": "оборотней",
-            "gen": "оборотней",
-            "dat": "оборотням",
-            "prep": "оборотнях",
-            "inst": "оборотнями"
-        },
         'undead': {
             "nom": "мертвецы",
             "accus": "мертвецов",
@@ -294,7 +286,6 @@ class Monster:
         if self.gender == 0:
             return he_word
         return she_word
-
 
     
     def check_name(self, message:str) -> bool:
@@ -557,7 +548,6 @@ class Monster:
         if not self.weapon.empty:
             return self.weapon.attack(target)
         return 0
-    
     
     
     def break_enemy_shield(self, target, total_attack:int) -> str:
@@ -1264,6 +1254,57 @@ class WalkingDead(Monster):
             self.become_a_zombie,
             self.become_a_zombie,
         ]
+
+
+class Skeleton(Monster):
+    """Класс Skeleton наследует класс Monster и представляет собой тип монстра - скелета. 
+    Скелеты имунны к колющему и режущему оружию, но получают дополнительный урон от ударного."""
+    
+    _weapon_type_weaknesses = {
+        'ударное': 2,
+        'колющее': 0.3,
+        'рубящее': 0.5
+    }
+    
+    def __init__(self, 
+                 game, 
+                 name='',
+                 lexemes={}, 
+                 stren=10, 
+                 health=20, 
+                 actions='бьет', 
+                 state='стоит', 
+                 agressive=True,
+                 carry_weapon=True, 
+                 carry_shield=True,
+                 wear_armor=True):
+        super().__init__(game, 
+                         name,
+                         lexemes, 
+                         stren, 
+                         health, 
+                         actions, 
+                         state, 
+                         agressive, 
+                         carry_weapon, 
+                         carry_shield,
+                         wear_armor)
+        self.empty = False
+        self.can_resurrect = True
+        self.corpse = True
+        self.can_run = False
+        self.wounds_list = [
+            self.rage,
+            self.leg_wound,
+            self.hand_wound
+        ]
+    
+    
+    def get_weakness(self, weapon:Weapon) -> float:
+        """Метод возвращает значение коэффициента ославбления/усиления 
+        при использовании против монстра определенного оружия."""    
+        
+        return Skeleton._weapon_type_weaknesses[weapon.type]
 
 
 class Corpse():
