@@ -1749,7 +1749,7 @@ class Hero:
         return trap.seen
     
     
-    def look(self, what:str=None):
+    def look(self, what:str=''):
         """Метод обрабатывает команду "осмотреть". """
         
         game = self.game
