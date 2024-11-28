@@ -3,7 +3,7 @@ from typing import NoReturn
 
 from class_basic import Loot, Money
 from class_items import Key
-from functions import pprint, randomitem, readfile, tprint, roll
+from functions import pprint, randomitem, tprint, roll
 from typing import Optional
 
 

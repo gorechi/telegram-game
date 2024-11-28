@@ -1,7 +1,7 @@
 import json
 
 from class_castle import Floor, Ladder
-from class_book import Book, ThrustingWeaponBook
+from class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeaponBook, TrapsBook, WisdomBook
 from class_hero import Hero
 from class_items import Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
@@ -9,7 +9,7 @@ from class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, Wal
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
-from class_allies import Trader, Scribe, RuneMerchant
+from class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
 from class_backpack import Backpack
 from functions import randomitem
 
@@ -106,12 +106,17 @@ class Game():
             'спички': Matches,
             'книга': Book,
             'книга о колющем оружии': ThrustingWeaponBook,
+            'книга о рубящем оружии': CuttingWeaponBook,
+            'книга об ударном оружии': BluntgWeaponBook,
+            'книга о ловушках': TrapsBook,
+            'книга об ученых': WisdomBook,
             'зелье': Potion,
             'руна': Rune,
             'заклинание': Spell,
             'торговец': Trader,
             'книжник': Scribe,
             'торговец рунами': RuneMerchant,
+            'Торговец заклинаниями': PotionsMerchant,
             'рюкзак': Backpack,
             'зелье исцеления': HealPotion,
             'зелье здоровья': HealthPotion,
