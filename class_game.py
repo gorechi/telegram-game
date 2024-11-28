@@ -64,7 +64,7 @@ class Game():
         'rooms': 3,
         'traps_difficulty': 4, 
         'how_many': {
-            'монстры': 5,
+            'монстры': 9,
             'оружие': 3,
             'щит': 2,
             'доспех': 2,
@@ -83,6 +83,12 @@ class Game():
     """Сколько торговцев в игре"""
 
     _traders_update_counter = 30
+    
+    _floor_monsters = {
+        1: ['вампир', 'растение'],
+        2: ['вампир', 'растение']
+    }
+    """Словарь типов монстров для некоторых этажей"""
 
 
     def __init__(self, chat_id:str, bot, hero:Hero=None):
@@ -206,7 +212,12 @@ class Game():
         
         floors = []
         for i in Game._castle_floors_sizes:
-            floor = Floor(self, i, Game._castle_floors_sizes[i])
+            monsters_classes = Game._floor_monsters.get(i, None)
+            floor = Floor(self, 
+                          floor_number = i, 
+                          data = Game._castle_floors_sizes[i], 
+                          monsters_classes = monsters_classes
+                          )
             floors.append(floor)
         return floors
     
@@ -221,7 +232,7 @@ class Game():
                                  file:str, 
                                  random:bool=False, 
                                  how_many:int=None, 
-                                 obj_class:str=None, 
+                                 obj_classes:list[str]=None, 
                                  floor:int=None
                                  ) -> list:
         
@@ -244,8 +255,8 @@ class Game():
             parsed_data = json.load(read_data)
         if not parsed_data:
             raise FileExistsError(f'Не удалось прочитать данные из файла {file}')
-        if obj_class and isinstance(obj_class, str):
-            parsed_data = [i for i in parsed_data if i['class'] == obj_class]
+        if obj_classes and isinstance(obj_classes, list):
+            parsed_data = [i for i in parsed_data if i['class'] in obj_classes]
         if floor and isinstance(floor, int):
             parsed_data = [i for i in parsed_data if int(i.get('floor')) >= floor]
         if random and how_many:

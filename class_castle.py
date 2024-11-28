@@ -22,7 +22,7 @@ class Floor:
     _max_money_in_locked_room = 40
     """Максимальное количество денег в запертой комнате."""
         
-    def __init__(self, game, floor_number:int, data:dict):
+    def __init__(self, game, floor_number:int, data:dict, monsters_classes:list[str]=None):
         self.game = game
         self.floor_number = floor_number
         print(f'floor number = {self.floor_number}')
@@ -45,6 +45,7 @@ class Floor:
                                'верх': (0 - self.rooms),
                                'право': 1}
         self.how_many = data['how_many']
+        self.monsters_classes = monsters_classes
         self.monsters_in_rooms = {}
         self.create_rooms(self.rows, self.rooms)
         self.lock_doors()
@@ -275,8 +276,10 @@ class Floor:
         self.all_monsters = game.create_objects_from_json(file='monsters.json',
                                        how_many=self.how_many['монстры'],
                                        random=True,
+                                       obj_classes = self.monsters_classes,
                                        floor=self.floor_number)
         for monster in self.all_monsters:
+            print(monster)
             monster.place(self)
             self.game.how_many_monsters += 1
 
