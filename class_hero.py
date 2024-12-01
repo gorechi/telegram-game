@@ -706,6 +706,13 @@ class Hero:
             c(full_command[1])
 
     
+    def get_poison_protection(self) -> int:
+        base_protection_die = roll([Hero._poison_base_protection_die])
+        additional_protection_die = 0
+        if self.armor.is_poisoned() or self.shield.is_poisoned():
+            additional_protection_die = roll([Hero._poison_additional_protection_die])
+        return base_protection_die + additional_protection_die
+    
     def poison_enemy(self, target:Monster) -> str|None:
         """
         Метод проводит проверку, отравил герой противника при атаке, или нет.
@@ -721,11 +728,7 @@ class Hero:
             poison_die = roll([Weapon._poison_level])
         else:
             poison_die = 0
-        base_protection_die = roll([Hero._poison_base_protection_die])
-        additional_protection_die = 0
-        if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = roll([Hero._poison_additional_protection_die])
-        protection = base_protection_die + additional_protection_die
+        protection = target.get_poison_protection()
         if poison_die > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target:pronoun} теперь неважно себя чувствует.'

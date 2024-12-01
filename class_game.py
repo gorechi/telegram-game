@@ -5,7 +5,7 @@ from class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeapo
 from class_hero import Hero
 from class_items import Key, Map, Matches, Rune, Spell
 from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
-from class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead
+from class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton
 from class_protection import Armor, Shield
 from class_room import Furniture
 from class_weapon import Weapon
@@ -106,6 +106,7 @@ class Game():
             'берсерк': Berserk,
             'растение': Plant,
             'животное': Animal,
+            'скелет': Skeleton,
             'труп': Corpse,
             'ключ': Key,
             'карта': Map,
@@ -122,7 +123,7 @@ class Game():
             'торговец': Trader,
             'книжник': Scribe,
             'торговец рунами': RuneMerchant,
-            'Торговец заклинаниями': PotionsMerchant,
+            'торговец заклинаниями': PotionsMerchant,
             'рюкзак': Backpack,
             'зелье исцеления': HealPotion,
             'зелье здоровья': HealthPotion,

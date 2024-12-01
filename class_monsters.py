@@ -85,14 +85,6 @@ class Monster:
             "prep": "обычных противниках",
             "inst": "обычными противниками"
         },
-        'shapeshifter': {
-            "nom": "оборотни",
-            "accus": "оборотней",
-            "gen": "оборотней",
-            "dat": "оборотням",
-            "prep": "оборотнях",
-            "inst": "оборотнями"
-        },
         'undead': {
             "nom": "мертвецы",
             "accus": "мертвецов",
@@ -124,7 +116,16 @@ class Monster:
             "dat": "вампирам",
             "prep": "вампирах",
             "inst": "вампирами"
+        },
+        'skeleton': {
+            "nom": "скелеты",
+            "accus": "скелетов",
+            "gen": "скелетов",
+            "dat": "скелетам",
+            "prep": "скелетах",
+            "inst": "скелетами"
         }
+
     }
     """Лексемы разных типов противников"""
     
@@ -204,6 +205,10 @@ class Monster:
                 return 'он'
             return 'она'
         return self.lexemes.get(format, '')
+    
+    
+    def make_noise_when_dead(self):
+        return 0
     
     
     def check_light(self) -> bool:
@@ -295,7 +300,6 @@ class Monster:
             return he_word
         return she_word
 
-
     
     def check_name(self, message:str) -> bool:
         room = self.current_position
@@ -334,6 +338,14 @@ class Monster:
         return self.name
     
     
+    def get_poison_protection(self) -> int:
+        base_protection_die = roll([Monster._poison_base_protection_die])
+        additional_protection_die = 0
+        if self.armor.is_poisoned() or self.shield.is_poisoned():
+            additional_protection_die = roll([Monster._poison_additional_protection_die])
+        return base_protection_die + additional_protection_die
+    
+    
     def poison_enemy(self, target) -> str:
         """
         Метод проводит проверку, отравил монстр противника при атаке, или нет.
@@ -348,12 +360,7 @@ class Monster:
             poison_die = dice(1, Monster._poison_level)
         else:
             poison_die = 0
-        base_protection_die = dice(1, Monster._poison_base_protection_die)
-        if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = dice(1, Monster._poison_additional_protection_die)
-        else:
-            additional_protection_die = 0
-        protection = base_protection_die + additional_protection_die
+        protection = target.get_poison_protection()
         if poison_die > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target.g("он", "она")} теперь неважно себя чувствует.'
@@ -557,7 +564,6 @@ class Monster:
         if not self.weapon.empty:
             return self.weapon.attack(target)
         return 0
-    
     
     
     def break_enemy_shield(self, target, total_attack:int) -> str:
@@ -1144,6 +1150,7 @@ class Vampire(Monster):
         classes_to_exclude = [
             'Vampire',
             'Plant',
+            'Skeleton',
             'WalkingDead'
         ]
         return fight.get_fighter_by_health(self, classes_to_exclude, 'Min')
@@ -1264,6 +1271,72 @@ class WalkingDead(Monster):
             self.become_a_zombie,
             self.become_a_zombie,
         ]
+
+
+class Skeleton(Monster):
+    """Класс Skeleton наследует класс Monster и представляет собой тип монстра - скелета. 
+    Скелеты имунны к колющему и режущему оружию, но получают дополнительный урон от ударного."""
+    
+    _weapon_type_weaknesses = {
+        'ударное': 2,
+        'колющее': 0.3,
+        'рубящее': 0.5
+    }
+    
+    def __init__(self, 
+                 game, 
+                 name='',
+                 lexemes={}, 
+                 stren=10, 
+                 health=20, 
+                 actions='бьет', 
+                 state='стоит', 
+                 agressive=True,
+                 carry_weapon=True, 
+                 carry_shield=True,
+                 wear_armor=True):
+        super().__init__(game, 
+                         name,
+                         lexemes, 
+                         stren, 
+                         health, 
+                         actions, 
+                         state, 
+                         agressive, 
+                         carry_weapon, 
+                         carry_shield,
+                         wear_armor)
+        self.empty = False
+        self.can_resurrect = True
+        self.corpse = True
+        self.can_run = False
+        self.wounds_list = [
+            self.rage,
+            self.leg_wound,
+            self.hand_wound
+        ]
+    
+    
+    def get_weakness(self, weapon:Weapon) -> float:
+        """Метод возвращает значение коэффициента ославбления/усиления 
+        при использовании против монстра определенного оружия."""    
+        
+        return Skeleton._weapon_type_weaknesses[weapon.type]
+    
+    
+    def choose_target(self, fight:Fight):
+        not_undead = fight.get_fighter_by_health(self, exclude=['Skeleton', 'WalkingDead'], mode='Min')
+        if not_undead:
+            return not_undead
+        return fight.get_fighter_by_health(self, exclude=['Skeleton'], mode='Min')
+    
+    
+    def make_noise_when_dead(self):
+        return 1
+    
+    
+    def get_poison_protection(self) -> int:
+        return 100
 
 
 class Corpse():
