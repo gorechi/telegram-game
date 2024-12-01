@@ -116,7 +116,16 @@ class Monster:
             "dat": "вампирам",
             "prep": "вампирах",
             "inst": "вампирами"
+        },
+        'skeleton': {
+            "nom": "скелеты",
+            "accus": "скелетов",
+            "gen": "скелетов",
+            "dat": "скелетам",
+            "prep": "скелетах",
+            "inst": "скелетами"
         }
+
     }
     """Лексемы разных типов противников"""
     
@@ -196,6 +205,10 @@ class Monster:
                 return 'он'
             return 'она'
         return self.lexemes.get(format, '')
+    
+    
+    def make_noise_when_dead(self):
+        return 0
     
     
     def check_light(self) -> bool:
@@ -325,6 +338,14 @@ class Monster:
         return self.name
     
     
+    def get_poison_protection(self) -> int:
+        base_protection_die = roll([Monster._poison_base_protection_die])
+        additional_protection_die = 0
+        if self.armor.is_poisoned() or self.shield.is_poisoned():
+            additional_protection_die = roll([Monster._poison_additional_protection_die])
+        return base_protection_die + additional_protection_die
+    
+    
     def poison_enemy(self, target) -> str:
         """
         Метод проводит проверку, отравил монстр противника при атаке, или нет.
@@ -339,12 +360,7 @@ class Monster:
             poison_die = dice(1, Monster._poison_level)
         else:
             poison_die = 0
-        base_protection_die = dice(1, Monster._poison_base_protection_die)
-        if target.armor.is_poisoned() or target.shield.is_poisoned():
-            additional_protection_die = dice(1, Monster._poison_additional_protection_die)
-        else:
-            additional_protection_die = 0
-        protection = base_protection_die + additional_protection_die
+        protection = target.get_poison_protection()
         if poison_die > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target.g("он", "она")} теперь неважно себя чувствует.'
@@ -1134,6 +1150,7 @@ class Vampire(Monster):
         classes_to_exclude = [
             'Vampire',
             'Plant',
+            'Skeleton',
             'WalkingDead'
         ]
         return fight.get_fighter_by_health(self, classes_to_exclude, 'Min')
@@ -1305,6 +1322,21 @@ class Skeleton(Monster):
         при использовании против монстра определенного оружия."""    
         
         return Skeleton._weapon_type_weaknesses[weapon.type]
+    
+    
+    def choose_target(self, fight:Fight):
+        not_undead = fight.get_fighter_by_health(self, exclude=['Skeleton', 'WalkingDead'], mode='Min')
+        if not_undead:
+            return not_undead
+        return fight.get_fighter_by_health(self, exclude=['Skeleton'], mode='Min')
+    
+    
+    def make_noise_when_dead(self):
+        return 1
+    
+    
+    def get_poison_protection(self) -> int:
+        return 100
 
 
 class Corpse():
