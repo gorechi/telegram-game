@@ -1,7 +1,7 @@
 from math import ceil
 from random import randint as dice
 
-from functions import randomitem, tprint
+from src.functions.functions import randomitem, tprint
 
 
 class Weapon:

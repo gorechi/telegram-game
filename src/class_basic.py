@@ -1,4 +1,5 @@
-from functions import howmany, tprint
+from src.functions.functions import howmany, tprint
+
 from typing import Union
 
 

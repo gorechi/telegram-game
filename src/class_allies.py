@@ -1,10 +1,11 @@
-from class_items import Rune, Matches
-from class_basic import Money
-from class_book import Book
-from class_potions import Potion
-from class_backpack import Backpack
-from class_room import Furniture
-from functions import randomitem, tprint, roll, howmany
+from src.class_items import Rune, Matches
+from src.class_basic import Money
+from src.class_book import Book
+from src.class_potions import Potion
+from src.class_backpack import Backpack
+from src.class_room import Furniture
+from src.functions.functions import randomitem, tprint, roll, howmany
+
 from dataclasses import dataclass
 from typing import Union, Literal, Optional
 
