@@ -1,6 +1,8 @@
-from functions import tprint, cprint
+from src.functions.functions import tprint, cprint
+from src.enums import state_enum
+
 from collections import deque
-from enums import state_enum
+
 
 class Fight:
     

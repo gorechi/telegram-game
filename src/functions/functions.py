@@ -199,7 +199,7 @@ def tprint(game, text, state=''):
 
 def pprint(game, text, width=200, height=200, color='#FFFFFF'):
     pic = Image.new('RGB', (width, height), color=color)
-    font = ImageFont.truetype('PTMono-Regular.ttf', size=18)
+    font = ImageFont.truetype('resources/PTMono-Regular.ttf', size=18)
     draw_text = ImageDraw.Draw(pic)
     if isinstance(text, str):
         draw_text.text(

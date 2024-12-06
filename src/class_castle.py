@@ -1,11 +1,11 @@
 from random import randint as dice
 
-from class_basic import Money
-from class_book import Book
-from class_potions import Potion
-from class_items import Key, Map, Matches, Rune
-from class_room import Door, Room, Ladder
-from functions import randomitem
+from src.class_basic import Money
+from src.class_book import Book
+from src.class_potions import Potion
+from src.class_items import Key, Map, Matches, Rune
+from src.class_room import Door, Room, Ladder
+from src.functions.functions import randomitem
 
 
 class Floor:
@@ -249,7 +249,7 @@ class Floor:
 
     
     def place_armor(self, game):
-        self.all_armor = game.create_objects_from_json(file='armor.json',
+        self.all_armor = game.create_objects_from_json(file='json/armor.json',
                                     how_many=self.how_many['доспех'],
                                     random=True)
         for armor in self.all_armor:
@@ -257,7 +257,7 @@ class Floor:
 
     
     def place_shields(self, game):
-        self.all_shields = game.create_objects_from_json(file='shields.json',
+        self.all_shields = game.create_objects_from_json(file='json/shields.json',
                                       how_many=self.how_many['щит'],
                                       random=True)
         for shield in self.all_shields:
@@ -265,7 +265,7 @@ class Floor:
 
     
     def place_weapons(self, game):
-        self.all_weapon = game.create_objects_from_json(file='weapon.json',
+        self.all_weapon = game.create_objects_from_json(file='json/weapon.json',
                                      how_many=self.how_many['оружие'],
                                      random=True)
         for weapon in self.all_weapon:
@@ -273,7 +273,7 @@ class Floor:
 
     
     def place_monsters(self, game):
-        self.all_monsters = game.create_objects_from_json(file='monsters.json',
+        self.all_monsters = game.create_objects_from_json(file='json/monsters.json',
                                        how_many=self.how_many['монстры'],
                                        random=True,
                                        obj_classes = self.monsters_classes,
@@ -285,7 +285,7 @@ class Floor:
 
     
     def place_rest_places(self, game):
-        self.all_rest_places = game.create_objects_from_json(file='furniture-rest.json',
+        self.all_rest_places = game.create_objects_from_json(file='json/furniture-rest.json',
                                         how_many=self.how_many['очаг'],)
         self.all_rest_places[0].place(self, room_to_place=self.plan[0])
         for rest_place in self.all_rest_places[1:]:
@@ -293,7 +293,7 @@ class Floor:
 
     
     def place_furniture(self, game):
-        self.all_furniture = game.create_objects_from_json(file='furniture.json',
+        self.all_furniture = game.create_objects_from_json(file='json/furniture.json',
                                         how_many=self.how_many['мебель'],
                                         random=True)
         for furniture in self.all_furniture:

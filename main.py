@@ -6,7 +6,7 @@ import os
 from dotenv import find_dotenv, load_dotenv
 from telebot import types
 
-from class_game import Game
+from src.class_game import Game
  
 # Константы и настройки
 game_sessions = {}

@@ -1,17 +1,17 @@
 import json
 
-from class_castle import Floor, Ladder
-from class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeaponBook, TrapsBook, WisdomBook
-from class_hero import Hero
-from class_items import Key, Map, Matches, Rune, Spell
-from class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
-from class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton
-from class_protection import Armor, Shield
-from class_room import Furniture
-from class_weapon import Weapon
-from class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
-from class_backpack import Backpack
-from functions import randomitem
+from src.class_castle import Floor, Ladder
+from src.class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeaponBook, TrapsBook, WisdomBook
+from src.class_hero import Hero
+from src.class_items import Key, Map, Matches, Rune, Spell
+from src.class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
+from src.class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton
+from src.class_protection import Armor, Shield
+from src.class_room import Furniture
+from src.class_weapon import Weapon
+from src.class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
+from src.class_backpack import Backpack
+from src.functions.functions import randomitem
 
 
 class Empty():
@@ -203,7 +203,7 @@ class Game():
         """
         
         if not hero:
-            hero = self.create_objects_from_json('hero.json')[0]
+            hero = self.create_objects_from_json('json/hero.json')[0]
         return hero
     
     
@@ -279,7 +279,7 @@ class Game():
         """
         
         objects = []
-        with open('weapon.json', encoding='utf-8') as read_data:
+        with open('json/weapon.json', encoding='utf-8') as read_data:
             parsed_data = json.load(read_data)
         if weapon_type:
             parsed_data = [i for i in parsed_data if i['type'] == weapon_type]

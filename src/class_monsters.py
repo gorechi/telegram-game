@@ -2,12 +2,12 @@ from math import ceil
 from random import randint as dice
 from random import choice
 
-from class_basic import Loot, Money
-from class_items import Rune
-from class_protection import Armor, Shield
-from class_weapon import Weapon
-from class_fight import Fight
-from functions import howmany, randomitem, tprint, roll
+from src.class_basic import Loot, Money
+from src.class_items import Rune
+from src.class_protection import Armor, Shield
+from src.class_weapon import Weapon
+from src.class_fight import Fight
+from src.functions.functions import howmany, randomitem, tprint, roll
 
 
 class Monster:

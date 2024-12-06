@@ -1,4 +1,4 @@
-from functions import randomitem, tprint, roll
+from src.functions.functions import randomitem, tprint, roll
 
 class Book:
     

@@ -1,14 +1,14 @@
-from class_items import Key, Rune, Map
-from class_basic import Money
-from class_book import Book
-from class_monsters import Monster, Vampire
-from class_protection import Armor, Shield
-from class_room import Furniture, Room, Ladder
-from class_weapon import Weapon
-from class_backpack import Backpack
-from class_fight import Fight
-from functions import howmany, normal_count, randomitem, tprint, roll, split_actions
-from enums import state_enum, move_enum
+from src.class_items import Key, Rune, Map
+from src.class_basic import Money
+from src.class_book import Book
+from src.class_monsters import Monster, Vampire
+from src.class_protection import Armor, Shield
+from src.class_room import Furniture, Room, Ladder
+from src.class_weapon import Weapon
+from src.class_backpack import Backpack
+from src.class_fight import Fight
+from src.functions.functions import howmany, normal_count, randomitem, tprint, roll, split_actions
+from src.enums import state_enum, move_enum
 
 
 class Hero:

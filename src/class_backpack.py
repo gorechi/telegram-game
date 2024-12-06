@@ -1,5 +1,5 @@
-from functions import randomitem, tprint
-from class_weapon import Weapon
+from src.functions.functions import randomitem, tprint
+from src.class_weapon import Weapon
 
 class Backpack:
     
