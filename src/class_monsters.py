@@ -537,8 +537,9 @@ class Monster:
         """
         
         element = str(weapon.element())
-        if self.weakness.get(element):
-            return self.weakness[element]
+        weakness = self.weakness.get(element, None)
+        if weakness:
+            return weakness
         return 1
         
             
@@ -1119,17 +1120,6 @@ class Vampire(Monster):
         """
         Инициализирует экземпляр класса Vampire с заданными параметрами.
         
-        :param game: ссылка на игру
-        :param name: имя вампира
-        :param lexemes: лексемы, связанные с вампиром
-        :param stren: сила вампира
-        :param health: здоровье вампира
-        :param actions: действия, которые может выполнять вампир
-        :param state: состояние вампира
-        :param agressive: является ли вампир агрессивным
-        :param carry_weapon: несет ли вампир оружие
-        :param carry_shield: несет ли вампир щит
-        :param wear_armor: носит ли вампир броню
         """
         super().__init__(game, 
                          name,
@@ -1144,6 +1134,11 @@ class Vampire(Monster):
                          wear_armor)
         self.empty = False
         self.can_run = True
+        self.weakness = {
+            '12': 1.5,
+            '15': 1.5,
+            '24': 2
+        }
 
     
     def choose_target(self, fight:Fight):
