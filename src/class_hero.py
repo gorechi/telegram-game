@@ -1765,20 +1765,28 @@ class Hero:
         if not what:
             room.show(game.player)
             room.map()
+            return
         if what == 'себя':
             self.show()
+            return
         if what == 'рюкзак':
             self.show_backpack()
+            return
         if self.floor.directions_dict.get(what):
             self.key_hole(what)
+            return
         if self.weapon.check_name(what):
             tprint(game, self.look_at_weapon())
+            return
         if self.shield.check_name(what):
             tprint(game, self.look_at_shield())
+            return
         if self.armor.check_name(what):
             tprint(game, self.look_at_armor())
+            return
         if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
             tprint(game, self.look_at_furniture(what=what))
+            return
 
     
     def check_monster_and_figth(self):
