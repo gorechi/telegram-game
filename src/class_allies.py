@@ -40,7 +40,9 @@ class Trader:
     
     
     @staticmethod
-    def search_item_by_name(items_list:list, name:int) -> Union[Book, Rune, Potion, Matches, None]:
+    def search_item_by_name(items_list:list, name:str) -> Union[Book, Rune, Potion, Matches, None]:
+        if not name or not isinstance(name, str):
+            raise ValueError('В метод randomitem передан пустой массив')
         for item in items_list:
             if item.item.check_name(name):
                 return item
@@ -59,7 +61,6 @@ class Trader:
         self.lexemes = lexemes
         self.shop = []
         self.goods_to_buy = []
-        self.place()
         self.money = self.generate_money()
         self.game.all_traders.append(self)    
     
