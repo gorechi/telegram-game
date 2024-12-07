@@ -945,6 +945,10 @@ class Plant(Monster):
     Класс Plant наследует класс Monster и представляет собой тип монстра - растение.
     Растения не могут носить оружие, щиты, броню, не агрессивны, не могут красть, прятаться или бегать.
     """
+    
+    _dark_mele_attack_divider = 2
+    """Во сколько раз уменьшается урон, наносимый растением, в темноте"""
+    
     def __init__(self,
                  game,
                  name='',
@@ -1016,6 +1020,20 @@ class Plant(Monster):
             room = randomitem(empty_rooms)
         self.current_position = room
         self.floor = floor
+    
+    
+    def generate_mele_attack(self, target) -> int:
+        """
+        Генерирует атаку в ближнем бою на цель. Если монстр отравлен, его атака уменьшается.
+        В зависимости от освещенности в комнате, атака может быть уменьшена.
+        """
+        if self.poisoned:
+            poison_stren = dice(1, self.stren // 2)
+        else:
+            poison_stren = 0
+        if not target.check_light():
+            return dice(1, self.stren - poison_stren) // Plant._dark_mele_attack_divider
+        return dice(1, self.stren - poison_stren)
 
 
 class Berserk(Monster):
