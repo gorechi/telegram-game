@@ -5,6 +5,7 @@ from src.class_book import Book
 from src.class_potions import Potion
 from src.class_items import Key, Map, Matches, Rune
 from src.class_room import Door, Room, Ladder
+from src.class_allies import Trader
 from src.functions.functions import randomitem
 
 
@@ -182,6 +183,9 @@ class Floor:
         # Создаем очаги и разбрасываем по замку
         self.place_rest_places(game)
         
+        # Создаем торговцев и рассаживаем по этажу
+        self.place_traders(game)
+        
         # Читаем монстров из файла и разбрасываем по замку
         self.place_monsters(game)
         
@@ -214,6 +218,12 @@ class Floor:
         matches = Matches(game)
         matches.place(self)
 
+    
+    def place_traders(self, game):
+        for _ in range(self.how_many['торговец']):
+            trader = Trader.random_trader(self.game, self)
+            trader.place()
+    
     
     def place_map(self, game):
         new_map = Map(game, self)
