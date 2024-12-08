@@ -31,6 +31,13 @@ class Trader:
         index: Optional[int] = None
     
     
+    @classmethod
+    def random_trader(cls, game, floor) -> 'Trader':
+        trader_class = randomitem(cls.__subclasses__())
+        new_trader = trader_class(game, floor)
+        return new_trader
+    
+    
     @staticmethod
     def search_item_by_index(items_list:list, index:int) -> Union[Book, Rune, Potion, Matches, None]:
         for item in items_list:
