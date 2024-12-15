@@ -24,9 +24,6 @@ class Monster:
     _add_poison_level = 3
     """Значение, которое прибавляется к уровню отравления чтобы рассчитать кубик отравления."""
        
-    _money = 5
-    """Сколько у монстра по умолчанию денег."""
-
     _see_through_keyhole = 'видит какую-то неясную фигуру.'
     """Что отображается если монстра увидеть через замочную скважину."""
   
@@ -129,66 +126,25 @@ class Monster:
     }
     """Лексемы разных типов противников"""
     
-    def __init__(self,
-                 game,
-                 name:str='',
-                 lexemes:dict[str, str]={},
-                 stren:int=50,
-                 health:int=10,
-                 actions:list[str]=['бьет'],
-                 state:str='стоит',
-                 agressive:bool=False,
-                 carry_weapon:bool=True,
-                 carry_shield:bool=False,
-                 wear_armor:bool=False,
-                 hit_chance:int=5,
-                 parry_chance:int=2,
-                 corpse:bool=True,
-                 can_resurrect:bool=False):
+    def __init__(self, game):
         self.game = game
-        self.name = name
-        self.monster_type = 'basic'
-        self.lexemes = lexemes
-        self.stren = stren
-        self.health = health
-        self.actions = actions
-        self.state = state
-        self.corpse = corpse
         self.initiative = 2
-        self.gender = 0
         self.floor = None
         self.run = False
         self.alive = True
         self.hide = False
-        self.hit_chance = hit_chance
-        self.parry_chance = parry_chance
         self.weapon = self.game.no_weapon
         self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
         self.armor = self.game.no_armor
-        self.money = Monster._money
         self.current_position = None
-        self.start_health = self.health
         self.loot = Loot(self.game)
-        self.can_steal = True
-        self.stink = False
-        self.can_hide = True
-        self.can_resurrect = can_resurrect
         self.hiding_place = None
-        self.can_run = True
         self.wounded = False
-        self.venomous = 0
         self.poisoned = False
-        self.weakness = {}
         self.key_hole = Monster._see_through_keyhole
         self.empty = False
-        self.prefered_weapon = None
-        self.carry_weapon = carry_weapon
-        self.wear_armor = wear_armor
-        self.carry_shield = carry_shield
-        self.agressive = agressive
         self.last_attacker = None
-        self.exp = self.stren * roll([Monster._exp_multiplier_limit]) + roll([self.health])
         self.wounds_list = [
             self.hand_wound,
             self.bleed,
@@ -277,6 +233,8 @@ class Monster:
         
         if self.prefered_weapon:
             self.weapon = self.game.create_random_weapon(weapon_type=self.prefered_weapon)
+            self.start_health = self.health
+            self.exp = self.stren * roll([Monster._exp_multiplier_limit]) + roll([self.health])
         return True
 
     
@@ -684,7 +642,7 @@ class Monster:
             self.floor.monsters_in_rooms[room].remove(self)
         except ValueError:
             print ('Не можем удалить себя из списка монстров. Ну и пофигу.')
-        self.game.how_many_monsters -= 1
+        self.game.monsters_controller.kill_monster(self)
         self.alive = False
         self.become_a_corpse(for_good=True)
         return f'{self:nom} падает замертво на пол комнаты.'
@@ -704,7 +662,7 @@ class Monster:
             self.floor.monsters_in_rooms[room].remove(self)
         except ValueError:
             print ('Не можем удалить себя из списка монстров. Ну и пофигу.')
-        self.game.how_many_monsters -= 1
+        self.game.monsters_controller.kill_monster(self)
         self.alive = False
         self.become_a_corpse(for_good=False)
         return True
@@ -718,7 +676,7 @@ class Monster:
         room = self.current_position
         self.floor.all_monsters.append(self)
         self.floor.monsters_in_rooms[room].append(self)
-        self.game.how_many_monsters += 1
+        self.game.monsters_controller.resurect_monster(self)
         self.alive = True
         self.get_weaker()
         return True
@@ -742,9 +700,6 @@ class Monster:
         Собирает добычу с монстра, включая деньги, щит, броню и оружие.
         """
         loot = self.loot
-        if self.money > 0:
-            money = Money(self.game, self.money)
-            loot.add(money)
         if not self.shield.empty:
             loot.add(self.shield)
         if not self.armor.empty:
@@ -949,40 +904,21 @@ class Plant(Monster):
     _dark_mele_attack_divider = 2
     """Во сколько раз уменьшается урон, наносимый растением, в темноте"""
     
-    def __init__(self,
-                 game,
-                 name='',
-                 lexemes={},
-                 stren=0,
-                 health=0,
-                 actions=[],
-                 state='растёт',
-                 agressive=False,
-                 carry_weapon=False,
-                 carry_shield=False):
+    def __init__(self, game):
         """
         Инициализирует экземпляр класса Plant с заданными параметрами.
         """
-        super().__init__(game, name, lexemes, stren, health, actions, state, agressive, carry_weapon, carry_shield)
-        self.carry_shield = False
-        self.carry_weapon = False
-        self.wear_armor = False
-        self.agressive = False
+        super().__init__(game)
         self.empty = False
-        self.can_steal = False
-        self.can_hide = False
-        self.can_run = False
         self.hiding_place = None
-        self.can_resurrect=False
 
 
     def grow_in_room(self, room):
         """
         Метод для размножения растения. Создает новый экземпляр растения в указанной комнате.
         """
-        new_plant = Plant(self.game, self.name, self.lexemes, self.stren, self.health, 'бьет', 'растет', False, False, False)
+        new_plant = self.game.monsters_controller.create_monster_by_name(self.name)
         new_plant.place(floor=room.floor, room_to_place=room)
-        self.game.how_many_monsters += 1
 
     
     def win(self, loser=None):
@@ -1046,60 +982,19 @@ class Berserk(Monster):
     """Какая часть потерянного здоровья берсерка уходит в его ярость (если 3, то 1/3)."""
     
 
-    def __init__(self,
-                 game,
-                 name='',
-                 lexemes={},
-                 stren=0,
-                 health=0,
-                 actions=[],
-                 state='мечется',
-                 agressive=True,
-                 carry_weapon=True,
-                 carry_shield=True,
-                 wear_armor=True):
+    def __init__(self, game):
         """
         Инициализирует экземпляр класса Berserk с заданными параметрами.
         
-        :param game: ссылка на игру
-        :param name: имя берсерка
-        :param lexemes: лексемы, связанные с берсерком
-        :param stren: сила берсерка
-        :param health: здоровье берсерка
-        :param actions: действия, которые может выполнять берсерк
-        :param state: состояние берсерка
-        :param agressive: является ли берсерк агрессивным
-        :param carry_weapon: несет ли берсерк оружие
-        :param carry_shield: несет ли берсерк щит
-        :param wear_armor: носит ли берсерк броню
         """
-        super().__init__(game,
-                         name,
-                         lexemes,
-                         stren,
-                         health,
-                         actions,
-                         state,
-                         agressive,
-                         carry_weapon,
-                         carry_shield,
-                         wear_armor)
-        self.agressive = True  # Берсерки всегда агрессивны
-        self.carry_shield = False  # Берсерки не носят щиты, предпочитая атаковать
-        self.rage = 0  # Начальное значение ярости берсерка
-        self.base_health = health  # Запоминаем начальное здоровье для расчета ярости
-        self.agressive = True
-        self.carry_shield = False
+        super().__init__(game)
         self.rage = 0
-        self.base_health = health
         self.empty = False
-        self.can_resurrect=False
-        self.can_run = True
 
    
     
     def generate_mele_attack(self, target):
-        self.rage = (int(self.base_health) - int(self.health)) // Berserk._rage_coefficient
+        self.rage = (int(self.start_health) - int(self.health)) // Berserk._rage_coefficient
         if self.poisoned:
             poison_stren = dice(1, self.stren // 2)
         else:
@@ -1123,40 +1018,13 @@ class Vampire(Monster):
     _suck_coefficient = 2
     """Какую часть урона вампир высасывает себе (если 2, то 1/2)."""
 
-    def __init__(self, 
-                 game, 
-                 name='',
-                 lexemes={}, 
-                 stren=10, 
-                 health=20, 
-                 actions='бьет', 
-                 state='стоит', 
-                 agressive=False,
-                 carry_weapon=True, 
-                 carry_shield=True,
-                 wear_armor=True):
+    def __init__(self, game):
         """
         Инициализирует экземпляр класса Vampire с заданными параметрами.
         
         """
-        super().__init__(game, 
-                         name,
-                         lexemes, 
-                         stren, 
-                         health, 
-                         actions, 
-                         state, 
-                         agressive, 
-                         carry_weapon, 
-                         carry_shield,
-                         wear_armor)
+        super().__init__(game)
         self.empty = False
-        self.can_run = True
-        self.weakness = {
-            '12': 1.5,
-            '15': 1.5,
-            '24': 2
-        }
 
     
     def choose_target(self, fight:Fight):
@@ -1211,31 +1079,9 @@ class Vampire(Monster):
 class Animal(Monster):
     """Класс Animal наследует класс Monster и представляет собой тип монстра - животное."""
     
-    def __init__(self, 
-                 game, 
-                 name='',
-                 lexemes={}, 
-                 stren=10, 
-                 health=20, 
-                 actions='бьет', 
-                 state='стоит', 
-                 agressive=False,
-                 carry_weapon=True, 
-                 carry_shield=True,
-                 wear_armor=True):
-        super().__init__(game, 
-                         name,
-                         lexemes, 
-                         stren, 
-                         health, 
-                         actions, 
-                         state, 
-                         agressive, 
-                         carry_weapon, 
-                         carry_shield,
-                         wear_armor)
+    def __init__(self, game):
+        super().__init__(game)
         self.empty = False
-        self.can_run = True
         self.wounds_list = [
             self.bleed,
             self.rage,
@@ -1250,33 +1096,13 @@ class WalkingDead(Monster):
     """Класс WalkingDead наследует класс Monster и представляет собой тип монстра - ходячего мертвеца. 
     Эти существа обладают способностью воскрешаться после смерти и могут быть встречены в различных локациях игры."""
     
-    def __init__(self, 
-                 game, 
-                 name='',
-                 lexemes={}, 
-                 stren=10, 
-                 health=20, 
-                 actions='бьет', 
-                 state='стоит', 
-                 agressive=False,
-                 carry_weapon=True, 
-                 carry_shield=True,
-                 wear_armor=True):
-        super().__init__(game, 
-                         name,
-                         lexemes, 
-                         stren, 
-                         health, 
-                         actions, 
-                         state, 
-                         agressive, 
-                         carry_weapon, 
-                         carry_shield,
-                         wear_armor)
+    
+    _resurrection_die = 6
+    
+    
+    def __init__(self, game):
+        super().__init__(game)
         self.empty = False
-        self.can_resurrect = True
-        self.corpse = True
-        self.can_run = True
         self.wounds_list = [
             self.rage,
             self.leg_wound,
@@ -1296,33 +1122,9 @@ class Skeleton(Monster):
         'рубящее': 0.5
     }
     
-    def __init__(self, 
-                 game, 
-                 name='',
-                 lexemes={}, 
-                 stren=10, 
-                 health=20, 
-                 actions='бьет', 
-                 state='стоит', 
-                 agressive=True,
-                 carry_weapon=True, 
-                 carry_shield=True,
-                 wear_armor=True):
-        super().__init__(game, 
-                         name,
-                         lexemes, 
-                         stren, 
-                         health, 
-                         actions, 
-                         state, 
-                         agressive, 
-                         carry_weapon, 
-                         carry_shield,
-                         wear_armor)
+    def __init__(self, game):
+        super().__init__(game)
         self.empty = False
-        self.can_resurrect = True
-        self.corpse = True
-        self.can_run = False
         self.wounds_list = [
             self.rage,
             self.leg_wound,
@@ -1406,7 +1208,7 @@ class Corpse():
         """Пытается воскресить существо, если это возможно."""
         if not self.creature or not self.can_resurrect:
             return False
-        die = self.creature.resurrection_die
+        die = self.creature.__class__._resurrection_die
         if roll([die]) == 1:
             return self.rise_from_dead()
         return False

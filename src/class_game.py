@@ -5,13 +5,13 @@ from src.class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgW
 from src.class_hero import Hero
 from src.class_items import Key, Map, Matches, Rune, Spell
 from src.class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
-from src.class_monsters import Berserk, Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton
 from src.class_protection import Armor, Shield
 from src.class_room import Furniture
 from src.class_weapon import Weapon
 from src.class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
 from src.class_backpack import Backpack
 from src.functions.functions import randomitem
+from src.controller_monsters import MonstersController
 
 
 class Empty():
@@ -56,7 +56,7 @@ class Game():
             'книга': 5,
             'очаг': 2,
             'руна': 10,
-            'торгоцец': 2,
+            'торговец': 2,
             'лестницы': 2,
             'ловушка': 3}
         },
@@ -74,7 +74,7 @@ class Game():
             'книга': 2,
             'очаг': 1,
             'руна': 3,
-            'торгоцец': 1,
+            'торговец': 1,
             'лестницы': 0,
             'ловушка': 2}
         }
@@ -83,16 +83,9 @@ class Game():
   
     _traders_update_counter = 30
     
-    _floor_monsters = {
-    
-    }
-    """Словарь типов монстров для некоторых этажей"""
-
 
     def __init__(self, chat_id:str, bot, hero:Hero=None):
         self.classes = { 
-            'монстр': Monster,
-            'мертвец': WalkingDead,
             'этаж': Floor,
             'лестница': Ladder,
             'герой': Hero,
@@ -100,12 +93,6 @@ class Game():
             'щит': Shield,
             'доспех': Armor,
             'мебель': Furniture,
-            'вампир': Vampire,
-            'берсерк': Berserk,
-            'растение': Plant,
-            'животное': Animal,
-            'скелет': Skeleton,
-            'труп': Corpse,
             'ключ': Key,
             'карта': Map,
             'спички': Matches,
@@ -134,10 +121,10 @@ class Game():
             'противоядие': Antidote,
             }
         self.empty_thing = Empty()
-        self.how_many_monsters = 0
         self.selected_item = self.empty_thing
         self.chat_id = chat_id
         self.bot = bot
+        self.monsters_controller = MonstersController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = Weapon(self, empty=True)
@@ -211,11 +198,9 @@ class Game():
         
         floors = []
         for i in Game._castle_floors_sizes:
-            monsters_classes = Game._floor_monsters.get(i, None)
             floor = Floor(self, 
                           floor_number = i, 
-                          data = Game._castle_floors_sizes[i], 
-                          monsters_classes = monsters_classes
+                          data = Game._castle_floors_sizes[i]
                           )
             floors.append(floor)
         return floors
@@ -301,63 +286,7 @@ class Game():
         return new_object
         
     
-    def monsters(self):
-        return self.how_many_monsters
-    
-    
     def test(self, hero:Hero):
-        """ floor = self.current_floor
-        room = floor.plan[1]
-        new_monster1 = Monster(
-            self,
-            name = 'Монстр1',
-            lexemes = {
-                "nom": "монстр1",
-                "accus": "монстра1",
-                "gen": "монстра1",
-                "dat": "монстру1",
-                "prep": "монстре1",
-                "inst": "моснтром1"
-            }
-        )
-        new_monster2 = Monster(
-            self,
-            name = 'Монстр2',
-            lexemes = {
-                "nom": "монстр2",
-                "accus": "монстра2",
-                "gen": "монстра2",
-                "dat": "монстру2",
-                "prep": "монстре2",
-                "inst": "моснтром2"
-            }
-        )
-        new_monster3 = Monster(
-            self,
-            name = 'Монстр3',
-            lexemes = {
-                "nom": "монстр3",
-                "accus": "монстра3",
-                "gen": "монстра3",
-                "dat": "монстру3",
-                "prep": "монстре3",
-                "inst": "моснтром3"
-            }
-        )
-        new_monster1.initiative = 100
-        new_monster2.initiative = 100
-        new_monster3.initiative = 100
-        new_monster1.place(floor=floor, room_to_place=room)
-        new_monster2.place(floor=floor, room_to_place=room)
-        new_monster3.place(floor=floor, room_to_place=room)
-        new_fight = Fight(
-            game=self, 
-            hero=None, 
-            who_started=new_monster1, 
-            fighters=[new_monster1, new_monster2, new_monster3]
-            )
-        new_fight.start()
-        return None """
         book1 = Book.random_book(self)
         book2 = Book.random_book(self)
         self.player.backpack + book1
