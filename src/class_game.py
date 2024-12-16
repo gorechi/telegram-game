@@ -147,6 +147,10 @@ class Game():
             floor.create_ladders()
             
 
+    def check_endgame(self) -> bool:
+        return False
+    
+    
     def get_floor_by_number(self, number:int) -> Floor:
         return next((floor for floor in self.castle_floors if floor.floor_number == number), None)
     

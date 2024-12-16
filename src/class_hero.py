@@ -356,7 +356,7 @@ class Hero:
         
         message = message.lower()
         if command in self.command_dict.keys() and self.state == state_enum.NO_STATE:
-            if not self.game_over('killall'):
+            if not self.game.check_endgame():
                 self.do(message)
             return True
         actions = {
@@ -1648,18 +1648,6 @@ class Hero:
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
     
     
-    def game_over(self, goal_type, goal=None):
-        """Метод проверяет, не произошло ли событие окончания игры."""
-        
-        if goal_type == 'killall':
-            if self.game.monsters() == 0:
-                tprint(self.game, f'{self.name} {self.g("убил", "убила")} всех монстров в замке и {self.g("выиграл", "выиграла")} в этой игре!')
-                return True
-            else:
-                return False
-        return False
-
-    
     def show_backpack(self):
         """Метод генерирует описание рюкзака героя."""
         
@@ -2084,8 +2072,7 @@ class Hero:
         if current_loot.empty:
             tprint(game, 'Здесь нечего брать.')
             return False
-        if self.backpack.no_backpack:
-            backpack_is_taken = self.try_to_take_backpack()
+        backpack_is_taken = self.try_to_take_backpack()
         if item in ['все', 'всё', '']:
             item_is_taken = self.take_all()
         else:
@@ -2096,6 +2083,8 @@ class Hero:
 
     
     def try_to_take_backpack(self) -> bool:
+        if not self.backpack.no_backpack:
+            return False
         current_loot = self.current_position.loot        
         backpacks = current_loot.get_items_by_class(Backpack)
         if backpacks:
@@ -2121,7 +2110,6 @@ class Hero:
         for item in current_loot.pile:
                 if self.can_take(item):
                     item.take(self)
-        current_loot.get_empty()
         return True
     
     
