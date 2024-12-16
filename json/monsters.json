@@ -447,17 +447,17 @@
   },
   {
     "class_name": "Vampire",
-    "name": "Дракула",
+    "name": "Лорд вампиров",
     "lexemes": {
-      "nom": "Дракула",
-      "accus": "Дракулу",
-      "gen": "Дракулы",
-      "dat": "Дракуле",
-      "prep": "Дракуле",
-      "inst": "Дракулой"
+      "nom": "лорд",
+      "accus": "лорда",
+      "gen": "лорда",
+      "dat": "лорду",
+      "prep": "лорде",
+      "inst": "лордом"
     },
-    "stren": 8,
-    "health": 30,
+    "stren": 10,
+    "health": 40,
     "hit_chance": 7,
     "parry_chance": 2,
     "can_hide": true,
@@ -487,8 +487,8 @@
     "size": 3,
     "corpse": false,
     "monster_type": "vampire",
-    "initiative": 6,
-    "min_floor": 1,
+    "initiative": 10,
+    "min_floor": 2,
     "max_floor": 5,
     "specific_floors": [],
     "wear_armor": true
