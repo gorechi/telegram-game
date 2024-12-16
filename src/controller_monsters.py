@@ -167,4 +167,8 @@ class MonstersController:
         self.how_many_monsters += 1
         self.all_monsters.append(monster)
         return True
-        
+    
+    
+    def check_endgame(self) -> bool:
+        """Проверяет, достигнут ли конец игры"""
+        return self.how_many_monsters == 0

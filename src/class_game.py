@@ -148,6 +148,10 @@ class Game():
             
 
     def check_endgame(self) -> bool:
+        if True in [
+            self.monsters_controller.check_endgame()
+            ]:
+            return True
         return False
     
     
