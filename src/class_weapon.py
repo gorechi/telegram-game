@@ -621,7 +621,7 @@ class Weapon:
                 who.shield = shield
                 who.removed_shield = game.no_shield
                 message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("occus")}.')
+                               f'{who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
         tprint(game, message)
 
     

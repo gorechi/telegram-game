@@ -388,28 +388,29 @@ class Hero:
         """
         
         rune_list = self.rune_list
+        game = self.game
         self.state = state_enum.NO_STATE
         if message == 'отмена':
             self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
-            tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'enchant')
+            tprint(game, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'enchant')
             return False
         message = int(message) - 1
         if not message < len(rune_list):
-            tprint(self, f'{self.name} не находит такую руну у себя в рюкзаке.', 'enchant')
+            tprint(game, f'{self.name} не находит такую руну у себя в рюкзаке.', 'enchant')
             return False
         if not self.selected_item:
-            tprint(self, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
+            tprint(game, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
             self.state = state_enum.NO_STATE
             return False
         chosen_rune = rune_list[message]
         rune_is_placed = self.selected_item.enchant(chosen_rune)
         if not rune_is_placed:
-            tprint(self, f'Похоже, что {self.name} не может вставить руну в {self.selected_item:occus}.', 'direction')
+            tprint(game, f'Похоже, что {self.name} не может вставить руну в {self.selected_item:accus}.', 'direction')
             self.state = state_enum.NO_STATE
             return False
-        tprint(self, f'{self.name} улучшает {self.selected_item:occus} новой руной.', 'direction')
+        tprint(game, f'{self.name} улучшает {self.selected_item:accus} новой руной.', 'direction')
         self.backpack.remove(chosen_rune)
         self.rune_list = self.backpack.get_items_by_class(Rune)
         self.state = state_enum.NO_STATE
@@ -427,21 +428,21 @@ class Hero:
         
         """
         if message == 'отмена':
-            tprint(self, f'{self.name} продолжает бой.', 'fight')
+            tprint(self.game, f'{self.name} продолжает бой.', 'fight')
             self.state = state_enum.FIGHT
             return False
         if not message.isdigit():
-            tprint(self, f'Чтобы все заработало {self:dat} нужно просто выбрать вещь по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
+            tprint(self.game, f'Чтобы все заработало {self:dat} нужно просто выбрать вещь по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'fight')
             return False
         items = self.can_use_in_fight
         message = int(message) - 1
         if not message < len(items):
-            tprint(self, f'{self.name} не находит такую вещь у себя в карманах.', 'fight')
+            tprint(self.game, f'{self.name} не находит такую вещь у себя в карманах.', 'fight')
             return False
         item = items[message]
         item_is_used = item.use(who_using=self, in_action=True)
         if not item_is_used:
-            tprint(self, f'Похоже, что {self.name} не может использовать {item:occus}.', 'fight')
+            tprint(self.game, f'Похоже, что {self.name} не может использовать {item:accus}.', 'fight')
             self.state = state_enum.FIGHT
             return False    
         self.state = state_enum.FIGHT
@@ -788,7 +789,7 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} убирает {self.weapon:occus} в рюкзак и берет в руки {second_weapon:occus}.')
+        message.append(f'{self.name} убирает {self.weapon:accus} в рюкзак и берет в руки {second_weapon:accus}.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
@@ -806,7 +807,7 @@ class Hero:
         
         message = []
         second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} достает из рюкзака {second_weapon:occus} и берет в руку.')
+        message.append(f'{self.name} достает из рюкзака {second_weapon:accus} и берет в руку.')
         if second_weapon.twohanded and not self.shield.empty:
             self.removed_shield = self.shield
             self.shield = self.game.no_shield
@@ -993,7 +994,7 @@ class Hero:
                 item = randomitem(all_items)
                 self.backpack.remove(item, stealing_monster)
                 stealing_monster.take(item)
-                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item:occus}.'
+                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item:accus}.'
         return None
     
     
@@ -1006,7 +1007,7 @@ class Hero:
             if repair_price > 0 and self.money >= repair_price:
                 shield.repair()
                 self.money -= repair_price
-                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names("occus")}')
+                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names("accus")}')
     
     
     def check_monster_in_ambush(self, place) -> bool:
@@ -1024,7 +1025,7 @@ class Hero:
         message = []
         if monster:
             monster.hiding_place = None
-            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self:occus}.')
+            message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self:accus}.')
             if monster.frightening:
                 message.append(f'{monster.name} очень {monster.g("страшный", "страшная")} и {self.name} пугается до икоты.')
                 self.fear += 1
@@ -1068,7 +1069,7 @@ class Hero:
         
         if not self.shield.empty:
             self.shield, self.removed_shield = self.removed_shield, self.shield
-            tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names("occus")} за спину.') 
+            tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names("accus")} за спину.') 
             return True
         return False
         
@@ -2106,10 +2107,11 @@ class Hero:
     
     
     def take_all(self):
-        current_loot = self.current_position.loot
-        for item in current_loot.pile:
-                if self.can_take(item):
-                    item.take(self)
+        loot = self.current_position.loot
+        can_take_items = [item for item in loot.pile if self.can_take(item)]
+        for item in can_take_items:
+            item.take(self)
+            loot.remove(item)
         return True
     
     
