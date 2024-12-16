@@ -1,7 +1,21 @@
-from src.class_allies import Trader
-from src.class_game import Game
+test = True
 
-new_game = Game(100, 100)
-new_tarder = Trader.random_trader(new_game, "floor")
-print (new_tarder)
-print(new_tarder.lexemes)
+def q(test):
+    return test
+
+def check(test):
+    if True in [q(test)]:
+        return True
+    return False
+
+print (check(test))
+print (check(test))
+print (check(test))
+test = False
+print (check(test))
+print (check(test))
+print (check(test))
+test = True
+print (check(test))
+print (check(test))
+print (check(test))
