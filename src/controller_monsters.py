@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 
-from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk
+from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
 from src.functions.functions import randomitem
 
 class MonstersController:
@@ -48,7 +48,8 @@ class MonstersController:
         "Corpse": Corpse,
         "WalkingDead": WalkingDead,
         "Skeleton": Skeleton,
-        "Berserk": Berserk
+        "Berserk": Berserk,
+        "Human": Human
     }    
     
     
