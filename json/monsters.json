@@ -86,7 +86,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Разбойник",
     "lexemes": {
       "nom": "разбойник",
@@ -121,7 +121,7 @@
     "gender": 0,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
@@ -129,7 +129,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Разбойница",
     "lexemes": {
       "nom": "разбойница",
@@ -164,7 +164,7 @@
     "gender": 1,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
@@ -172,7 +172,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Бандит",
     "lexemes": {
       "nom": "бандит",
@@ -207,7 +207,7 @@
     "gender": 0,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 4,
     "min_floor": 1,
     "max_floor": 5,
@@ -215,7 +215,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Бандитка",
     "lexemes": {
       "nom": "бандитка",
@@ -250,7 +250,7 @@
     "gender": 1,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 4,
     "min_floor": 1,
     "max_floor": 5,
@@ -714,7 +714,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Крестоносец",
     "lexemes": {
       "nom": "крестоносец",
@@ -749,7 +749,7 @@
     "gender": 0,
     "size": 4,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 7,
     "min_floor": 1,
     "max_floor": 5,
@@ -843,7 +843,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Солдат",
     "lexemes": {
       "nom": "солдат",
@@ -878,7 +878,7 @@
     "gender": 0,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
@@ -886,7 +886,7 @@
     "wear_armor": true
   },
   {
-    "class_name": "Monster",
+    "class_name": "Human",
     "name": "Крестьянин",
     "lexemes": {
       "nom": "крестьянин",
@@ -921,7 +921,7 @@
     "gender": 0,
     "size": 3,
     "corpse": true,
-    "monster_type": "basic",
+    "monster_type": "human",
     "initiative": 2,
     "min_floor": 1,
     "max_floor": 5,
