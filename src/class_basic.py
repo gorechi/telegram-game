@@ -52,8 +52,9 @@ class Loot:
         и возвращает первую найденную  по этому имени вещь.
         """
         
+        name_lower = name.lower()
         for item in self.pile:
-            if name.lower() in [item.name.lower(), item.lexemes['accus'].lower()]:
+            if (name_lower in item.name.lower()) or (name_lower in item.lexemes['accus'].lower()):
                 return item
         return False
     
@@ -63,8 +64,8 @@ class Loot:
         Метод принимает на вход строку имени вещи и
         и возвращает все найденные по этому имени вещи.
         """
-        
-        return [item for item in self.pile if name.lower() in [item.name.lower(), item.lexemes['accus'].lower()]]
+        name_lower = name.lower()
+        return [item for item in self.pile if (name_lower in item.name.lower()) or (name_lower in item.lexemes['accus'].lower())]
 
     
     def get_items_by_class(self, item_class) -> list:
