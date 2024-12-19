@@ -1,4 +1,5 @@
 import json
+from random import randint
 from dataclasses import dataclass
 
 from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
@@ -124,9 +125,19 @@ class MonstersController:
         if not isinstance(template, MonstersController.MonsterTemplate):
             raise TypeError("Параметр 'template' должен быть экземпляром класса MonsterTemplate.")
         monster_class = MonstersController._classes[template.class_name]
+        if not monster_class:
+            raise ValueError(f"Класс монстра '{template.class_name}' не найден.")
         new_monster = monster_class(game=self.game)
-        for param in template.__dict__:
-            vars(new_monster)[param] = template.__dict__[param]
+        template_dict = template.__dict__
+        for param, value in template_dict.items():
+            if isinstance(value, dict):
+                rand_range = value.get('rand')
+                if rand_range:
+                    setattr(new_monster, param, randint(rand_range[0], rand_range[1]))
+                else:
+                    setattr(new_monster, param, value)
+            else:
+                setattr(new_monster, param, value)
         new_monster.on_create()
         self.how_many_monsters += 1
         self.all_monsters.append(new_monster)
