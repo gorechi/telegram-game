@@ -3,6 +3,7 @@ from random import randint
 from dataclasses import dataclass
 
 from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
+from src.class_dice import Dice
 from src.functions.functions import randomitem
 
 class MonstersController:
@@ -80,7 +81,7 @@ class MonstersController:
         """Возвращает список шаблонов монстров по классу"""
 
         if not isinstance(class_name, str):
-            raise TypeError("Параметр 'class_name' должен быть строкой.")
+            raise TypeError(f"Параметр 'class_name' должен быть строкой, а передан {type(class_name)} {class_name}.")
         return [template for template in self.templates if template.class_name == class_name]
     
     
@@ -88,7 +89,7 @@ class MonstersController:
         """Возвращает шаблон монстра по его имени"""
 
         if not isinstance(name, str):
-            raise TypeError("Параметр 'name' должен быть строкой.")
+            raise TypeError(f"Параметр 'name' должен быть строкой, а передан {type(name)} {name}.")
         for template in self.templates:
             if template.name == name:
                 return template
@@ -99,7 +100,7 @@ class MonstersController:
         """Возвращает список всех шаблонов монстров, подходящих по этажу"""
         
         if not isinstance(floor, int):
-            raise TypeError("Параметр 'floor' должен быть целым числом.")
+            raise TypeError(f"Параметр 'floor' должен быть целым числом, а передан {type(floor)} {floor}.")
         templates_list = []
         for template in self.templates:
             if (template.min_floor <= floor <= template.max_floor) or floor in template.specific_floors:
@@ -111,7 +112,7 @@ class MonstersController:
         """Возвращает список случайных шаблоны монстров по этажу"""
         
         if not isinstance(floor, int):
-            raise TypeError("Параметр 'floor' должен быть целым числом.")
+            raise TypeError(f"Параметр 'floor' должен быть целым числом, а передан {type(floor)} {floor}.")
         templates_list = []
         floor_templates = self.get_templates_by_floor(floor)
         for _ in range(how_many):
@@ -123,25 +124,39 @@ class MonstersController:
         """Создает монстра из шаблона"""
 
         if not isinstance(template, MonstersController.MonsterTemplate):
-            raise TypeError("Параметр 'template' должен быть экземпляром класса MonsterTemplate.")
+            raise TypeError(f"Параметр 'template' должен быть экземпляром класса MonsterTemplate, а передан {type(template)} {template}.")
         monster_class = MonstersController._classes[template.class_name]
         if not monster_class:
             raise ValueError(f"Класс монстра '{template.class_name}' не найден.")
         new_monster = monster_class(game=self.game)
         template_dict = template.__dict__
         for param, value in template_dict.items():
-            if isinstance(value, dict):
-                rand_range = value.get('rand')
-                if rand_range:
-                    setattr(new_monster, param, randint(rand_range[0], rand_range[1]))
-                else:
-                    setattr(new_monster, param, value)
-            else:
-                setattr(new_monster, param, value)
+            setattr(new_monster, param, self.generate_value(value))
         new_monster.on_create()
         self.how_many_monsters += 1
         self.all_monsters.append(new_monster)
         return new_monster
+    
+    
+    def generate_value(self, value):
+        """Генерирует значение для параметра"""
+        
+        if not isinstance(value, dict):
+            return value
+        rand_range = value.get('rand')
+        dice_list = value.get('dice')
+        if dice_list:
+            return self.create_dice(dice_list)
+        if rand_range:
+                return randint(rand_range[0], rand_range[1])
+        return value
+    
+    def generate_dice(self, dice_list:list[int]) -> Dice:
+        """Генерирует кубики"""
+
+        if not isinstance(dice_list, list):
+            raise TypeError(f"Параметр 'dice_list' должен быть списком, а передан {type(dice_list)} {dice_list}.")
+        return Dice(dice_list)
     
     
     def create_monsters_by_floor(self, floor:int, how_many:int=1) -> list[Monster]:
@@ -166,7 +181,7 @@ class MonstersController:
     def kill_monster(self, monster:Monster) -> bool:
         """Убивает монстра"""
         if not isinstance(monster, Monster):
-            raise TypeError("Параметр 'monster' должен быть экземпляром класса Monster.")
+            raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
         self.how_many_monsters -= 1
         self.all_monsters.remove(monster)
         return True
@@ -175,7 +190,7 @@ class MonstersController:
     def resurect_monster(self, monster:Monster) -> bool:
         """Воскрешает монстра"""
         if not isinstance(monster, Monster):
-            raise TypeError("Параметр 'monster' должен быть экземпляром класса Monster.")
+            raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
         self.how_many_monsters += 1
         self.all_monsters.append(monster)
         return True
