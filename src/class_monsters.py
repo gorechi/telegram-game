@@ -69,10 +69,6 @@ class Monster:
     _weak_health_die = Dice([6])
     """Кубик, определяющий, какая часть здоровья теряется монстром при ослаблении"""
     
-    _initiative_die = Dice([20])
-    """Кубик инициативы"""
-
-    
     _types = {
         'basic': {
             "nom": "обычные противники",
@@ -128,7 +124,6 @@ class Monster:
     
     def __init__(self, game):
         self.game = game
-        self.initiative = 2
         self.floor = None
         self.run = False
         self.alive = True
@@ -183,7 +178,7 @@ class Monster:
     
     
     def generate_initiative(self) -> int:
-        return Monster._initiative_die.roll() + self.initiative
+        return self.initiative.roll()
 
     
     def is_hero(self) -> bool:
