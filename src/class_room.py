@@ -854,7 +854,7 @@ class Room:
         self.show(who)
         self.map()
         if monster:
-            if monster.agressive:
+            if monster.aggressive:
                 who.fight(monster.name, True)
                 
     

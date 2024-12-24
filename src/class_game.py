@@ -25,7 +25,7 @@ class Empty():
     def __init__(self):
         self.empty = True
         self.frightening = False
-        self.agressive = False
+        self.aggressive = False
         self.locked = False
     
     def __bool__(self):

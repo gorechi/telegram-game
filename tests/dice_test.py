@@ -4,27 +4,37 @@ from src.class_dice import Dice
 class TestDiceRoll(unittest.TestCase):
 
     def test_roll_with_single_die(self):
-        dice = Dice([6])  # A single 6-sided die
+        dice = Dice([6])
         result = dice.roll()
-        self.assertIn(result, range(1, 7))  # Result should be between 1 and 6
+        self.assertIn(result, range(1, 7))
 
     def test_roll_with_multiple_dice(self):
-        dice = Dice([6, 8])  # A 6-sided and an 8-sided die
+        dice = Dice([6, 8])
         result = dice.roll()
-        self.assertIn(result, range(2, 15))  # Result should be between 2 and 14
+        self.assertIn(result, range(2, 15))
 
     def test_roll_with_modificator(self):
-        dice = Dice([6], modificator=2)  # A single 6-sided die with a modificator of 2
+        dice = Dice([6], modificator=2)
         result = dice.roll()
-        self.assertIn(result, range(3, 9))  # Result should be between 3 and 8
+        self.assertIn(result, range(3, 9))
+    
+    def test_roll_with_negative_modificator(self):
+        dice = Dice([6], modificator=-2)
+        result = dice.roll()
+        self.assertIn(result, range(0, 5))
 
-    def test_roll_with_no_dice(self):
-        dice = Dice([])  # No dice
+    def test_roll_with_big_negative_modificator(self):
+        dice = Dice([6], modificator=-10)
         result = dice.roll()
-        self.assertEqual(result, 0)  # Result should be 0 since there are no dice
+        self.assertEqual(result, 0)
+    
+    def test_roll_with_no_dice(self):
+        dice = Dice([]) 
+        result = dice.roll()
+        self.assertEqual(result, 0)
 
     def test_roll_with_invalid_die(self):
-        dice = Dice([6, 'a'])  # Invalid die
+        dice = Dice([6, 'a'])
         with self.assertRaises(ValueError):
             dice.roll()
 
@@ -114,6 +124,12 @@ class TestDiceGetText(unittest.TestCase):
         dice = Dice([4, 12], modificator=0)
         result = dice.get_text()
         self.assertEqual(result, "d4 + d12")  # Ожидаемое значение: "d4 + d12"
+        
+    def test_dice_with_negative_modificator(self):
+        # Тестирование случая, когда есть кубики и положительный модификатор
+        dice = Dice([6, 8], modificator=-3)
+        result = dice.get_text()
+        self.assertEqual(result, "d6 + d8 - 3")  # Ожидаемое значение: "d6 + d8 + 3" 
 
 class TestDiceIncreaseModificator(unittest.TestCase):
 
@@ -175,7 +191,7 @@ class TestDiceDecreaseModificator(unittest.TestCase):
         # Тестирование случая, когда уменьшение приводит к отрицательному модификатору
         dice = Dice([6, 8], modificator=3)
         dice.decrease_modificator(4)
-        self.assertEqual(dice.modificator, 0)  # Ожидаемое значение: 0
+        self.assertEqual(dice.modificator, -1)  # Ожидаемое значение: 0
         
 if __name__ == '__main__':
     unittest.main()

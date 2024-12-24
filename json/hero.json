@@ -25,7 +25,7 @@
         "терзает"
       ],
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
     "venomous": 0,

@@ -7,6 +7,7 @@ from src.class_room import Furniture, Room, Ladder
 from src.class_weapon import Weapon
 from src.class_backpack import Backpack
 from src.class_fight import Fight
+from src.class_dice import Dice
 from src.functions.functions import howmany, normal_count, randomitem, tprint, roll, split_actions
 from src.enums import state_enum, move_enum
 
@@ -1788,7 +1789,7 @@ class Hero:
         room = self.current_position
         monster = room.monsters('first')
         if monster:
-            if monster.agressive and self.check_light():
+            if monster.aggressive and self.check_light():
                 self.fight(monster.name)
     
     

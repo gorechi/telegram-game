@@ -14,16 +14,16 @@ class MonstersController:
         class_name: str
         name: str
         lexemes: dict
-        stren: int
-        health: int
-        hit_chance: int
+        stren: dict
+        health: dict
+        hit_chance: dict
         parry_chance: int
         can_hide: bool
         can_run: bool
         actions: list
         state: str
         frightening: bool
-        agressive: bool
+        aggressive: bool
         carry_weapon: bool
         carry_shield: bool
         venomous: int
@@ -31,12 +31,12 @@ class MonstersController:
         size: int
         corpse: bool
         monster_type: str
-        initiative: int
+        initiative: dict
         min_floor: int
         max_floor: int
         specific_floors: list
         wear_armor: bool
-        prefered_weapon:str
+        preferred_weapon:str
         stink:bool
         can_resurrect:bool
         weakness:dict
@@ -130,34 +130,31 @@ class MonstersController:
             raise ValueError(f"Класс монстра '{template.class_name}' не найден.")
         new_monster = monster_class(game=self.game)
         template_dict = template.__dict__
-        for param, value in template_dict.items():
-            setattr(new_monster, param, self.generate_value(value))
+        for param, data in template_dict.items():
+            setattr(new_monster, param, self.generate_value(data))
         new_monster.on_create()
         self.how_many_monsters += 1
         self.all_monsters.append(new_monster)
         return new_monster
     
     
-    def generate_value(self, value):
+    def generate_value(self, data):
         """Генерирует значение для параметра"""
         
-        if not isinstance(value, dict):
-            return value
-        rand_range = value.get('rand')
-        dice_list = value.get('dice')
-        if dice_list:
-            return self.create_dice(dice_list)
+        if not isinstance(data, dict):
+            return data
+        rand_range = data.get('random')
+        dice = data.get('dice')
+        value = data.get('value')
         if rand_range:
-                return randint(rand_range[0], rand_range[1])
-        return value
-    
-    def generate_dice(self, dice_list:list[int]) -> Dice:
-        """Генерирует кубики"""
-
-        if not isinstance(dice_list, list):
-            raise TypeError(f"Параметр 'dice_list' должен быть списком, а передан {type(dice_list)} {dice_list}.")
-        return Dice(dice_list)
-    
+            value = randint(rand_range[0], rand_range[1])
+            if dice:
+                return Dice([value])
+            return value
+        if dice:
+            return Dice([value])    
+        return data
+        
     
     def create_monsters_by_floor(self, floor:int, how_many:int=1) -> list[Monster]:
         """Создает список монстров для этажа"""

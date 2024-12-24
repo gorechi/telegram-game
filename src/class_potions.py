@@ -1,4 +1,5 @@
 from src.functions.functions import howmany, randomitem, tprint
+from src.class_dice import Dice
 from random import randint as dice
 
 
@@ -178,7 +179,7 @@ class StrengthPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.description:str = "Зелье силы увеличивает максимальное значение силы персонажа."
+        self.description:str = "Зелье силы увеличивает постоянный модификатор силы персонажа."
         self.lexemes:dict[str, str] = {
             "nom": "зелье силы",
             "accus": "зелье силы",
@@ -193,10 +194,11 @@ class StrengthPotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.stren += self.effect
-        self.owner.start_stren += self.effect
+        self.owner.stren.increase_modificator(self.effect)
+        if self.owner.start_stren:
+            self.owner.start_stren.increase_modificator(self.effect)
         tprint(
-            self.game, f'{self.owner.name} увеличивает свою силу на {str(self.effect)} до {str(self.owner.stren)}.')
+            self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.get_text()}.')
         return True
     
 
@@ -204,7 +206,7 @@ class StrengtheningPotion(Potion):
     
     _name:str = "Зелье усиления"
     
-    _effect:int = 5
+    _effect:Dice = Dice([5, 5])
     
     _can_use_in_fight:bool = True
       
@@ -221,13 +223,17 @@ class StrengtheningPotion(Potion):
             "inst": "зельем усиления"
         }
         self.base_price = 15
-
+    
+    
+    def get_effect(self):
+        return self.__class__._effect.roll()
+    
         
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.stren += self.effect
-        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {str(self.effect)} до {str(self.owner.stren)}.')
+        self.owner.stren.add_temporary()
+        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.get_text()}.')
         return True
 
 
