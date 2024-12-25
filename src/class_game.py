@@ -12,6 +12,7 @@ from src.class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
 from src.class_backpack import Backpack
 from src.functions.functions import randomitem
 from src.controller_monsters import MonstersController
+from src.controller_protection import ProtectionController
 
 
 class Empty():
@@ -125,11 +126,12 @@ class Game():
         self.chat_id = chat_id
         self.bot = bot
         self.monsters_controller = MonstersController(self)
+        self.protection_controller = ProtectionController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = Weapon(self, empty=True)
-        self.no_shield = Shield(self, empty=True)
-        self.no_armor = Armor(self, empty=True)
+        self.no_shield = self.protection_controller.get_empty_object_by_class_name('Shield')
+        self.no_armor = self.protection_controller.get_empty_object_by_class_name('Armor')
         self.no_backpack = Backpack(self, no_backpack=True)
         self.castle_floors = self.create_floors()
         self.create_ladders()

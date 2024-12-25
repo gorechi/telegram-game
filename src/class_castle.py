@@ -258,19 +258,23 @@ class Floor:
 
     
     def place_armor(self):
-        self.all_armor = self.game.create_objects_from_json(file='json/armor.json',
-                                    how_many=self.how_many['доспех'],
-                                    random=True)
+        self.all_armor = self.game.protection_controller.get_random_objects_by_class_name(
+            class_name = 'Armor',
+            how_many=self.how_many['доспех'],
+        )
         for armor in self.all_armor:
             armor.place(self)
+            print(armor)
 
     
     def place_shields(self):
-        self.all_shields = self.game.create_objects_from_json(file='json/shields.json',
-                                      how_many=self.how_many['щит'],
-                                      random=True)
+        self.all_shields = self.game.protection_controller.get_random_objects_by_class_name(
+            class_name = 'Shield',
+            how_many=self.how_many['щит'],
+        )
         for shield in self.all_shields:
             shield.place(self)
+            print(shield)
 
     
     def place_weapons(self):

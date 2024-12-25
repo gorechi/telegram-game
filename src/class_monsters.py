@@ -229,7 +229,11 @@ class Monster:
         if self.preferred_weapon:
             self.weapon = self.game.create_random_weapon(weapon_type=self.preferred_weapon)
             self.start_health = self.health
-            exp_dice = Dice(self.stren.dice * roll([Monster._exp_multiplier_limit]) + roll([self.health]))
+            stren_dice = self.stren.dice
+            multiplier = roll([Monster._exp_multiplier_limit])
+            health_appendix = roll([self.health])
+            dice = stren_dice * multiplier + [health_appendix]
+            exp_dice = Dice(dice=dice)
             self.exp = exp_dice.roll()
         return True
 

@@ -3,6 +3,8 @@ from random import randint as dice
 
 from src.functions.functions import randomitem, tprint
 
+from src.class_dice import Dice
+
 class Protection:
     
     _elements_dictionary = {1: 'огня',
@@ -21,12 +23,6 @@ class Protection:
                         24: 'потопа'}
     """Словарь стихий."""
     
-    _weak_weapon_multiplier = 0.67
-    """Множитель защиты когда бьют оружием со слабыми рунами."""
-    
-    _strong_weapon_multiplier = 1.5
-    """Множитель защиты когда бьют оружием с сильными рунами."""
-
     _weakness_dictionary = {1: [3, 3],
                             2: [3, 6],
                             3: [7, 7],
@@ -164,30 +160,30 @@ class Protection:
         "protection_modifier": 1,
         0: 
             {
-            "nom": "крепкий",
-            "accus": "крепкого",
-            "gen": "крепкого",
-            "dat": "крепкому",
-            "prep": "о крепком",
-            "inst": "крепким",
+            "nom": "Крепкий",
+            "accus": "Крепкого",
+            "gen": "Крепкого",
+            "dat": "Крепкому",
+            "prep": "Крепком",
+            "inst": "Крепким",
             }, 
         1: 
             {
-            "nom": "крепкая",
-            "accus": "крепкую",
-            "gen": "крепкой",
-            "dat": "крепкой",
-            "prep": "о крепкой",
-            "inst": "крепкой",
+            "nom": "Крепкая",
+            "accus": "Крепкую",
+            "gen": "Крепкой",
+            "dat": "Крепкой",
+            "prep": "Крепкой",
+            "inst": "Крепкой",
             }, 
         2: 
             {
-            "nom": "крепкое",
-            "accus": "крепкое",
-            "gen": "крепкого",
-            "dat": "крепкому",
-            "prep": "о крепком",
-            "inst": "крепким",
+            "nom": "Крепкое",
+            "accus": "Крепкое",
+            "gen": "Крепкого",
+            "dat": "Крепкому",
+            "prep": "Крепком",
+            "inst": "Крепким",
         }
         }
     ],
@@ -224,30 +220,30 @@ class Protection:
         "protection_modifier": 1,
         0: 
             {
-            "nom": "крепкий",
-            "accus": "крепкого",
-            "gen": "крепкого",
-            "dat": "крепкому",
-            "prep": "о крепком",
-            "inst": "крепким",
+            "nom": "Крепкий",
+            "accus": "Крепкого",
+            "gen": "Крепкого",
+            "dat": "Крепкому",
+            "prep": "Крепком",
+            "inst": "Крепким",
             }, 
         1: 
             {
-            "nom": "крепкая",
-            "accus": "крепкую",
-            "gen": "крепкой",
-            "dat": "крепкой",
-            "prep": "о крепкой",
-            "inst": "крепкой",
+            "nom": "Крепкая",
+            "accus": "Крепкую",
+            "gen": "Крепкой",
+            "dat": "Крепкой",
+            "prep": "Крепкой",
+            "inst": "Крепкой",
             }, 
         2: 
             {
-            "nom": "крепкое",
-            "accus": "крепкое",
-            "gen": "крепкого",
-            "dat": "крепкому",
-            "prep": "о крепком",
-            "inst": "крепким",
+            "nom": "Крепкое",
+            "accus": "Крепкое",
+            "gen": "Крепкого",
+            "dat": "Крепкому",
+            "prep": "Крепком",
+            "inst": "Крепким",
         }
         },
         {
@@ -283,44 +279,40 @@ class Protection:
         {
         "protection_modifier": -1,
         0: {
-            "nom": "дырявый",
-            "accus": "дырявого",
-            "gen": "дырявого",
-            "dat": "дырявому",
-            "prep": "дырявом",
-            "inst": "дырявым"
+            "nom": "Дырявый",
+            "accus": "Дырявого",
+            "gen": "Дырявого",
+            "dat": "Дырявому",
+            "prep": "Дырявом",
+            "inst": "Дырявым"
         },
         1: {
-            "nom": "дырявая",
-            "accus": "дырявую",
-            "gen": "дырявой",
-            "dat": "дырявой",
-            "prep": "дырявой",
-            "inst": "дырявой"
+            "nom": "Дырявая",
+            "accus": "Дырявую",
+            "gen": "Дырявой",
+            "dat": "Дырявой",
+            "prep": "Дырявой",
+            "inst": "Дырявой"
         },
         2: {
-            "nom": "дырявое",
-            "accus": "дырявое",
-            "gen": "дырявого",
-            "dat": "дырявому",
-            "prep": "дырявом",
-            "inst": "дырявым"
+            "nom": "Дырявое",
+            "accus": "Дырявое",
+            "gen": "Дырявого",
+            "dat": "Дырявому",
+            "prep": "Дырявом",
+            "inst": "Дырявым"
         }
         }
     ]
     }
     """Словарь декораторов для защины"""
     
-    def __init__(self, game, name='', protection=1, actions='', empty=False, enchantable=True):
+    def __init__(self, game):
         self.game = game
-        self.name = name
-        self.actions = actions.split(',')
         self.can_use_in_fight = True
-        self.empty = empty
+        self.empty = False
         self.runes = []
-        self.protection = int(protection)
         self.user = None
-        self.enchantable = enchantable
     
     
     def __format__(self, format:str) -> str:
@@ -328,10 +320,9 @@ class Protection:
     
 
     def __str__(self):
-        protection_string = str(self.protection)
-        if self.perm_protection() != 0:
-            protection_string += '+' + str(self.perm_protection())
-        return self.name + self.enchantment() + ' (' + protection_string + ')'
+        name_string = f'{self:nom}' + self.enchantment()
+        return f'{name_string} ({self.protection.get_text()})'
+    
     
     def on_create(self):
         return True
@@ -356,13 +347,6 @@ class Protection:
             element_sum += rune.element
         return element_sum
 
-    def perm_protection(self):
-        protection = 0
-        if len(self.runes) in [1, 2]:
-            for rune in self.runes:
-                protection += rune.defence
-        return protection
-
     
     def can_be_enchanted(self) -> bool:
         if len(self.runes) > 1 or self.empty or not self.enchatable:
@@ -373,6 +357,7 @@ class Protection:
     def enchant(self, rune):
         if self.can_be_enchanted():
             self.runes.append(rune)
+            self.protection.increase_modificator(rune.defence)
             return True
         return False
 
@@ -381,27 +366,23 @@ class Protection:
         if len(self.runes) not in [1, 2]:
             return ''
         else:
-            element = 0
-            for i in self.runes:
-                element += int(i.element)
-            return ' ' + Protection._elements_dictionary[element]
+            return ' ' + Protection._elements_dictionary[self.element()]
+
 
     def protect(self, who):
-        multiplier = 1
-        if not who.weapon.empty and who.weapon.element() != 0 and self.element() != 0:
-            if who.weapon.element() in Protection._weakness_dictionary[self.element()]:
-                multiplier = Protection._strong_weapon_multiplier
-            elif self.element() in Protection._weakness_dictionary[who.weapon.element()]:
-                multiplier = Protection._weak_weapon_multiplier
         if who.hide:
             who.hide = False
-            return self.protection + self.perm_protection()
-        else:
-            if self.protection > 0:
-                return ceil((dice(1, self.protection) + self.perm_protection())*multiplier)
-            else:
-                return 0
+            return self.protection.roll()
+        if who.weapon.empty or who.weapon.element() == 0 or self.element() == 0:
+            return self.protection.roll()
+        base_damage = [who.weapon.damage.base_die() // 2]
+        if who.weapon.element() in Protection._weakness_dictionary[self.element()]:
+            return self.perm_protection.roll(subtract=base_damage)
+        elif self.element() in Protection._weakness_dictionary[who.weapon.element()]:
+            return self.perm_protection.roll(add=base_damage)
+        return self.protection.roll()
 
+    
     def take(self, who):
         if who.shield == '':
             who.shield = self
@@ -415,10 +396,7 @@ class Protection:
         if self.empty:
             return None
         full_name = self.get_full_names('nom')
-        protection_string = str(self.protection)
-        if self.perm_protection() != 0:
-            protection_string += '+' + str(self.perm_protection())
-        return f'{full_name} ({protection_string})'
+        return f'{full_name} ({self.protection.get_text()})'
 
     
     def get_full_names(self, key:str=None) -> str|list:
@@ -458,22 +436,8 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
-    def __init__(self, 
-                 game, 
-                 name:str='защита', 
-                 protection:int=1, 
-                 actions:list=['отражает'], 
-                 empty:bool=False, 
-                 enchantable:bool=True):
-        self.game = game
-        self.name = name
-        self.protection = protection
-        self.enchantable = enchantable
-        self.actions = actions
-        self.can_use_in_fight = True
-        self.empty = empty
-        self.runes = []
-        self.user = None
+    def __init__(self, game):
+        super().__init__(game)
   
     
     def on_create(self):
@@ -482,7 +446,7 @@ class Armor(Protection):
 
     
     def decorate(self) -> bool:
-        decorators = Protection._armor_decorators.get(self.type, [])
+        decorators = Protection._armor_decorators.get(self.protection_type, [])
         decorator = randomitem(decorators)
         if not decorator:
             return False
@@ -493,9 +457,7 @@ class Armor(Protection):
             decorate_string = decorator[self.gender].get(lexeme, False)
             if decorate_string:
                 lexemes[lexeme] = f'{decorate_string} {self.lexemes[lexeme]}'
-        self.protection += decorator['protection_modifier']
-        if self.protection < 2:
-            self.protection = 1
+        self.protection.increase_modificator(decorator['protection_modifier'])
         self.lexemes = lexemes
     
     
@@ -598,23 +560,9 @@ class Shield (Protection):
     """Словарь состояний щита."""
 
     
-    def __init__(self, 
-                 game, 
-                 name:str='', 
-                 protection:int=1, 
-                 actions:list=[], 
-                 empty:bool=False, 
-                 enchantable:bool=True):
-        self.game = game
-        self.name = name
-        self.protection = protection
-        self.enchantable = enchantable
-        self.actions = actions
-        self.can_use_in_fight = True
-        self.empty = empty
-        self.runes = []
+    def __init__(self, game):
+        super().__init__(game)
         self.accumulated_damage = 0
-        self.user = None
     
     
     def on_create(self):

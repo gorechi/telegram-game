@@ -3,13 +3,20 @@ from random import randint, sample
 class Dice():
     
     def __init__(self, dice:list[int], modificator:int=0, dice_type:str=''):
-        self.dice = dice
+        self.dice:list[int] = dice
         self.modificator = modificator
         self.dice_type = dice_type
         self.temporary = []
 
     def __str__(self):
         return self.get_text()
+    
+    
+    def base_die(self) -> int:
+        """Функция возвращает базовый кубик"""
+        if not self.dice:
+            return 0
+        return self.dice[0]
     
     
     def add_temporary(self, die:int):
@@ -80,8 +87,6 @@ class Dice():
         """Увеличивает значение модификатора"""
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
-        if value < 0:
-            raise ValueError("Значение должно быть больше или равно нулю.")
         self.modificator += value
         return self.modificator
     
@@ -90,7 +95,5 @@ class Dice():
         """Уменьшает значение модификатора"""
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
-        if value < 0:
-            raise ValueError("Значение должно быть больше или равно нулю.")
         self.modificator -= value
         return self.modificator
