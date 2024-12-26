@@ -606,20 +606,16 @@ class Monster:
     def defence(self, attacker):
         result = 0
         weapon = attacker.weapon
+        parry_chance = self.parry_chance(roll)
+        if self.poisoned:
+            parry_chance = parry_chance // 2
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
-        parry_chance = self.parry_chance
-        if self.poisoned:
-            parry_chance -= self.parry_chance // 2
-        if parry_chance > 0:
-            parry_dice = dice(1, parry_chance)
-        else:
-            parry_dice = 0
-        hit_dice = dice(1, (weapon.get_hit_chance() + attacker.get_hit_chance()))
-        if parry_dice > hit_dice:
+        hit_dice = weapon.hit_chance.roll() + attacker.hit_chance.roll()
+        if parry_chance > hit_dice:
             result = -1
         return result
 

@@ -15,7 +15,7 @@ class MonstersController(Controller):
         stren: dict
         health: dict
         hit_chance: dict
-        parry_chance: int
+        parry_chance: dict
         can_hide: bool
         can_run: bool
         actions: list
