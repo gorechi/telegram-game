@@ -93,11 +93,12 @@ class Weapon:
         return element_sum
 
     
-    def is_poisoned(self):
-        for i in self.runes:
-            if i.poison:
-                return True
-        return False
+    def get_poison_level(self):
+        poison_level = 0
+        for rune in self.runes:
+            if rune.poison:
+                poison_level += 1
+        return poison_level
     
     
     def can_be_enchanted(self) -> bool:

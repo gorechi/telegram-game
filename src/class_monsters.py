@@ -1,5 +1,5 @@
 from math import ceil
-from random import choice
+from random import choice, randint
 
 from src.class_basic import Loot, Money
 from src.class_items import Rune
@@ -297,11 +297,10 @@ class Monster:
     
     
     def get_poison_protection(self) -> int:
-        base_protection_die = Monster._poison_base_protection_die.roll()
-        additional_protection_die = 0
+        protection = self.poison_protection.roll()
         if self.armor.is_poisoned() or self.shield.is_poisoned():
-            additional_protection_die = Monster._poison_additional_protection_die.roll()
-        return base_protection_die + additional_protection_die
+            protection += 2
+        return protection
     
     
     def poison_enemy(self, target) -> str:
@@ -314,12 +313,10 @@ class Monster:
         """
         if target.poisoned:
             return None
-        if self.weapon.is_poisoned() or self.venomous:
-            poison_die = dice(1, Monster._poison_level)
-        else:
-            poison_die = 0
+        self_poison_level = self.poison_level.roll()
+        weapon_poison_level = self.weapon.get_poison_level()
         protection = target.get_poison_protection()
-        if poison_die > protection:
+        if self_poison_level + weapon_poison_level > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target.g("он", "она")} теперь неважно себя чувствует.'
         return None

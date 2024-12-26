@@ -46,7 +46,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 2,
     "corpse": true,
@@ -103,7 +110,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "ударное",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [2]
+      },
     "gender": 0,
     "size": 4,
     "corpse": true,
@@ -160,7 +174,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "колющее",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -217,7 +238,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "колющее",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 1,
     "size": 3,
     "corpse": true,
@@ -274,7 +302,14 @@
     "carry_weapon": true,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -331,7 +366,14 @@
     "carry_weapon": true,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 1,
     "size": 3,
     "corpse": true,
@@ -388,7 +430,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -444,7 +493,14 @@
     "carry_weapon": true,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 2,
+    "poison_level": {
+      "dice": true,
+      "value": [2]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [100]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -510,7 +566,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 4,
+    "poison_level": {
+      "dice": true,
+      "value": [4]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [100]
+      },
     "gender": 1,
     "size": 2,
     "corpse": false,
@@ -575,7 +638,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 5,
+    "poison_level": {
+      "dice": true,
+      "value": [5]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [100]
+      },
     "gender": 1,
     "size": 1,
     "monster_type": "plant",
@@ -637,7 +707,14 @@
     "carry_weapon": false,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [20]
+      },
     "gender": 0,
     "size": 3,
     "corpse": false,
@@ -699,7 +776,14 @@
     "carry_weapon": false,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [10]
+      },
     "gender": 0,
     "size": 3,
     "corpse": false,
@@ -756,7 +840,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 4,
     "corpse": true,
@@ -813,7 +904,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 4,
     "corpse": true,
@@ -870,7 +968,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "рубящее",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 2,
     "corpse": true,
@@ -927,7 +1032,14 @@
     "carry_weapon": true,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -984,7 +1096,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 4,
     "corpse": true,
@@ -1041,7 +1160,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [10]
+      },
     "gender": 0,
     "size": 4,
     "corpse": true,
@@ -1098,7 +1224,14 @@
     "carry_weapon": false,
     "carry_shield": true,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [100]
+      },
     "gender": 0,
     "size": 5,
     "corpse": true,
@@ -1155,7 +1288,14 @@
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "колющее",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -1212,7 +1352,14 @@
     "carry_weapon": true,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,
@@ -1267,7 +1414,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 0,
     "size": 2,
     "corpse": true,
@@ -1321,7 +1475,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 0,
+    "poison_level": {
+      "dice": true,
+      "value": [0]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [0]
+      },
     "gender": 1,
     "size": 2,
     "corpse": true,
@@ -1376,7 +1537,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 1,
+    "poison_level": {
+      "dice": true,
+      "value": [1]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [1]
+      },
     "gender": 1,
     "size": 1,
     "corpse": true,
@@ -1431,7 +1599,14 @@
     "carry_weapon": false,
     "carry_shield": false,
     "preferred_weapon": "",
-    "venomous": 3,
+    "poison_level": {
+      "dice": true,
+      "value": [3]
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": [6]
+      },
     "gender": 0,
     "size": 3,
     "corpse": true,

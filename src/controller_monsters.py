@@ -24,7 +24,8 @@ class MonstersController(Controller):
         aggressive: bool
         carry_weapon: bool
         carry_shield: bool
-        venomous: int
+        poison_level: dict
+        poison_protection: dict
         gender: int
         size: int
         corpse: bool
