@@ -72,8 +72,13 @@ class Controller:
         new_object.on_create()
         self.how_many += 1
         self.all_objects.append(new_object)
+        self.additional_actions(new_object)
         return new_object
 
+    
+    def additional_actions(self, object) -> bool:
+        return True
+    
 
     def generate_value(self, data):
         """Генерирует значение для параметра"""
@@ -113,3 +118,18 @@ class Controller:
         new_object.empty = True
         return new_object
     
+    
+    def get_random_object_by_filters(self, **filters):
+        """Возвращает случайный объект, удовлетворяющий заданным фильтрам"""
+        
+        template = self.get_random_template_by_filters(filters)
+        return self.create_object_from_template(template)
+    
+    
+    def get_random_template_by_filters(self, filters:dict):
+        """Возвращает случайный шаблон, удовлетворяющий заданным фильтрам"""
+
+        filtered_templates = [template for template in self.templates if all(getattr(template, key) == value for key, value in filters.items())]
+        if not filtered_templates:
+            raise ValueError("Нет подходящих шаблонов.")
+        return randomitem(filtered_templates)

@@ -264,7 +264,6 @@ class Floor:
         )
         for armor in self.all_armor:
             armor.place(self)
-            print(armor)
 
     
     def place_shields(self):
@@ -274,15 +273,16 @@ class Floor:
         )
         for shield in self.all_shields:
             shield.place(self)
-            print(shield)
 
     
     def place_weapons(self):
-        self.all_weapon = self.game.create_objects_from_json(file='json/weapon.json',
-                                     how_many=self.how_many['оружие'],
-                                     random=True)
+        self.all_weapon = self.game.weapon_controller.get_random_objects_by_class_name(
+            class_name = 'Weapon',
+            how_many=self.how_many['оружие'],
+        )
         for weapon in self.all_weapon:
             weapon.place(self)
+            print(weapon)
 
     
     def place_monsters(self):

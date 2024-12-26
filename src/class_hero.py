@@ -664,7 +664,7 @@ class Hero:
             
 #TODO       
     def get_weakness(self, weapon:Weapon) -> float:
-        return 1
+        return 0
     
     
     def get_shield(self) -> Shield|None:

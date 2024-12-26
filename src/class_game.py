@@ -13,6 +13,7 @@ from src.class_backpack import Backpack
 from src.functions.functions import randomitem
 from src.controller_monsters import MonstersController
 from src.controller_protection import ProtectionController
+from src.controller_weapon import WeaponController
 
 
 class Empty():
@@ -127,9 +128,10 @@ class Game():
         self.bot = bot
         self.monsters_controller = MonstersController(self)
         self.protection_controller = ProtectionController(self)
+        self.weapon_controller = WeaponController(self)
         self.all_corpses = []
         self.all_traders = []
-        self.no_weapon = Weapon(self, empty=True)
+        self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')
         self.no_shield = self.protection_controller.get_empty_object_by_class_name('Shield')
         self.no_armor = self.protection_controller.get_empty_object_by_class_name('Armor')
         self.no_backpack = Backpack(self, no_backpack=True)
@@ -263,27 +265,7 @@ class Game():
             new_game_object = self.object_from_json(json_object=i)
             objects.append(new_game_object)
         return objects
-    
-          
-    def create_random_weapon(self, how_many:int=1, weapon_type:str=None) -> Weapon | list[Weapon]:
-        """
-        Метод создания случайного оружия.
         
-        """
-        
-        objects = []
-        with open('json/weapon.json', encoding='utf-8') as read_data:
-            parsed_data = json.load(read_data)
-        if weapon_type:
-            parsed_data = [i for i in parsed_data if i['type'] == weapon_type]
-        for _ in range(how_many):
-            i = randomitem(parsed_data)
-            new_game_object = self.object_from_json(json_object=i)
-            objects.append(new_game_object)
-        if len(objects) == 1:
-            return objects[0]
-        return objects
-    
     
     def object_from_json(self, json_object:object) -> object:
         

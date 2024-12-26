@@ -35,12 +35,17 @@ class Dice():
         """Функция имитирует бросок нескольких кубиков сразу
 
         """
+        print(f'self.dice: {self.dice}, add: {add}, subtract: {subtract}, modificator: {self.modificator}')
         self_result = self.roll_set(self.dice + self.temporary)
+        print(f'self_result: {self_result}')
         if not isinstance(add, list) or not isinstance(subtract, list):
             raise ValueError("В качестве аргумента 'add' или 'subtract' должен быть передан список целых чисел")
         add_result = self.roll_set(add)
+        print(f'add_result: {add_result}')
         subtract_result = self.roll_set(subtract)
+        print(f'subtract_result: {subtract_result}')
         result = self_result + add_result - subtract_result + self.modificator
+        print(f'result: {result}')
         return max(0, result)
     
     
@@ -97,3 +102,11 @@ class Dice():
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
         self.modificator -= value
         return self.modificator
+    
+    
+    def set_dice(self, dice:list[int]):
+        self.dice = dice
+        
+    
+    def set_modificator(self, modificator:int):
+        self.modificator = modificator

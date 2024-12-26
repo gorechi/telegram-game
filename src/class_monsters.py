@@ -227,7 +227,7 @@ class Monster:
         """Метод вызывается после создания экземпляра класса Монстр."""
         
         if self.preferred_weapon:
-            self.weapon = self.game.create_random_weapon(weapon_type=self.preferred_weapon)
+            self.weapon = self.game.weapon_controller.get_random_object_by_filters(weapon_type=self.preferred_weapon)
             self.start_health = self.health
             stren_dice = self.stren.dice
             multiplier = roll([Monster._exp_multiplier_limit])
@@ -496,9 +496,7 @@ class Monster:
         
         element = str(weapon.element())
         weakness = self.weakness.get(element, None)
-        if weakness:
-            return weakness
-        return 1
+        return weakness if weakness else 0
         
             
     def generate_mele_attack(self, target) -> int:

@@ -1,6 +1,6 @@
 [
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":{
       "nom": "меч",
       "accus": "меч",
@@ -16,14 +16,23 @@
     ], 
     "gender": 0,
     "name": "Меч", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": false,
-    "damage": 9,
-    "enchatable": true, 
-    "hit_chance": 6
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [8, 10]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [5, 7]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":{
       "nom": "двуручный меч",
       "accus": "двуручный меч",
@@ -39,14 +48,23 @@
     ], 
     "gender": 0,
     "name": "Двуручный меч", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": true,
-    "damage": 11,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [9, 12]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":{
       "nom": "сабля",
       "accus": "саблю",
@@ -63,14 +81,23 @@
     ], 
     "gender": 1,
     "name": "Сабля", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": false,
-    "damage": 8,
-    "enchatable": true, 
-    "hit_chance": 7
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [6, 8]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":{
       "nom": "катана",
       "accus": "катану",
@@ -86,14 +113,23 @@
     ], 
     "gender": 1,
     "name": "Катана", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": true,
-    "damage": 9,
-    "enchatable": true, 
-    "hit_chance": 6
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [7, 10]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [6, 7]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "рапира",
@@ -110,14 +146,23 @@
     ], 
     "gender": 1,
     "name": "Рапира", 
-    "type": "колющее", 
+    "weapon_type": "колющее", 
     "twohanded": false,
-    "damage": 7,
-    "enchatable": true, 
-    "hit_chance": 6
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [5, 8]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [6, 7]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "пика",
@@ -134,14 +179,23 @@
     ], 
     "gender": 1,
     "name": "Пика", 
-    "type": "колющее", 
+    "weapon_type": "колющее", 
     "twohanded": true,
-    "damage": 9,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [9, 10]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "копье",
@@ -157,14 +211,23 @@
     ], 
     "gender": 2,
     "name": "Копье", 
-    "type": "колющее", 
+    "weapon_type": "колющее", 
     "twohanded": true,
-    "damage": 9,
-    "enchatable": true, 
-    "hit_chance": 4
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [8, 10]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "топор",
@@ -181,14 +244,23 @@
     ], 
     "gender": 0,
     "name": "Топор", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": false,
-    "damage": 10,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [9, 11]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "секира",
@@ -205,14 +277,23 @@
     ], 
     "gender": 1,
     "name": "Секира", 
-    "type": "рубящее", 
+    "weapon_type": "рубящее", 
     "twohanded": true,
-    "damage": 12,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [11, 13]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "кинжал",
@@ -229,14 +310,23 @@
     ], 
     "gender": 0,
     "name": "Кинжал", 
-    "type": "колющее", 
+    "weapon_type": "колющее", 
     "twohanded": false,
-    "damage": 6,
-    "enchatable": true, 
-    "hit_chance": 8
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [5, 6]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "дубина",
@@ -253,14 +343,23 @@
     ], 
     "gender": 1,
     "name": "Дубина", 
-    "type": "ударное", 
+    "weapon_type": "ударное", 
     "twohanded": false,
-    "damage": 7,
-    "enchatable": false, 
-    "hit_chance": 4
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [7, 8]
+      },
+    "enchantable": false,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "палица",
@@ -277,14 +376,23 @@
     ], 
     "gender": 1,
     "name": "Палица", 
-    "type":"ударное", 
+    "weapon_type":"ударное", 
     "twohanded": false,
-    "damage": 8,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "булава",
@@ -302,14 +410,23 @@
     ], 
     "gender": 1,
     "name": "Булава", 
-    "type": "ударное", 
+    "weapon_type": "ударное", 
     "twohanded": false,
-    "damage": 9,
-    "enchatable": true, 
-    "hit_chance": 5
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [9, 10]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "молот",
@@ -326,14 +443,23 @@
     ], 
     "gender": 0,
     "name": "Молот", 
-    "type": "ударное", 
+    "weapon_type": "ударное", 
     "twohanded": true,
-    "damage": 10,
-    "enchatable": true, 
-    "hit_chance": 4
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [10, 12]
+      },
+    "enchantable": true,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      }
   },
   {
-    "class": "оружие",
+    "class_name": "Weapon",
     "lexemes":
     {
       "nom": "шпага",
@@ -350,10 +476,19 @@
     ], 
     "gender": 1,
     "name": "Шпага", 
-    "type": "колющее", 
+    "weapon_type": "колющее", 
     "twohanded": false,
-    "damage": 7,
-    "enchatable": true, 
-    "hit_chance": 7
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [6, 9]
+      },
+    "enchantable": true,
+    "fencing": true, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [6, 8]
+      }
   }
 ]

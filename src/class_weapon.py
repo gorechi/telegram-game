@@ -1,7 +1,5 @@
-from math import ceil
-from random import randint as dice
-
 from src.functions.functions import randomitem, tprint
+from src.class_dice import Dice
 
 
 class Weapon:
@@ -22,402 +20,13 @@ class Weapon:
                         24: 'потопа'}
     """Словарь стихий."""
     
-    _poison_level = 10
+    _poison_level = Dice([10])
     """Кубик, который кидается при проверке отравления оружием."""
     
-    _decorators = {
-    "колющее":
-    [
-        {
-        "damage_modifier": 1,
-        0: 
-            {
-            "nom": "Большой",
-            "accus": "Большого",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-            }, 
-        1: 
-            {
-            "nom": "Большая",
-            "accus": "Большую",
-            "gen": "Большой",
-            "dat": "Большой",
-            "prep": "Большой",
-            "inst": "Большой",
-            }, 
-        2: 
-            {
-            "nom": "Большое",
-            "accus": "Большое",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-        }
-        },
-        {
-        "damage_modifier": -1,
-        0: 
-            {
-            "nom": "Малый",
-            "accus": "Малого",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-            }, 
-        1: 
-            {
-            "nom": "Малая",
-            "accus": "Малую",
-            "gen": "Малой",
-            "dat": "Малой",
-            "prep": "Малой",
-            "inst": "Малой",
-            }, 
-        2: 
-            {
-            "nom": "Малое",
-            "accus": "Малое",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-        }
-        },
-        {
-        "damage_modifier": -1,
-        0: 
-            {
-            "nom": "Старый",
-            "accus": "Старого",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-            }, 
-        1: 
-            {
-            "nom": "Старая",
-            "accus": "Старую",
-            "gen": "Старой",
-            "dat": "Старой",
-            "prep": "Старой",
-            "inst": "Старой",
-            }, 
-        2: 
-            {
-            "nom": "Старое",
-            "accus": "Старое",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-        }
-        },
-        {
-        "damage_modifier": 1,
-        0: 
-            {
-            "nom": "Новый",
-            "accus": "Нового",
-            "gen": "Нового",
-            "dat": "Новому",
-            "prep": "Новом",
-            "inst": "Новым",
-            }, 
-        1: 
-            {
-            "nom": "Новая",
-            "accus": "Новую",
-            "gen": "Новой",
-            "dat": "Новой",
-            "prep": "Новой",
-            "inst": "Новой",
-            }, 
-        2: 
-            {
-            "nom": "Новое",
-            "accus": "Новое",
-            "gen": "Нового",
-            "dat": "Новому",
-            "prep": "Новом",
-            "inst": "Новым",
-            }
-        }
-    ],
-    "ударное":
-    [
-        {
-        "damage_modifier": 2,
-        0: 
-            {
-            "nom": "Большой",
-            "accus": "Большого",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-            }, 
-        1: 
-            {
-            "nom": "Большая",
-            "accus": "Большую",
-            "gen": "Большой",
-            "dat": "Большой",
-            "prep": "Большой",
-            "inst": "Большой",
-            }, 
-        2: 
-            {
-            "nom": "Большое",
-            "accus": "Большое",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-        }
-        },
-        {
-        "damage_modifier": -1,
-        0: 
-            {
-            "nom": "Малый",
-            "accus": "Малого",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-            }, 
-        1: 
-            {
-            "nom": "Малая",
-            "accus": "Малую",
-            "gen": "Малой",
-            "dat": "Малой",
-            "prep": "Малой",
-            "inst": "Малой",
-            }, 
-        2: 
-            {
-            "nom": "Малое",
-            "accus": "Малое",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-        }
-        },
-        {
-        "damage_modifier": 0,
-        0: 
-            {
-            "nom": "Старый",
-            "accus": "Старого",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-            }, 
-        1: 
-            {
-            "nom": "Старая",
-            "accus": "Старую",
-            "gen": "Старой",
-            "dat": "Старой",
-            "prep": "Старой",
-            "inst": "Старой",
-            }, 
-        2: 
-            {
-            "nom": "Старое",
-            "accus": "Старое",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-        }
-        },
-        {
-        "damage_modifier": 1,
-        0: 
-            {
-            "nom": "Тяжелый",
-            "accus": "Тяжелого",
-            "gen": "Тяжелого",
-            "dat": "Тяжелому",
-            "prep": "Тяжелом",
-            "inst": "Тяжелым",
-            }, 
-        1: 
-            {
-            "nom": "Тяжелая",
-            "accus": "Тяжелую",
-            "gen": "Тяжелой",
-            "dat": "Тяжелой",
-            "prep": "Тяжелой",
-            "inst": "Тяжелой",
-            }, 
-        2: 
-            {
-            "nom": "Тяжелое",
-            "accus": "Тяжелое",
-            "gen": "Тяжелого",
-            "dat": "Тяжелому",
-            "prep": "Тяжелом",
-            "inst": "Тяжелым",
-            }
-        }
-    ],
-        "рубящее":
-    [
-        {
-        "damage_modifier": 2,
-        0: 
-            {
-            "nom": "Большой",
-            "accus": "Большого",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-            }, 
-        1: 
-            {
-            "nom": "Большая",
-            "accus": "Большую",
-            "gen": "Большой",
-            "dat": "Большой",
-            "prep": "Большой",
-            "inst": "Большой",
-            }, 
-        2: 
-            {
-            "nom": "Большое",
-            "accus": "Большое",
-            "gen": "Большого",
-            "dat": "Большому",
-            "prep": "Большом",
-            "inst": "Большим",
-        }
-        },
-        {
-        "damage_modifier": -1,
-        0: 
-            {
-            "nom": "Малый",
-            "accus": "Малого",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-            }, 
-        1: 
-            {
-            "nom": "Малая",
-            "accus": "Малую",
-            "gen": "Малой",
-            "dat": "Малой",
-            "prep": "Малой",
-            "inst": "Малой",
-            }, 
-        2: 
-            {
-            "nom": "Малое",
-            "accus": "Малое",
-            "gen": "Малого",
-            "dat": "Малому",
-            "prep": "Малом",
-            "inst": "Малым",
-        }
-        },
-        {
-        "damage_modifier": -1,
-        0: 
-            {
-            "nom": "Старый",
-            "accus": "Старого",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-            }, 
-        1: 
-            {
-            "nom": "Старая",
-            "accus": "Старую",
-            "gen": "Старой",
-            "dat": "Старой",
-            "prep": "Старой",
-            "inst": "Старой",
-            }, 
-        2: 
-            {
-            "nom": "Старое",
-            "accus": "Старое",
-            "gen": "Старого",
-            "dat": "Старому",
-            "prep": "Старом",
-            "inst": "Старым",
-        }
-        },
-        {
-        "damage_modifier": 1,
-        0: 
-            {
-            "nom": "Новый",
-            "accus": "Нового",
-            "gen": "Нового",
-            "dat": "Новому",
-            "prep": "Новом",
-            "inst": "Новым",
-            }, 
-        1: 
-            {
-            "nom": "Новая",
-            "accus": "Новую",
-            "gen": "Новой",
-            "dat": "Новой",
-            "prep": "Новой",
-            "inst": "Новой",
-            }, 
-        2: 
-            {
-            "nom": "Новое",
-            "accus": "Новое",
-            "gen": "Нового",
-            "dat": "Новому",
-            "prep": "Новом",
-            "inst": "Новым",
-            }
-        }
-    ]
-    }
-    """Словарь первых слов в описании оружия."""
        
-    def __init__(self, 
-                 game, 
-                 name=None, 
-                 damage:int=1, 
-                 actions=['бьет', 'ударяет'], 
-                 empty=False, 
-                 type=None, 
-                 enchantable=True,
-                 gender=0):
+    def __init__(self, game):
         self.game = game
-        self.name = name
-        self.damage = damage
-        self.empty = empty
-        self.twohanded = False
-        self.actions = actions
-        self.enchatable = enchantable
-        self.type = type
-        self.hit_chance = 0
         self.runes = []
-        self.gender = gender
 
     
     def __format__(self, format:str) -> str:
@@ -425,36 +34,15 @@ class Weapon:
     
     
     def on_create(self) -> bool:
-        self.decorate()
         return True
 
     
     def get_hit_chance(self) -> int:
-        return self.hit_chance
-    
-    
-    def decorate(self) -> bool:
-        decorators = Weapon._decorators.get(self.type, [])
-        decorator = randomitem(decorators)
-        if not decorator:
-            return False
-        if not decorator.get(self.gender, False):
-            return False
-        lexemes = {}
-        for lexeme in self.lexemes:
-            decorate_string = decorator[self.gender].get(lexeme, False)
-            if decorate_string:
-                lexemes[lexeme] = f'{decorate_string} {self.lexemes[lexeme]}'
-        self.damage += decorator['damage_modifier']
-        self.lexemes = lexemes
-        return True
+        return self.hit_chance.roll()
     
     
     def __str__(self) -> str:
-        damage_string = str(self.damage)
-        if self.perm_damage() != 0:
-            damage_string += '+' + str(self.perm_damage())
-        return f'{self.name}{self.enchantment()} ({damage_string})'
+        return f'{self.name}{self.enchantment()} ({self.damage.get_text()})'
     
     
     def get_full_names(self, key:str=None) -> str|list:
@@ -485,14 +73,16 @@ class Weapon:
         if self.empty:
             return False
         names_list = self.get_names_list(['nom', "accus"])
-        return message.lower() in names_list
+        return bool([name for name in names_list if message.lower() in name.lower()])
 
     
     def get_names_list(self, cases:list=None) -> list:
         names_list = ['оружие']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
-            names_list.append(self.get_element_names(case).lower())
+            element_name = self.get_element_names(case)
+            if element_name:
+                names_list.append(element_name.lower())
         return names_list
     
     
@@ -519,6 +109,7 @@ class Weapon:
     def enchant(self, rune):
         if self.can_be_enchanted():
             self.runes.append(rune)
+            self.damage.increase_modificator(rune.damage)
             return True
         return False
     
@@ -540,14 +131,6 @@ class Weapon:
             return ' ' + Weapon._elements_dictionary[element]
 
     
-    def perm_damage(self):
-        damage = 0
-        if len(self.runes) in [1, 2]:
-            for rune in self.runes:
-                damage += rune.damage
-        return damage
-
-    
     def attack(self, who=None):
         """Функция рассчитывает урон, который наносит оружие конкретному монстру
 
@@ -557,14 +140,12 @@ class Weapon:
         Returns:
             integer: Значение нанесенного урона
         """
-        damage = dice(1, int(self.damage))
-        big_damage = damage + self.perm_damage()
-        if who:
-            damage_multiplier = who.get_weakness(self)
-        else:
-            damage_multiplier = 1
-        full_damage = ceil(big_damage * damage_multiplier)
-        return full_damage
+        target_weakness = who.get_weakness(self)
+        if target_weakness < 0:
+            return self.damage.roll(subtract=[target_weakness*-1])
+        elif target_weakness > 0: 
+            return self.damage.roll(add=[target_weakness])
+        return self.damage.roll()
 
     
     def take(self, who):
@@ -592,9 +173,7 @@ class Weapon:
 
     
     def show(self):
-        damage_string = str(self.damage)
-        if self.perm_damage() != 0:
-            damage_string += '+' + str(self.perm_damage())
+        damage_string = self.damage.get_text()
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
         else:
