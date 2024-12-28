@@ -252,7 +252,7 @@ class Floor:
     def place_potions(self):
         self.all_potions = [] 
         for _ in range(self.how_many['зелье']):
-            new_potion = Potion.random_potion(self.game)
+            new_potion = self.game.potions_controller.get_random_object_by_filters()
             self.all_potions.append(new_potion)
             new_potion.place(self)
 

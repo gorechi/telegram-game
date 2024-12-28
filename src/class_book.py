@@ -5,7 +5,6 @@ class Book:
     def __init__(self, game):
         self.game = game
         self.empty = False
-        self.base_price = self.define_base_price()
 
 
     def __format__(self, format:str) -> str:

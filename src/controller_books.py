@@ -4,7 +4,7 @@ from src.class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgW
 from src.class_controller import Controller
 from src.functions.functions import randomitem
 
-class BookController(Controller):
+class BooksController(Controller):
     """Класс для управления героями."""
 
     @dataclass
