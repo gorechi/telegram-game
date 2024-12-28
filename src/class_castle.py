@@ -231,7 +231,7 @@ class Floor:
     
     def place_books(self):
         for _ in range(self.how_many['книга']):
-            new_book = Book.random_book(self.game)
+            new_book = self.game.books_controller.get_random_object_by_filters()
             new_book.place(self)
 
     

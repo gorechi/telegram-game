@@ -15,6 +15,7 @@ from src.controller_monsters import MonstersController
 from src.controller_protection import ProtectionController
 from src.controller_weapon import WeaponController
 from src.controller_heroes import HeroController
+from src.controller_books import BooksController
 
 
 class Empty():
@@ -131,6 +132,7 @@ class Game():
         self.protection_controller = ProtectionController(self)
         self.weapon_controller = WeaponController(self)
         self.hero_controller = HeroController(self)
+        self.books_controller = BooksController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')
