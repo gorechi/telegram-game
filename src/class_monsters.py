@@ -311,7 +311,7 @@ class Monster:
         - target (obj Hero): Герой, которого атакует монстр
 
         """
-        if target.poisoned:
+        if target.poisoned or target.poison_level.base_die() > 0:
             return None
         self_poison_level = self.poison_level.roll()
         weapon_poison_level = self.weapon.get_poison_level()
@@ -600,13 +600,13 @@ class Monster:
         """
         Возвращает шанс попадания по цели.
         """
-        return self.hit_chance
+        return self.hit_chance.roll() + self.weapon.get_hit_chance()
     
     
     def defence(self, attacker):
         result = 0
         weapon = attacker.weapon
-        parry_chance = self.parry_chance(roll)
+        parry_chance = self.parry_chance.roll()
         if self.poisoned:
             parry_chance = parry_chance // 2
         if not self.shield.empty:

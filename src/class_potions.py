@@ -198,7 +198,7 @@ class StrengthPotion(Potion):
         if self.owner.start_stren:
             self.owner.start_stren.increase_modificator(self.effect)
         tprint(
-            self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.get_text()}.')
+            self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
         return True
     
 
@@ -233,7 +233,7 @@ class StrengtheningPotion(Potion):
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.stren.add_temporary()
-        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.get_text()}.')
+        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
         return True
 
 

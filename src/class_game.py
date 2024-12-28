@@ -14,6 +14,7 @@ from src.functions.functions import randomitem
 from src.controller_monsters import MonstersController
 from src.controller_protection import ProtectionController
 from src.controller_weapon import WeaponController
+from src.controller_heroes import HeroController
 
 
 class Empty():
@@ -86,7 +87,7 @@ class Game():
     _traders_update_counter = 30
     
 
-    def __init__(self, chat_id:str, bot, hero:Hero=None):
+    def __init__(self, chat_id:str, bot):
         self.classes = { 
             'этаж': Floor,
             'лестница': Ladder,
@@ -129,6 +130,7 @@ class Game():
         self.monsters_controller = MonstersController(self)
         self.protection_controller = ProtectionController(self)
         self.weapon_controller = WeaponController(self)
+        self.hero_controller = HeroController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')
@@ -138,7 +140,7 @@ class Game():
         self.castle_floors = self.create_floors()
         self.create_ladders()
         self.current_floor = self.castle_floors[0]
-        self.player = self.check_hero(hero=hero)
+        self.player = self.hero_controller.get_random_object_by_filters()
         self.player.place(self.current_floor.plan[0])
         new_key = Key(self)
         self.player.backpack + new_key
@@ -189,20 +191,7 @@ class Game():
         for corpse in self.all_corpses: 
             if corpse.can_resurrect:
                 corpse.try_to_rise()
-    
-    
-    def check_hero(self, hero:Hero) -> Hero:
         
-        """
-        Метод проверяет, передан ли в игру герой. 
-        Если не передан, то создает нового героя с настройками по умолчанию.
-        
-        """
-        
-        if not hero:
-            hero = self.create_objects_from_json('json/hero.json')[0]
-        return hero
-    
     
     def create_floors(self) -> list[Floor]:
         

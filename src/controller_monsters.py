@@ -27,7 +27,7 @@ class MonstersController(Controller):
         poison_level: dict
         poison_protection: dict
         gender: int
-        size: int
+        size: dict
         corpse: bool
         monster_type: str
         initiative: dict

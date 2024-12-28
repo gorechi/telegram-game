@@ -42,7 +42,7 @@ class Weapon:
     
     
     def __str__(self) -> str:
-        return f'{self.name}{self.enchantment()} ({self.damage.get_text()})'
+        return f'{self.name}{self.enchantment()} ({self.damage.text()})'
     
     
     def get_full_names(self, key:str=None) -> str|list:
@@ -174,7 +174,7 @@ class Weapon:
 
     
     def show(self):
-        damage_string = self.damage.get_text()
+        damage_string = self.damage.text()
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
         else:

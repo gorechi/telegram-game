@@ -104,31 +104,31 @@ class TestDiceGetText(unittest.TestCase):
     def test_no_dice(self):
         # Тестирование случая, когда нет кубиков
         dice = Dice([])
-        result = dice.get_text()
+        result = dice.text()
         self.assertEqual(result, "Нет кубиков")  # Ожидаемое значение: "Нет кубиков"
 
     def test_dice_without_modificator(self):
         # Тестирование случая, когда есть кубики, но нет модификатора
         dice = Dice([6, 8, 10])
-        result = dice.get_text()
+        result = dice.text()
         self.assertEqual(result, "d6 + d8 + d10")  # Ожидаемое значение: "d6 + d8 + d10"
 
     def test_dice_with_positive_modificator(self):
         # Тестирование случая, когда есть кубики и положительный модификатор
         dice = Dice([6, 8], modificator=3)
-        result = dice.get_text()
+        result = dice.text()
         self.assertEqual(result, "d6 + d8 + 3")  # Ожидаемое значение: "d6 + d8 + 3"
 
     def test_dice_with_zero_modificator(self):
         # Тестирование случая, когда есть кубики и модификатор равен нулю
         dice = Dice([4, 12], modificator=0)
-        result = dice.get_text()
+        result = dice.text()
         self.assertEqual(result, "d4 + d12")  # Ожидаемое значение: "d4 + d12"
         
     def test_dice_with_negative_modificator(self):
         # Тестирование случая, когда есть кубики и положительный модификатор
         dice = Dice([6, 8], modificator=-3)
-        result = dice.get_text()
+        result = dice.text()
         self.assertEqual(result, "d6 + d8 - 3")  # Ожидаемое значение: "d6 + d8 + 3" 
 
 class TestDiceIncreaseModificator(unittest.TestCase):

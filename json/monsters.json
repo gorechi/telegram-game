@@ -52,14 +52,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -120,14 +123,17 @@
     "preferred_weapon": "ударное",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [2]
+      "value": 2
       },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -188,14 +194,17 @@
     "preferred_weapon": "колющее",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -256,14 +265,17 @@
     "preferred_weapon": "колющее",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 1,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -324,14 +336,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -392,14 +407,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 1,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -460,14 +478,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "shapeshifter",
     "min_floor": 1,
@@ -527,14 +548,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [2]
+      "value": 2
       },
     "poison_protection": {
       "dice": true,
-      "value": [100]
+      "value": 100
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "can_resurrect": true,
     "monster_type": "undead",
@@ -604,14 +628,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [4]
+      "value": 4
       },
     "poison_protection": {
       "dice": true,
-      "value": [100]
+      "value": 100
       },
     "gender": 1,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": false,
     "monster_type": "plant",
     "min_floor": 1,
@@ -680,14 +707,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [5]
+      "value": 5
       },
     "poison_protection": {
       "dice": true,
-      "value": [100]
+      "value": 100
       },
     "gender": 1,
-    "size": 1,
+    "size": {
+      "dice": true,
+      "value": 1
+      },
     "monster_type": "plant",
     "corpse": false,
     "min_floor": 1,
@@ -753,14 +783,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [20]
+      "value": 20
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": false,
     "monster_type": "vampire",
     "min_floor": 2,
@@ -826,14 +859,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [10]
+      "value": 10
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": false,
     "monster_type": "vampire",
     "min_floor": 1,
@@ -894,14 +930,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 1,
@@ -962,14 +1001,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 1,
@@ -1030,14 +1072,17 @@
     "preferred_weapon": "рубящее",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -1098,14 +1143,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -1166,14 +1214,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -1234,14 +1285,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [10]
+      "value": 10
       },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -1302,14 +1356,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [100]
+      "value": 100
       },
     "gender": 0,
-    "size": 5,
+    "size": {
+      "dice": true,
+      "value": 5
+      },
     "corpse": true,
     "monster_type": "plant",
     "min_floor": 1,
@@ -1370,14 +1427,17 @@
     "preferred_weapon": "колющее",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -1438,14 +1498,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -1504,14 +1567,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 1,
@@ -1569,14 +1635,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "poison_protection": {
       "dice": true,
-      "value": [0]
+      "value": 0
       },
     "gender": 1,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 1,
@@ -1635,14 +1704,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [1]
+      "value": 1
       },
     "poison_protection": {
       "dice": true,
-      "value": [1]
+      "value": 1
       },
     "gender": 1,
-    "size": 1,
+    "size": {
+      "dice": true,
+      "value": 1
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 1,
@@ -1701,14 +1773,17 @@
     "preferred_weapon": "",
     "poison_level": {
       "dice": true,
-      "value": [3]
+      "value": 3
       },
     "poison_protection": {
       "dice": true,
-      "value": [6]
+      "value": 6
       },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "animal",
     "min_floor": 2,

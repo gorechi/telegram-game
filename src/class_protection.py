@@ -321,7 +321,7 @@ class Protection:
 
     def __str__(self):
         name_string = f'{self:nom}' + self.enchantment()
-        return f'{name_string} ({self.protection.get_text()})'
+        return f'{name_string} ({self.protection.text()})'
     
     
     def on_create(self):
@@ -396,7 +396,7 @@ class Protection:
         if self.empty:
             return None
         full_name = self.get_full_names('nom')
-        return f'{full_name} ({self.protection.get_text()})'
+        return f'{full_name} ({self.protection.text()})'
 
     
     def get_full_names(self, key:str=None) -> str|list:
