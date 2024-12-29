@@ -1,12 +1,12 @@
 from math import ceil
-from random import randint as dice
-from random import choice
+from random import choice, randint
 
 from src.class_basic import Loot, Money
 from src.class_items import Rune
 from src.class_protection import Armor, Shield
 from src.class_weapon import Weapon
 from src.class_fight import Fight
+from src.class_dice import Dice
 from src.functions.functions import howmany, randomitem, tprint, roll
 
 
@@ -18,7 +18,7 @@ class Monster:
     такие как атака, защита, перемещение и другие действия.
     """
     
-    _dark_damage_divider_die = 3
+    _dark_damage_divider_die = Dice([3])
     """Кубик, который кидается, чтобы выяснить, во сколько раз уменьшится урон от атаки в темноте."""
     
     _add_poison_level = 3
@@ -50,28 +50,24 @@ class Monster:
     _wounded_monster_health_coefficient = 0.4
     """Коэффициент, на который умножается здоровье монстра если он ранен."""
     
-    _hide_possibility = 5
+    _hide_possibility = Dice([5])
     """Вероятность, с которой монстр садится в засаду (если 5, то вероятность 1/5)."""
     
-    _poison_base_protection_die = 5
+    _poison_base_protection_die = Dice([5])
     """Кубик, который кидается чтобы определить базовую защиту от отравления."""
 
-    _poison_additional_protection_die = 5
+    _poison_additional_protection_die = Dice([5])
     """
     Кубик, который кидается чтобы определить дополнительную защиту от яда
     когда у героя или монстра ядовитые доспехи или щит.
 
     """
 
-    _weak_strength_die = 6
+    _weak_strength_die = Dice([6])
     """Кубик, определяющий, какая часть силы теряется монстром при ослаблении"""
 
-    _weak_health_die = 6
+    _weak_health_die = Dice([6])
     """Кубик, определяющий, какая часть здоровья теряется монстром при ослаблении"""
-    
-    _initiative_die = 20
-    """Кубик инициативы"""
-
     
     _types = {
         'basic': {
@@ -128,7 +124,6 @@ class Monster:
     
     def __init__(self, game):
         self.game = game
-        self.initiative = 2
         self.floor = None
         self.run = False
         self.alive = True
@@ -183,7 +178,7 @@ class Monster:
     
     
     def generate_initiative(self) -> int:
-        return roll([Monster._initiative_die]) + self.initiative
+        return self.initiative.roll()
 
     
     def is_hero(self) -> bool:
@@ -221,9 +216,9 @@ class Monster:
         Метод уменьшает силу и здоровье монстра на случайное значение, 
         определенное броском кубика.
         """
-        stren_die = roll([Monster._weak_strength_die])
-        health_die = roll([Monster._weak_health_die])
-        self.stren = int(self.stren * (1 - stren_die/10))
+        stren_die = self.stren.roll()
+        health_die = Monster._weak_health_die.roll()
+        self.stren.decrease_modificator(int(stren_die/2))
         self.health = int(self.health * (1 - health_die/10))
         return True
     
@@ -231,10 +226,15 @@ class Monster:
     def on_create(self):
         """Метод вызывается после создания экземпляра класса Монстр."""
         
-        if self.prefered_weapon:
-            self.weapon = self.game.create_random_weapon(weapon_type=self.prefered_weapon)
+        if self.preferred_weapon:
+            self.weapon = self.game.weapon_controller.get_random_object_by_filters(weapon_type=self.preferred_weapon)
             self.start_health = self.health
-            self.exp = self.stren * roll([Monster._exp_multiplier_limit]) + roll([self.health])
+            stren_dice = self.stren.dice
+            multiplier = roll([Monster._exp_multiplier_limit])
+            health_appendix = roll([self.health])
+            dice = stren_dice * multiplier + [health_appendix]
+            exp_dice = Dice(dice=dice)
+            self.exp = exp_dice.roll()
         return True
 
     
@@ -297,11 +297,10 @@ class Monster:
     
     
     def get_poison_protection(self) -> int:
-        base_protection_die = roll([Monster._poison_base_protection_die])
-        additional_protection_die = 0
+        protection = self.poison_protection.roll()
         if self.armor.is_poisoned() or self.shield.is_poisoned():
-            additional_protection_die = roll([Monster._poison_additional_protection_die])
-        return base_protection_die + additional_protection_die
+            protection += 2
+        return protection
     
     
     def poison_enemy(self, target) -> str:
@@ -312,14 +311,12 @@ class Monster:
         - target (obj Hero): Герой, которого атакует монстр
 
         """
-        if target.poisoned:
+        if target.poisoned or target.poison_level.base_die() > 0:
             return None
-        if self.weapon.is_poisoned() or self.venomous:
-            poison_die = dice(1, Monster._poison_level)
-        else:
-            poison_die = 0
+        self_poison_level = self.poison_level.roll()
+        weapon_poison_level = self.weapon.get_poison_level()
         protection = target.get_poison_protection()
-        if poison_die > protection:
+        if self_poison_level + weapon_poison_level > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target.g("он", "она")} теперь неважно себя чувствует.'
         return None
@@ -365,7 +362,7 @@ class Monster:
         
         if not self.weapon.empty or not self.carry_weapon:
             return False
-        if self.prefered_weapon and self.prefered_weapon != item.type:
+        if self.preferred_weapon and self.preferred_weapon != item.type:
             self.loot.add(item)
             return True
         return self.equip_weapon(item)
@@ -375,8 +372,8 @@ class Monster:
         """Метод обрабатывает ситуацию, когда монстр выбирает оружие из лута."""
         
         all_weapons = loot.get_items_by_class(Weapon)
-        if self.prefered_weapon:
-            weapons = [i for i in all_weapons if i.type == self.prefered_weapon]
+        if self.preferred_weapon:
+            weapons = [i for i in all_weapons if i.type == self.preferred_weapon]
         else:
             weapons = all_weapons
         if not self.weapon.empty or not self.carry_weapon or not weapons:
@@ -496,9 +493,7 @@ class Monster:
         
         element = str(weapon.element())
         weakness = self.weakness.get(element, None)
-        if weakness:
-            return weakness
-        return 1
+        return weakness if weakness else 0
         
             
     def generate_mele_attack(self, target) -> int:
@@ -506,14 +501,15 @@ class Monster:
         Генерирует атаку в ближнем бою на цель. Если монстр отравлен, его атака уменьшается.
         В зависимости от освещенности в комнате, атака может быть уменьшена.
         """
+        base_stren_die = self.stren.dice[0]
+        poison_die = base_stren_die // 3
+        darkness_die = base_stren_die // 2
+        subtract = []
         if self.poisoned:
-            poison_stren = dice(1, self.stren // 2)
-        else:
-            poison_stren = 0
-        if target.check_light():
-            return dice(1, self.stren - poison_stren)
-        else:
-            return dice(1, self.stren - poison_stren) // dice(1, Monster._dark_damage_divider_die)
+            subtract.append(poison_die)
+        if not target.check_light():
+            subtract.append(darkness_die)
+        return self.stren.roll(subtract=subtract)
 
     
     def generate_weapon_attack(self, target) -> int:
@@ -604,26 +600,22 @@ class Monster:
         """
         Возвращает шанс попадания по цели.
         """
-        return self.hit_chance
+        return self.hit_chance.roll() + self.weapon.get_hit_chance()
     
     
     def defence(self, attacker):
         result = 0
         weapon = attacker.weapon
+        parry_chance = self.parry_chance.roll()
+        if self.poisoned:
+            parry_chance = parry_chance // 2
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
-        parry_chance = self.parry_chance
-        if self.poisoned:
-            parry_chance -= self.parry_chance // 2
-        if parry_chance > 0:
-            parry_dice = dice(1, parry_chance)
-        else:
-            parry_dice = 0
-        hit_dice = dice(1, (weapon.get_hit_chance() + attacker.get_hit_chance()))
-        if parry_dice > hit_dice:
+        hit_dice = weapon.hit_chance.roll() + attacker.hit_chance.roll()
+        if parry_chance > hit_dice:
             result = -1
         return result
 
@@ -785,8 +777,8 @@ class Monster:
         Обрабатывает ситуацию, когда монстр истекает кровью. Это приводит к потере силы,
         но здоровье восстанавливается до начального уровня. Возвращает True.
         """
-        weakness_amount = ceil(self.stren * Monster._wounded_monster_strength_coefficient)
-        self.stren -= weakness_amount
+        weakness_amount = self.stren.roll()
+        self.stren.decrease_modificator(weakness_amount)
         self.health = self.start_health
         message = [f'{self.get_self_name_in_room()} остается в живых и истекает кровью, теряя при '
                    f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы.']
@@ -799,9 +791,9 @@ class Monster:
         Обрабатывает вход в состояние ярости. Монстр получает увеличение силы, но теряет часть здоровья.
         Возвращает True.
         """
-        strengthening_amount = ceil(self.stren * Monster._wounded_monster_strength_coefficient)
+        strengthening_amount = self.stren.roll()
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
-        self.stren += strengthening_amount
+        self.stren.increase_modificator(strengthening_amount)
         self.health = self.start_health - ill_amount
         message = [f'{self.get_self_name_in_room()} остается в живых и приходит в ярость, получая при '
                    f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и '
@@ -815,9 +807,9 @@ class Monster:
         Обрабатывает получение контузии. Монстр теряет силу, но получает дополнительное здоровье.
         Возвращает True.
         """
-        weakness_amount = ceil(self.stren * Monster._wounded_monster_strength_coefficient)
+        weakness_amount = self.stren.roll()
+        self.stren.decrease_modificator(weakness_amount)
         health_boost_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
-        self.stren -= weakness_amount
         self.health = self.start_health + health_boost_amount
         message = [f'{self.get_self_name_in_room()} остается в живых и получает контузию, теряя при '
                    f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы и '
@@ -831,9 +823,9 @@ class Monster:
         Обрабатывает получение ранения в ногу. Монстр теряет силу и часть здоровья, а также не может двигаться.
         Возвращает True.
         """
-        weakness_amount = ceil(self.stren * Monster._wounded_monster_strength_coefficient)
+        weakness_amount = self.stren.roll()
+        self.stren.decrease_modificator(weakness_amount)
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
-        self.stren -= weakness_amount
         self.health = self.start_health - ill_amount
         message =  [f'{self.get_self_name_in_room()} остается в живых, получает ранение в ногу и отползает куда-то в темный угол, теряя при ' 
                     f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы '
@@ -881,7 +873,7 @@ class Monster:
         floor.monsters_in_rooms[room].append(self)
         if old_place:
             floor.monsters_in_rooms[old_place].remove(self)
-        if self.can_hide and dice(1, Monster._hide_possibility) == 1:
+        if self.can_hide and Monster._hide_possibility.roll() == 1:
             places_to_hide = []
             for i in room.furniture:
                 if i.can_hide:
@@ -900,10 +892,7 @@ class Plant(Monster):
     Класс Plant наследует класс Monster и представляет собой тип монстра - растение.
     Растения не могут носить оружие, щиты, броню, не агрессивны, не могут красть, прятаться или бегать.
     """
-    
-    _dark_mele_attack_divider = 2
-    """Во сколько раз уменьшается урон, наносимый растением, в темноте"""
-    
+        
     def __init__(self, game):
         """
         Инициализирует экземпляр класса Plant с заданными параметрами.
@@ -963,13 +952,15 @@ class Plant(Monster):
         Генерирует атаку в ближнем бою на цель. Если монстр отравлен, его атака уменьшается.
         В зависимости от освещенности в комнате, атака может быть уменьшена.
         """
+        base_stren_die = self.stren.dice[0]
+        poison_die = base_stren_die // 3
+        darkness_die = base_stren_die
+        subtract = []
         if self.poisoned:
-            poison_stren = dice(1, self.stren // 2)
-        else:
-            poison_stren = 0
+            subtract.append(poison_die)
         if not target.check_light():
-            return dice(1, self.stren - poison_stren) // Plant._dark_mele_attack_divider
-        return dice(1, self.stren - poison_stren)
+            subtract.append(darkness_die)
+        return self.stren.roll(subtract=subtract)
 
 
 class Berserk(Monster):
@@ -995,11 +986,13 @@ class Berserk(Monster):
     
     def generate_mele_attack(self, target):
         self.rage = (int(self.start_health) - int(self.health)) // Berserk._rage_coefficient
+        base_stren_die = self.stren.dice[0]
+        poison_die = base_stren_die // 3
+        subtract = []
+        add = [self.rage]
         if self.poisoned:
-            poison_stren = dice(1, self.stren // 2)
-        else:
-            poison_stren = 0
-        return dice(1, (self.stren + self.rage - poison_stren))
+            subtract.append(poison_die)
+        return self.stren.roll(subtract=subtract, add=add)
     
     
     def choose_target(self, fight:Fight):

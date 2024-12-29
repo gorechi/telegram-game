@@ -1,0 +1,242 @@
+[
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Круглый щит",
+    "lexemes": {
+      "nom": "Круглый щит",
+      "accus": "Круглый щит",
+      "gen": "Круглого щита",
+      "dat": "Круглому щиту",
+      "prep": "Круглом щите",
+      "inst": "Круглым щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [2, 3]
+      },
+    "enchantable": true,
+    "actions":
+      [
+      "защищается"
+      ]
+  },
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Большой щит",
+    "lexemes": {
+      "nom": "Большой щит",
+      "accus": "Большой щит",
+      "gen": "Большого щита",
+      "dat": "Большому щиту",
+      "prep": "Большом щите",
+      "inst": "Большим щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "enchantable": false,
+    "actions": [
+      "защищается",
+      "отражает"
+    ]
+  },
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Малый щит",
+    "lexemes": {
+      "nom": "Малый щит",
+      "accus": "Малый щит",
+      "gen": "Малого щита",
+      "dat": "Малому щиту",
+      "prep": "Малом щите",
+      "inst": "Малым щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
+    "enchantable": true,
+    "actions": [
+      "защищается",
+      "парирует"
+    ]
+  },
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Старый щит",
+    "lexemes": {
+      "nom": "Старый щит",
+      "accus": "Старый щит",
+      "gen": "Старого щита",
+      "dat": "Старому щиту",
+      "prep": "Старом щите",
+      "inst": "Старым щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [2, 4]
+      },
+    "enchantable": true,
+    "actions": [
+      "защищается",
+      "блокирует"
+    ]
+  },
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Тяжелый щит",
+    "lexemes": {
+      "nom": "Тяжелый щит",
+      "accus": "Тяжелый щит",
+      "gen": "Тяжелого щита",
+      "dat": "Тяжелому щиту",
+      "prep": "Тяжелом щите",
+      "inst": "Тяжелым щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "enchantable": false,
+    "actions": [
+      "защищается",
+      "отталкивает"
+    ]
+  },
+  {
+    "class_name": "Shield",
+    "gender": 0,
+    "protection_type": "щит",
+    "name": "Новый щит",
+    "lexemes": {
+      "nom": "Новый щит",
+      "accus": "Новый щит",
+      "gen": "Нового щита",
+      "dat": "Новому щиту",
+      "prep": "Новом щите",
+      "inst": "Новым щитом"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
+    "enchantable": true,
+    "actions": [
+      "защищается",
+      "отражает"
+    ]
+  },
+  {
+    "class_name": "Armor",
+    "protection_type": "кованый",
+    "gender": 1,
+    "name": "кираса",
+    "lexemes": {
+      "nom": "кираса",
+      "accus": "кирасу",
+      "gen": "кирасы",
+      "dat": "кирасе",
+      "prep": "кирасе",
+      "inst": "кирасой"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [3, 3]
+      },
+    "enchantable": true,
+    "actions":
+      [
+      "защищается"
+      ]
+  },
+  {
+    "class_name": "Armor",
+    "protection_type": "кованый",
+    "gender": 1,
+    "name": "броня",
+    "lexemes": {
+      "nom": "броня",
+      "accus": "броню",
+      "gen": "брони",
+      "dat": "броне",
+      "prep": "броне",
+      "inst": "броней"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      },
+    "enchantable": true,
+    "actions":
+      [
+      "защищается"
+      ]
+  },
+  {
+    "class_name": "Armor",
+    "protection_type": "кованый",
+    "gender": 1,
+    "name": "кольчуга",
+    "lexemes": {
+      "nom": "кольчуга",
+      "accus": "кольчугу",
+      "gen": "кольчуги",
+      "dat": "кольчуге",
+      "prep": "кольчуге",
+      "inst": "кольчугой"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [2, 3]
+      },
+    "enchantable": true,
+    "actions":
+      [
+      "защищается"
+      ]
+  },
+  {
+    "class_name": "Armor",
+    "protection_type": "кожаный",
+    "gender": 1,
+    "name": "защита",
+    "lexemes": {
+      "nom": "защита",
+      "accus": "защиту",
+      "gen": "защиты",
+      "dat": "защите",
+      "prep": "защите",
+      "inst": "защитой"
+    },
+    "protection": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
+    "enchantable": false,
+    "actions":
+      [
+      "отражает"
+      ]
+  }
+]

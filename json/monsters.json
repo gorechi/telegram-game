@@ -11,30 +11,28 @@
       "inst": "гоблином"
     },
     "stren": {
-      "rand": [
-        7,
-        10
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 10]
       },
     "health": {
-      "rand": [
-        16,
-        20
-        ]
+      "random":true,
+      "value": [16, 20]
       },
     "hit_chance": {
-      "rand": [
-        4,
-        5
-        ]
+      "random": true,
+      "value": [4, 5]
       },
     "initiative": {
-      "rand": [
-        4,
-        6
-        ]
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
       },
-    "parry_chance": 2,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 3]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -48,13 +46,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "basic",
     "min_floor": 1,
@@ -74,19 +82,28 @@
       "inst": "троллем"
     },
     "stren": {
-      "rand": [
-        10,
-        14
-        ]
+      "dice": true,
+      "random": true,
+      "value": [10, 14]
       },
     "health": {
-      "rand": [
-        30,
-        45
-        ]
+      "random":true,
+      "value": [30, 45]
       },
-    "hit_chance": 4,
-    "parry_chance": 0,
+    "hit_chance": {
+      "random": true,
+      "value": [4, 4]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [2, 2]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": true,
     "actions":
@@ -99,17 +116,26 @@
     "weakness": {},
     "can_resurrect": false,
     "frightening": true,
-    "agressive": false,
+    "aggressive": false,
     "stink": true,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "ударное",
-    "venomous": 0,
+    "preferred_weapon": "ударное",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 2
+      },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "basic",
-    "initiative": 2,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -127,30 +153,28 @@
       "inst": "разбойником"
     },
     "stren": {
-      "rand": [
-        7,
-        10
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 10]
       },
     "health": {
-      "rand": [
-        25,
-        35
-        ]
+      "random":true,
+      "value": [25, 35]
       },
     "hit_chance": {
-      "rand": [
-        4,
-        7
-        ]
+      "random": true,
+      "value": [4, 7]
       },
     "initiative": {
-      "rand": [
-        4,
-        6
-        ]
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
       },
-    "parry_chance": 3,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -164,13 +188,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "колющее",
-    "venomous": 0,
+    "preferred_weapon": "колющее",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -190,30 +224,28 @@
       "inst": "разбойницей"
     },
     "stren": {
-      "rand": [
-        7,
-        9
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
       },
     "health": {
-      "rand": [
-        28,
-        35
-        ]
+      "random":true,
+      "value": [28, 35]
       },
     "hit_chance": {
-      "rand": [
-        5,
-        6
-        ]
+      "random": true,
+      "value": [5, 6]
       },
     "initiative": {
-      "rand": [
-        4,
-        6
-        ]
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
       },
-    "parry_chance": 3,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 5]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -227,13 +259,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "колющее",
-    "venomous": 0,
+    "preferred_weapon": "колющее",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 1,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -253,30 +295,28 @@
       "inst": "бандитом"
     },
     "stren": {
-      "rand": [
-        7,
-        9
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
       },
     "health": {
-      "rand": [
-        20,
-        25
-        ]
+      "random":true,
+      "value": [20, 25]
       },
     "hit_chance": {
-      "rand": [
-        4,
-        5
-        ]
+      "random": true,
+      "value": [4, 5]
       },
     "initiative": {
-      "rand": [
-        3,
-        4
-        ]
+      "dice": true,
+      "random": true,
+      "value": [3, 3]
       },
-    "parry_chance": 3,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 3]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -290,13 +330,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": true,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -316,30 +366,28 @@
       "inst": "бандиткой"
     },
     "stren": {
-      "rand": [
-        7,
-        9
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
       },
     "health": {
-      "rand": [
-        20,
-        30
-        ]
+      "random":true,
+      "value": [20, 30]
       },
     "hit_chance": {
-      "rand": [
-        4,
-        5
-        ]
+      "random": true,
+      "value": [4, 5]
       },
     "initiative": {
-      "rand": [
-        4,
-        5
-        ]
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
       },
-    "parry_chance": 3,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -353,13 +401,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": true,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 1,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
     "min_floor": 1,
@@ -379,30 +437,28 @@
       "inst": "оборотнем"
     },
     "stren": {
-      "rand": [
-        9,
-        12
-        ]
+      "dice": true,
+      "random": true,
+      "value": [9, 12]
       },
     "health": {
-      "rand": [
-        28,
-        32
-        ]
+      "random":true,
+      "value": [28, 32]
       },
     "hit_chance": {
-      "rand": [
-        5,
-        6
-        ]
+      "random": true,
+      "value": [5, 6]
       },
     "initiative": {
-      "rand": [
-        4,
-        5
-        ]
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
       },
-    "parry_chance": 2,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
     "can_hide": false,
     "can_run": true,
     "actions":
@@ -416,13 +472,23 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "shapeshifter",
     "min_floor": 1,
@@ -442,30 +508,28 @@
       "inst": "зомби"
     },
     "stren": {
-      "rand": [
-        7,
-        9
-        ]
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
       },
     "health": {
-      "rand": [
-        28,
-        35
-        ]
+      "random":true,
+      "value": [28, 35]
       },
     "hit_chance": {
-      "rand": [
-        3,
-        4
-        ]
+      "random": true,
+      "value": [3, 4]
       },
     "initiative": {
-      "rand": [
-        1,
-        2
-        ]
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
       },
-    "parry_chance": 1,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 1]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -478,13 +542,23 @@
     "weakness": {},
     "stink": false,
     "frightening": true,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": true,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 2,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 2
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 100
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "can_resurrect": true,
     "monster_type": "undead",
@@ -505,24 +579,28 @@
       "inst": "мухоловкой"
     },
     "stren": {
-      "rand": [
-        6,
-        7
-        ]
+      "dice": true,
+      "random": true,
+      "value": [6, 7]
       },
     "health": {
-      "rand": [
-        25,
-        28
-        ]
+      "random":true,
+      "value": [25, 28]
       },
     "hit_chance": {
-      "rand": [
-        5,
-        5
-        ]
+      "random": true,
+      "value": [5, 5]
       },
-    "parry_chance": 0,
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [1, 1]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -544,16 +622,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 4,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 4
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 100
+      },
     "gender": 1,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": false,
     "monster_type": "plant",
-    "initiative": 0,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -571,24 +658,28 @@
       "inst": "лианой"
     },
     "stren": {
-      "rand": [
-        8,
-        10
-        ]
+      "dice": true,
+      "random": true,
+      "value": [8, 10]
       },
     "health": {
-      "rand": [
-        28,
-        35
-        ]
+      "random":true,
+      "value": [28, 35]
       },
     "hit_chance": {
-      "rand": [
-        5,
-        5
-        ]
+      "random": true,
+      "value": [5, 5]
       },
-    "parry_chance": 1,
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [1, 1]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -600,26 +691,35 @@
     "state": "растет",
     "weakness":
     {
-      "1": 1.1,
-      "2": 1.2,
-      "8": 1.2,
-      "12": 0.8,
-      "15": 0.7,
-      "24": 0.6
+      "1": 1,
+      "2": 2,
+      "8": 3,
+      "12": -1,
+      "15": -2,
+      "24": -3
     },
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 5,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 5
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 100
+      },
     "gender": 1,
-    "size": 1,
+    "size": {
+      "dice": true,
+      "value": 1
+      },
     "monster_type": "plant",
     "corpse": false,
-    "initiative": 0,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -637,30 +737,28 @@
       "inst": "лордом вампиров"
     },
     "stren": {
-      "rand": [
-        10,
-        13
-        ]
+      "dice": true,
+      "random": true,
+      "value": [10, 13]
       },
     "health": {
-      "rand": [
-        35,
-        45
-        ]
+      "random":true,
+      "value": [35, 45]
       },
     "hit_chance": {
-      "rand": [
-        5,
-        8
-        ]
+      "random": true,
+      "value": [5, 8]
       },
     "initiative": {
-      "rand": [
-        8,
-        10
-        ]
+      "dice": true,
+      "random": true,
+      "value": [8, 10]
       },
-    "parry_chance": 2,
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [2, 2]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -672,20 +770,30 @@
     "state": "парит",
     "weakness": 
       {
-      "12": 1.5,
-      "15": 1.5,
-      "24": 2
+      "12": 4,
+      "15": 4,
+      "24": 6
       },
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 20
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": false,
     "monster_type": "vampire",
     "min_floor": 2,
@@ -704,10 +812,29 @@
       "prep": "вурдалаке",
       "inst": "вурдалаком"
     },
-    "stren": 6,
-    "health": 25,
-    "hit_chance": 6,
-    "parry_chance": 3,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [5, 8]
+      },
+    "health": {
+      "random":true,
+      "value": [18, 27]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 7]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -719,23 +846,32 @@
     "state": "притаился",
     "weakness": 
       {
-      "12": 1.5,
-      "15": 1.5,
-      "24": 2
+      "12": 4,
+      "15": 4,
+      "24": 6
       },
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 10
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": false,
     "monster_type": "vampire",
-    "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -752,10 +888,29 @@
       "prep": "медведе",
       "inst": "медведем"
     },
-    "stren": 10,
-    "health": 27,
-    "hit_chance": 4,
-    "parry_chance": 2,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [9, 12]
+      },
+    "health": {
+      "random":true,
+      "value": [25, 30]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [3, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [2, 3]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
     "can_hide": false,
     "can_run": true,
     "actions":
@@ -769,16 +924,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 2,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -795,10 +959,29 @@
       "prep": "льве",
       "inst": "львом"
     },
-    "stren": 12,
-    "health": 27,
-    "hit_chance": 5,
-    "parry_chance": 3,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [9, 13]
+      },
+    "health": {
+      "random":true,
+      "value": [25, 30]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [2, 4]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [2, 3]
+      },
     "can_hide": false,
     "can_run": true,
     "actions":
@@ -812,16 +995,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 3,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -838,10 +1030,29 @@
       "prep": "гноме",
       "inst": "гномом"
     },
-    "stren": 11,
-    "health": 22,
-    "hit_chance": 5,
-    "parry_chance": 4,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [8, 11]
+      },
+    "health": {
+      "random":true,
+      "value": [16, 25]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 6]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -855,16 +1066,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "рубящее",
-    "venomous": 0,
+    "preferred_weapon": "рубящее",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "basic",
-    "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -881,10 +1101,29 @@
       "prep": "берсерке",
       "inst": "берсерком"
     },
-    "stren": 10,
-    "health": 25,
-   "hit_chance": 7,
-    "parry_chance": 0,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [9, 12]
+      },
+    "health": {
+      "random":true,
+      "value": [23, 27]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [6, 7]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [9, 11]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -898,16 +1137,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": true,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "basic",
-    "initiative": 10,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -924,10 +1172,29 @@
       "prep": "крестоносце",
       "inst": "крестоносцем"
     },
-    "stren": 10,
-    "health": 28,
-    "hit_chance": 5,
-    "parry_chance": 0,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [8, 10]
+      },
+    "health": {
+      "random":true,
+      "value": [25, 28]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [5, 8]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -941,16 +1208,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
-    "initiative": 7,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -967,10 +1243,29 @@
       "prep": "лешем",
       "inst": "лешим"
     },
-    "stren": 15,
-    "health": 22,
-    "hit_chance": 4,
-    "parry_chance": 1,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [13, 16]
+      },
+    "health": {
+      "random":true,
+      "value": [16, 22]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [3, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [2, 4]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 1]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -984,16 +1279,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 10
+      },
     "gender": 0,
-    "size": 4,
+    "size": {
+      "dice": true,
+      "value": 4
+      },
     "corpse": true,
     "monster_type": "basic",
-    "initiative": 3,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1010,10 +1314,29 @@
       "prep": "древне",
       "inst": "древнем"
     },
-    "stren": 17,
-    "health": 28,
-    "hit_chance": 3,
-    "parry_chance": 0,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [15, 19]
+      },
+    "health": {
+      "random":true,
+      "value": [25, 28]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [2, 4]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [0, 0]
+      },
     "can_hide": false,
     "can_run": false,
     "actions":
@@ -1027,16 +1350,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": true,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 100
+      },
     "gender": 0,
-    "size": 5,
+    "size": {
+      "dice": true,
+      "value": 5
+      },
     "corpse": true,
     "monster_type": "plant",
-    "initiative": 0,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1053,10 +1385,29 @@
       "prep": "солдате",
       "inst": "солдатом"
     },
-    "stren": 8,
-    "health": 26,
-    "hit_chance": 7,
-    "parry_chance": 4,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
+      },
+    "health": {
+      "random":true,
+      "value": [24, 27]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [5, 7]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -1070,16 +1421,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "prefered_weapon": "колющее",
-    "venomous": 0,
+    "preferred_weapon": "колющее",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
-    "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1096,10 +1456,29 @@
       "prep": "крестьянине",
       "inst": "крестьянином"
     },
-    "stren": 6,
-    "health": 30,
-    "hit_chance": 4,
-    "parry_chance": 1,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [5, 6]
+      },
+    "health": {
+      "random":true,
+      "value": [22, 33]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [3, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [2, 2]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -1113,16 +1492,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "human",
-    "initiative": 2,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1139,10 +1527,29 @@
       "prep": "волке",
       "inst": "волком"
     },
-    "stren": 9,
-    "health": 20,
-    "hit_chance": 6,
-    "parry_chance": 2,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [7, 10]
+      },
+    "health": {
+      "random":true,
+      "value": [16, 20]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [5, 6]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
     "can_hide": true,
     "can_run": true,
     "actions": [
@@ -1154,16 +1561,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 0,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 5,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1180,10 +1596,29 @@
       "prep": "лисе",
       "inst": "лисой"
     },
-    "stren": 6,
-    "health": 18,
-    "hit_chance": 5,
-    "parry_chance": 2,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "health": {
+      "random":true,
+      "value": [16, 20]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [2, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions": [
@@ -1194,16 +1629,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 0,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
     "gender": 1,
-    "size": 2,
+    "size": {
+      "dice": true,
+      "value": 2
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 3,
     "min_floor": 1,
     "max_floor": 5,
     "specific_floors": [],
@@ -1220,10 +1664,29 @@
       "prep": "крысе",
       "inst": "крысой"
     },
-    "stren": 3,
-    "health": 10,
-    "hit_chance": 4,
-    "parry_chance": 1,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [2, 3]
+      },
+    "health": {
+      "random":true,
+      "value": [9, 11]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [4, 6]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 4]
+      },
     "can_hide": true,
     "can_run": true,
     "actions": [
@@ -1235,16 +1698,25 @@
     "stink": true,
     "can_resurrect": false,
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 1,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 1
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 1
+      },
     "gender": 1,
-    "size": 1,
+    "size": {
+      "dice": true,
+      "value": 1
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 6,
     "min_floor": 1,
     "max_floor": 3,
     "specific_floors": [],
@@ -1261,10 +1733,29 @@
       "prep": "пауке",
       "inst": "пауком"
     },
-    "stren": 8,
-    "health": 25,
-    "hit_chance": 5,
-    "parry_chance": 2,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [7, 9]
+      },
+    "health": {
+      "random":true,
+      "value": [20, 25]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [4, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [3, 5]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
     "can_hide": true,
     "can_run": false,
     "actions": [
@@ -1276,16 +1767,25 @@
     "stink": false,
     "can_resurrect": false,
     "frightening": true,
-    "agressive": true,
+    "aggressive": true,
     "carry_weapon": false,
     "carry_shield": false,
-    "prefered_weapon": "",
-    "venomous": 3,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 3
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 6
+      },
     "gender": 0,
-    "size": 3,
+    "size": {
+      "dice": true,
+      "value": 3
+      },
     "corpse": true,
     "monster_type": "animal",
-    "initiative": 4,
     "min_floor": 2,
     "max_floor": 6,
     "specific_floors": [],

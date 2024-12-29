@@ -7,14 +7,17 @@ from src.class_room import Furniture, Room, Ladder
 from src.class_weapon import Weapon
 from src.class_backpack import Backpack
 from src.class_fight import Fight
+from src.class_dice import Dice
 from src.functions.functions import howmany, normal_count, randomitem, tprint, roll, split_actions
 from src.enums import state_enum, move_enum
+
+from random import randint
 
 
 class Hero:
     """Класс героя игры"""
     
-    _nightmare_probability = 3
+    _nightmare_probability = Dice([3])
     """
     Вероятность того, что герой увидит кошмар во время отдыха. 
     Рассчитывается как 1/n, где n - это значение параметра.
@@ -24,7 +27,7 @@ class Hero:
     _nightmare_divider = 2
     """Коэффициент, на который делится страх если приснился кошмар."""
 
-    _steal_probability = 2 
+    _steal_probability = Dice([2]) 
     """
     Вероятность того, что героя обворуют во время отдыха. 
     Рассчитывается как 1/n, где n - это значение параметра.
@@ -44,16 +47,16 @@ class Hero:
     """Кубик, который кидается, чтобы выяснить, во сколько раз уменьшится урон от атаки в темноте."""
     
     _doors_dict = {'наверх': 0,
-                        'направо': 1,
-                        'вправо': 1,
-                        'право': 1,
-                        'налево': 3,
-                        'влево': 3,
-                        'лево': 3,
-                        'вниз': 2,
-                        'низ': 2,
-                        'вверх': 0,
-                        'верх': 0}
+                    'направо': 1,
+                    'вправо': 1,
+                    'право': 1,
+                    'налево': 3,
+                    'влево': 3,
+                    'лево': 3,
+                    'вниз': 2,
+                    'низ': 2,
+                    'вверх': 0,
+                    'верх': 0}
     """Словарь направлений, в которых может пойти герой."""
     
     _poison_base_protection_die = 5
@@ -83,99 +86,34 @@ class Hero:
                         'использовать')
     """Список комманд во время схватки."""
     
-    _initiative_die = 20
-    """Кубик инициативы"""
     
-    def __init__(self,
-                 game,
-                 name:str = None,
-                 gender:int = None,
-                 stren:int = 10,
-                 dext:int = 2,
-                 intel:int = 0,
-                 health:int = 20,
-                 actions:list = None,
-                 weapon=None,
-                 shield=None,
-                 backpack=None,
-                 armor=None):
-        if not actions:
-            self.actions = ['бьет']
-        else:
-            self.actions = actions
+    def __init__(self, game):
         self.game = game
-        self.name = name
-        self.gender = gender
         self.poisoned = False
-        self.stren = stren
-        self.start_stren = self.stren
-        self.dext = dext
-        self.start_dext = self.dext
-        self.intel = intel
-        self.start_intel = self.intel
-        self.health = health
-        self.trap_mastery = 0
         self.trader = None
-        if weapon is None:
-            self.weapon = self.game.no_weapon
-        else:
-            self.weapon = weapon
-        if armor is None:
-            self.armor = self.game.no_armor
-        else:
-            self.armor = armor
-        if shield is None:
-            self.shield = self.game.no_shield
-        else:
-            self.shield = shield
+        self.weapon = self.game.no_weapon
+        self.armor = self.game.no_armor
+        self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
-        if backpack is None:
-            self.backpack = Backpack(self.game)
-        else:
-            self.backpack = backpack
+        self.backpack = Backpack(self.game)
         self.money = Money(self.game, 0)
         self.current_position = None
         self.current_fight = None
         self.state = state_enum.NO_STATE
         self.game_is_over = False
-        self.start_health = self.health
-        self.weakness = {}
-        self.monster_knowledge = {}
         self.can_use_in_fight = []
         self.rune_list = []
         self.restless = 0
         self.wins = 0
-        self.rage = 0
         self.hide = False
         self.run = False
-        self.level = 1
         self.exp = 0
         self.fear = 0
         self.drunk = 0
         self.floor = self.game.castle_floors[0]
         self.save_room = self.floor.plan[0]
-        self.levels = [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000]
-        self.elements = {'огонь': 0, 'вода': 0, 'земля': 0, 'воздух': 0, 'магия': 0}
-        self.element_levels = {'1': 2, '2': 4, '3': 7, '4': 10}
         self.wounds = {}
         self.last_move = move_enum.DOWN
-        self.weapon_mastery = {'рубящее': {
-                                        'counter': 0,
-                                        'level': 0
-                                        }, 
-                               "колющее": {
-                                        'counter': 0,
-                                        'level': 0
-                                        }, 
-                               "ударное": {
-                                        'counter': 0,
-                                        'level': 0
-                                        }, 
-                               "": {
-                                        'counter': 0,
-                                        'level': 0
-                                        }
-                               }
         self.command_dict = {'осмотреть': self.look,
                             'подняться': self.go_up,
                             'подниматься': self.go_up,
@@ -212,6 +150,11 @@ class Hero:
     
     
     def on_create(self):
+        self.start_stren = self.stren.copy()
+        self.start_dext = self.dext.copy()
+        self.start_intel = self.intel.copy()
+        self.start_rage = self.rage.copy()
+        self.start_health = self.health
         return None
     
     
@@ -232,7 +175,7 @@ class Hero:
     
     
     def generate_initiative(self) -> int:
-        return roll([Hero._initiative_die]) + self.dext
+        return self.initiative.roll() + self.dext.roll()
         
     
     def test(self, commands:list=None):
@@ -240,9 +183,48 @@ class Hero:
         tprint(self.game, 'Тестирование началось')
         
     
+    def check_stren(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        if self.check_light():
+            multiplier += self.rage.roll()
+        subtract.append(self.wounds.get('stren', 0))
+        subtract.append(self.stren.base_die() // 2)
+        result = self.stren.roll(
+                subtract = subtract,
+                multiplier = multiplier,
+                add = add
+            )
+        if against:
+            return result > against
+        return result
+    
+    
+    def check_dext(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        subtract.append(self.wounds.get('dext', 0))
+        result = self.dext.roll(
+                subtract = subtract,
+                multiplier = multiplier,
+                add = add
+            )
+        if against:
+            return result > against
+        return result
+    
+    
+    def check_intel(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        subtract.append(self.wounds.get('intel', 0))
+        subtract.append(self.rage.base_die() - 1)
+        result = self.intel.roll(
+                subtract = subtract,
+                multiplier = multiplier,
+                add = add
+            )
+        if against:
+            return result > against
+        return result
+    
+    
     def check_if_sneak_past_monster(self, monster: Monster) -> bool:
-        die = [8 + roll([self.dext]) - monster.size]
-        return roll(die) > 5
+        return self.check_dext(against=monster.size.roll())
     
     
     def place(self, room):
@@ -252,7 +234,7 @@ class Hero:
     
     
     def check_if_sneak_past_furniture(self) -> bool:
-        return roll([3 + self.dext]) > 2
+        return self.check_dext(against=3, add=[2])
     
     
     def examine(self, what:str) -> bool:
@@ -274,7 +256,7 @@ class Hero:
     
     
     def increase_monster_knowledge(self, monster_type) -> bool:
-        knowledge = self.monster_knowledge.get(monster_type, '0')
+        knowledge = self.monster_knowledge.get(monster_type, 0)
         self.monster_knowledge[monster_type] = knowledge + 1
         tprint(self.game, f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}')
         return True       
@@ -611,7 +593,7 @@ class Hero:
         
         :return: Целое число, представляющее шанс на успешное обезвреживание ловушки.
         """
-        return roll([self.dext, self.trap_mastery])
+        return self.check_dext(add=[self.trap_mastery])
                 
         
     def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
@@ -660,10 +642,12 @@ class Hero:
         wound = self.wounds.get('dex', 0)
         self.wounds['dex'] = wound + 1
         return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
+        
             
-#TODO       
     def get_weakness(self, weapon:Weapon) -> float:
-        return 1
+        element = str(weapon.element())
+        weakness = self.weakness.get(element, None)
+        return weakness if weakness else 0
     
     
     def get_shield(self) -> Shield|None:
@@ -708,12 +692,12 @@ class Hero:
 
     
     def get_poison_protection(self) -> int:
-        base_protection_die = roll([Hero._poison_base_protection_die])
-        additional_protection_die = 0
+        protection = self.poison_protection.roll()
         if self.armor.is_poisoned() or self.shield.is_poisoned():
-            additional_protection_die = roll([Hero._poison_additional_protection_die])
-        return base_protection_die + additional_protection_die
+            protection += 2
+        return protection
     
+        
     def poison_enemy(self, target:Monster) -> str|None:
         """
         Метод проводит проверку, отравил герой противника при атаке, или нет.
@@ -723,14 +707,12 @@ class Hero:
 
         """
         
-        if target.poisoned or target.venomous:
+        if target.poisoned or target.poison_level.base_die() > 0:
             return None
-        if self.weapon.is_poisoned():
-            poison_die = roll([Weapon._poison_level])
-        else:
-            poison_die = 0
+        self_poison_level = self.poison_level.roll()
+        weapon_poison_level = self.weapon.get_poison_level()
         protection = target.get_poison_protection()
-        if poison_die > protection:
+        if self_poison_level + weapon_poison_level > protection:
             target.poisoned = True
             return f'{target.name} получает отравление, {target:pronoun} теперь неважно себя чувствует.'
         return None
@@ -739,26 +721,21 @@ class Hero:
     def get_hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
-        dext_wound = self.wounds.get('dext', 0)
-        wound_modifier = roll([dext_wound])
         weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
         weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
-        return self.dext + weapon_mastery_level - wound_modifier
+        weapon_hit_chance = self.weapon.get_hit_chance()
+        return self.check_dext(add=[weapon_mastery_level]) + weapon_hit_chance
     
     
     def parry_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса парирования атаки."""
         
-        dext_wound = self.wounds.get('dext', 0)
-        wound_modifier = roll([dext_wound])
         weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
         weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
-        chance = self.dext + weapon_mastery_level - wound_modifier
+        parry_chance = self.check_dext(add=[weapon_mastery_level])
         if self.poisoned:
-            chance -= self.dext // 2
-        if chance < 0:
-            chance = 0
-        return chance
+            parry_chance -= self.dext.base_die() // 2
+        return max(parry_chance, 0)
     
     
     def change(self, what:str=None):
@@ -964,7 +941,7 @@ class Hero:
         """Метод моделирует сон героя во время отдыха."""
         
         message = []
-        dream_count = roll([Hero._nightmare_probability])
+        dream_count = Hero._nightmare_probability.roll()
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
                            Так толком и не отдохнув {self.g("герой", "героиня")} просыпается с тревогой в душе.')
@@ -985,7 +962,7 @@ class Hero:
         
         """
         
-        steal_count = roll([Hero._steal_probability])
+        steal_count = Hero._steal_probability.roll()
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
@@ -1128,7 +1105,7 @@ class Hero:
 
     
     def generate_in_fight_description(self, index:int) -> str:
-        line = f'{index}: {self.name}: сила - d{str(self.stren)}'
+        line = f'{index}: {self.name}: сила - {self.stren.text()}'
         line += self.generate_weapon_text()
         line += self.generate_protection_text()
         line += f', жизней - {str(self.health)}. '
@@ -1137,17 +1114,17 @@ class Hero:
     
     def generate_weapon_text(self) -> str:
         if not self.weapon.empty:
-            return f'+d{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}'
+            return f'{self.weapon.damage.text()}'
         return ''
     
     
     def generate_protection_text(self) -> str:
         if not self.shield.empty and self.armor.empty:
-            return f', защита - d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
+            return f', защита - {self.shield.protection.text()}'
         elif self.shield.empty and not self.armor.empty:
-            return f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())}'
+            return f', защита - {self.armor.protection.text()}'
         elif not self.shield.empty and not self.armor.empty:
-            return f', защита - d{str(self.armor.protection)}+{str(self.armor.perm_protection())} + d{str(self.shield.protection)}+{str(self.shield.perm_protection())}'
+            return f', защита - {self.armor.protection.text()} + {self.shield.protection.text()}'
         return ''
      
         
@@ -1179,7 +1156,7 @@ class Hero:
         """
         
         room = self.current_position
-        a = roll([2])
+        a = randint(1, 2)
         if a == 1 and not self.weapon.empty:
             if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
@@ -1234,7 +1211,7 @@ class Hero:
         
         room = self.current_position
         available_directions = room.get_available_directions()
-        self.rage = 0
+        self.rage.reset()
         self.hide = False
         message = [
             self.generate_run_away_text(target=target),
@@ -1244,7 +1221,7 @@ class Hero:
         if self.check_light():
             direction = randomitem(available_directions)
         else:
-            direction = roll([4]) - 1
+            direction = randint(0, 3)
             if direction not in available_directions:
                 message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
                 tprint(self.game, message)
@@ -1270,43 +1247,16 @@ class Hero:
         else:
             return 'Неизвестная тварь из темноты', 'черт знает кого'
             
-    
-    def generate_rage(self) -> int:
-        """Метод генерирует значение ярости героя."""
-        
-        if self.check_light() and self.rage > 0:
-            return roll([self.rage])
-        return 1
-    
-    
-    def generate_poison_effect(self) -> int:
-        """Метод генерирует значение силы отравления, которое испытывает герой."""
-        
-        if self.poisoned:
-            return roll([self.stren // 2])
-        return 0
-    
-    
-    def get_real_strength(self) -> int:
-        strength_wound = self.wounds.get('stren', 0)
-        wound_modifier = roll([strength_wound])
-        poison_effect = self.generate_poison_effect()
-        return self.stren - wound_modifier - poison_effect
-        
-    
+
     def generate_mele_attack(self) -> int:
         """Метод генерирует значение атаки голыми руками."""
         
-        rage = self.generate_rage()
-        strength = self.get_real_strength()
-        strength_die = roll([strength])
-        if self.check_light():
-            return strength_die * rage
-        return strength_die // roll([Hero._dark_damage_divider_die])
+        return self.check_stren()
                 
     
     def generate_weapon_attack(self, target:Monster) -> int:
         """Метод генерирует значение дополнительной атаки оружием."""
+        
         if self.weapon.empty:
             return 0
         if isinstance(target, Vampire) and self.weapon.element() == 4:
@@ -1314,7 +1264,7 @@ class Hero:
         weapon_attack = self.weapon.attack(target)
         weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
         critical_probability = weapon_mastery * Hero._critical_step
-        if roll([100]) <= critical_probability and not self.poisoned:
+        if randint(1, 100) <= critical_probability and not self.poisoned:
             weapon_attack = weapon_attack * Hero._critical_multiplier
         return weapon_attack
     
@@ -1353,7 +1303,7 @@ class Hero:
             return None
         weapon_type = self.weapon.type
         mastery = self.weapon_mastery.get(weapon_type)
-        mastery['counter'] += roll([10])/100
+        mastery['counter'] += randint(1, 10)/100
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
             mastery['level'] += 1
@@ -1389,7 +1339,7 @@ class Hero:
                 self.increase_weapon_mastery()
             ] 
         target.health -= total_damage
-        self.rage = 0
+        self.rage.reset()
         tprint(game, message)
         
     
@@ -1448,7 +1398,7 @@ class Hero:
             tprint(game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
         else:
             self.hide = True
-            self.rage += 1
+            self.rage.increase_base_die()
             tprint(game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
 
     
@@ -1460,7 +1410,7 @@ class Hero:
         message = []
         money_text = self.show_me_money()
         message.append(f'{self.name} - это {self.g("смелый герой", "смелая героиня")} {str(self.level)} уровня. ' 
-                       f'{self.g("Его", "Ее")} сила - {str(self.stren)}, ловкость - {str(self.dext)}, интеллект - {str(self.intel)} и сейчас'
+                       f'{self.g("Его", "Ее")} сила - {self.stren.text()}, ловкость - {self.dext.text()}, интеллект - {self.intel.text()} и сейчас'
                        f' у {self.g("него", "нее")} {howmany(self.health, ["единица", "единицы", "единиц"])} здоровья, что составляет '
                        f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
         message.append(self.show_weapon())
@@ -1500,7 +1450,7 @@ class Hero:
         
         if not self.weapon.empty:
             weapon_text = f'{self.weapon.get_full_names("nom")} в руке {self.g("героя", "героини")} добавляет к {self.g("его", "ее")} силе ' \
-                          f'{str(self.weapon.damage)}+{str(self.weapon.perm_damage())}.'
+                          f'{self.weapon.damage.text()}.'
         else:
             weapon_text = f'{self.name} предпочитает сражаться голыми руками.'
         return weapon_text
@@ -1533,10 +1483,9 @@ class Hero:
         """Метод проверки, удалось ли персонажу увернуться от удара врага."""
         
         weapon = attacker.weapon
-        chance = self.parry_chance()
-        parry_die = roll([chance])
-        hit_die = roll([attacker.get_hit_chance() + weapon.get_hit_chance()])
-        if parry_die > hit_die:
+        parry_chance = self.parry_chance()
+        hit_chance = attacker.hit_chance.roll() + weapon.hit_chance.roll()
+        if parry_chance > hit_chance:
             return True
         return False
     
@@ -1563,6 +1512,14 @@ class Hero:
         return result
 
     
+    def reset_dice(self):
+        self.stren = self.start_stren.copy()
+        self.dext = self.start_dext.copy()
+        self.intel = self.start_intel.copy()
+        self.rage = self.start_rage.copy()
+        self.health = self.start_health
+    
+    
     def lose(self, fight:Fight) -> list[str]:
         """
         Метод сбрасывает состояние героя при его проигрыше в бою
@@ -1571,10 +1528,7 @@ class Hero:
         - winner - атакующий монстр (пока не используется).
         
         """
-        self.health = self.start_health
-        self.stren = self.start_stren
-        self.dext = self.start_dext
-        self.intel = self.start_intel
+        self.reset_dice()
         self.current_position = self.save_room
         self.restless = 0
         self.last_move = move_enum.START
@@ -1584,10 +1538,7 @@ class Hero:
     def win(self, loser):
         """Метод обрабатыват событие победы в схватке."""
         
-        self.health = self.start_health
-        self.stren = self.start_stren
-        self.dext = self.start_dext
-        self.intel = self.start_intel
+        self.reset_dice()
         self.wins += 1
         tprint(self.game, f'{self.name} получает {howmany(loser.exp, ["единицу", "единицы", "единиц"])} опыта!')
         self.restless = 0
@@ -1632,20 +1583,20 @@ class Hero:
     
     
     def increase_strength(self, amount:int=1) -> bool:
-        self.stren += amount
-        self.start_stren += amount
+        self.stren.increase_base_die(amount)
+        self.start_stren.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою силу на {amount}.', 'direction')
     
     
     def increase_dexterity(self, amount:int=1) -> bool:
-        self.dext += amount
-        self.start_dext += amount
+        self.dext.increase_base_die(amount)
+        self.start_dext.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою ловкость на {amount}.', 'direction')
     
     
     def increase_intelligence(self, amount:int=1) -> bool:
-        self.intel += amount
-        self.start_intel += amount
+        self.intel.increase_base_die(amount)
+        self.start_intel.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
     
     
@@ -1710,10 +1661,10 @@ class Hero:
         
         room = self.current_position
         message = []
-        for i in room.furniture:
-            if i.lexemes["accus"].find(what) != -1:
-                message += (i.show())
-                message.append(self.get_trap_text(i))
+        for furniture in room.furniture:
+            if furniture.lexemes["accus"].find(what) != -1:
+                message += (furniture.show())
+                message.append(self.get_trap_text(furniture))
         return message
     
     
@@ -1734,7 +1685,7 @@ class Hero:
         if trap.seen:
             self.current_position.last_seen_trap = trap
             return True
-        detection = roll([self.intel]) - roll([self.wounds['intel']]) + self.trap_mastery
+        detection = self.check_intel() + self.trap_mastery
         if detection > trap.difficulty:
             trap.seen = True
             self.current_position.last_seen_trap = trap
@@ -1788,7 +1739,7 @@ class Hero:
         room = self.current_position
         monster = room.monsters('first')
         if monster:
-            if monster.agressive and self.check_light():
+            if monster.aggressive and self.check_light():
                 self.fight(monster.name)
     
     
@@ -1853,7 +1804,8 @@ class Hero:
     
     
     def try_not_to_fall_down(self) -> bool:
-        if not roll([3 + self.dext]) > 2:
+        check_target = self.dext.base_die() // 2
+        if not self.dext_check(against=check_target):
             tprint(self.game, f'{self.name} медленно пробирается через темноту, но в какой-то момент перестает чувствовать пол под ногами и кубарем скатывается по лестнице вниз.')
             self.descend(self.current_position)
             return False

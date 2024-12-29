@@ -1,2 +1,3 @@
-from random import randint as r
-print(r(1, 2))
+from random import randint
+for _ in range(100):
+    print(randint(0, 3))

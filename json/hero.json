@@ -1,6 +1,6 @@
 [
 {
-    "class": "герой",
+    "class_name": "Hero",
     "name": "Клава",
     "lexemes": {
         "nom": "Клава",
@@ -11,11 +11,47 @@
         "inst": "Клавoй"
     },
     "gender": 1,
-    "stren": 10,
-    "dext": 2,
-    "intel": 1,
-    "health": 20,
-    "hit_chance": 4,
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [8, 12]
+      },
+    "dext": {
+      "dice": true,
+      "random": true,
+      "value": [1, 3]
+      },
+    "intel": {
+      "dice": true,
+      "random": true,
+      "value": [1, 2]
+      },
+    "health": {
+      "random": true,
+      "value": [18, 22]
+      },
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 5]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [18, 22]
+      },
+    "poison_level": {
+      "dice": true,
+      "value": 0
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 0
+      },
+    "rage": {
+      "dice": true,
+      "value": 1
+      },
     "can_hide": true,
     "can_run": true,
     "actions":
@@ -25,11 +61,45 @@
         "терзает"
       ],
     "frightening": false,
-    "agressive": false,
+    "aggressive": false,
     "carry_weapon": true,
     "carry_shield": true,
-    "venomous": 0,
     "corpse": true,
-    "wear_armor": true
+    "level": 1,
+    "wear_armor": true,
+    "weakness": {},
+    "levels": [0, 100, 200, 350, 500, 750, 1000, 1300, 1600, 2000, 2500, 3000],
+    "trap_mastery": 0,
+    "elements": {
+      "огонь": 0, 
+      "вода": 0, 
+      "земля": 0, 
+      "воздух": 0, 
+      "магия": 0
+    },
+    "element_levels": {
+      "1": 2, 
+      "2": 4, 
+      "3": 7, 
+      "4": 10},
+    "weapon_mastery": {
+      "рубящее": {
+        "counter": 0,
+        "level": 0
+        }, 
+      "колющее": {
+        "counter": 0,
+        "level": 0
+        }, 
+      "ударное": {
+        "counter": 0,
+        "level": 0
+        }, 
+      "": {
+        "counter": 0,
+        "level": 0
+        }
+    },
+    "monster_knowledge": {}
   }
 ]

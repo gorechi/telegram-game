@@ -43,16 +43,6 @@ def roll(dice:list|tuple) -> int:
             result += randint(1, i)
     return result
 
-def readfile(filename, divide, divider='|'):
-    filelines = []
-    with open(filename, encoding='utf-8') as new_file:
-        for line in new_file:
-            if divide:
-                filelines.append(line.rstrip('\n').split(divider))
-            else:
-                filelines.append(line.rstrip('\n'))
-    return filelines
-
 
 def randomitem(items_list, how_many:int=1, need_number:bool=False):
     """Возвращает случайные элементы списка
@@ -88,19 +78,6 @@ def howmany(number:int, options_list:list[str]) -> str:
     if 1 < last_digit < 5 and (last_two_digits < 12 or last_two_digits > 14):
         return f'{number} {options_list[1]}'
     return f'{number} {options_list[2]}'
-
-
-def readitems(what_kind, how_many, classes):
-    all_items = readfile('items', True, '\\')
-    items_list = []
-    for i in all_items:
-        if i[0] == what_kind:
-            item = classes[i[0]](i[1], i[2], i[3], i[4])
-            items_list.append(item)
-    while len(items_list) < how_many[what_kind]:
-        new = classes[what_kind](0)
-        items_list.append(new)
-    return items_list
 
 
 def generate_keyboard(keys:list, keys_in_row:int):
