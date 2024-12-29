@@ -236,9 +236,9 @@ class Floor:
 
     
     def place_runes(self):
-        self.all_runes = [Rune(self.game) for _ in range(self.how_many['руна'])]
-        for rune in self.all_runes:
-            rune.place(self)
+        for _ in range(self.how_many['руна']):
+            new_rune = self.game.runes_controller.get_random_object_by_filters()
+            new_rune.place(self)
     
     
     def activate_traps(self):

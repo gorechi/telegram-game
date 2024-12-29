@@ -35,7 +35,7 @@ class BookController(Controller):
     def __init__(self, game):
         self.game = game
         self.how_many = 0
-        self.templates = self.load_templates('json/hero.json')
+        self.templates = self.load_templates('json/potions.json')
         self.all_objects = []
     
     

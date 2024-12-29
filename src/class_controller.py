@@ -76,7 +76,7 @@ class Controller:
         return new_object
 
     
-    def additional_actions(self, object) -> bool:
+    def additional_actions(self, item) -> bool:
         return True
     
 
