@@ -1,9 +1,7 @@
 from random import randint as dice
 
 from src.class_basic import Money
-from src.class_book import Book
-from src.class_potions import Potion
-from src.class_items import Key, Map, Matches, Rune
+from src.class_items import Key, Map, Matches
 from src.class_room import Door, Room, Ladder
 from src.class_allies import Trader
 from src.functions.functions import randomitem

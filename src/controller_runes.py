@@ -30,7 +30,7 @@ class RunesController(Controller):
             "inst": "руной"
             }
     
-    _poison_probability = Dice(3)
+    _poison_probability = Dice([3])
     """
     Вероятность того, что руна будет отравленной. 
 
@@ -52,13 +52,13 @@ class RunesController(Controller):
                         24: 'потопа'}
     """Словарь стихий."""
 
-    _base_price_dice = Dice(15)
+    _base_price_dice = Dice([15])
     
-    _poison_price_modifier = Dice(5)
+    _poison_price_modifier = Dice([5])
     
-    _damage_dice = Dice(4)
+    _damage_dice = Dice([4])
     
-    _defence_dice = Dice(3)
+    _defence_dice = Dice([3])
     
     def __init__(self, game):
         self.game = game
@@ -81,7 +81,7 @@ class RunesController(Controller):
     def generate_lexemes(self, rune:Rune):
         lexemes = {}
         for key in RunesController._lexemes:
-            lexemes[key] = f'{RunesController._lexemes[key]} {RunesController._elements_dictionary[self.element]}'
+            lexemes[key] = f'{RunesController._lexemes[key]} {RunesController._elements_dictionary[rune.element]}'
         rune.lexemes = lexemes
         
     
@@ -104,7 +104,7 @@ class RunesController(Controller):
     def generate_poison(self, rune:Rune) -> bool:    
         if RunesController._poison_probability.roll() == 1:
             rune.poison = True
-            rune.description = f'ядовитая {self.description}'
+            rune.description = f'ядовитая {rune.description}'
             rune.base_price += RunesController._poison_price_modifier.roll()
             return True
         else:

@@ -1,9 +1,11 @@
-from src.class_items import Key, Rune, Map
+from src.class_items import Key, Map
+from src.class_rune import Rune
 from src.class_basic import Money
 from src.class_book import Book
 from src.class_monsters import Monster, Vampire
 from src.class_protection import Armor, Shield
-from src.class_room import Furniture, Room, Ladder
+from src.class_furniture import Furniture
+from src.class_room import Room, Ladder
 from src.class_weapon import Weapon
 from src.class_backpack import Backpack
 from src.class_fight import Fight

@@ -611,8 +611,8 @@ class Room:
         """
         types = []
         for furniture in self.furniture:
-            if furniture.type not in types:
-                types.append(furniture.type)
+            if furniture.furniture_type not in types:
+                types.append(furniture.furniture_type)
         return types
 
     
@@ -732,7 +732,7 @@ class Room:
                 who.fight(monster.name, True)
                 
     
-    def get_random_unlocked_furniture(self) -> Furniture:
+    def get_random_unlocked_furniture(self):
         if self.furniture:
             furniture_list = [f for f in self.furniture if not f.locked]
             if furniture_list:

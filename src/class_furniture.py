@@ -1,5 +1,5 @@
-from src.class_basic import Loot, Key
-from src.class_room import Trap, Room
+from src.class_items import Key
+from src.class_room import Room
 from src.class_dice import Dice
 from src.functions.functions import randomitem
 
@@ -13,7 +13,7 @@ class Furniture:
         "очаг": ['очаг']
     }
     
-    _lock_dice = Dice(4)
+    _lock_dice = Dice([4])
     """Вероятность того, что мебель будет заперта (если 4, то 1/4)."""
    
     def __init__(self, game):
@@ -82,7 +82,7 @@ class Furniture:
     
     def place(self, floor=None, room_to_place=None):
         if room_to_place:
-            if self.type not in room_to_place.furniture_types():
+            if self.furniture_type not in room_to_place.furniture_types():
                 room_to_place.furniture.append(self)
                 self.room = room_to_place
             else:
@@ -91,7 +91,7 @@ class Furniture:
             can_place = False
             while not can_place:
                 room = randomitem(floor.plan)
-                if self.type not in room.furniture_types():
+                if self.furniture_type not in room.furniture_types():
                     can_place = True
             room.furniture.append(self)
             self.room = room

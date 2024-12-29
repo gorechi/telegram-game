@@ -30,9 +30,9 @@ class FurnitureController(Controller):
         "Furniture": Furniture
     }
     
-    _money_probability_dice = Dice(2)
+    _money_probability_dice = Dice([2])
     
-    _money_dice = Dice(50)
+    _money_dice = Dice([50])
     
     
     def __init__(self, game):

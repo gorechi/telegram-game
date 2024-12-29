@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 from src.class_potions import Potion, HealPotion, HealthPotion, StrengtheningPotion, StrengthPotion, IntelligencePotion, EnlightmentPotion, DexterityPotion, EvasionPotion, Antidote
 from src.class_controller import Controller
-from src.functions.functions import randomitem
 
-class BookController(Controller):
+class PotionsController(Controller):
     """Класс для управления героями."""
 
     @dataclass

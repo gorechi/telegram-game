@@ -15,6 +15,10 @@ class Book:
         return self.name
     
     
+    def on_create(self):
+        return True
+    
+    
     def check_name(self, message:str) -> bool:
         names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list

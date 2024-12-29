@@ -1,8 +1,8 @@
 from math import ceil
-from random import choice, randint
+from random import choice
 
-from src.class_basic import Loot, Money
-from src.class_items import Rune
+from src.class_basic import Loot
+from src.class_rune import Rune
 from src.class_protection import Armor, Shield
 from src.class_weapon import Weapon
 from src.class_fight import Fight

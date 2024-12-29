@@ -27,6 +27,7 @@ class Weapon:
     def __init__(self, game):
         self.game = game
         self.runes = []
+        self.empty = False
 
     
     def __format__(self, format:str) -> str:

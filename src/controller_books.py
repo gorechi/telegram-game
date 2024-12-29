@@ -117,8 +117,8 @@ class BooksController(Controller):
     
     
     def decorate(self, book):
-        description_dict = randomitem(BookController._descriptions)
-        name_dict = BookController._names
+        description_dict = randomitem(BooksController._descriptions)
+        name_dict = BooksController._names
         book.lexemes = {}
         for lexeme in name_dict:
             book.lexemes[lexeme] = f'{description_dict[lexeme]} {name_dict[lexeme]} {book.decoration}'

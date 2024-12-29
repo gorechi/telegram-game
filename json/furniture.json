@@ -1,6 +1,6 @@
 [
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -33,7 +33,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -64,7 +64,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -95,7 +95,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -126,7 +126,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -155,7 +155,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -184,7 +184,7 @@
       ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -215,7 +215,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 1,
     "name": "полка",
     "lexemes": {
@@ -245,7 +245,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -277,7 +277,7 @@
     ]
   },
   {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -307,7 +307,7 @@
     ]  
     },
     {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -336,7 +336,7 @@
         ]        
     },
     {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -362,7 +362,7 @@
     ]
     },
     {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -391,7 +391,7 @@
     ]
     },
     {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 2,
     "name": "шкаф",
     "lexemes": {
@@ -418,7 +418,7 @@
     ]
     },
     {
-    "class": "Furniture",
+    "class_name": "Furniture",
     "furniture_type": 3,
     "name": "сундук",
     "lexemes": {
@@ -449,207 +449,239 @@
     ]
   },
   {
-      "class": "Furniture",
-      "furniture_type": 3,
-      "name": "сундук",
-      "lexemes": {
-        "nom": "кованый сундук",
-        "accus": "кованый сундук",
-        "gen": "кованого сундука",
-        "dat": "кованому сундуку",
-        "prep": "кованом сундуке",
-        "inst": "кованым сундуком"
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "сундук",
+    "lexemes": {
+      "nom": "кованый сундук",
+      "accus": "кованый сундук",
+      "gen": "кованого сундука",
+      "dat": "кованому сундуку",
+      "prep": "кованом сундуке",
+      "inst": "кованым сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": true,
+    "can_contain_weapon": true,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит",
+      "пылится"
+    ],
+    "wheres": [
+      "Под окном",
+      "В углу",
+      "Ближе к выходу",
+      "В центре"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "сундук",
+    "lexemes": {
+      "nom": "большой сундук",
+      "accus": "большой сундук",
+      "gen": "большого сундука",
+      "dat": "большому сундуку",
+      "prep": "большом сундуке",
+      "inst": "большим сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": true,
+    "can_contain_weapon": true,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит"
+    ],
+    "wheres": [
+      "В углу",
+      "У стены",
+      "В центре комнаты"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "деревянный сундук",
+    "lexemes": {
+      "nom": "деревянный сундук",
+      "accus": "деревянный сундук",
+      "gen": "деревянного сундука",
+      "dat": "деревянному сундуку",
+      "prep": "деревянном сундуке",
+      "inst": "деревянным сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": true,
+    "can_contain_weapon": true,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит",
+      "пылится"
+    ],
+    "wheres": [
+      "Под окном",
+      "В углу",
+      "Ближе к выходу",
+      "В центре"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "сундук",
+    "lexemes": {
+      "nom": "маленький сундук",
+      "accus": "маленький сундук",
+      "gen": "маленького сундука",
+      "dat": "маленькому сундуку",
+      "prep": "маленьком сундуке",
+      "inst": "маленьким сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": false,
+    "can_contain_weapon": false,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит",
+      "пылится"
+    ],
+    "wheres": [
+      "Под окном",
+      "В углу",
+      "Ближе к выходу",
+      "В центре"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "сундук",
+    "lexemes": {
+      "nom": "антикварный сундук",
+      "accus": "антикварный сундук",
+      "gen": "антикварного сундука",
+      "dat": "антикварному сундуку",
+      "prep": "антикварном сундуке",
+      "inst": "антикварным сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": false,
+    "can_contain_weapon": true,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит",
+      "пылится"
+    ],
+    "wheres": [
+      "Под окном",
+      "В углу",
+      "Ближе к выходу",
+      "В центре"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 3,
+    "name": "сундук",
+    "lexemes": {
+      "nom": "странный сундук",
+      "accus": "странный сундук",
+      "gen": "странного сундука",
+      "dat": "странному сундуку",
+      "prep": "странном сундуке",
+      "inst": "странным сундуком"
+    },
+    "empty_text": "пуст",
+    "lockable": true,
+    "can_hide": true,
+    "can_contain_weapon": true,
+    "can_contain_trap": true,
+    "can_rest": false,
+    "states": [
+      "стоит",
+      "покрыт пылью",
+      "издает гул",
+      "мерцает"
+    ],
+    "wheres": [
+      "Под окном",
+      "В углу",
+      "В центре комнаты",
+      "За занавеской"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 4,
+    "name": "очаг",
+    "lexemes": {
+      "nom": "очаг",
+      "accus": "очаг",
+      "gen": "очага",
+      "dat": "очагу",
+      "prep": "очаге",
+      "inst": "очагом"
       },
-      "empty_text": "пуст",
-      "lockable": true,
-      "can_hide": true,
-      "can_contain_weapon": true,
-      "can_contain_trap": true,
-      "can_rest": false,
-      "states": [
-        "стоит",
-        "пылится"
-      ],
-      "wheres": [
-        "Под окном",
+    "empty_text": "пуст",
+    "lockable": false,
+    "can_hide": false,
+    "can_contain_weapon": false,
+    "can_contain_trap": false,
+    "can_rest": true,
+    "states":
+    [
+        "расположен",
+        "тлеет",
+        "светится"
+    ],
+    "wheres":
+    [
+        "У стены",
         "В углу",
-        "Ближе к выходу",
-        "В центре"
-      ]
-    },
-    {
-        "class": "Furniture",
-        "furniture_type": 3,
-        "name": "сундук",
-        "lexemes": {
-          "nom": "большой сундук",
-          "accus": "большой сундук",
-          "gen": "большого сундука",
-          "dat": "большому сундуку",
-          "prep": "большом сундуке",
-          "inst": "большим сундуком"
-        },
-        "empty_text": "пуст",
-        "lockable": true,
-        "can_hide": true,
-        "can_contain_weapon": true,
-        "can_contain_trap": true,
-        "can_rest": false,
-        "states": [
-          "стоит"
-        ],
-        "wheres": [
-          "В углу",
-          "У стены",
-          "В центре комнаты"
-        ]
-    },
-    {
-        "class": "Furniture",
-        "furniture_type": 3,
-        "name": "деревянный сундук",
-        "lexemes": {
-          "nom": "деревянный сундук",
-          "accus": "деревянный сундук",
-          "gen": "деревянного сундука",
-          "dat": "деревянному сундуку",
-          "prep": "деревянном сундуке",
-          "inst": "деревянным сундуком"
-        },
-        "empty_text": "пуст",
-        "lockable": true,
-        "can_hide": true,
-        "can_contain_weapon": true,
-        "can_contain_trap": true,
-        "can_rest": false,
-        "states": [
-          "стоит",
-          "пылится"
-        ],
-        "wheres": [
-          "Под окном",
-          "В углу",
-          "Ближе к выходу",
-          "В центре"
-        ]
-    },
-    {
-        "class": "Furniture",
-        "furniture_type": 3,
-        "name": "сундук",
-        "lexemes": {
-          "nom": "маленький сундук",
-          "accus": "маленький сундук",
-          "gen": "маленького сундука",
-          "dat": "маленькому сундуку",
-          "prep": "маленьком сундуке",
-          "inst": "маленьким сундуком"
-        },
-        "empty_text": "пуст",
-        "lockable": true,
-        "can_hide": false,
-        "can_contain_weapon": false,
-        "can_contain_trap": true,
-        "can_rest": false,
-        "states": [
-          "стоит",
-          "пылится"
-        ],
-        "wheres": [
-          "Под окном",
-          "В углу",
-          "Ближе к выходу",
-          "В центре"
-        ]
+        "В центре комнаты"
+    ]
+  },
+  {
+    "class_name": "Furniture",
+    "furniture_type": 4,
+    "name": "удобное кресло",
+    "lexemes": {
+      "nom": "удобное кресло",
+      "accus": "удобное кресло",
+      "gen": "удобного кресла",
+      "dat": "удобному креслу",
+      "prep": "удобном кресле",
+      "inst": "удобным креслом"
       },
-      {
-        "class": "Furniture",
-        "furniture_type": 3,
-        "name": "сундук",
-        "lexemes": {
-          "nom": "антикварный сундук",
-          "accus": "антикварный сундук",
-          "gen": "антикварного сундука",
-          "dat": "антикварному сундуку",
-          "prep": "антикварном сундуке",
-          "inst": "антикварным сундуком"
-        },
-        "empty_text": "пуст",
-        "lockable": true,
-        "can_hide": false,
-        "can_contain_weapon": true,
-        "can_contain_trap": true,
-        "can_rest": false,
-        "states": [
-          "стоит",
-          "пылится"
-        ],
-        "wheres": [
-          "Под окном",
-          "В углу",
-          "Ближе к выходу",
-          "В центре"
-        ]
-      },
-      {
-        "class": "Furniture",
-        "furniture_type": 3,
-        "name": "сундук",
-        "lexemes": {
-          "nom": "странный сундук",
-          "accus": "странный сундук",
-          "gen": "странного сундука",
-          "dat": "странному сундуку",
-          "prep": "странном сундуке",
-          "inst": "странным сундуком"
-        },
-        "empty_text": "пуст",
-        "lockable": true,
-        "can_hide": true,
-        "can_contain_weapon": true,
-        "can_contain_trap": true,
-        "can_rest": false,
-        "states": [
-          "стоит",
-          "покрыт пылью",
-          "издает гул",
-          "мерцает"
-        ],
-        "wheres": [
-          "Под окном",
-          "В углу",
-          "В центре комнаты",
-          "За занавеской"
-        ]
-      },
-      {
-        "class": "Furniture",
-        "furniture_type": 4,
-        "name": "очаг",
-        "lexemes": {
-          "nom": "очаг",
-          "accus": "очаг",
-          "gen": "очага",
-          "dat": "очагу",
-          "prep": "очаге",
-          "inst": "очагом"
-          },
-        "empty_text": "пуст",
-        "lockable": false,
-        "can_hide": false,
-        "can_contain_weapon": false,
-        "can_rest": true,
-        "states":
-        [
-            "расположен",
-            "тлеет",
-            "светится"
-        ],
-        "wheres":
-        [
-            "У стены",
-            "В углу",
-            "В центре комнаты"
-        ]
-      }
+    "empty_text": "пусто",
+    "lockable": false,
+    "can_hide": false,
+    "can_contain_weapon": false,
+    "can_contain_trap": false,
+    "can_rest": true,
+    "states":
+    [
+        "стоит",
+        "приютилось",
+        "расположено"
+    ],
+    "wheres":
+    [
+        "У стены",
+        "В углу",
+        "В центре комнаты"
+    ]
+  }
 ]

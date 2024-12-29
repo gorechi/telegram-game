@@ -1,9 +1,10 @@
-from src.class_items import Rune, Matches
+from src.class_items import Matches
+from src.class_rune import Rune
 from src.class_basic import Money
 from src.class_book import Book
 from src.class_potions import Potion
 from src.class_backpack import Backpack
-from src.class_room import Furniture
+from src.class_furniture import Furniture
 from src.functions.functions import randomitem, tprint, roll, howmany
 
 from dataclasses import dataclass
@@ -194,7 +195,7 @@ class Trader:
         traders_room.light = True
         self.room = traders_room
         if not self.room.can_rest(mode='simple'):
-            new_rest_place = Furniture(game=self.game, name='Удобное кресло', can_rest=True)
+            new_rest_place = self.game.furniture_controller.get_random_object_by_filters(name="удобное кресло")
             new_rest_place.place(room_to_place=self.room)
     
     
@@ -249,7 +250,7 @@ class Scribe(Trader):
         self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
         for _ in range(how_many_books):
-            book = Book.random_book(self.game)
+            book = self.game.books_controller.get_random_object_by_filters()
             price = self.evaluate(book)
             new_book = Trader.ItemInShop(item=book, price=price)
             self.shop.append(new_book)
@@ -340,7 +341,7 @@ class RuneMerchant(Trader):
         self.shop = []
         how_many_runes = roll([RuneMerchant._runes_quantity_die])
         for _ in range(how_many_runes):
-            rune = Rune(self.game)
+            rune = self.game.runes_controller.get_random_object_by_filters()
             price = self.evaluate(rune)
             new_rune = Trader.ItemInShop(item=rune, price=price)
             self.shop.append(new_rune)
@@ -431,7 +432,7 @@ class PotionsMerchant(Trader):
         self.shop = []
         how_many_potions = roll([PotionsMerchant._potions_quantity_die])
         for _ in range(how_many_potions):
-            potion = Potion.random_potion(self.game)
+            potion = self.game.potions_controller.get_random_object_by_filters()
             price = self.evaluate(potion)
             new_potion = Trader.ItemInShop(item= potion, price=price)
             self.shop.append(new_potion)
