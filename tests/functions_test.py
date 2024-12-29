@@ -1,7 +1,7 @@
 import unittest
 import os
 from typing import Tuple, Optional
-from src.functions.functions import split_actions, roll, readfile, randomitem, howmany, normal_count
+from src.functions.functions import split_actions, roll, randomitem, howmany, normal_count
 
 class TestSplitActions(unittest.TestCase):
 
@@ -61,40 +61,6 @@ class TestRollFunction(unittest.TestCase):
         dice = [-4, 6]
         result = roll(dice)
         self.assertTrue(1 <= result <= 6)
-        
-class TestReadFileFunction(unittest.TestCase):
-
-    def setUp(self):
-        # Create a temporary file for testing
-        self.test_filename = 'test_file.txt'
-        with open(self.test_filename, 'w', encoding='utf-8') as f:
-            f.write("line1|part1\n")
-            f.write("line2|part2\n")
-            f.write("line3|part3\n")
-
-    def tearDown(self):
-        # Remove the temporary file after tests
-        os.remove(self.test_filename)
-
-    def test_readfile_with_divide(self):
-        expected_result = [['line1', 'part1'], ['line2', 'part2'], ['line3', 'part3']]
-        result = readfile(self.test_filename, divide=True)
-        self.assertEqual(result, expected_result)
-
-    def test_readfile_without_divide(self):
-        expected_result = ['line1|part1', 'line2|part2', 'line3|part3']
-        result = readfile(self.test_filename, divide=False)
-        self.assertEqual(result, expected_result)
-
-    def test_readfile_with_custom_divider(self):
-        with open(self.test_filename, 'w', encoding='utf-8') as f:
-            f.write("line1,part1\n")
-            f.write("line2,part2\n")
-            f.write("line3,part3\n")
-        
-        expected_result = [['line1', 'part1'], ['line2', 'part2'], ['line3', 'part3']]
-        result = readfile(self.test_filename, divide=True, divider=',')
-        self.assertEqual(result, expected_result)
         
 class TestRandomItemFunction(unittest.TestCase):
 

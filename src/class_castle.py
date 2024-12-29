@@ -295,19 +295,17 @@ class Floor:
 
     
     def place_rest_places(self):
-        self.all_rest_places = self.game.create_objects_from_json(file='json/furniture-rest.json',
-                                        how_many=self.how_many['очаг'],)
-        self.all_rest_places[0].place(self, room_to_place=self.plan[0])
-        for rest_place in self.all_rest_places[1:]:
+        rest_place = self.game.furniture_controller.get_random_object_by_filters(can_rest=True)
+        rest_place.place(self, room_to_place=self.plan[0])
+        for _ in range(self.how_many['очаг'] - 1):
+            rest_place = self.game.furniture_controller.get_random_object_by_filters(can_rest=True)
             rest_place.place(self)
 
     
     def place_furniture(self):
-        self.all_furniture = self.game.create_objects_from_json(file='json/furniture.json',
-                                        how_many=self.how_many['мебель'],
-                                        random=True)
-        for furniture in self.all_furniture:
-            furniture.place(self)
+        for _ in range(self.how_many['мебель']):
+            new_furniture = self.game.furniture_controller.get_random_object_by_filters(can_rest=False)
+            new_furniture.place(self)
 
     
     def secret_rooms(self):
