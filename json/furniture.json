@@ -11,6 +11,10 @@
         "prep": "деревянной полке",
         "inst": "деревянной полкой"
       },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -44,6 +48,10 @@
       "prep": "резной полке",
       "inst": "резной полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -75,6 +83,10 @@
       "prep": "ажурной полке",
       "inst": "ажурной полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -106,6 +118,10 @@
       "prep": "массивной полке",
       "inst": "массивной полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -137,6 +153,10 @@
       "prep": "легкой полке",
       "inst": "легкой полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -166,6 +186,10 @@
       "prep": "металлической полке",
       "inst": "металлической полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": true,
     "can_hide": false,
@@ -195,6 +219,10 @@
       "prep": "кривой полке",
       "inst": "кривой полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -226,6 +254,10 @@
       "prep": "уродливой полке",
       "inst": "уродливой полкой"
     },
+    "basic_lexemes": [
+      "полка",
+      "полку"
+    ],
     "empty_text": "пуста",
     "lockable": false,
     "can_hide": false,
@@ -256,6 +288,9 @@
         "prep": "деревянном шкафе",
         "inst": "деревянным шкафом"
       },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -288,6 +323,9 @@
       "prep": "огромном шкафе",
       "inst": "огромным шкафом"
     },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -318,6 +356,9 @@
         "prep": "старом шкафе",
         "inst": "старым шкафом"
     },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -347,6 +388,9 @@
         "prep": "новом шкафе",
         "inst": "новым шкафом"
     },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": false,
@@ -373,6 +417,9 @@
         "prep": "покосившемся шкафе",
         "inst": "покосившимся шкафом"
     },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": false,
@@ -402,6 +449,9 @@
         "prep": "страшном шкафе",
         "inst": "страшным шкафом"
     },
+    "basic_lexemes": [
+      "шкаф"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -429,6 +479,9 @@
         "prep": "обычном сундуке",
         "inst": "обычным сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -460,6 +513,9 @@
       "prep": "кованом сундуке",
       "inst": "кованым сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -489,6 +545,9 @@
       "prep": "большом сундуке",
       "inst": "большим сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -516,6 +575,9 @@
       "prep": "деревянном сундуке",
       "inst": "деревянным сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -545,6 +607,9 @@
       "prep": "маленьком сундуке",
       "inst": "маленьким сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": false,
@@ -574,6 +639,9 @@
       "prep": "антикварном сундуке",
       "inst": "антикварным сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": false,
@@ -603,6 +671,9 @@
       "prep": "странном сундуке",
       "inst": "странным сундуком"
     },
+    "basic_lexemes": [
+      "сундук"
+    ],
     "empty_text": "пуст",
     "lockable": true,
     "can_hide": true,
@@ -634,6 +705,9 @@
       "prep": "очаге",
       "inst": "очагом"
       },
+    "basic_lexemes": [
+      "очаг"
+    ],
     "empty_text": "пуст",
     "lockable": false,
     "can_hide": false,
@@ -656,7 +730,7 @@
   {
     "class_name": "Furniture",
     "furniture_type": 4,
-    "name": "удобное кресло",
+    "name": "кресло",
     "lexemes": {
       "nom": "удобное кресло",
       "accus": "удобное кресло",
@@ -665,6 +739,9 @@
       "prep": "удобном кресле",
       "inst": "удобным креслом"
       },
+    "basic_lexemes": [
+      "кресло"
+    ],
     "empty_text": "пусто",
     "lockable": false,
     "can_hide": false,

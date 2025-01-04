@@ -16,6 +16,7 @@ class FurnitureController(Controller):
         furniture_type: int
         name: str
         lexemes: dict
+        basic_lexemes: list
         empty_text: str
         lockable: bool
         can_hide: bool

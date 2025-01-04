@@ -118,4 +118,4 @@ class MonstersController(Controller):
     
     def check_endgame(self) -> bool:
         """Проверяет, достигнут ли конец игры"""
-        return self.how_many_monsters == 0
+        return self.how_many == 0

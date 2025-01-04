@@ -5,14 +5,7 @@ from src.functions.functions import randomitem
 
 class Furniture:
     """Класс мебели."""
-    
-    _basic_lexemes = {
-        "полка": ['полка', 'полку'],
-        "шкаф": ['шкаф'],
-        "сундук": ['сундук'],
-        "очаг": ['очаг']
-    }
-    
+        
     _lock_dice = Dice([4])
     """Вероятность того, что мебель будет заперта (если 4, то 1/4)."""
    
@@ -60,8 +53,8 @@ class Furniture:
         return False
     
     
-    def get_names_list(self, cases:list=None) -> list:
-        names_list = Furniture._basic_lexemes[self.name]
+    def get_names_list(self, cases:list=[]) -> list:
+        names_list = self.basic_lexemes
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list

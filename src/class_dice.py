@@ -39,19 +39,26 @@ class Dice():
         self_result = self.roll_set(self.dice * multiplier + self.temporary)
         if not isinstance(add, list) or not isinstance(subtract, list):
             raise ValueError("В качестве аргумента 'add' или 'subtract' должен быть передан список целых чисел")
-        add_result = self.roll_set(add)
-        subtract_result = self.roll_set(subtract)
+        if add:
+            add_result = self.roll_set(add)
+        else:
+            add_result = 0
+        if subtract:
+            subtract_result = self.roll_set(subtract)
+        else:
+            subtract_result = 0
         result = self_result + add_result - subtract_result + self.modificator
         return max(0, result)
     
     
-    def roll_set(self, set:list[int]) -> int:
+    def roll_set(self, dice_set:list[int]) -> int:
         """Функция имитирует бросок нескольких кубиков сразу"""
         result = 0
-        for die in set:
+        for die in dice_set:
             if not isinstance(die, int):
-                raise ValueError("Все значения кубиков должны быть целыми числами")
-            result += randint(1, die)
+                raise ValueError("Все значения кубиков должны быть целыми числами больше нуля, а передано {die} как часть {dice_set}")
+            if die > 0:
+                result += randint(1, die)
         return max(0, result)
     
     

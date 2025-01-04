@@ -396,8 +396,8 @@ class WeaponController(Controller):
         
     _classes = {
         "Weapon": Weapon,
-    }
-
+    }       
+        
     def __init__(self, game):
         self.game = game
         self.how_many = 0
@@ -425,3 +425,12 @@ class WeaponController(Controller):
         weapon.damage.increase_modificator(decorator['damage_modifier'])
         weapon.lexemes = lexemes
         return True
+    
+    def get_empty_object_by_class_name(self, class_name:str):
+        new_class = self.__class__._classes[class_name]
+        new_object = new_class(game=self.game)
+        new_object.empty = True
+        new_object.twohanded = False
+        new_object.fencing = False
+        return new_object
+

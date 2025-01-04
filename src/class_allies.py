@@ -195,7 +195,7 @@ class Trader:
         traders_room.light = True
         self.room = traders_room
         if not self.room.can_rest(mode='simple'):
-            new_rest_place = self.game.furniture_controller.get_random_object_by_filters(name="удобное кресло")
+            new_rest_place = self.game.furniture_controller.get_random_object_by_filters(name="кресло")
             new_rest_place.place(room_to_place=self.room)
     
     
