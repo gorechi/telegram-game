@@ -1748,8 +1748,8 @@ class Hero:
     def go(self, direction:str):
         """Метод обрабатывает команду "идти". """
         
-        direction_number = Hero._doors_dict.get(direction, False)
-        if not direction_number:
+        direction_number = Hero._doors_dict.get(direction, 5)
+        if direction_number == 5:
             tprint(self.game, f'{self.name} не знает такого направления!')
             return False
         if self.check_light():
@@ -1793,7 +1793,7 @@ class Hero:
             for monster in room.monsters():
                 if not self.check_if_sneak_past_monster(monster):
                     tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
-                    self.fight(monster.name, True)
+                    self.fight(monster.name)
                     return False
         if room.ladder_down:
             stayed = self.try_not_to_fall_down()
