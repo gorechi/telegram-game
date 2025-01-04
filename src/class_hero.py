@@ -2370,7 +2370,7 @@ class Hero:
         Метод обрабатывает команду "читать".       
         """
         game = self.game
-        if what.lower() in ['карту', 'карта']:
+        if what and what.lower() in ['карту', 'карта']:
             return self.use_item_from_backpack('карта')
         self.book_list = self.backpack.get_items_by_class(Book)
         if not self.book_list:

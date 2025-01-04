@@ -334,6 +334,7 @@ class Room:
         self.torch = self.set_torch()
         self.decorate()
         self.secret_word = self.get_secret_word()
+        self.enter_point = False
 
     
     def get_symbol_for_map(self) -> str:
@@ -554,7 +555,7 @@ class Room:
         if not monsters:
             return ['Не видно ничего интересного.']
         for monster in monsters:
-            message.append(f'{randomitem(Room.decor3)} {monster.state} {monster.name}.')
+            message.append(f'{randomitem(Room._decor3)} {monster.state} {monster.name}.')
         return message
     
     
