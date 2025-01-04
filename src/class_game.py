@@ -102,9 +102,8 @@ class Game():
         self.no_shield = self.protection_controller.get_empty_object_by_class_name('Shield')
         self.no_armor = self.protection_controller.get_empty_object_by_class_name('Armor')
         self.no_backpack = Backpack(self, no_backpack=True)
-        self.castle_floors = self.create_floors()
-        self.create_ladders()
-        self.current_floor = self.castle_floors[0]
+        self.create_floors()
+        self.inhabit_castle()
         self.player = self.hero_controller.get_random_object_by_filters()
         self.player.place(self.current_floor.plan[0])
         new_key = Key(self)
@@ -158,18 +157,27 @@ class Game():
                 corpse.try_to_rise()
         
     
-    def create_floors(self) -> list[Floor]:
+    def create_floors(self) -> bool:
         
         """Метод создания этажей замка"""
         
-        floors = []
+        self.castle_floors = []
         for i in Game._castle_floors_sizes:
             floor = Floor(self, 
                           floor_number = i, 
                           data = Game._castle_floors_sizes[i]
                           )
-            floors.append(floor)
-        return floors
+            self.castle_floors.append(floor)
+        self.current_floor = self.castle_floors[0]
+        self.current_floor.plan[0].enter_point = True
+        self.create_ladders()
+        return True
+    
+    
+    def inhabit_castle(self) -> bool:
+        for floor in self.castle_floors:
+            floor.inhabit()
+        return True
     
     
     def __del__ (self):

@@ -48,7 +48,6 @@ class Floor:
         self.create_rooms(self.rows, self.rooms)
         self.lock_doors()
         self.lights_off()
-        self.inhabit()
                 
     
     def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
@@ -74,7 +73,8 @@ class Floor:
         for _ in range(self.how_many['лестницы']):
             room = self.get_room_to_place_ladder_up()
             room_to_go = next_floor.get_room_to_place_ladder_down()
-            new_ladder = Ladder(room, room_to_go)  # noqa: F841
+            new_ladder = Ladder(room, room_to_go)
+            room_to_go.enter_point = True
         return True
     
     
@@ -293,11 +293,16 @@ class Floor:
 
     
     def place_rest_places(self):
-        rest_place = self.game.furniture_controller.get_random_object_by_filters(can_rest=True)
-        rest_place.place(self, room_to_place=self.plan[0])
-        for _ in range(self.how_many['очаг'] - 1):
+        rest_places_number = self.how_many['очаг']
+        enter_points = self.get_enter_points()
+        for enter_point in enter_points:
             rest_place = self.game.furniture_controller.get_random_object_by_filters(can_rest=True)
-            rest_place.place(self)
+            rest_place.place(self, room_to_place=enter_point)
+            rest_places_number -= 1
+        if rest_places_number > 0:
+            for _ in range(rest_places_number):
+                rest_place = self.game.furniture_controller.get_random_object_by_filters(can_rest=True)
+                rest_place.place(self)
 
     
     def place_furniture(self):
@@ -398,3 +403,7 @@ class Floor:
         
         rooms = [a for a in self.plan if (not a.locked)]
         return randomitem(rooms)
+    
+    
+    def get_enter_points(self) -> list[Room]:
+        return [room for room in self.plan if room.enter_point]
