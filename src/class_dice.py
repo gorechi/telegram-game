@@ -2,13 +2,13 @@ from random import randint, sample
 
 class Dice():
     
-    def __init__(self, dice:list[int], modificator:int=0, dice_type:str=''):
+    def __init__(self, dice:list[int], modifier:int=0, dice_type:str=''):
         self.dice:list[int] = dice
-        self.modificator = modificator
+        self.modifier = modifier
         self.dice_type = dice_type
         self.temporary = []
         self.initial_dice = self.dice.copy()
-        self.initial_modificator = self.modificator
+        self.initial_modifier = self.modifier
 
     def __str__(self):
         return self.text()
@@ -47,7 +47,7 @@ class Dice():
             subtract_result = self.roll_set(subtract)
         else:
             subtract_result = 0
-        result = self_result + add_result - subtract_result + self.modificator
+        result = self_result + add_result - subtract_result + self.modifier
         return max(0, result)
     
     
@@ -84,45 +84,45 @@ class Dice():
         if not self.dice:
             return "Нет кубиков"
         text =  " + ".join(f"d{die}" for die in (self.dice + self.temporary))
-        if self.modificator > 0:
-            text += f' + {self.modificator}'
-        if self.modificator < 0:
-            text += f' - {-1 * self.modificator}'
+        if self.modifier > 0:
+            text += f' + {self.modifier}'
+        if self.modifier < 0:
+            text += f' - {-1 * self.modifier}'
         return text
     
     
-    def increase_modificator(self, value:int) -> int:
+    def increase_modifier(self, value:int) -> int:
         """Увеличивает значение модификатора"""
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
-        self.modificator += value
-        return self.modificator
+        self.modifier += value
+        return self.modifier
     
         
-    def decrease_modificator(self, value:int) -> int:
+    def decrease_modifier(self, value:int) -> int:
         """Уменьшает значение модификатора"""
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
-        self.modificator -= value
-        return self.modificator
+        self.modifier -= value
+        return self.modifier
     
     
     def set_dice(self, dice:list[int]):
         self.dice = dice
         
     
-    def set_modificator(self, modificator:int):
-        self.modificator = modificator
+    def set_modifier(self, modifier:int):
+        self.modifier = modifier
     
     
     def copy(self):
         """Возвращает копию кубика"""
-        return Dice(self.dice.copy(), self.modificator, self.dice_type)
+        return Dice(self.dice.copy(), self.modifier, self.dice_type)
     
     
     def reset(self):
         self.dice = self.initial_dice.copy()
-        self.modificator = self.initial_modificator
+        self.modifier = self.initial_modifier
         
     
     def increase_base_die(self, value:int=1) -> int:

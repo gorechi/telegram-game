@@ -90,6 +90,7 @@ class HealPotion(Potion):
             owner.poisoned = False
             text += ' и излечивается от отравления'
         tprint(self.game, text)
+        owner.backpack.remove(self)
         return True
     
 
@@ -104,8 +105,8 @@ class HealthPotion(Potion):
             return False
         self.owner.start_health += self.effect
         self.owner.health += self.effect
-        tprint(
-            self.game, f'{self.owner.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(self.owner.health)}.')
+        tprint(self.game, f'{self.owner.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(self.owner.health)}.')
+        self.owner.backpack.remove(self)
         return True
     
 
@@ -118,10 +119,11 @@ class StrengthPotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.stren.increase_modificator(self.effect)
+        self.owner.stren.increase_modifier(self.effect)
         if self.owner.start_stren:
-            self.owner.start_stren.increase_modificator(self.effect)
+            self.owner.start_stren.increase_modifier(self.effect)
         tprint(self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
+        self.owner.backpack.remove(self)
         return True
     
 
@@ -136,6 +138,7 @@ class StrengtheningPotion(Potion):
             return False
         self.owner.stren.add_temporary(self.effect)
         tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
+        self.owner.backpack.remove(self)
         return True
 
 
@@ -148,10 +151,10 @@ class DexterityPotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.dext.increase_modificator(self.effect)
-        self.owner.start_dext.increase_modificator(self.effect)
-        tprint(
-            self.game, f'{self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
+        self.owner.dext.increase_modifier(self.effect)
+        self.owner.start_dext.increase_modifier(self.effect)
+        tprint(self.game, f'{self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
+        self.owner.backpack.remove(self)
         return True
 
 
@@ -165,8 +168,8 @@ class EvasionPotion(Potion):
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.dext.add_temporary(self.effect)
-        tprint(
-            self.game, f'На время боя {self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
+        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
+        self.owner.backpack.remove(self)
         return True
     
     
@@ -179,9 +182,10 @@ class IntelligencePotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.intel.increase_modificator(self.effect)
-        self.owner.start_intel.increase_modificator(self.effect)
+        self.owner.intel.increase_modifier(self.effect)
+        self.owner.start_intel.increase_modifier(self.effect)
         tprint(self.game, f'{self.owner.name} увеличивает свой интеллект на {self.effect} до {self.owner.intel.text()}.')
+        self.owner.backpack.remove(self)
         return True
     
 
@@ -196,6 +200,7 @@ class EnlightmentPotion(Potion):
             return False
         self.owner.intel.add_temporary(self.effect)
         tprint(self.game, f'На время боя {self.owner.name} увеличивает свой интеллект на {self.effect} до {self.owner.intel.text()}.')
+        self.owner.backpack.remove(self)
         return True
 
 
@@ -218,6 +223,6 @@ class Antidote(Potion):
             return False
         self.owner.poisoned = False
         self.owner.fear = 0
-        tprint(
-            self.game, f'{self.owner.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
+        tprint(self.game, f'{self.owner.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
+        self.owner.backpack.remove(self)
         return True

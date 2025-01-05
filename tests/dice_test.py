@@ -13,18 +13,18 @@ class TestDiceRoll(unittest.TestCase):
         result = dice.roll()
         self.assertIn(result, range(2, 15))
 
-    def test_roll_with_modificator(self):
-        dice = Dice([6], modificator=2)
+    def test_roll_with_modifier(self):
+        dice = Dice([6], modifier=2)
         result = dice.roll()
         self.assertIn(result, range(3, 9))
     
-    def test_roll_with_negative_modificator(self):
-        dice = Dice([6], modificator=-2)
+    def test_roll_with_negative_modifier(self):
+        dice = Dice([6], modifier=-2)
         result = dice.roll()
         self.assertIn(result, range(0, 5))
 
-    def test_roll_with_big_negative_modificator(self):
-        dice = Dice([6], modificator=-10)
+    def test_roll_with_big_negative_modifier(self):
+        dice = Dice([6], modifier=-10)
         result = dice.roll()
         self.assertEqual(result, 0)
     
@@ -107,27 +107,27 @@ class TestDiceGetText(unittest.TestCase):
         result = dice.text()
         self.assertEqual(result, "Нет кубиков")  # Ожидаемое значение: "Нет кубиков"
 
-    def test_dice_without_modificator(self):
+    def test_dice_without_modifier(self):
         # Тестирование случая, когда есть кубики, но нет модификатора
         dice = Dice([6, 8, 10])
         result = dice.text()
         self.assertEqual(result, "d6 + d8 + d10")  # Ожидаемое значение: "d6 + d8 + d10"
 
-    def test_dice_with_positive_modificator(self):
+    def test_dice_with_positive_modifier(self):
         # Тестирование случая, когда есть кубики и положительный модификатор
-        dice = Dice([6, 8], modificator=3)
+        dice = Dice([6, 8], modifier=3)
         result = dice.text()
         self.assertEqual(result, "d6 + d8 + 3")  # Ожидаемое значение: "d6 + d8 + 3"
 
-    def test_dice_with_zero_modificator(self):
+    def test_dice_with_zero_modifier(self):
         # Тестирование случая, когда есть кубики и модификатор равен нулю
-        dice = Dice([4, 12], modificator=0)
+        dice = Dice([4, 12], modifier=0)
         result = dice.text()
         self.assertEqual(result, "d4 + d12")  # Ожидаемое значение: "d4 + d12"
         
-    def test_dice_with_negative_modificator(self):
+    def test_dice_with_negative_modifier(self):
         # Тестирование случая, когда есть кубики и положительный модификатор
-        dice = Dice([6, 8], modificator=-3)
+        dice = Dice([6, 8], modifier=-3)
         result = dice.text()
         self.assertEqual(result, "d6 + d8 - 3")  # Ожидаемое значение: "d6 + d8 + 3" 
 
@@ -135,63 +135,63 @@ class TestDiceIncreaseModificator(unittest.TestCase):
 
     def test_increase_with_positive_integer(self):
         # Тестирование увеличения модификатора положительным числом
-        dice = Dice([6, 8], modificator=5)
-        dice.increase_modificator(3)
-        self.assertEqual(dice.modificator, 8)  # Ожидаемое значение: 8
+        dice = Dice([6, 8], modifier=5)
+        dice.increase_modifier(3)
+        self.assertEqual(dice.modifier, 8)  # Ожидаемое значение: 8
 
     def test_increase_with_zero(self):
         # Тестирование случая, когда передан ноль
-        dice = Dice([6, 8], modificator=5)
-        dice.increase_modificator(0)
-        self.assertEqual(dice.modificator, 5)  # Ожидаемое значение: 5
+        dice = Dice([6, 8], modifier=5)
+        dice.increase_modifier(0)
+        self.assertEqual(dice.modifier, 5)  # Ожидаемое значение: 5
 
     def test_increase_with_negative_integer(self):
         # Тестирование случая, когда передано отрицательное число
-        dice = Dice([6, 8], modificator=5)
+        dice = Dice([6, 8], modifier=5)
         with self.assertRaises(ValueError) as context:
-            dice.increase_modificator(-3)
+            dice.increase_modifier(-3)
         self.assertEqual(str(context.exception), "Значение должно быть больше или равно нулю.")
 
     def test_increase_with_non_integer(self):
         # Тестирование случая, когда передано не целое число
-        dice = Dice([6, 8], modificator=5)
+        dice = Dice([6, 8], modifier=5)
         with self.assertRaises(ValueError) as context:
-            dice.increase_modificator(2.5)
+            dice.increase_modifier(2.5)
         self.assertEqual(str(context.exception), "Значение должно быть целым числом, а передан <class 'float'> 2.5.")
     
 class TestDiceDecreaseModificator(unittest.TestCase):
 
     def test_decrease_with_positive_integer(self):
         # Тестирование уменьшения модификатора положительным числом
-        dice = Dice([6, 8], modificator=5)
-        dice.decrease_modificator(3)
-        self.assertEqual(dice.modificator, 2)  # Ожидаемое значение: 2
+        dice = Dice([6, 8], modifier=5)
+        dice.decrease_modifier(3)
+        self.assertEqual(dice.modifier, 2)  # Ожидаемое значение: 2
 
     def test_decrease_with_zero(self):
         # Тестирование случая, когда передан ноль
-        dice = Dice([6, 8], modificator=5)
-        dice.decrease_modificator(0)
-        self.assertEqual(dice.modificator, 5)  # Ожидаемое значение: 5
+        dice = Dice([6, 8], modifier=5)
+        dice.decrease_modifier(0)
+        self.assertEqual(dice.modifier, 5)  # Ожидаемое значение: 5
 
     def test_decrease_with_negative_integer(self):
         # Тестирование случая, когда передано отрицательное число
-        dice = Dice([6, 8], modificator=5)
+        dice = Dice([6, 8], modifier=5)
         with self.assertRaises(ValueError) as context:
-            dice.decrease_modificator(-3)
+            dice.decrease_modifier(-3)
         self.assertEqual(str(context.exception), "Значение должно быть больше или равно нулю.")
 
     def test_decrease_with_non_integer(self):
         # Тестирование случая, когда передано не целое число
-        dice = Dice([6, 8], modificator=5)
+        dice = Dice([6, 8], modifier=5)
         with self.assertRaises(ValueError) as context:
-            dice.decrease_modificator(2.5)
+            dice.decrease_modifier(2.5)
         self.assertEqual(str(context.exception), "Значение должно быть целым числом, а передан <class 'float'> 2.5.")
 
-    def test_decrease_to_negative_modificator(self):
+    def test_decrease_to_negative_modifier(self):
         # Тестирование случая, когда уменьшение приводит к отрицательному модификатору
-        dice = Dice([6, 8], modificator=3)
-        dice.decrease_modificator(4)
-        self.assertEqual(dice.modificator, -1)  # Ожидаемое значение: 0
+        dice = Dice([6, 8], modifier=3)
+        dice.decrease_modifier(4)
+        self.assertEqual(dice.modifier, -1)  # Ожидаемое значение: 0
         
 if __name__ == '__main__':
     unittest.main()

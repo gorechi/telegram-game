@@ -357,7 +357,7 @@ class Protection:
     def enchant(self, rune):
         if self.can_be_enchanted():
             self.runes.append(rune)
-            self.protection.increase_modificator(rune.defence)
+            self.protection.increase_modifier(rune.defence)
             return True
         return False
 
@@ -457,7 +457,7 @@ class Armor(Protection):
             decorate_string = decorator[self.gender].get(lexeme, False)
             if decorate_string:
                 lexemes[lexeme] = f'{decorate_string} {self.lexemes[lexeme]}'
-        self.protection.increase_modificator(decorator['protection_modifier'])
+        self.protection.increase_modifier(decorator['protection_modifier'])
         self.lexemes = lexemes
     
     

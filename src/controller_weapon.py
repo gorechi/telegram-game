@@ -422,7 +422,7 @@ class WeaponController(Controller):
             decorate_string = decorator[weapon.gender].get(lexeme, False)
             if decorate_string:
                 lexemes[lexeme] = f'{decorate_string} {weapon.lexemes[lexeme]}'
-        weapon.damage.increase_modificator(decorator['damage_modifier'])
+        weapon.damage.increase_modifier(decorator['damage_modifier'])
         weapon.lexemes = lexemes
         return True
     

@@ -111,7 +111,7 @@ class Weapon:
     def enchant(self, rune):
         if self.can_be_enchanted():
             self.runes.append(rune)
-            self.damage.increase_modificator(rune.damage)
+            self.damage.increase_modifier(rune.damage)
             return True
         return False
     
@@ -162,7 +162,7 @@ class Weapon:
                 who.shield = self.game.no_shield
                 who.removed_shield = shield
                 message.append(f'Из-за того, что {who.g("герой взял", "героиня взяла")} двуручное оружие, '
-                               f'{who.g("ему", "ей")} пришлось убрать {shield.get_full_name("accus")} за спину.')
+                               f'{who.g("ему", "ей")} пришлось убрать {shield.get_full_names("accus")} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')

@@ -218,7 +218,7 @@ class Monster:
         """
         stren_die = self.stren.roll()
         health_die = Monster._weak_health_die.roll()
-        self.stren.decrease_modificator(int(stren_die/2))
+        self.stren.decrease_modifier(int(stren_die/2))
         self.health = int(self.health * (1 - health_die/10))
         return True
     
@@ -778,7 +778,7 @@ class Monster:
         но здоровье восстанавливается до начального уровня. Возвращает True.
         """
         weakness_amount = self.stren.roll()
-        self.stren.decrease_modificator(weakness_amount)
+        self.stren.decrease_modifier(weakness_amount)
         self.health = self.start_health
         message = [f'{self.get_self_name_in_room()} остается в живых и истекает кровью, теряя при '
                    f'этом {howmany(weakness_amount, ["единицу", "единицы", "единиц"])} силы.']
@@ -793,7 +793,7 @@ class Monster:
         """
         strengthening_amount = self.stren.roll()
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
-        self.stren.increase_modificator(strengthening_amount)
+        self.stren.increase_modifier(strengthening_amount)
         self.health = self.start_health - ill_amount
         message = [f'{self.get_self_name_in_room()} остается в живых и приходит в ярость, получая при '
                    f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и '
@@ -808,7 +808,7 @@ class Monster:
         Возвращает True.
         """
         weakness_amount = self.stren.roll()
-        self.stren.decrease_modificator(weakness_amount)
+        self.stren.decrease_modifier(weakness_amount)
         health_boost_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.health = self.start_health + health_boost_amount
         message = [f'{self.get_self_name_in_room()} остается в живых и получает контузию, теряя при '
@@ -824,7 +824,7 @@ class Monster:
         Возвращает True.
         """
         weakness_amount = self.stren.roll()
-        self.stren.decrease_modificator(weakness_amount)
+        self.stren.decrease_modifier(weakness_amount)
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.health = self.start_health - ill_amount
         message =  [f'{self.get_self_name_in_room()} остается в живых, получает ранение в ногу и отползает куда-то в темный угол, теряя при ' 

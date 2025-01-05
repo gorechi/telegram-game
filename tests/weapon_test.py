@@ -49,7 +49,7 @@ class TestWeaponAttack(unittest.TestCase):
         self.weapon = self.controller.get_random_object_by_filters()
         
         self.weapon.damage.set_dice([6])
-        self.weapon.damage.set_modificator(0)
+        self.weapon.damage.set_modifier(0)
         
         self.mock_monster = MagicMock()
 

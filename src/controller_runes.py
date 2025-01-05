@@ -106,10 +106,10 @@ class RunesController(Controller):
             rune.poison = True
             rune.description = f'ядовитая {rune.description}'
             rune.base_price += RunesController._poison_price_modifier.roll()
-            return True
         else:
-            self.poison = False
-            
+            rune.poison = False
+        return True
+        
     
     def generate_base_price(self, rune:Rune):
         rune.base_price += RunesController._base_price_dice.roll()
