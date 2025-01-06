@@ -9,7 +9,8 @@ class state_enum(Enum):
     - LEVEL_UP - персонаж поднимает уровень
     - USE_IN_FIGHT - персонадж использует вещь во время боя
     - TRADE - персонаж торгует
-    - READ - персонаж выбирает что ему почитать
+    - READ - персонаж выбирает, что ему почитать
+    - DRINK - персонаж выбирает, что ему выпть
     """
     NO_STATE = 0
     FIGHT = 1
@@ -18,6 +19,7 @@ class state_enum(Enum):
     USE_IN_FIGHT = 4
     TRADE = 5
     READ = 6
+    DRINK = 7
 
 class move_enum(Enum):
     """

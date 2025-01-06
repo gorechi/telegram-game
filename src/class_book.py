@@ -111,5 +111,5 @@ class WisdomBook(Book):
             
     def increase_mastery(self, who) -> str:
         who.intel.increase_modifier(1)
-        who.base_intel.increase_modifier(1)
+        who.start_intel.increase_modifier(1)
         return f'{who.name} чувствует, что {who.g("стал", "стала")} немного умнее'

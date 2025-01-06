@@ -2,6 +2,7 @@ from src.class_items import Key, Map
 from src.class_rune import Rune
 from src.class_basic import Money
 from src.class_book import Book
+from src.class_potions import Potion
 from src.class_monsters import Monster, Vampire
 from src.class_protection import Armor, Shield
 from src.class_furniture import Furniture
@@ -148,6 +149,8 @@ class Hero:
                             'торговать': self.trade,
                             'изучить': self.examine,
                             'изучать': self.examine,
+                            'выпить': self.drink,
+                            'пить': self.drink,
                             'улучшить': self.enchant}    
     
     
@@ -348,7 +351,8 @@ class Hero:
             state_enum.TRADE: self.trade_actions,
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
             state_enum.FIGHT: self.fight_actions,
-            state_enum.READ: self.read_actions
+            state_enum.READ: self.read_actions,
+            state_enum.DRINK: self.drink_actions
         }
         if command in Hero._level_up_commands and self.state == state_enum.LEVEL_UP:
             self.levelup(command)
@@ -1833,7 +1837,7 @@ class Hero:
         return True
     
     
-    def fight(self, enemy:None):
+    def fight(self, enemy=None):
         """Метод обрабатывает команду "атаковать". """
         
         room = self.current_position
@@ -2412,6 +2416,52 @@ class Hero:
         self.backpack.remove(book)           
         tprint(self.game, book.use(self), 'direction')
         self.decrease_restless(2)
+        self.state = state_enum.NO_STATE
+        return True
+    
+    
+    def drink(self, what:str=None) -> bool:
+        """
+        Метод обрабатывает команду "пить".       
+        """
+        game = self.game
+        self.potion_list = self.backpack.get_items_by_class(Potion)
+        if not self.potion_list:
+            tprint(game, 'В рюкзаке нет ни одного зелья.', 'direction')
+            return False
+        message = []
+        message.append(f'{self.name} может выпить следующие зелья:')
+        for potion in self.potion_list:
+            message.append(f'{self.potion_list.index(potion) + 1}: {str(potion)}')
+        message.append('Выберите номер зелья или скажите "отмена" чтобы ничего не пить')
+        self.state = state_enum.DRINK
+        tprint(game, message, 'read')
+        return True
+        
+    
+    def drink_actions(self, message:str) -> bool:
+        
+        """
+        Метод обрабатывает команды игрока когда он пьет зелья.
+        
+        Возвращает:
+        - True - если удалось выпить зелье
+        - False - если по любой причине выпить не удалось
+        
+        """
+        
+        if message == 'отмена':
+            self.state = state_enum.NO_STATE
+            return False
+        if not message.isdigit():
+            tprint(self.game, f'Чтобы выпить зелье {self:dat} нужно выбрать его по номеру.', 'read')
+            return False
+        message = int(message) - 1
+        if not message < len(self.potion_list):
+            tprint(self.game, f'У {self:gen} нет столько зелий.', 'read')
+            return False
+        potion = self.potion_list[message]
+        tprint(self.game, potion.use(self, in_action=False), 'direction')
         self.state = state_enum.NO_STATE
         return True
     
