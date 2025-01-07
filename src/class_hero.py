@@ -464,7 +464,6 @@ class Hero:
                 tprint(self.game, 'Герой не может атаковать сам себя.')
                 return False
             return enemy
-        enemies.remove(self)
         if not enemy_text:
             return randomitem(enemies)
         for enemy in enemies:

@@ -400,7 +400,7 @@ class Protection:
 
     
     def get_full_names(self, key:str=None) -> str|list:
-        if self.element != 0:
+        if self.element() != 0:
             return self.get_element_names(key)
         if key:
             return self.lexemes.get(key, '')
