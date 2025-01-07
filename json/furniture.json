@@ -191,7 +191,7 @@
       "полку"
     ],
     "empty_text": "пуста",
-    "lockable": true,
+    "lockable": false,
     "can_hide": false,
     "can_contain_weapon": true,
     "can_contain_trap": false,
