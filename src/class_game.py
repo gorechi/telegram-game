@@ -1,6 +1,4 @@
-from src.class_castle import Floor
 from src.class_book import Book
-from src.class_hero import Hero
 from src.class_items import Key
 from src.class_backpack import Backpack
 from src.controller_monsters import MonstersController
@@ -11,6 +9,7 @@ from src.controller_books import BooksController
 from src.controller_potions import PotionsController
 from src.controller_runes import RunesController
 from src.controller_furniture import FurnitureController
+from src.controller_floors import FloorsController
 
 
 class Empty():
@@ -39,47 +38,7 @@ class Game():
     Содержит методы создания объектов игры, а также методы обработки комманд игрока.
     
     """
-        
-    _castle_floors_sizes = {
-        1: {
-        'rows': 5, 
-        'rooms': 5,
-        'traps_difficulty': 4, 
-        'how_many': {
-            'монстры': 10,
-            'оружие': 10,
-            'щит': 5,
-            'доспех': 5,
-            'зелье': 10,
-            'мебель': 10,
-            'книга': 5,
-            'очаг': 2,
-            'руна': 10,
-            'торговец': 2,
-            'лестницы': 2,
-            'ловушка': 3}
-        },
-        2: {
-        'rows': 3, 
-        'rooms': 3,
-        'traps_difficulty': 4, 
-        'how_many': {
-            'монстры': 5,
-            'оружие': 3,
-            'щит': 2,
-            'доспех': 2,
-            'зелье': 5,
-            'мебель': 6,
-            'книга': 2,
-            'очаг': 1,
-            'руна': 3,
-            'торговец': 1,
-            'лестницы': 0,
-            'ловушка': 2}
-        }
-    }
-    """Размеры этажей замка. Каждый объект - это этаж замка."""
-  
+          
     _traders_update_counter = 30
     
 
@@ -96,14 +55,15 @@ class Game():
         self.potions_controller = PotionsController(self)
         self.runes_controller = RunesController(self)
         self.furniture_controller = FurnitureController(self)
+        self.floors_controller = FloorsController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')
         self.no_shield = self.protection_controller.get_empty_object_by_class_name('Shield')
         self.no_armor = self.protection_controller.get_empty_object_by_class_name('Armor')
         self.no_backpack = Backpack(self, no_backpack=True)
-        self.create_floors()
-        self.inhabit_castle()
+        self.castle_floors = self.floors_controller.create_castle()
+        self.current_floor = self.castle_floors[0]
         self.player = self.hero_controller.get_random_object_by_filters()
         self.player.place(self.current_floor.plan[0])
         new_key = Key(self)
@@ -112,21 +72,12 @@ class Game():
         self.traders_update_counter = Game._traders_update_counter
         
 
-    def create_ladders(self):
-        for floor in self.castle_floors[:-1]:
-            floor.create_ladders()
-            
-
     def check_endgame(self) -> bool:
         if True in [
             self.monsters_controller.check_endgame()
             ]:
             return True
         return False
-    
-    
-    def get_floor_by_number(self, number:int) -> Floor:
-        return next((floor for floor in self.castle_floors if floor.floor_number == number), None)
     
     
     def trigger_on_movement(self):
@@ -157,36 +108,13 @@ class Game():
                 corpse.try_to_rise()
         
     
-    def create_floors(self) -> bool:
-        
-        """Метод создания этажей замка"""
-        
-        self.castle_floors = []
-        for i in Game._castle_floors_sizes:
-            floor = Floor(self, 
-                          floor_number = i, 
-                          data = Game._castle_floors_sizes[i]
-                          )
-            self.castle_floors.append(floor)
-        self.current_floor = self.castle_floors[0]
-        self.current_floor.plan[0].enter_point = True
-        self.create_ladders()
-        return True
-    
-    
-    def inhabit_castle(self) -> bool:
-        for floor in self.castle_floors:
-            floor.inhabit()
-        return True
-    
-    
     def __del__ (self):
         print("=" * 40)
         print('Игра удалена')
         print("=" * 40)
      
     
-    def test(self, hero:Hero):
+    def test(self, hero):
         book1 = Book.random_book(self)
         book2 = Book.random_book(self)
         self.player.backpack + book1
