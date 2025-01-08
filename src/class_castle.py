@@ -41,9 +41,9 @@ class Floor:
                       2: self.rooms,
                       3: -1}
         available_rooms = []
-        for i, door in enumerate(room.doors):
-            if door and not door.locked:
-                available_rooms.append(self.plan[room.position + directions[i]])
+        for index, door in enumerate(room.doors):
+            if door and not door.locked and not door.empty:
+                available_rooms.append(self.plan[room.position + directions[index]])
         if ladders:
             if room.ladder_down and not room.ladder_down.locked:
                 available_rooms.append(room.ladder_down.room_down)
