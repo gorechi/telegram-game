@@ -69,83 +69,6 @@ class Floor:
         rooms = [room for room in self.plan if not room.ladder_down]
         return randomitem(rooms)
     
-    # def create_rooms(self, f:int, r:int):    
-        
-    #     """
-    #     Функция генерирует комнаты этажа замка.
-    #     - f - это количество рядов в плане этажа
-    #     - r - это количество комнат в одном ряду
-        
-    #     """
-        
-    #     all_doors = self.create_doors(f, r)
-    #     self.plan = []
-    #     for index, doors in enumerate(all_doors):
-    #         new_room = Room(self.game, self, doors)
-    #         new_room.position = index
-    #         self.plan.append(new_room)
-    #         self.monsters_in_rooms[new_room] = []
-         
-    
-    # def create_rooms_plan(self, f:int, r:int) -> list:
-        
-    #     """
-    #     Функция генерирует заготовки для всех комнат этажа замка.
-    #     - f - это количество рядов в плане этажа
-    #     - r - это количество комнат в одном ряду
-        
-    #     Возвращает список заготовок комнат с указанием, 
-    #     с каким количеством других комнат каждая из них граничит
-    #     """
-        
-    #     all_rooms = [2] * r
-    #     if f > 2: 
-    #         all_rooms += ([2] + [3] * (r - 2) + [2]) * (f - 2)
-    #     if f > 1: 
-    #         all_rooms += [2] * r
-    #     return all_rooms
-    
-    
-    # def create_doors(self, f:int, r:int) -> list:
-        
-    #     """
-    #     Функция случайным образом генерирует двери между комнатами.
-    #     - f - это количество рядов в плане этажа
-    #     - r - это количество комнат в одном ряду
-        
-    #     Возвращает список, который для каждой комнаты содержит список дверей.
-    #     """
-        
-    #     all_rooms = self.create_rooms_plan(f, r)
-    #     all_doors = []
-    #     for _ in range(f * r):
-    #         doors = []
-    #         for _ in range(4):
-    #             door = Door(self.game)
-    #             doors.append(door)
-    #         all_doors.append(doors)
-    #     for index, doors in enumerate(all_doors):
-    #         row = index // r
-    #         room = index % r
-    #         if f > 1 and r > 1:
-    #             while sum(not door.empty for door in doors) < all_rooms[index]:
-    #                 door = randomitem([door for door in doors if door.empty])
-    #                 q = doors.index(door)
-    #                 if q == 0 and row != 0:
-    #                     doors[0].activate()
-    #                     all_doors[index - r][2] = doors[0]
-    #                 elif q == 2 and row < f - 1:
-    #                     doors[2].activate()
-    #                     all_doors[index + r][0] = doors[2]
-    #                 elif q == 3 and room != 0:
-    #                     doors[3].activate()
-    #                     all_doors[index - 1][1] = doors[3]
-    #                 elif q == 1 and room < r - 1:
-    #                     doors[1].activate()
-    #                     all_doors[index + 1][3] = doors[1]
-    #     return all_doors
-    
-    
     def inhabit(self):
         
         """
@@ -332,44 +255,6 @@ class Floor:
             for j in range(self.rooms):
                 floor = f'{floor + str(self.plan[i*self.rooms + j].stink)} '
 
-    
-    # def lights_off(self):
-        
-    #     """
-    #     Функция выключает свет в некоторых комнатах этажа замка.
-        
-    #     """
-        
-    #     self.how_many_dark_rooms = len(self.plan) // Floor._dark_rooms_ratio
-    #     dark_rooms = randomitem(self.plan, self.how_many_dark_rooms)
-    #     if isinstance(dark_rooms, list):
-    #         for room in dark_rooms:
-    #             room.light = False
-    #     if isinstance(dark_rooms, Room):
-    #         dark_rooms.light = False
-
-    
-    # def lock_doors(self):
-        
-    #     """
-    #     Функция запирает двери некоторых случайных комнатах этажа замка.
-        
-    #     """
-        
-    #     how_many_locked_rooms = len(self.plan) // Floor._locked_rooms_ratio
-    #     for _ in range(how_many_locked_rooms):
-    #         room = randomitem([r for r in self.plan[1::] if not r.locked])
-    #         new_money = Money(self.game, dice(Floor._min_money_in_locked_room, Floor._max_money_in_locked_room))
-    #         room.lock()
-    #         monster = room.monsters('random')
-    #         if not monster:
-    #             room.loot.add(new_money)
-    #         else:
-    #             monster.take(new_money)
-    #         new_key = Key(self.game)
-    #         new_key.place(self)
-    #     return True
-        
     
     def get_random_room_with_furniture(self) -> Room:
     

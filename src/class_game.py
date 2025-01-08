@@ -1,5 +1,3 @@
-from src.class_book import Book
-from src.class_items import Key
 from src.class_backpack import Backpack
 from src.controller_monsters import MonstersController
 from src.controller_protection import ProtectionController
@@ -66,8 +64,6 @@ class Game():
         self.current_floor = self.castle_floors[0]
         self.player = self.hero_controller.get_random_object_by_filters()
         self.player.place(self.current_floor.plan[0])
-        new_key = Key(self)
-        self.player.backpack + new_key
         self.game_is_on = False
         self.traders_update_counter = Game._traders_update_counter
         
@@ -115,8 +111,8 @@ class Game():
      
     
     def test(self, hero):
-        book1 = Book.random_book(self)
-        book2 = Book.random_book(self)
-        self.player.backpack + book1
-        self.player.backpack + book2
-        print('Тестирование чтения книг')
+        potion1 = self.potions_controller.get_random_object_by_filters()
+        potion2 = self.potions_controller.get_random_object_by_filters()
+        self.player.backpack + potion1
+        self.player.backpack + potion2
+        print('Тестирование питья напитков')
