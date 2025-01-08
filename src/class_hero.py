@@ -379,6 +379,7 @@ class Hero:
         game = self.game
         self.state = state_enum.NO_STATE
         if message == 'отмена':
+            tprint(game, f'{self.name} передумывает что-то улучшать и решает просто жить дальше.', 'direction')
             self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
@@ -2402,6 +2403,7 @@ class Hero:
         
         book_list = self.book_list
         if message == 'отмена':
+            tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего читать.', 'direction')
             self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
@@ -2450,6 +2452,7 @@ class Hero:
         """
         
         if message == 'отмена':
+            tprint(self.game, f'{self.name} теряет всякое желание пить какие-то зелья.', 'direction')
             self.state = state_enum.NO_STATE
             return False
         if not message.isdigit():
@@ -2460,8 +2463,9 @@ class Hero:
             tprint(self.game, f'У {self:gen} нет столько зелий.', 'read')
             return False
         potion = self.potion_list[message]
-        tprint(self.game, potion.use(self, in_action=False), 'direction')
-        self.state = state_enum.NO_STATE
+        if potion.check_if_can_be_used(in_action=False):
+            potion.use(self, in_action=False)
+            self.state = state_enum.NO_STATE
         return True
     
     

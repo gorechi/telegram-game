@@ -59,5 +59,5 @@ class HeroController(Controller):
     
     
     def give_items(self, hero: Hero) -> None:
-        new_key = Key(self)
+        new_key = Key(self.game)
         hero.backpack + new_key 
