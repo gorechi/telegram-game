@@ -2463,8 +2463,9 @@ class Hero:
             tprint(self.game, f'У {self:gen} нет столько зелий.', 'read')
             return False
         potion = self.potion_list[message]
-        tprint(self.game, potion.use(self, in_action=False), 'direction')
-        self.state = state_enum.NO_STATE
+        if potion.check_if_can_be_used(in_action=False):
+            potion.use(self, in_action=False)
+            self.state = state_enum.NO_STATE
         return True
     
     

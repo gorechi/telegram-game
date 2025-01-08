@@ -113,6 +113,6 @@ class Game():
     def test(self, hero):
         potion1 = self.potions_controller.get_random_object_by_filters()
         potion2 = self.potions_controller.get_random_object_by_filters()
-        self.player.backpack + potion1
-        self.player.backpack + potion2
+        potion1.take(self.player)
+        potion2.take(self.player)
         print('Тестирование питья напитков')
