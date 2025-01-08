@@ -1,8 +1,5 @@
-from random import randint as dice
-
-from src.class_basic import Money
-from src.class_items import Key, Map, Matches
-from src.class_room import Door, Room, Ladder
+from src.class_items import Map, Matches
+from src.class_room import Room, Ladder
 from src.class_allies import Trader
 from src.functions.functions import randomitem
 
@@ -10,36 +7,29 @@ from src.functions.functions import randomitem
 class Floor:
             
     def __init__(self, game):
+        """
+        Инициирует экземпляр класса Floor
+        """
         self.game = game
-        self.rows = 0
-        self.rooms = 0
-        self.directions_dict = {0: (0 - self.rooms),
-                               1: 1,
-                               2: self.rooms,
-                               3: (0 - 1),
-                               'наверх': (0 - self.rooms),
-                               'направо': 1,
-                               'вправо': 1,
-                               'налево': (0 - 1),
-                               'лево': (0 - 1),
-                               'влево': (0 - 1),
-                               'вниз': self.rooms,
-                               'низ': self.rooms,
-                               'вверх': (0 - self.rooms),
-                               'верх': (0 - self.rooms),
-                               'право': 1}
         self.monsters_in_rooms = {}
                 
     
     def on_create(self):
+        """
+        Выполняет дополнительные действия после инициации экземпляра класса Floor
+        """
         return True
     
     
     def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
+        """
+        Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
+        """
         directions = {0: -self.rooms,
                       1: 1,
                       2: self.rooms,
                       3: -1}
+        print("directions:", directions)
         available_rooms = []
         for index, door in enumerate(room.doors):
             if door and not door.locked and not door.empty:
@@ -51,7 +41,11 @@ class Floor:
                 available_rooms.append(room.ladder_up.room_up)
         return available_rooms
     
+    
     def create_ladders(self, next_floor) -> bool:
+        """
+        Создает лестницы между этажами.
+        """
         for _ in range(self.how_many['лестницы']):
             room = self.get_room_to_place_ladder_up()
             room_to_go = next_floor.get_room_to_place_ladder_down()
@@ -61,20 +55,26 @@ class Floor:
     
     
     def get_room_to_place_ladder_up(self) -> Room:
+        """
+        Возвращает случайную комнату, в которую можно поставить лестницу вверх.
+        """
         rooms = [room for room in self.plan if not room.ladder_up]
         return randomitem(rooms)
     
     
     def get_room_to_place_ladder_down(self) -> Room:
+        """
+        Возвращает случайную комнату, в которую можно поставить лестницу вниз.
+        """
         rooms = [room for room in self.plan if not room.ladder_down]
         return randomitem(rooms)
+    
     
     def inhabit(self):
         
         """
         Функция населяет этаж замка всякими монстрами и штуками. 
         Отвечает за наполнение этажа всем содержимым.
-        
         """    
         
         game = self.game
@@ -117,34 +117,52 @@ class Floor:
 
      
     def place_matches(self):
+        """
+        Раскидывает по этажу спички
+        """
         matches = Matches(self.game)
         matches.place(self)
 
     
     def place_traders(self):
+        """
+        Рассаживает по этажу торговцев
+        """
         for _ in range(self.how_many['торговец']):
             trader = Trader.random_trader(self.game, self)
             trader.place()
     
     
     def place_map(self):
+        """
+        Раскидывает по этажу карты
+        """
         new_map = Map(self.game, self)
         new_map.place()
 
     
     def place_books(self):
+        """
+        Раскидывает по этажу книги
+        """
         for _ in range(self.how_many['книга']):
             new_book = self.game.books_controller.get_random_object_by_filters()
             new_book.place(self)
 
     
     def place_runes(self):
+        """
+        Раскидывает по этажу руны
+        """
         for _ in range(self.how_many['руна']):
             new_rune = self.game.runes_controller.get_random_object_by_filters()
             new_rune.place(self)
     
     
     def activate_traps(self):
+        """
+        Активирует на этаже ловушки
+        """
         all_furnitures = [f for f in self.all_furniture if f.can_contain_trap and not f.trap.activated]
         furnitures = randomitem(all_furnitures, how_many=self.how_many['ловушка'])
         for f in furnitures:
@@ -153,6 +171,9 @@ class Floor:
 
     
     def place_potions(self):
+        """
+        Раскидывает по этажу зелья
+        """
         self.all_potions = [] 
         for _ in range(self.how_many['зелье']):
             new_potion = self.game.potions_controller.get_random_object_by_filters()
@@ -161,6 +182,9 @@ class Floor:
 
     
     def place_armor(self):
+        """
+        Раскидывает по этажу доспехи
+        """
         self.all_armor = self.game.protection_controller.get_random_objects_by_class_name(
             class_name = 'Armor',
             how_many=self.how_many['доспех'],
@@ -170,6 +194,9 @@ class Floor:
 
     
     def place_shields(self):
+        """ 
+        Раскидывает по этажу щиты 
+        """
         self.all_shields = self.game.protection_controller.get_random_objects_by_class_name(
             class_name = 'Shield',
             how_many=self.how_many['щит'],
@@ -179,6 +206,9 @@ class Floor:
 
     
     def place_weapons(self):
+        """
+        Раскидывает по этажу оружие
+        """
         self.all_weapon = self.game.weapon_controller.get_random_objects_by_class_name(
             class_name = 'Weapon',
             how_many=self.how_many['оружие'],
@@ -189,6 +219,9 @@ class Floor:
 
     
     def place_monsters(self):
+        """
+        Создает монстров на этаже.
+        """
         self.all_monsters = self.game.monsters_controller.create_monsters_by_floor(
             self.floor_number,
             self.how_many['монстры']
@@ -198,6 +231,9 @@ class Floor:
 
     
     def place_rest_places(self):
+        """
+        Создает на этаже места отдыха
+        """
         rest_places_number = self.how_many['очаг']
         enter_points = self.get_enter_points()
         for enter_point in enter_points:
@@ -211,12 +247,18 @@ class Floor:
 
     
     def place_furniture(self):
+        """
+        Расставляет по этажу мебель
+        """
         for _ in range(self.how_many['мебель']):
             new_furniture = self.game.furniture_controller.get_random_object_by_filters(can_rest=False)
             new_furniture.place(self)
 
     
     def secret_rooms(self):
+        """
+        Возвращает список комнат, в которых есть секретные тайные места
+        """
         return [i for i in self.plan if i.secret_word]
     
     
@@ -225,11 +267,6 @@ class Floor:
         Функция распространения вони по замку.\n
         Распространяет вонь через открытые и закрытые двери, постепенно уменьшая уровень.\n
         Уровень вони записывается в параметр stink комнаты.
-
-        Получает на вход:
-            - room - Комната, с которой начинается распределение вони
-            - stink_level - Начальный уровень вони
-
         """
         if room.stink >= stink_level:
             return True
@@ -247,9 +284,7 @@ class Floor:
         """
         Генерирует карту вони этажа замка. 
         Нужна в основном для отладки, но может потом и понадобится.
-        
         """
-        
         for i in range(self.rows):
             floor = ''
             for j in range(self.rooms):
@@ -258,19 +293,24 @@ class Floor:
     
     def get_random_room_with_furniture(self) -> Room:
     
-        """ Метод возвращает случайную комнату с мебелью. """
-    
+        """ 
+        Возвращает случайную комнату с мебелью. 
+        """
         rooms = [a for a in self.plan if a.furniture]
         return randomitem(rooms)
     
     
     def get_random_unlocked_room(self) -> Room:
         
-        """ Метод возвращает случайную незапертую комнату. """
-        
+        """
+        Возвращает случайную незапертую комнату.
+        """
         rooms = [a for a in self.plan if (not a.locked)]
         return randomitem(rooms)
     
     
     def get_enter_points(self) -> list[Room]:
+        """
+        Возвращает список точек входа на этаж.
+        """
         return [room for room in self.plan if room.enter_point]

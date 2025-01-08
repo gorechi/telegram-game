@@ -39,6 +39,7 @@ class FloorsController(Controller):
         self.create_rooms(floor)
         self.lock_doors(floor)
         self.lights_off(floor)
+        self.generate_directions(floor)
         return True
     
     
@@ -175,3 +176,24 @@ class FloorsController(Controller):
         for floor in self.floors:
             floor.inhabit()
         return True
+    
+    
+    def generate_directions(self, floor):
+        directions_dict = {
+            0: -floor.rooms,
+            1: 1,
+            2: floor.rooms,
+            3: -1,
+            'наверх': -floor.rooms,
+            'направо': 1,
+            'вправо': 1,
+            'налево': -1,
+            'лево': -1,
+            'влево': -1,
+            'вниз': floor.rooms,
+            'низ': floor.rooms,
+            'вверх': -floor.rooms,
+            'верх': -floor.rooms,
+            'право': 1
+            }
+        floor.directions_dict = directions_dict
