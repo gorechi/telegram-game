@@ -686,11 +686,22 @@ class Room:
     def get_symbol_for_plan(self) -> str:
         monster = self.monsters('first')
         if monster:
-            return monster.name[0]
+            return self.get_monsters_symbol()
         if self.trader:
             return '₽'
         return ' '
     
+    
+    def get_number_of_monsters(self) -> int:
+        return len(self.floor.monsters_in_rooms[self])
+    
+    
+    def get_monsters_symbol(self) -> str:
+        number_of_monsters = self.get_number_of_monsters()
+        if number_of_monsters == 1:
+            return '~'
+        return '≈'
+        
     
     def get_second_line_for_plan(self) -> str:
         if self.ladder_up:
