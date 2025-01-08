@@ -922,8 +922,7 @@ class Plant(Monster):
 
     def grow(self):
         available_rooms = self.floor.get_rooms_around(self.current_position)
-        roms_without_monsters = [room for room in available_rooms if not room.has_a_monster()]
-        target_rooms = randomitem(roms_without_monsters, how_many=2)
+        target_rooms = randomitem(available_rooms, how_many=2)
         for room in target_rooms:
             self.grow_in_room(room)
 
@@ -946,6 +945,7 @@ class Plant(Monster):
             room = randomitem(empty_rooms)
         self.current_position = room
         self.floor = floor
+        floor.monsters_in_rooms[room].append(self)
     
     
     def generate_mele_attack(self, target) -> int:
@@ -1067,6 +1067,7 @@ class Vampire(Monster):
         self.current_position = room
         self.hiding_place = where_to_hide
         self.floor = floor
+        floor.monsters_in_rooms[room].append(self)
         return True
 
 
