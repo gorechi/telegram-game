@@ -64,7 +64,7 @@ class Protection:
         if self.empty:
             return False
         names_list = self.get_names_list(['nom', "accus"])
-        return message.lower() in names_list
+        return bool([name for name in names_list if message.lower() in name.lower()])
     
     
     def is_poisoned(self):
