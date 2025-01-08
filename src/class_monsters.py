@@ -860,12 +860,19 @@ class Monster:
         """
         if room_to_place:
             room = room_to_place
+        elif old_place:
+            rooms = [room for room in floor.plan if (not room.trader 
+                                                     and not room == old_place 
+                                                     and not room.enter_point)]
+            if not bool(rooms):
+                return False
+            room = randomitem(rooms)
         else:
-            empty_rooms = [a for a in floor.plan if (not a.monsters() 
-                                                     and not a.monster_in_ambush()
-                                                     and not a.trader 
-                                                     and a != old_place 
-                                                     and a.position != 0)]
+            empty_rooms = [room for room in floor.plan if (not room.monsters() 
+                                                     and not room.monster_in_ambush()
+                                                     and not room.trader 
+                                                     and not room == old_place 
+                                                     and not room.enter_point)]
             if not bool(empty_rooms):
                 return False
             room = randomitem(empty_rooms)
