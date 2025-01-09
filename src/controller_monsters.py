@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
 from src.class_controller import Controller
+from src.class_basic import Money
 from src.functions.functions import randomitem
 
 class MonstersController(Controller):
@@ -39,6 +40,8 @@ class MonstersController(Controller):
         stink:bool
         can_resurrect:bool
         weakness:dict
+        carry_money:bool
+        money:int
     
     
     _classes = {
@@ -55,14 +58,41 @@ class MonstersController(Controller):
     
     
     def __init__(self, game):
+        """
+        Иницииирует экземпляр контроллера монстров
+        """
         self.game = game
         self.how_many = 0
         self.templates = self.load_templates('json/monsters.json')
         self.all_objects = []
     
     
+    def additional_actions(self, monster:Monster) -> bool:
+        """
+        Выполняет дополнительные действия при создании нового монстра
+        """
+        self.generate_money(monster)
+        return True
+    
+    
+    def generate_money(self, monster:Monster) -> None:
+        """
+        Генерирует деньги для монстра
+        """
+
+        if not isinstance(monster, Monster):
+            raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
+        if monster.carry_money:
+            money = Money(self.game, monster.money)
+            monster.loot.add(money)
+        monster.money = None
+        return True
+    
+    
     def get_templates_by_floor(self, floor:int) -> list[Template]:
-        """Возвращает список всех шаблонов монстров, подходящих по этажу"""
+        """
+        Возвращает список всех шаблонов монстров, подходящих по этажу
+        """
         
         if not isinstance(floor, int):
             raise TypeError(f"Параметр 'floor' должен быть целым числом, а передан {type(floor)} {floor}.")
@@ -74,8 +104,9 @@ class MonstersController(Controller):
     
     
     def get_random_templates_by_floor(self, floor:int, how_many:int=1) -> list[Template]:
-        """Возвращает список случайных шаблоны монстров по этажу"""
-        
+        """
+        Возвращает список случайных шаблоны монстров по этажу
+        """
         if not isinstance(floor, int):
             raise TypeError(f"Параметр 'floor' должен быть целым числом, а передан {type(floor)} {floor}.")
         templates_list = []
@@ -86,8 +117,9 @@ class MonstersController(Controller):
         
     
     def create_monsters_by_floor(self, floor:int, how_many:int=1) -> list[Monster]:
-        """Создает список монстров для этажа"""
-        
+        """
+        Создает список монстров для этажа
+        """
         templates_list = self.get_random_templates_by_floor(floor, how_many)
         monsters_list = []
         for template in templates_list:
@@ -97,8 +129,9 @@ class MonstersController(Controller):
      
     
     def kill_monster(self, monster:Monster) -> bool:
-        """Убивает монстра"""
-        
+        """
+        Убивает монстра
+        """
         if not isinstance(monster, Monster):
             raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
         self.how_many_monsters -= 1
@@ -107,8 +140,9 @@ class MonstersController(Controller):
         
     
     def resurect_monster(self, monster:Monster) -> bool:
-        """Воскрешает монстра"""
-        
+        """
+        Воскрешает монстра
+        """
         if not isinstance(monster, Monster):
             raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
         self.how_many_monsters += 1
@@ -117,5 +151,7 @@ class MonstersController(Controller):
     
     
     def check_endgame(self) -> bool:
-        """Проверяет, достигнут ли конец игры"""
+        """
+        Проверяет, достигнут ли конец игры, связанный с монстрами
+        """
         return self.how_many == 0

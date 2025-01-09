@@ -51,7 +51,6 @@ class Loot:
         Метод принимает на вход строку имени вещи и
         и возвращает первую найденную  по этому имени вещь.
         """
-        
         name_lower = name.lower()
         for item in self.pile:
             if (name_lower in item.name.lower()) or (name_lower in item.lexemes['accus'].lower()):
@@ -160,7 +159,7 @@ class Money:
     
     def __repr__(self):
         return str(self.how_much_money)
-
+    
     
     def __int__(self) -> int:
         return self.how_much_money
