@@ -119,9 +119,8 @@ class StrengthPotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.stren.increase_modifier(self.effect)
-        if self.owner.start_stren:
-            self.owner.start_stren.increase_modifier(self.effect)
+        self.owner.stren.increase_base_die(self.effect)
+        self.owner.start_stren.increase_base_die(self.effect)
         tprint(self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
         self.owner.backpack.remove(self)
         return True
@@ -151,8 +150,8 @@ class DexterityPotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.dext.increase_modifier(self.effect)
-        self.owner.start_dext.increase_modifier(self.effect)
+        self.owner.dext.increase_base_die(self.effect)
+        self.owner.start_dext.increase_base_die(self.effect)
         tprint(self.game, f'{self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
         self.owner.backpack.remove(self)
         return True
@@ -182,8 +181,8 @@ class IntelligencePotion(Potion):
     def use(self, who_using, in_action:bool) -> bool:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
-        self.owner.intel.increase_modifier(self.effect)
-        self.owner.start_intel.increase_modifier(self.effect)
+        self.owner.intel.increase_base_die(self.effect)
+        self.owner.start_intel.increase_base_die(self.effect)
         tprint(self.game, f'{self.owner.name} увеличивает свой интеллект на {self.effect} до {self.owner.intel.text()}.')
         self.owner.backpack.remove(self)
         return True
