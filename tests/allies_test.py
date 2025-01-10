@@ -1,31 +1,36 @@
 import unittest
 from mock import MagicMock, patch
-from src.class_items import Rune, Matches
+from src.class_items import Matches
 from src.class_basic import Money
-from src.class_book import Book
-from src.class_potions import Potion
 from src.class_allies import Trader
-from src.class_hero import Hero
+from src.controller_books import BooksController
+from src.controller_runes import RunesController
+from src.controller_potions import PotionsController
 from src.functions.functions import howmany
 
 class TestItemInShop(unittest.TestCase):
+    def setUp(self):
+        self.books_controller = BooksController(game=MagicMock())
+        self.runes_controller = RunesController(game=MagicMock())
+        self.potions_controller = PotionsController(game=MagicMock())
+    
     def test_item_in_shop_initialization(self):
         # Test with a Book item
-        book = Book.random_book(game=MagicMock())
+        book = self.books_controller.get_random_object_by_filters()
         item_in_shop = Trader.ItemInShop(item=book, price=10)
         self.assertEqual(item_in_shop.item, book)
         self.assertEqual(item_in_shop.price, 10)
         self.assertIsNone(item_in_shop.index)
 
         # Test with a Rune item
-        rune = Rune(game=MagicMock())
+        rune = self.runes_controller.get_random_object_by_filters()
         item_in_shop = Trader.ItemInShop(item=rune, price=15, index=1)
         self.assertEqual(item_in_shop.item, rune)
         self.assertEqual(item_in_shop.price, 15)
         self.assertEqual(item_in_shop.index, 1)
 
         # Test with a Potion item
-        potion = Potion.random_potion(game=MagicMock())
+        potion = self.potions_controller.get_random_object_by_filters()
         item_in_shop = Trader.ItemInShop(item=potion, price=5)
         self.assertEqual(item_in_shop.item, potion)
         self.assertEqual(item_in_shop.price, 5)
@@ -40,10 +45,12 @@ class TestItemInShop(unittest.TestCase):
 
 class TestSearchItemByIndex(unittest.TestCase):
     def setUp(self):
-        # Create some mock items with indices
-        self.book = Trader.ItemInShop(item=Book.random_book(game=MagicMock()), price=10, index=1)
-        self.rune = Trader.ItemInShop(item=Rune(game=MagicMock()), price=15, index=2)
-        self.potion = Trader.ItemInShop(item=Potion.random_potion(game=MagicMock()), price=5, index=3)
+        self.books_controller = BooksController(game=MagicMock())
+        self.runes_controller = RunesController(game=MagicMock())
+        self.potions_controller = PotionsController(game=MagicMock())
+        self.book = Trader.ItemInShop(item=self.books_controller.get_random_object_by_filters(), price=10, index=1)
+        self.rune = Trader.ItemInShop(item=self.runes_controller.get_random_object_by_filters(), price=15, index=2)
+        self.potion = Trader.ItemInShop(item=self.potions_controller.get_random_object_by_filters(), price=5, index=3)
         self.matches = Trader.ItemInShop(item=Matches(game=MagicMock()), price=3, index=4)
         self.items_list = [self.book, self.rune, self.potion, self.matches]
 
@@ -69,12 +76,14 @@ class TestSearchItemByIndex(unittest.TestCase):
 
 class TestSearchItemByName(unittest.TestCase):
     def setUp(self):
-        # Create some mock items with indices
-        self.book = Trader.ItemInShop(item=Book.random_book(game=MagicMock()), price=10, index=1)
+        self.books_controller = BooksController(game=MagicMock())
+        self.runes_controller = RunesController(game=MagicMock())
+        self.potions_controller = PotionsController(game=MagicMock())
+        self.book = Trader.ItemInShop(item=self.books_controller.get_random_object_by_filters(), price=10, index=1)
         self.book.name = 'книга'
-        self.rune = Trader.ItemInShop(item=Rune(game=MagicMock()), price=15, index=2)
+        self.rune = Trader.ItemInShop(item=self.runes_controller.get_random_object_by_filters(), price=15, index=2)
         self.rune.name = 'руна'
-        self.potion = Trader.ItemInShop(item=Potion.random_potion(game=MagicMock()), price=5, index=3)
+        self.potion = Trader.ItemInShop(item=self.potions_controller.get_random_object_by_filters(), price=5, index=3)
         self.potion.name = 'зелье'
         self.matches = Trader.ItemInShop(item=Matches(game=MagicMock()), price=3, index=4)
         self.matches.name = 'спички'

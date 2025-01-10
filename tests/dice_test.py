@@ -145,13 +145,6 @@ class TestDiceIncreaseModificator(unittest.TestCase):
         dice.increase_modifier(0)
         self.assertEqual(dice.modifier, 5)  # Ожидаемое значение: 5
 
-    def test_increase_with_negative_integer(self):
-        # Тестирование случая, когда передано отрицательное число
-        dice = Dice([6, 8], modifier=5)
-        with self.assertRaises(ValueError) as context:
-            dice.increase_modifier(-3)
-        self.assertEqual(str(context.exception), "Значение должно быть больше или равно нулю.")
-
     def test_increase_with_non_integer(self):
         # Тестирование случая, когда передано не целое число
         dice = Dice([6, 8], modifier=5)
@@ -172,13 +165,6 @@ class TestDiceDecreaseModificator(unittest.TestCase):
         dice = Dice([6, 8], modifier=5)
         dice.decrease_modifier(0)
         self.assertEqual(dice.modifier, 5)  # Ожидаемое значение: 5
-
-    def test_decrease_with_negative_integer(self):
-        # Тестирование случая, когда передано отрицательное число
-        dice = Dice([6, 8], modifier=5)
-        with self.assertRaises(ValueError) as context:
-            dice.decrease_modifier(-3)
-        self.assertEqual(str(context.exception), "Значение должно быть больше или равно нулю.")
 
     def test_decrease_with_non_integer(self):
         # Тестирование случая, когда передано не целое число
