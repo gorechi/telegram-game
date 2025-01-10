@@ -1921,5 +1921,85 @@
     "max_floor": 6,
     "specific_floors": [],
     "wear_armor": false
+  },
+  {
+    "class_name": "Demon",
+    "name": "Демон огня",
+    "lexemes": {
+      "nom": "демон",
+      "accus": "демона",
+      "gen": "демона",
+      "dat": "демону",
+      "prep": "демоне",
+      "inst": "демоном"
+    },
+    "stren": {
+      "dice": true,
+      "random": true,
+      "value": [10, 15]
+      },
+    "health": {
+      "random":true,
+      "value": [40, 60]
+      },
+    "hit_chance": {
+      "random": true,
+      "value": [6, 8]
+      },
+    "initiative": {
+      "dice": true,
+      "random": true,
+      "value": [5, 8]
+      },
+    "parry_chance": {
+      "dice": true,
+      "random": true,
+      "value": [3, 5]
+      },
+    "can_hide": false,
+    "can_run": false,
+    "actions": [
+      "атакует",
+      "обжигает",
+      "бьет",
+      "рвет"
+    ],
+    "state": "возвышается",
+    "weakness": {
+      "12": 6,
+      "15": 6,
+      "24": 10
+      },
+    "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [50, 100]
+      },
+    "can_resurrect": false,
+    "frightening": true,
+    "aggressive": true,
+    "carry_weapon": true,
+    "carry_shield": false,
+    "preferred_weapon": "",
+    "poison_level": {
+      "dice": true,
+      "value": 1
+      },
+    "poison_protection": {
+      "dice": true,
+      "value": 1
+      },
+    "gender": 0,
+    "size": {
+      "dice": true,
+      "value": 5
+      },
+    "corpse": true,
+    "monster_type": "demon",
+    "min_floor": 1,
+    "max_floor": 20,
+    "specific_floors": [],
+    "wear_armor": false
   }
 ]

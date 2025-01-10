@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
+from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human, Demon
 from src.class_controller import Controller
 from src.class_basic import Money
 from src.functions.functions import randomitem
@@ -53,7 +53,8 @@ class MonstersController(Controller):
         "WalkingDead": WalkingDead,
         "Skeleton": Skeleton,
         "Berserk": Berserk,
-        "Human": Human
+        "Human": Human,
+        "Demon": Demon
     }    
     
     

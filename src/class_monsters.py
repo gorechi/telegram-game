@@ -1115,8 +1115,14 @@ class Human(Monster):
     def __init__(self, game):
         super().__init__(game)
         self.empty = False
-    
 
+
+class Demon(Monster):
+    """Класс Human наследует класс Monster и представляет собой тип монстра - демон."""
+    
+    def __init__(self, game):
+        super().__init__(game)
+        self.empty = False
 
 
 class WalkingDead(Monster):
