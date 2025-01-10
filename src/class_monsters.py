@@ -1,7 +1,7 @@
 from math import ceil
 from random import choice
 
-from src.class_basic import Loot
+from src.class_basic import Loot, Money
 from src.class_rune import Rune
 from src.class_protection import Armor, Shield
 from src.class_weapon import Weapon
@@ -457,6 +457,20 @@ class Monster:
         self.take_shield_from_loot(loot)
         self.take_armor_from_loot(loot)
         self.loot.add(loot)
+        
+    
+    def take_money(self, item:Money) -> bool:
+        """
+        Обрабатывает ситуацию, когда монстр берет деньги
+        """
+        if not self.carry_money:
+            return False
+        current_money = self.loot.get_items_by_class(Money)
+        if current_money:
+            current_money = current_money + item
+        else:
+            self.loot.add(item)
+        return True
     
     
     def take(self, item) -> bool:
@@ -474,6 +488,8 @@ class Monster:
             return self.take_armor(item=item)
         if isinstance(item, Rune):
             return self.take_rune(item=item)
+        if isinstance(item, Money):
+            return self.take_money(item=item)
         self.loot.add(item)
         return True
 
