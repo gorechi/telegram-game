@@ -1,6 +1,7 @@
 [
     {
         "class_name": "Floor",
+        "boss": false,
         "floor_number": 1,
         "rows": 5, 
         "rooms": 5,
@@ -27,6 +28,7 @@
     },
     {
         "class_name": "Floor",
+        "boss": false,
         "floor_number": 2,
         "rows": 3, 
         "rooms": 3,
@@ -48,6 +50,60 @@
             "очаг": 1,
             "руна": 3,
             "торговец": 1,
+            "лестницы": 1,
+            "ловушка": 2}
+    },
+    {
+        "class_name": "Floor",
+        "boss": false,
+        "floor_number": 3,
+        "rows": 4, 
+        "rooms": 6,
+        "traps_difficulty": 4,
+        "how_many_dark_rooms": 4,
+        "how_many_locked_rooms": 3,
+        "money_in_locked_rooms":{
+            "dice": true,
+            "value": 50
+        }, 
+        "how_many": {
+            "монстры": 10,
+            "оружие": 6,
+            "щит": 3,
+            "доспех": 4,
+            "зелье": 6,
+            "мебель": 10,
+            "книга": 8,
+            "очаг": 2,
+            "руна": 5,
+            "торговец": 1,
+            "лестницы": 1,
+            "ловушка": 5}
+    },
+    {
+        "class_name": "Floor",
+        "boss": true,
+        "floor_number": 4,
+        "rows": 3, 
+        "rooms": 3,
+        "traps_difficulty": 6,
+        "how_many_dark_rooms": 0,
+        "how_many_locked_rooms": 0,
+        "money_in_locked_rooms":{
+            "dice": true,
+            "value": 40
+        }, 
+        "how_many": {
+            "монстры": 5,
+            "оружие": 3,
+            "щит": 2,
+            "доспех": 2,
+            "зелье": 5,
+            "мебель": 6,
+            "книга": 2,
+            "очаг": 1,
+            "руна": 3,
+            "торговец": 0,
             "лестницы": 0,
             "ловушка": 2}
     }
