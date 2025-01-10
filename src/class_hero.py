@@ -975,9 +975,10 @@ class Hero:
             all_items = self.backpack.get_items_except_class(Key)
             if all_items:
                 item = randomitem(all_items)
-                self.backpack.remove(item, stealing_monster)
-                stealing_monster.take(item)
-                return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item:accus}.'
+                item_is_taken = stealing_monster.take(item)
+                if item_is_taken:
+                    self.backpack.remove(item, stealing_monster)
+                    return f'Проснувшись {self.name} лезет в свой рюкзак и обнаруживает, что кто-то украл {item:accus}.'
         return None
     
     

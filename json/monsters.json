@@ -44,6 +44,11 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [1, 20]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -118,6 +123,12 @@
     "frightening": true,
     "aggressive": false,
     "stink": true,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [1, 30]
+      },
+
     "carry_weapon": true,
     "carry_shield": true,
     "preferred_weapon": "ударное",
@@ -186,6 +197,12 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [10, 30]
+      },
+
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -257,6 +274,12 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [10, 30]
+      },
+
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -328,6 +351,12 @@
     "state": "притаился",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [10, 30]
+      },
+
     "can_resurrect": false,
     "frightening": false,
     "aggressive": true,
@@ -399,6 +428,12 @@
     "state": "притаилась",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [10, 30]
+      },
+
     "can_resurrect": false,
     "frightening": false,
     "aggressive": true,
@@ -470,6 +505,12 @@
     "state": "прячется",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
+
     "can_resurrect": false,
     "frightening": false,
     "aggressive": true,
@@ -541,6 +582,11 @@
     "state": "рычит",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "frightening": true,
     "aggressive": true,
     "carry_weapon": true,
@@ -620,6 +666,11 @@
         "24": 0.6
       },
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -699,6 +750,11 @@
       "24": -3
     },
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -775,6 +831,11 @@
       "24": 6
       },
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [20, 50]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": false,
@@ -851,6 +912,11 @@
       "24": 6
       },
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [10, 20]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -922,6 +988,11 @@
     "state": "переминается с лапы на лапу",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": false,
@@ -993,6 +1064,11 @@
     "state": "вальяжно лежит",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": false,
@@ -1064,6 +1140,11 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [15, 25]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1135,6 +1216,11 @@
     "state": "ревет",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": true,
@@ -1206,6 +1292,11 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [30, 40]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1277,6 +1368,11 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [1, 15]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1348,6 +1444,11 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": false,
@@ -1419,6 +1520,11 @@
     "state": "что-то ищет",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [1, 10]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1490,6 +1596,11 @@
     "state": "чего-то ждет",
     "weakness": {},
     "stink": false,
+    "carry_money": true,
+    "money": {
+      "random": true,
+      "value": [1, 5]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1559,6 +1670,11 @@
     "state": "лежит",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": true,
@@ -1627,6 +1743,11 @@
     "state": "сидит",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1696,6 +1817,11 @@
     "state": "шныряет",
     "weakness": {},
     "stink": true,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": false,
     "aggressive": false,
@@ -1765,6 +1891,11 @@
     "state": "прячется",
     "weakness": {},
     "stink": false,
+    "carry_money": false,
+    "money": {
+      "random": true,
+      "value": [0, 0]
+      },
     "can_resurrect": false,
     "frightening": true,
     "aggressive": true,
