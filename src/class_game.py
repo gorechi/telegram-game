@@ -1,13 +1,13 @@
 from src.class_backpack import Backpack
-from src.controller_monsters import MonstersController
-from src.controller_protection import ProtectionController
-from src.controller_weapon import WeaponController
-from src.controller_heroes import HeroController
-from src.controller_books import BooksController
-from src.controller_potions import PotionsController
-from src.controller_runes import RunesController
-from src.controller_furniture import FurnitureController
-from src.controller_floors import FloorsController
+from src.controllers.controller_monsters import MonstersController
+from src.controllers.controller_protection import ProtectionController
+from src.controllers.controller_weapon import WeaponController
+from src.controllers.controller_heroes import HeroController
+from src.controllers.controller_books import BooksController
+from src.controllers.controller_potions import PotionsController
+from src.controllers.controller_runes import RunesController
+from src.controllers.controller_furniture import FurnitureController
+from src.controllers.controller_floors import FloorsController
 
 
 class Empty():
