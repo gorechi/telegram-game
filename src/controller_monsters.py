@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human
+from src.class_monsters import Monster, Plant, Vampire, Corpse, Animal, WalkingDead, Skeleton, Berserk, Human, Demon
 from src.class_controller import Controller
 from src.class_basic import Money
 from src.functions.functions import randomitem
@@ -36,12 +36,13 @@ class MonstersController(Controller):
         max_floor: int
         specific_floors: list
         wear_armor: bool
-        preferred_weapon:str
-        stink:bool
-        can_resurrect:bool
-        weakness:dict
-        carry_money:bool
-        money:int
+        preferred_weapon: str
+        stink: bool
+        can_resurrect: bool
+        weakness: dict
+        carry_money: bool
+        money: int
+        boss: bool
     
     
     _classes = {
@@ -53,7 +54,8 @@ class MonstersController(Controller):
         "WalkingDead": WalkingDead,
         "Skeleton": Skeleton,
         "Berserk": Berserk,
-        "Human": Human
+        "Human": Human,
+        "Demon": Demon
     }    
     
     
@@ -98,9 +100,19 @@ class MonstersController(Controller):
             raise TypeError(f"Параметр 'floor' должен быть целым числом, а передан {type(floor)} {floor}.")
         templates_list = []
         for template in self.templates:
-            if (template.min_floor <= floor <= template.max_floor) or floor in template.specific_floors:
+            if ((template.min_floor <= floor <= template.max_floor) or floor in template.specific_floors) and not template.boss:
                 templates_list.append(template)
         return templates_list
+    
+    
+    def get_random_boss_template(self) -> Template:
+        """
+        Возвращает случайный шаблон монстра-босса
+        """
+        boss_templates = [template for template in self.templates if template.boss]
+        if not boss_templates:
+            raise ValueError("Нет шаблонов монстров-боссов.")
+        return randomitem(boss_templates)
     
     
     def get_random_templates_by_floor(self, floor:int, how_many:int=1) -> list[Template]:
@@ -116,16 +128,29 @@ class MonstersController(Controller):
         return templates_list
         
     
-    def create_monsters_by_floor(self, floor:int, how_many:int=1) -> list[Monster]:
+    def create_monsters_by_floor(self, floor) -> list[Monster]:
         """
         Создает список монстров для этажа
         """
-        templates_list = self.get_random_templates_by_floor(floor, how_many)
+        how_many = floor.how_many['монстры']
+        floor_number = floor.floor_number
+        templates_list = self.get_random_templates_by_floor(floor_number, how_many)
         monsters_list = []
         for template in templates_list:
             new_monster = self.create_object_from_template(template)
             monsters_list.append(new_monster)
+        if floor.boss:
+            monsters_list.append(self.create_random_boss())
         return monsters_list
+    
+    
+    def create_random_boss(self) -> Monster:
+        """
+        Создает случайного монстра-босса
+        """
+        boss_template = self.get_random_boss_template()
+        new_boss = self.create_object_from_template(boss_template)
+        return new_boss
      
     
     def kill_monster(self, monster:Monster) -> bool:

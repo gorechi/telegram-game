@@ -20,7 +20,8 @@ class FloorsController(Controller):
         how_many: dict
         how_many_dark_rooms: int
         how_many_locked_rooms: int
-        money_in_locked_rooms: dict    
+        money_in_locked_rooms: dict 
+        boss: bool   
     
     
     _classes = {

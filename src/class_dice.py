@@ -5,6 +5,7 @@ class Dice():
     def __init__(self, dice:list[int], modifier:int=0, dice_type:str=''):
         self.dice:list[int] = dice
         self.modifier = modifier
+        self.monster_class_modifiers = {}
         self.dice_type = dice_type
         self.temporary = []
         self.initial_dice = self.dice.copy()
@@ -33,7 +34,7 @@ class Dice():
         self.temporary = []
     
     
-    def roll(self, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> int:
+    def roll(self, add:list[int]=[], subtract:list[int]=[], multiplier:int=1, monster=None) -> int:
         """Функция имитирует бросок кубиков"""
         
         self_result = self.roll_set(self.dice * multiplier + self.temporary)
@@ -47,8 +48,18 @@ class Dice():
             subtract_result = self.roll_set(subtract)
         else:
             subtract_result = 0
-        result = self_result + add_result - subtract_result + self.modifier
+        if monster:
+            monster_modifier = self.get_monster_modifier(monster)
+        else:
+            monster_modifier = 0
+        result = self_result + add_result - subtract_result + self.modifier + monster_modifier
         return max(0, result)
+    
+    
+    def get_monster_modifier(self, monster) -> int:
+        monster_class = type(monster).__name__
+        modifier = self.monster_class_modifiers.get(monster_class, 0)
+        return modifier
     
     
     def roll_set(self, dice_set:list[int]) -> int:

@@ -908,6 +908,7 @@ class Monster:
             floor.stink(room, 3)
             floor.stink_map()
         self.floor = floor
+        print(f'Монстр {self.name} помещен в комнату {room.position} этажа {floor.floor_number}.')
         return True
 
 
@@ -1115,8 +1116,14 @@ class Human(Monster):
     def __init__(self, game):
         super().__init__(game)
         self.empty = False
-    
 
+
+class Demon(Monster):
+    """Класс Human наследует класс Monster и представляет собой тип монстра - демон."""
+    
+    def __init__(self, game):
+        super().__init__(game)
+        self.empty = False
 
 
 class WalkingDead(Monster):
