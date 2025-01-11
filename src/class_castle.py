@@ -222,10 +222,7 @@ class Floor:
         """
         Создает монстров на этаже.
         """
-        self.all_monsters = self.game.monsters_controller.create_monsters_by_floor(
-            self.floor_number,
-            self.how_many['монстры']
-        )
+        self.all_monsters = self.game.monsters_controller.create_monsters_by_floor(self)
         for monster in self.all_monsters:
             monster.place(self)
 

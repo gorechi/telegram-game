@@ -2,6 +2,7 @@
   {
     "class_name": "Monster",
     "name": "Гоблин",
+    "boss": false,
     "lexemes": {
       "nom": "гоблин",
       "accus": "гоблина",
@@ -78,6 +79,7 @@
   {
     "class_name": "Monster",
     "name": "Тролль",
+    "boss": false,
     "lexemes": {
       "nom": "тролль",
       "accus": "тролля",
@@ -155,6 +157,7 @@
   {
     "class_name": "Human",
     "name": "Разбойник",
+    "boss": false,
     "lexemes": {
       "nom": "разбойник",
       "accus": "разбойника",
@@ -232,6 +235,7 @@
   {
     "class_name": "Human",
     "name": "Разбойница",
+    "boss": false,
     "lexemes": {
       "nom": "разбойница",
       "accus": "разбойницу",
@@ -309,6 +313,7 @@
   {
     "class_name": "Human",
     "name": "Бандит",
+    "boss": false,
     "lexemes": {
       "nom": "бандит",
       "accus": "бандита",
@@ -386,6 +391,7 @@
   {
     "class_name": "Human",
     "name": "Бандитка",
+    "boss": false,
     "lexemes": {
       "nom": "бандитка",
       "accus": "бандитку",
@@ -463,6 +469,7 @@
   {
     "class_name": "Monster",
     "name": "Оборотень",
+    "boss": false,
     "lexemes": {
       "nom": "оборотень",
       "accus": "оборотня",
@@ -540,6 +547,7 @@
   {
     "class_name": "WalkingDead",
     "name": "Зомби",
+    "boss": false,
     "lexemes": {
       "nom": "зомби",
       "accus": "зомби",
@@ -616,6 +624,7 @@
   {
     "class_name": "Plant",
     "name": "Мухоловка",
+    "boss": false,
     "lexemes": {
       "nom": "мухоловка",
       "accus": "мухоловку",
@@ -700,6 +709,7 @@
   {
     "class_name": "Plant",
     "name": "Лиана",
+    "boss": false,
     "lexemes": {
       "nom": "лиана",
       "accus": "лиану",
@@ -784,6 +794,7 @@
   {
     "class_name": "Vampire",
     "name": "Лорд вампиров",
+    "boss": false,
     "lexemes": {
       "nom": "лорд вампиров",
       "accus": "лорда вампиров",
@@ -865,6 +876,7 @@
   {
     "class_name": "Vampire",
     "name": "Вурдалак",
+    "boss": false,
     "lexemes": {
       "nom": "вурдалак",
       "accus": "вурдалака",
@@ -946,6 +958,7 @@
   {
     "class_name": "Animal",
     "name": "Медведь",
+    "boss": false,
     "lexemes": {
       "nom": "медведь",
       "accus": "медведя",
@@ -1022,6 +1035,7 @@
   {
     "class_name": "Animal",
     "name": "Лев",
+    "boss": false,
     "lexemes": {
       "nom": "лев",
       "accus": "льва",
@@ -1098,6 +1112,7 @@
   {
     "class_name": "Monster",
     "name": "Гном",
+    "boss": false,
     "lexemes": {
       "nom": "гном",
       "accus": "гнома",
@@ -1174,6 +1189,7 @@
   {
     "class_name": "Berserk",
     "name": "Берсерк",
+    "boss": false,
     "lexemes": {
       "nom": "берсерк",
       "accus": "берсерка",
@@ -1250,6 +1266,7 @@
   {
     "class_name": "Human",
     "name": "Крестоносец",
+    "boss": false,
     "lexemes": {
       "nom": "крестоносец",
       "accus": "крестоносца",
@@ -1326,6 +1343,7 @@
   {
     "class_name": "Monster",
     "name": "Леший",
+    "boss": false,
     "lexemes": {
       "nom": "леший",
       "accus": "лешего",
@@ -1402,6 +1420,7 @@
   {
     "class_name": "Monster",
     "name": "Древень",
+    "boss": false,
     "lexemes": {
       "nom": "древень",
       "accus": "древня",
@@ -1478,6 +1497,7 @@
   {
     "class_name": "Human",
     "name": "Солдат",
+    "boss": false,
     "lexemes": {
       "nom": "солдат",
       "accus": "солдата",
@@ -1554,6 +1574,7 @@
   {
     "class_name": "Human",
     "name": "Крестьянин",
+    "boss": false,
     "lexemes": {
       "nom": "крестьянин",
       "accus": "крестьянина",
@@ -1630,6 +1651,7 @@
   {
     "class_name": "Animal",
     "name": "Волк",
+    "boss": false,
     "lexemes": {
       "nom": "волк",
       "accus": "волка",
@@ -1704,6 +1726,7 @@
   {
     "class_name": "Animal",
     "name": "Лиса",
+    "boss": false,
     "lexemes": {
       "nom": "лиса",
       "accus": "лису",
@@ -1777,6 +1800,7 @@
   {
     "class_name": "Animal",
     "name": "Крыса",
+    "boss": false,
     "lexemes": {
       "nom": "крыса",
       "accus": "крысу",
@@ -1851,6 +1875,7 @@
   {
     "class_name": "Animal",
     "name": "Гигантский паук",
+    "boss": false,
     "lexemes": {
       "nom": "паук",
       "accus": "паука",
@@ -1925,6 +1950,7 @@
   {
     "class_name": "Demon",
     "name": "Демон огня",
+    "boss": true,
     "lexemes": {
       "nom": "демон",
       "accus": "демона",

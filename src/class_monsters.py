@@ -908,6 +908,7 @@ class Monster:
             floor.stink(room, 3)
             floor.stink_map()
         self.floor = floor
+        print(f'Монстр {self.name} помещен в комнату {room.position} этажа {floor.floor_number}.')
         return True
 
 
