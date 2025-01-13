@@ -100,8 +100,12 @@ class BooksController(Controller):
             "prep": "Большой",
             "inst": "Большой"
           }
-    )    
+    )
     
+    _hero_actions = {
+      "вычитать": "use",
+      "почитать": "use"
+    }
     
     def __init__(self, game):
         self.game = game
@@ -113,7 +117,12 @@ class BooksController(Controller):
     def additional_actions(self, object) -> bool:
         self.decorate(object)
         self.define_price(object)
+        self.generate_hero_actions(object)
         return True
+    
+    
+    def generate_hero_actions(self, book):
+        book.hero_actions = BooksController._hero_actions
     
     
     def decorate(self, book):

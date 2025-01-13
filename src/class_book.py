@@ -47,7 +47,7 @@ class Book:
         message = [self.text]
         message.append(self.increase_mastery(who))
         message.append(f'{who.g("Он", "Она")} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-        self.increase_mastery(who)
+        who.action_controller.delete_actions_by_item(self)
         return message
 
     
@@ -55,6 +55,7 @@ class Book:
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             tprint(self.game, f'{who.name} забирает {self:accus} себе.')
+            who.action_controller.add_actions(self)
             return True
         return False
     

@@ -197,17 +197,17 @@ class Monster:
     
     def generate_weapon_text(self) -> str:
         if not self.weapon.empty:
-            return f'+d{self.weapon.damage}+{self.weapon.perm_damage()}'
+            return f'+{self.weapon.damage.text()}'
         return ''
     
     
     def generate_protection_text(self) -> str:
         if not self.shield.empty and self.armor.empty:
-            return f', защита - d{self.shield.protection}+{self.shield.perm_protection()}'
+            return f', защита - {self.shield.protection.text()}'
         elif self.shield.empty and not self.armor.empty:
-            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()}'
+            return f', защита - {self.armor.protection.text()}'
         elif not self.shield.empty and not self.armor.empty:
-            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()} + d{self.shield.protection}+{self.shield.perm_protection()}'
+            return f', защита - {self.armor.protection.text()} + {self.shield.protection.text()}'
         return ''
 
     
@@ -1080,7 +1080,7 @@ class Vampire(Monster):
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
+            empty_rooms = [room for room in floor.plan if (not room.monster_in_ambush() and not room == old_place)]
             room = randomitem(empty_rooms)
         places_to_hide = []
         for i in room.furniture:

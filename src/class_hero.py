@@ -12,6 +12,7 @@ from src.class_backpack import Backpack
 from src.class_fight import Fight
 from src.class_dice import Dice
 from src.functions.functions import howmany, normal_count, randomitem, tprint, roll, split_actions
+from src.controllers.controller_actions import ActionController
 from src.enums import state_enum, move_enum
 
 from random import randint
@@ -92,6 +93,7 @@ class Hero:
     
     def __init__(self, game):
         self.game = game
+        self.action_controller = ActionController(game=self.game, hero=self)
         self.poisoned = False
         self.trader = None
         self.weapon = self.game.no_weapon
@@ -680,21 +682,22 @@ class Hero:
         - command - команда от пользователя, полученная из чата игры
         
         """
-        full_command = command.split(' ')
-        if full_command[0] == '?':
+        parts = command.split(' ', maxsplit=1)
+        action, item = parts if len(parts) == 2 else (parts[0], None)
+        if action == '?':
             text = []
             text.append(f'{self.name} может:')
             for i in self.command_dict.keys():
                 text.append(i)
             tprint(self.game, text)
             return True
-        c = self.command_dict.get(full_command[0], False)
-        if not c:
+        method = self.command_dict.get(action, False)
+        if not method:
             tprint(self.game, f'Такого {self.name} не умеет!')
-        elif len(full_command) == 1:
-            c()
+        elif not item:
+            method()
         else:
-            c(full_command[1])
+            method(item)
 
     
     def get_poison_protection(self) -> int:
