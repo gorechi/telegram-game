@@ -3,6 +3,7 @@ from typing import NoReturn, Optional
 
 from src.class_basic import Loot, Money
 from src.class_items import Key
+from src.controllers.controller_actions import ActionController
 from src.functions.functions import pprint, randomitem, tprint, roll
 
 
@@ -343,6 +344,7 @@ class Room:
     
     def __init__(self, game, floor, doors):
         self.game = game
+        self.action_controller = ActionController(game=self.game, room=self)
         self.floor = floor
         self.doors = doors
         self.money:int = 0

@@ -23,18 +23,32 @@ class ActionController():
         name:str
     
     
-    def __init__(self, game, hero=None, room=None):
+    def __init__(self, game, hero=None, room=None, fight=None):
         self.game = game
         self.hero = hero
         self.room = room
+        self.fight = fight
         self.actions = {}
         self.items = []
         
     
+    def extract_actions(self, item:ItemProtocol) -> dict:
+        """
+        Извлекает действия из протокола предмета.
+        """
+        if self.hero and hasattr(item, 'hero_actions'):
+            return item.hero_actions
+        if self.room and hasattr(item, 'room_actions'):
+            return item.room_actions
+        if self.fight and hasattr(item, 'fight_actions'):
+            return item.fight_actions
+        return dict()
+    
+    
     def add_actions(self, item:ItemProtocol) -> bool:
         item_name = item.name
         item_names = item.get_names_list(['nom', "accus"])
-        actions = item.hero_actions
+        actions = self.extract_actions(item)
         for action, value in actions.items():
             method = getattr(item, value)
             new_item = self.Item(
@@ -49,34 +63,6 @@ class ActionController():
             self.actions[action].append(new_item)
         print(f'actions: {self.actions}')
         return True
-    
-    
-    # def add_actions(self, actions:dict) -> bool:
-    #     """
-    #     Добавляеет новые действия в контроллер.
-    #     :param actions: Словарь, где ключи - названия действий, а значения - словари с параметрами действий.
-    #     """
-    #     if not isinstance(actions, dict):
-    #         raise ValueError("Значение параметра actions должено быть словарем, но получено: {actions}")
-    #     for key, value in actions.items():
-    #         print(f'key: {key}, value: {value}')
-    #         if not self.actions.get(key, None):
-    #             self.actions[key] = {}
-    #         for key2, value2 in value.items():
-    #             self.actions[key][key2] = value2
-    #     print(f'В контроллер добавлены новые действия: {self.actions}')
-    #     return True
-    
-    
-    # def delete_actions_by_item(self, item) -> bool:
-    #     """
-    #     Удаляет действия из контроллера для определенного предмета.
-    #     """
-    #     for key, value in self.actions.items():
-    #         if item in value:
-    #             del self.actions[key][item]    
-    #     print(f'Из контроллера удалены действия: {self.actions}')
-    #     return True
     
     
     def delete_actions_by_item(self, item) -> bool:

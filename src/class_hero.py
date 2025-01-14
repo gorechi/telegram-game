@@ -134,8 +134,6 @@ class Hero:
                             'открыть': self.open,
                             'использовать': self.use,
                             'применить': self.use,
-                            'читать': self.read,
-                            'прочитать': self.read,
                             'убрать': self.remove,
                             'чинить': self.repair,
                             'починить': self.repair,
@@ -353,7 +351,6 @@ class Hero:
             state_enum.TRADE: self.trade_actions,
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
             state_enum.FIGHT: self.fight_actions,
-            state_enum.READ: self.read_actions,
             state_enum.DRINK: self.drink_actions,
             state_enum.ACTION: self.free_action
         }
@@ -1963,7 +1960,7 @@ class Hero:
                 message = []
                 message.append(f'{self.name} осматривает {item} и находит:')
                 message += room.secret_loot.show_sorted()
-                room.secret_loot.transfer(room.loot)
+                room.secret_loot.reveal(room)
                 message.append('Все, что было спрятано, теперь лежит на виду.')
                 tprint(game, message)
             return True
@@ -1992,7 +1989,7 @@ class Hero:
             message = []
             message.append(f'{self.name} осматривает {corpse.name} и находит:')
             message += corpse.loot.show_sorted()
-            corpse.loot.transfer(room.loot)
+            corpse.loot.reveal(room)
             message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
             tprint(game, message)
         return True
@@ -2031,7 +2028,7 @@ class Hero:
             return False
         message = [f'{self.name} осматривает {what:accus} и находит:']
         message += what.loot.show_sorted()
-        what.loot.transfer(room.loot)
+        what.loot.reveal(room)
         message.append('Все, что было спрятано, теперь лежит на виду.')
         tprint(self.game, message)
         return True
@@ -2360,19 +2357,16 @@ class Hero:
         tprint(game, message, 'enchant')
 
     
-    def check_if_hero_can_read(self) -> bool:
+    def check_if_can_read(self) -> bool:
         """Метод проверки, может ли герой сейчас читать."""
         
-        game = self.game
         if self.fear >= Hero._fear_limit:
-            tprint(game, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.')
-            return False
+            return False, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.'
         if not self.check_light():
-            tprint(game, f'{self.name} решает, что читать в такой темноте вредно для зрения.')
-            return False
-        return True
+            return False, f'{self.name} решает, что читать в такой темноте вредно для зрения.'
+        return True, []
     
-    
+        
     def check_light(self) -> bool:
         """Метод проверки, есть ли в комнате свет."""
         
@@ -2388,79 +2382,79 @@ class Hero:
         return False
         
     
-    def get_book(self, item:str) -> Book|None:
-        """
-        Метод поиска книги в рюкзаке.
-        Принимает на вход строку из команды игрока.
-        Если передана пустая строка или просто "книга", 
-        возвращает случайную книку.
-        Если передана конкретная книга, возвращает ее.
+    # def get_book(self, item:str) -> Book|None:
+    #     """
+    #     Метод поиска книги в рюкзаке.
+    #     Принимает на вход строку из команды игрока.
+    #     Если передана пустая строка или просто "книга", 
+    #     возвращает случайную книку.
+    #     Если передана конкретная книга, возвращает ее.
         
-        """
+    #     """
         
-        game = self.game
-        if not item or item == 'книгу':
-            book = self.backpack.get_random_item_by_class(Book)
-            message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
-        else:
-            book = self.backpack.get_first_item_by_name(item)
-            message = f'{self.name} читает {book:accus}.'
-        if book:
-            tprint(game, message)
-            return book
-        return None 
+    #     game = self.game
+    #     if not item or item == 'книгу':
+    #         book = self.backpack.get_random_item_by_class(Book)
+    #         message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
+    #     else:
+    #         book = self.backpack.get_first_item_by_name(item)
+    #         message = f'{self.name} читает {book:accus}.'
+    #     if book:
+    #         tprint(game, message)
+    #         return book
+    #     return None 
     
     
-    def read(self, what:str=None) -> bool:
-        """
-        Метод обрабатывает команду "читать".       
-        """
-        game = self.game
-        if what and what.lower() in ['карту', 'карта']:
-            return self.use_item_from_backpack('карта')
-        self.book_list = self.backpack.get_items_by_class(Book)
-        if not self.book_list:
-            tprint(game, 'В рюкзаке нет ни одной книги.', 'direction')
-            return False
-        message = []
-        message.append(f'{self.name} может прочитать следующие книги:')
-        for book in self.book_list:
-            message.append(f'{str(self.book_list.index(book) + 1)}: {str(book)}')
-        message.append('Выберите номер книги или скажите "отмена" чтобы ничего не читать')
-        self.state = state_enum.READ
-        tprint(game, message, 'read')
-        return True
+    # def read(self, what:str=None) -> bool:
+    #     """
+    #     Метод обрабатывает команду "читать".       
+    #     """
+    #     game = self.game
+    #     if what and what.lower() in ['карту', 'карта']:
+    #         return self.use_item_from_backpack('карта')
+    #     self.book_list = self.backpack.get_items_by_class(Book)
+    #     if not self.book_list:
+    #         tprint(game, 'В рюкзаке нет ни одной книги.', 'direction')
+    #         return False
+    #     message = []
+    #     message.append(f'{self.name} может прочитать следующие книги:')
+    #     for book in self.book_list:
+    #         message.append(f'{str(self.book_list.index(book) + 1)}: {str(book)}')
+    #     message.append('Выберите номер книги или скажите "отмена" чтобы ничего не читать')
+    #     self.state = state_enum.READ
+    #     tprint(game, message, 'read')
+    #     return True
         
     
-    def read_actions(self, message:str) -> bool:
+    # def read_actions(self, message:str) -> bool:
         
-        """
-        Метод обрабатывает команды игрока когда он читает книги.
+    #     """
+    #     Метод обрабатывает команды игрока когда он читает книги.
         
-        Возвращает:
-        - True - если удалось прочитать книгу
-        - False - если по любой причине книгу прочитать не удалось
+    #     Возвращает:
+    #     - True - если удалось прочитать книгу
+    #     - False - если по любой причине книгу прочитать не удалось
         
-        """
+    #     """
         
-        book_list = self.book_list
-        if message == 'отмена':
-            tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего читать.', 'direction')
-            self.state = state_enum.NO_STATE
-            return False
-        if not message.isdigit():
-            tprint(self.game, f'Чтобы прочитать книгу {self:dat} нужно выбрать ее по ее номеру.', 'read')
-            return False
-        message = int(message) - 1
-        if not message < len(book_list):
-            tprint(self.game, f'У {self:gen} нет столько книг.', 'read')
-            return False
-        book = book_list[message]
-        self.backpack.remove(book)           
-        tprint(self.game, book.use(self), 'direction')
-        self.decrease_restless(2)
-        self.state = state_enum.NO_STATE
-        return True
+    #     book_list = self.book_list
+    #     if message == 'отмена':
+    #         tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего читать.', 'direction')
+    #         self.state = state_enum.NO_STATE
+    #         return False
+    #     if not message.isdigit():
+    #         tprint(self.game, f'Чтобы прочитать книгу {self:dat} нужно выбрать ее по ее номеру.', 'read')
+    #         return False
+    #     message = int(message) - 1
+    #     if not message < len(book_list):
+    #         tprint(self.game, f'У {self:gen} нет столько книг.', 'read')
+    #         return False
+    #     book = book_list[message]
+    #     self.backpack.remove(book)           
+    #     tprint(self.game, book.use(self), 'direction')
+    #     self.decrease_restless(2)
+    #     self.state = state_enum.NO_STATE
+    #     return True
     
     
     def drink(self, what:str=None) -> bool:

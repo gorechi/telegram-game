@@ -5,6 +5,16 @@ class Book:
     def __init__(self, game):
         self.game = game
         self.empty = False
+        self.hero_actions = {
+            "читать": "use",
+            "прочитать": "use",
+            "почитать": "use"
+            }
+        self.room_actions = {
+            "взять": "take",
+            "брать": "take",
+            "собрать": "take"
+        }
 
 
     def __format__(self, format:str) -> str:
@@ -39,24 +49,36 @@ class Book:
         return True
     
     
+    def examine(self, who) -> list[str]:
+        can_examine, message = who.check_if_can_examine()
+        if can_examine:
+            message = [f'{who.name} держит в руках {self:accus}. {self.examine_text}']
+        return message
+
+    
     def show(self):
         return self.lexemes['nom']
     
     
     def use(self, who, in_action:bool=False) -> list[str]:
-        message = [self.text]
-        message.append(self.increase_mastery(who))
-        message.append(f'{who.g("Он", "Она")} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
-        who.backpack.remove(self)
-        who.action_controller.delete_actions_by_item(self)
+        can_read, message = who.check_if_can_read()
+        if can_read: 
+            message = [f'{who.name} читает {self:accus}.']
+            message.append(self.text)
+            message.append(self.increase_mastery(who))
+            message.append(f'{who:pronoun} решает больше не носить книгу с собой и оставляет ее в незаметном месте.'.capitalize())
+            who.backpack.remove(self)
+            who.action_controller.delete_actions_by_item(self)
         return message
 
     
     def take(self, who):
+        room = who.current_position
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             tprint(self.game, f'{who.name} забирает {self:accus} себе.')
             who.action_controller.add_actions(self)
+            room.action_controller.delete_actions_by_item(self)
             return True
         return False
     

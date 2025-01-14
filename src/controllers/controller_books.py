@@ -14,7 +14,8 @@ class BooksController(Controller):
         base_price: int
         price_dice: dict
         texts: list
-        can_use_in_fight: bool      
+        can_use_in_fight: bool
+        examine_text: str      
     
     
     _classes = {
@@ -102,11 +103,6 @@ class BooksController(Controller):
           }
     )
     
-    _hero_actions = {
-      "вычитать": "use",
-      "почитать": "use"
-    }
-    
     def __init__(self, game):
         self.game = game
         self.how_many = 0
@@ -117,12 +113,7 @@ class BooksController(Controller):
     def additional_actions(self, object) -> bool:
         self.decorate(object)
         self.define_price(object)
-        self.generate_hero_actions(object)
         return True
-    
-    
-    def generate_hero_actions(self, book):
-        book.hero_actions = BooksController._hero_actions
     
     
     def decorate(self, book):

@@ -8,6 +8,11 @@ class Potion:
         self.game = game
         self.empty = False
         self.owner = None
+        self.hero_actions = {
+            "пить": "use",
+            "выпить": "use",
+            "попить": "use"
+            }
 
     
     def __format__(self, format:str) -> str:
