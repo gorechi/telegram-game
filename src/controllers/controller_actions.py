@@ -91,13 +91,25 @@ class ActionController():
         return True
     
     
-    def get_items_by_action(self, action: str) -> list:
+    def get_items_by_action(self, action: str, item: str=None) -> list:
         """
         Возвращает список экземпляров дата-класса Item, которые могут быть использованы для выполнения действия.
         """
+        if item:
+            items = self.get_items_by_filters()
         return self.actions.get(action, [])
     
     
     def get_items_by_filters(self, **filters) -> list:
         """Возвращает случайный объект, удовлетворяющий заданным фильтрам"""
         return [item for item in self.items if all(getattr(item, key) == value for key, value in filters.items())]
+    
+    
+    def get_items_by_action_and_name(self, action:str, name: str=None) -> list:
+        """
+        Возвращает список экземпляров дата-класса Item, которые имеют заданное имя.
+        """
+        items_list = self.actions[action]
+        if name:
+            return [item for item in items_list if name.lower() in item.names]
+        return items_list

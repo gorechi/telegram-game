@@ -47,6 +47,7 @@ class Book:
         message = [self.text]
         message.append(self.increase_mastery(who))
         message.append(f'{who.g("Он", "Она")} решает больше не носить книгу с собой и оставляет ее в незаметном месте.')
+        who.backpack.remove(self)
         who.action_controller.delete_actions_by_item(self)
         return message
 

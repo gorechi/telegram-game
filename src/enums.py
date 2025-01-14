@@ -20,6 +20,7 @@ class state_enum(Enum):
     TRADE = 5
     READ = 6
     DRINK = 7
+    ACTION = 8
 
 class move_enum(Enum):
     """

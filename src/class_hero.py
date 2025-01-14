@@ -342,9 +342,9 @@ class Hero:
     def action(self, command:str, message:str):
         
         """Метод обработки комманд от игрока."""
-        
+        # command in self.command_dict.keys() and
         message = message.lower()
-        if command in self.command_dict.keys() and self.state == state_enum.NO_STATE:
+        if self.state == state_enum.NO_STATE:
             if not self.game.check_endgame():
                 self.do(message)
             return True
@@ -354,7 +354,8 @@ class Hero:
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
             state_enum.FIGHT: self.fight_actions,
             state_enum.READ: self.read_actions,
-            state_enum.DRINK: self.drink_actions
+            state_enum.DRINK: self.drink_actions,
+            state_enum.ACTION: self.free_action
         }
         if command in Hero._level_up_commands and self.state == state_enum.LEVEL_UP:
             self.levelup(command)
@@ -692,13 +693,50 @@ class Hero:
             tprint(self.game, text)
             return True
         method = self.command_dict.get(action, False)
-        if not method:
+        if method:
+            if not item:
+                method()
+            else:
+                method(item)
+            return True
+        self.do_from_dictionary(action, item)
+        
+        
+    def do_from_dictionary(self, action:str, item:str=None):
+        items = self.action_controller.get_items_by_action_and_name(action, item)
+        if not items:
             tprint(self.game, f'Такого {self.name} не умеет!')
-        elif not item:
-            method()
-        else:
-            method(item)
+            return False
+        message = []
+        message.append(f'{self.name} может "{action}" следующие вещи:')
+        for item in items:
+            message.append(f'{items.index(item) + 1}: {item.name}')
+        message.append('Выберите номер вещи или скажите "отмена" чтобы ничего не делать')
+        self.to_do_list = items
+        self.state = state_enum.ACTION
+        tprint(self.game, message, 'read')
+        return False
+    
 
+    def free_action(self, message:str):
+        items_list = self.to_do_list
+        if message == 'отмена':
+            tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего делать.', 'direction')
+            self.state = state_enum.NO_STATE
+            return False
+        if not message.isdigit():
+            tprint(self.game, f'Чтобы что-то сделать {self:dat} нужно выбрать вещь по ее номеру.', 'read')
+            return False
+        message = int(message) - 1
+        if not message < len(self.to_do_list):
+            tprint(self.game, f'У {self:gen} нет столько подходящих вещей.', 'read')
+            return False
+        item = self.to_do_list[message]
+        action = item.action
+        tprint(self.game, action(self), 'direction')
+        self.decrease_restless(2)
+        self.state = state_enum.NO_STATE
+        
     
     def get_poison_protection(self) -> int:
         protection = self.poison_protection.roll()
