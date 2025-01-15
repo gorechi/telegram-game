@@ -39,9 +39,6 @@ class Loot:
             room.loot.add(item)
             room.action_controller.add_actions(item)
         self.clear()
-        print('='*40)
-        print(f'Словарь комнаты {room.position}: {room.action_controller.actions}')
-        print('='*40)
         return True
     
     

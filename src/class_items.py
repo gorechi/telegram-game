@@ -190,6 +190,13 @@ class Matches:
             who.backpack.remove(self)
             return True
         return False
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['спички', 'спичку', 'спичка']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
   
 
 class Map:
@@ -306,6 +313,13 @@ class Map:
         if not who.backpack.no_backpack:
             who.backpack.append(self)
             tprint(self.game, f'{who.name} забирает {self:accus} себе.')
+            
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = []
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
 
 
 class Key:
@@ -374,3 +388,10 @@ class Key:
         
         tprint(
             self.game, f'{who_is_using.name} не знает, как можно использовать ключ если не открывать им что-то.')
+        
+        
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = []
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list

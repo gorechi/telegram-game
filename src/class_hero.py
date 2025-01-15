@@ -697,18 +697,42 @@ class Hero:
                 method(item)
             return True
         self.do_from_dictionary(action, item)
+    
+    
+    def check_fight(self) -> bool:
+        if self.current_fight:
+            return True
+        return False
+            
         
-        
+    def get_items_for_action(self, action:str, item:str=None, in_darkness:bool=False, in_combat:bool=False) -> list:
+        hero_items_list = self.action_controller.get_items_by_action_and_name(
+            action = action, 
+            item = item, 
+            in_darkness = in_darkness, 
+            in_combat = in_combat
+            ) 
+        room_items_list = self.current_position.action_controller.get_items_by_action_and_name(
+            action = action, 
+            item = item, 
+            in_darkness = in_darkness, 
+            in_combat = in_combat
+            )
+        return hero_items_list + room_items_list
+    
+    
     def do_from_dictionary(self, action:str, item:str=None):
-        items = self.action_controller.get_items_by_action_and_name(action, item)
+        in_darkness = not self.check_light()
+        in_combat = self.check_fight()
+        items = self.get_items_for_action(action, item, in_darkness, in_combat)
         if not items:
-            tprint(self.game, f'Такого {self.name} не умеет!')
+            tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
             return False
         message = []
         message.append(f'{self.name} может "{action}" следующие вещи:')
         for item in items:
             message.append(f'{items.index(item) + 1}: {item.name}')
-        message.append('Выберите номер вещи или скажите "отмена" чтобы ничего не делать')
+        message.append('Герой должен назвать номер вещи или громко выкрикнуть "отмена" чтобы ничего не делать')
         self.to_do_list = items
         self.state = state_enum.ACTION
         tprint(self.game, message, 'read')

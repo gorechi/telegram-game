@@ -153,11 +153,11 @@ class Protection:
         return Protection._elements_dictionary.get(self.element(), None)
         
         
-    def get_element_names(self, key:str=None) -> str|dict|None:
+    def get_element_names(self, key:str=None) -> str|dict:
         names = {}
         element_decorator = self.get_element_decorator()
         if not element_decorator:
-            return None
+            return ''
         for lexeme in self.lexemes:
             names[lexeme] = f'{self.lexemes[lexeme]} {element_decorator}'
         if key:

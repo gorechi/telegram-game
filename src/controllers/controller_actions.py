@@ -21,7 +21,9 @@ class ActionController():
         names: list
         action: object
         name:str
-    
+        in_combat: bool
+        in_darkness: bool
+          
     
     def __init__(self, game, hero=None, room=None, fight=None):
         self.game = game
@@ -50,13 +52,18 @@ class ActionController():
         item_names = item.get_names_list(['nom', "accus"])
         actions = self.extract_actions(item)
         for action, value in actions.items():
-            method = getattr(item, value)
+            method = getattr(item, value["method"])
             new_item = self.Item(
                 item = item, 
                 names = item_names, 
                 action = method, 
-                name = item_name
+                name = item_name,
+                in_combat = value["in_combat"],
+                in_darkness = value["in_darkness"],
                 )
+            print('='*40)
+            print(f'Создан item {new_item}')
+            print('='*40)
             self.items.append(new_item)
             if not self.actions.get(action, None):
                 self.actions[action] = []
@@ -91,11 +98,11 @@ class ActionController():
         return [item for item in self.items if all(getattr(item, key) == value for key, value in filters.items())]
     
     
-    def get_items_by_action_and_name(self, action:str, name: str=None) -> list:
+    def get_items_by_action_and_name(self, action:str, name: str=None, in_darcness: bool=False, in_combat: bool=False) -> list:
         """
         Возвращает список экземпляров дата-класса Item, которые имеют заданное имя.
         """
-        items_list = self.actions[action]
+        items_list = self.actions.get(action, list())
         if name:
             return [item for item in items_list if name.lower() in item.names]
         return items_list

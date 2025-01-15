@@ -6,14 +6,38 @@ class Book:
         self.game = game
         self.empty = False
         self.hero_actions = {
-            "читать": "use",
-            "прочитать": "use",
-            "почитать": "use"
+            "читать": {
+                "method": "use",
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "прочитать": {
+                "method": "use",
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "почитать": {
+                "method": "use",
+                "in_combat": False,
+                "in_darkness": False
+                }
             }
         self.room_actions = {
-            "взять": "take",
-            "брать": "take",
-            "собрать": "take"
+            "взять": {
+                "method": "take",
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "in_combat": False,
+                "in_darkness": False
+                }
         }
 
 
