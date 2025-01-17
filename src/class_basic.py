@@ -144,6 +144,27 @@ class Money:
         self.how_much_money = how_much_money
         self.empty = False
         self.generate_name()
+        self.hero_actions = {}
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
     
     def generate_name(self):

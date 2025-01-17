@@ -23,6 +23,7 @@ class ActionController():
         name:str
         in_combat: bool
         in_darkness: bool
+        bulk: bool
           
     
     def __init__(self, game, hero=None, room=None, fight=None):
@@ -52,14 +53,15 @@ class ActionController():
         item_names = item.get_names_list(['nom', "accus"])
         actions = self.extract_actions(item)
         for action, value in actions.items():
-            method = getattr(item, value["method"])
+            method = getattr(item, value.get("method", ''))
             new_item = self.Item(
                 item = item, 
                 names = item_names, 
                 action = method, 
                 name = item_name,
-                in_combat = value["in_combat"],
-                in_darkness = value["in_darkness"],
+                in_combat = value.get("in_combat", False),
+                in_darkness = value.get("in_darkness", False),
+                bulk = value.get("bulk", False)
                 )
             print('='*40)
             print(f'Создан item {new_item}')
@@ -88,8 +90,6 @@ class ActionController():
         """
         Возвращает список экземпляров дата-класса Item, которые могут быть использованы для выполнения действия.
         """
-        if item:
-            items = self.get_items_by_filters()
         return self.actions.get(action, [])
     
     
@@ -98,11 +98,15 @@ class ActionController():
         return [item for item in self.items if all(getattr(item, key) == value for key, value in filters.items())]
     
     
-    def get_items_by_action_and_name(self, action:str, name: str=None, in_darcness: bool=False, in_combat: bool=False) -> list:
+    def get_items_by_action_and_name(self, action:str, name:str=None, in_darkness:bool=False, in_combat:bool=False) -> list:
         """
         Возвращает список экземпляров дата-класса Item, которые имеют заданное имя.
         """
         items_list = self.actions.get(action, list())
         if name:
-            return [item for item in items_list if name.lower() in item.names]
+            return [item for item in items_list if (name.lower() in item.names)]
+        if in_darkness:
+            items_list = [item for item in items_list if item.in_darkness == True]
+        if in_combat:
+            items_list = [item for item in items_list if item.in_combat == True]
         return items_list

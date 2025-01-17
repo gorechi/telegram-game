@@ -115,4 +115,4 @@ class Game():
         book2 = self.books_controller.get_random_object_by_filters()
         book1.take(self.player)
         book2.take(self.player)
-        print('Тестирование питья напитков')
+        self.current_floor.plan[0].light = False

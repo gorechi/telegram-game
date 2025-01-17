@@ -1,8 +1,6 @@
-from random import randint as dice
 from typing import NoReturn, Optional
 
-from src.class_basic import Loot, Money
-from src.class_items import Key
+from src.class_basic import Loot
 from src.controllers.controller_actions import ActionController
 from src.functions.functions import pprint, randomitem, tprint, roll
 
@@ -753,7 +751,7 @@ class Room:
         return None
     
     
-    def turn_on_light(self, who) -> NoReturn:
+    def turn_on_light(self, who) -> list[str]:
         
         """Метод зажигания в комнате света. """
         
@@ -764,15 +762,9 @@ class Room:
                 f'{who.name} зажигает факел и комната озаряется светом']
         if monster:
             if monster.frightening:
-                message.append(
-                        f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
+                message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
                 who.fear += 1
-        tprint(self.game, message)
-        self.show(who)
-        self.map()
-        if monster:
-            if monster.aggressive:
-                who.fight(monster.name, True)
+        return message
                 
     
     def get_random_unlocked_furniture(self):

@@ -1,5 +1,3 @@
-from random import randint as dice
-from typing import Any, NoReturn
 
 from src.functions.functions import randomitem, tprint, roll, pprint
 
@@ -90,6 +88,46 @@ class Matches:
         self.room = None
         self.empty = False
         self.quantity = self.get_quantity()
+        self.hero_actions = {
+            "осмотреть": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "пересчитать": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "посчитать": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
 
     def __format__(self, format:str) -> str:
@@ -149,7 +187,7 @@ class Matches:
         return True
 
     
-    def take(self, who=None) -> bool:
+    def take(self, who=None) -> str:
         
         """ Метод вызывается когда кто-то забирает спички себе. """
         
@@ -161,12 +199,11 @@ class Matches:
                 matches_in_backpack + self
             else:
                 who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
-            return True
-        return False
+            return f'{who.name} забирает {self:accus} себе.'
+        return 'ТЕХДОЛГ В МЕТОДЕ Take() спичек'
 
     
-    def use(self, who_is_using=None, in_action=False) -> bool:
+    def use(self, who_is_using=None, in_action=False) -> str|list[str]:
         
         """ Метод использования спичек. """
         
@@ -174,22 +211,20 @@ class Matches:
             who_is_using = self.game.player
         room = who_is_using.current_position
         if room.light:
-            tprint(self.game, 'Незачем тратить спички, здесь и так светло.')
-            return False
+            return 'Незачем тратить спички, здесь и так светло.'
         if who_is_using.check_fear(print_message=False) and roll([2]) == 1:
-            tprint(self.game, f'От страха пальцы {who_is_using.g("героя", "героини")} не слушаются. Спичка ломается и падает на пол.')    
-        else:
-            room.turn_on_light(who_is_using)
+            return f'От страха пальцы {who_is_using.g("героя", "героини")} не слушаются. Спичка ломается и падает на пол.'  
+        message = room.turn_on_light(who_is_using)
         self.quantity -= 1
-        self.check_if_empty(who_is_using)
-        return True
+        message.append(self.check_if_empty(who_is_using))
+        return message
     
     
-    def check_if_empty(self, who) -> bool:
+    def check_if_empty(self, who) -> str:
         if self.quantity <= 0:
             who.backpack.remove(self)
-            return True
-        return False
+            return f'{who.g("Герой", "Героиня")} зашвыривает пустую коробочку от спичек в угол комнаты.'
+        return f'{who.g("Герой", "Героиня")} бержно убирает оставшиеся спички в рюкзак'
     
     
     def get_names_list(self, cases:list=None) -> list:
@@ -222,6 +257,52 @@ class Map:
         }
         self.empty = False
         self.decorate()
+        self.hero_actions = {
+            "смотреть": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "использовать": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "прочитать": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "читать": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
     
 
     def __format__(self, format:str) -> str:
@@ -235,7 +316,7 @@ class Map:
     
     
     def check_name(self, message:str) -> bool:
-        return message.lower() in ['карта', 'карту']
+        return message.lower() in ['карта', 'карту', 'карты']
     
     
     def place(self, room=None) -> bool:
@@ -270,13 +351,23 @@ class Map:
         - in_action - признак того, что предмет используется в бою. По умолчанию False.
 
         """
-        game = self.game
-        read_map, map_text = who.generate_map_text(in_action)
-        tprint(game, map_text, 'direction')
+        read_map, map_text = who.generate_map_text(who, in_action)
         if read_map:    
             self.show_map()
-            return True
-        return False
+        return map_text
+
+    
+    def generate_map_text(self, who, in_action: bool = False) -> list[bool, str]:
+        if not in_action:
+            if not who.check_fear:
+                return False, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.'
+            elif not who.current_position.light:
+                return False, 'В комнате слишком темно чтобы разглядывать карту'
+            else:
+                return True, f'{who.name} смотрит на карту этажа замка.'
+        else:
+            return False, 'Во время боя это совершенно неуместно!'
+
 
     
     def show_map(self):
@@ -306,13 +397,14 @@ class Map:
         pprint(game, text, rooms*Map._width_coefficient, rows*Map._height_coefficient)
 
     
-    def take(self, who) -> NoReturn:
+    def take(self, who) -> str:
         
         """ Метод вызывается когда кто-то забирает карту себе. """
         
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
+            return f'{who.name} забирает {self:accus} себе.'
+        return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             
     
     def get_names_list(self, cases:list=None) -> list:
@@ -338,6 +430,27 @@ class Key:
         }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
+        self.hero_actions = {}
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
 
     def __format__(self, format:str) -> str:
@@ -374,21 +487,9 @@ class Key:
     def take(self, who):
         if not who.backpack.no_backpack:
             who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self.name} себе.')
-            return True
-        return False
-    
-    
-    def use(self, who_is_using, in_action:bool=False) -> str:
-        
-        """ 
-        Метод использования ключа. 
-        
-        """
-        
-        tprint(
-            self.game, f'{who_is_using.name} не знает, как можно использовать ключ если не открывать им что-то.')
-        
+            return f'{who.name} забирает {self.name} себе.'
+        return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
+            
         
     def get_names_list(self, cases:list=None) -> list:
         names_list = []

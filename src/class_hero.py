@@ -602,16 +602,16 @@ class Hero:
         return self.check_dext(add=[self.trap_mastery])
                 
         
-    def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
-        if not in_action:
-            if self.fear >= Hero._fear_limit:
-                return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
-            elif not self.current_position.light:
-                return False, 'В комнате слишком темно чтобы разглядывать карту'
-            else:
-                return True, f'{self.name} смотрит на карту этажа замка.'
-        else:
-            return False, 'Во время боя это совершенно неуместно!'
+    # def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
+    #     if not in_action:
+    #         if self.fear >= Hero._fear_limit:
+    #             return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
+    #         elif not self.current_position.light:
+    #             return False, 'В комнате слишком темно чтобы разглядывать карту'
+    #         else:
+    #             return True, f'{self.name} смотрит на карту этажа замка.'
+    #     else:
+    #         return False, 'Во время боя это совершенно неуместно!'
     
     
     def intel_wound(self) -> str:
@@ -705,16 +705,16 @@ class Hero:
         return False
             
         
-    def get_items_for_action(self, action:str, item:str=None, in_darkness:bool=False, in_combat:bool=False) -> list:
+    def get_items_for_action(self, action:str, item:str=None, in_darkness:bool=False, in_combat:bool=False, bulk:bool=False) -> list:
         hero_items_list = self.action_controller.get_items_by_action_and_name(
             action = action, 
-            item = item, 
+            name = item, 
             in_darkness = in_darkness, 
             in_combat = in_combat
             ) 
         room_items_list = self.current_position.action_controller.get_items_by_action_and_name(
             action = action, 
-            item = item, 
+            name = item, 
             in_darkness = in_darkness, 
             in_combat = in_combat
             )
@@ -726,8 +726,15 @@ class Hero:
         in_combat = self.check_fight()
         items = self.get_items_for_action(action, item, in_darkness, in_combat)
         if not items:
-            tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
+            if in_darkness:
+                tprint(self.game, f'В комнате слишком темно чтобы делать что-то такое.') 
+            else:
+                tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
             return False
+        items = self.bulk_actions(items)
+        if not items:
+            tprint(self.game, f'У героя закончились варианты сделать еще что-то подобное.') 
+            return True
         message = []
         message.append(f'{self.name} может "{action}" следующие вещи:')
         for item in items:
@@ -736,11 +743,18 @@ class Hero:
         self.to_do_list = items
         self.state = state_enum.ACTION
         tprint(self.game, message, 'read')
-        return False
+        return True
     
+    
+    def bulk_actions(self, items:list) -> list:
+        items_for_bulk_actions = [item for item in items if item.bulk]
+        for item in items_for_bulk_actions:
+            tprint(self.game, item.action(self))
+            items.remove(item)
+        return items
+            
 
     def free_action(self, message:str):
-        items_list = self.to_do_list
         if message == 'отмена':
             tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего делать.', 'direction')
             self.state = state_enum.NO_STATE
@@ -2136,7 +2150,7 @@ class Hero:
         return True
     
     
-    def check_fear(self, print_message:bool=True) -> bool:
+    def check_fear(self) -> str|bool:
         """
         Метод проверки того, что герой испытывает страх.
         Если страх выше лимита, то на экран выводится сообщение, что ничего не получилось.
@@ -2145,9 +2159,7 @@ class Hero:
         """
         
         if self.fear >= Hero._fear_limit:
-            if print_message:
-                tprint(self.game, f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.')
-            return True
+            return f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.'
         return False
     
     
@@ -2173,7 +2185,9 @@ class Hero:
         """Метод проверяет, может ли герой что-то открывать."""
         
         game = self.game
-        if self.check_fear():
+        fear = self.check_fear()
+        if fear:
+            tprint(game, fear)
             return False
         if not self.check_light():
             tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')

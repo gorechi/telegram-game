@@ -1,4 +1,4 @@
-from src.functions.functions import randomitem, tprint, roll
+from src.functions.functions import randomitem, tprint
 
 class Book:
         
@@ -8,16 +8,19 @@ class Book:
         self.hero_actions = {
             "читать": {
                 "method": "use",
+                "batch": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "прочитать": {
                 "method": "use",
+                "batch": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": True
                 },
             "почитать": {
                 "method": "use",
+                "batch": False,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -25,16 +28,19 @@ class Book:
         self.room_actions = {
             "взять": {
                 "method": "take",
+                "batch": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
+                "batch": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
+                "batch": True,
                 "in_combat": False,
                 "in_darkness": False
                 }
