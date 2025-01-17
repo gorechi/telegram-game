@@ -105,10 +105,8 @@ class Book:
     def take(self, who):
         room = who.current_position
         if not who.backpack.no_backpack:
-            who.backpack.append(self)
+            who.put_in_backpack(self)
             tprint(self.game, f'{who.name} забирает {self:accus} себе.')
-            who.action_controller.add_actions(self)
-            room.action_controller.delete_actions_by_item(self)
             return True
         return False
     

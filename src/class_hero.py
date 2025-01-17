@@ -2086,6 +2086,13 @@ class Hero:
         return self.search_furniture(item=item)
         
 
+    def put_in_backpack(self, item) -> bool:
+        self.backpack.append(item)
+        self.action_controller.add_actions(item)
+        self.current_position.action_controller.delete_actions_by_item(item)
+        return True
+    
+    
     def can_take(self, obj) -> bool:
         """
         Метод проверяет, может ли герой взять объект себе.

@@ -193,12 +193,13 @@ class Matches:
         
         if not who:
             return False
+        room = who.current_position
         if not who.backpack.no_backpack:
             matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
             if matches_in_backpack:
                 matches_in_backpack + self
             else:
-                who.backpack.append(self)
+                who.put_in_backpack(self)
             return f'{who.name} забирает {self:accus} себе.'
         return 'ТЕХДОЛГ В МЕТОДЕ Take() спичек'
 
@@ -399,10 +400,12 @@ class Map:
     
     def take(self, who) -> str:
         
-        """ Метод вызывается когда кто-то забирает карту себе. """
-        
+        """ 
+        Метод вызывается когда кто-то забирает карту себе. 
+        """
+        room = who.current_position
         if not who.backpack.no_backpack:
-            who.backpack.append(self)
+            who.put_in_backpack(self)
             return f'{who.name} забирает {self:accus} себе.'
         return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             
@@ -485,8 +488,9 @@ class Key:
 
     
     def take(self, who):
+        room = who.current_position
         if not who.backpack.no_backpack:
-            who.backpack.append(self)
+            who.put_in_backpack(self)
             return f'{who.name} забирает {self.name} себе.'
         return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             

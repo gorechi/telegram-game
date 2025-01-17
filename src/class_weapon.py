@@ -28,6 +28,46 @@ class Weapon:
         self.game = game
         self.runes = []
         self.empty = False
+        self.hero_actions = {
+            "использовать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "экипировать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выбрать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
     
     def __format__(self, format:str) -> str:
@@ -150,8 +190,7 @@ class Weapon:
         return self.damage.roll()
 
     
-    def take(self, who):
-        game = self.game
+    def take(self, who, in_action=False) -> list[str]:
         message = [f'{who.name} берет {self:accus}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
@@ -171,7 +210,9 @@ class Weapon:
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
                 who.backpack.append(self)
-        tprint(game, message)
+        who.action_controller.add_actions(self)
+        who.current_position.action_controller.delete_actions_by_item(self)
+        return message
 
     
     def show(self):
@@ -183,27 +224,25 @@ class Weapon:
         return f'{name} ({damage_string}), {self.type}'.capitalize()
 
     
-    def use(self, who, in_action=False):
-        game = self.game
-        if who.weapon.empty:
-            who.weapon = self
-        else:
+    def use(self, who, in_action=False) -> list[str]:
+        if not who.weapon.empty:
+            if who.weapon == self:
+                return [f'{who.name} уже использует {self:accus} в качестве оружия.']
             who.backpack.append(who.weapon)
-            who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
-            if not who.shield.empty and self.twohanded:
-                shield = who.shield
-                who.removed_shield = shield
-                who.shield = game.no_shield
-                message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
-            if not who.removed_shield.empty and not self.twohanded:
-                shield = who.removed_shield
-                who.shield = shield
-                who.removed_shield = game.no_shield
-                message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
-        tprint(game, message)
+        who.weapon = self
+        message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
+        if not who.shield.empty and self.twohanded:
+            shield = who.shield
+            who.removed_shield = shield
+            who.shield = self.game.no_shield
+            message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
+        if not who.removed_shield.empty and not self.twohanded:
+            shield = who.removed_shield
+            who.shield = shield
+            who.removed_shield = self.game.no_shield
+            message.append(f'Из-за того, что новое оружие одноручное, {who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
+        return message
 
     
     def place(self, castle, room_to_place = None):

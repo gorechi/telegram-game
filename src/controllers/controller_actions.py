@@ -21,9 +21,10 @@ class ActionController():
         names: list
         action: object
         name:str
-        in_combat: bool
-        in_darkness: bool
-        bulk: bool
+        in_combat: bool = False
+        in_darkness: bool = False
+        bulk: bool = False
+        on_rest: bool = False
           
     
     def __init__(self, game, hero=None, room=None, fight=None):
