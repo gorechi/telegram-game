@@ -1,7 +1,7 @@
 ﻿from math import ceil
 from random import randint as dice
 
-from src.functions.functions import randomitem, tprint
+from src.functions.functions import randomitem, tprint, howmany
 
 from src.class_dice import Dice
 
@@ -115,15 +115,6 @@ class Protection:
         return self.protection.roll()
 
     
-    def take(self, who):
-        if who.shield == '':
-            who.shield = self
-            tprint(self.game, f'{who.name} использует {self:accus} как защиту.')
-        else:
-            self.game.player.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
-
-    
     def show(self) -> str:
         if self.empty:
             return None
@@ -139,14 +130,14 @@ class Protection:
         return self.lexemes
     
     
-    def use(self, who_using, in_action=False):
-        if who_using.shield == '':
-            who_using.shield = self
-        else:
-            who_using.backpack.append(who_using.shield)
-            who_using.shield = self
-            who_using.backpack.remove(self, who_using)
-        tprint(self.game, f'{who_using.name} теперь использует {self:accus} в качестве защиты!')
+    # def use(self, who, in_action=False) -> str:
+    #     if who.shield.empty:
+    #         who.shield = self
+    #     else:
+    #         who.backpack.append(who.shield)
+    #         who.shield = self
+    #         who.backpack.remove(self, who)
+    #     tprint(self.game, f'{who.name} теперь использует {self:accus} в качестве защиты!')
     
     
     def get_element_decorator(self) -> str|None:
@@ -170,6 +161,34 @@ class Protection:
 class Armor(Protection):
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "снять": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+        }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
   
     
     def on_create(self):
@@ -201,16 +220,32 @@ class Armor(Protection):
                 return True
         room.loot.add(self)
 
+
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
-    def take(self, who):
+    def take(self, who, in_action:bool=False) -> list[str]:
         old_armor = who.armor
         message = [f'{who.name} использует {self:accus} как защиту.']
         if not old_armor.empty:
             message.append(f'При этом он снимает {old_armor:accus} и оставляет валяться на полу.')
-            who.drop(old_armor.name)
+            old_armor.drop(who)
         who.armor = self
         self.user = who
-        tprint(self.game, message)
+        return message
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания доспехов.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        who.armor = self.game.no_armor
+        if room.light:
+            return f'{who.name} бережно складывает {self.name} у стены.'
+        return f'{who.name} снимает {self.name} и швыряет куда-то в темноту.'
+#TODO : По идее тут должен быть шум от падающего доспеха, если он из железа
 
 
 #Класс Щит (подкласс Защиты)
@@ -278,6 +313,94 @@ class Shield (Protection):
     def __init__(self, game):
         super().__init__(game)
         self.accumulated_damage = 0
+        self.hero_actions = {
+            "использовать": {
+                "method": "take_out",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "экипировать": {
+                "method": "take_out",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "достать": {
+                "method": "take_out",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выбрать": {
+                "method": "take_out",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "чинить": {
+                "method": "repair",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "починить": {
+                "method": "repair",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "убрать": {
+                "method": "take_away",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": False
+                },
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "подобрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
     
     
     def on_create(self):
@@ -312,6 +435,56 @@ class Shield (Protection):
         return names
           
     
+    def take_away(self, who, in_action:bool=False) -> str:
+        if not who.shield.empty:
+            who.shield, who.removed_shield = who.removed_shield, who.shield
+            return f'{who.name} убирает {self.get_full_names("accus")} за спину.'
+        return f'Щит и так висит за спиной {who.g('героя', 'героини')}.'
+    
+    
+    def take_out(self, who, in_action:bool=False) -> str:
+        """
+        Метод доставания щита из-за спины.
+        """
+        if who.weapon.twohanded:
+            return f'{who.name} воюет двуручным оружием, поэтому не может взять щит.'
+        who.shield, who.removed_shield = who.removed_shield, who.shield
+        return f'{who.name} достает {self.get_full_names("accus")} из-за спины и берет его в руку.'
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        room = who.current_position
+        if who.shield == self:
+            message = f'{who.name} швыряет {self.name} на пол комнаты.'
+            who.shield = self.game.no_shield
+        if who.removed_shield == self:
+            message = f'{who.name} достает {self.name} из-за спины и ставит его к стене.'
+            who.removed_shield = self.game.no_shield
+        room.loot.add(self)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return message
+            
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        return self.show()
+    
+    
+    def repair(self, who, in_action:bool=False) -> str:
+        """
+        Метод починки щита.
+        Щит чинится за деньги. Если у героя не хватает денег, то щит починен не будет.
+        """
+        repair_price = self.get_repair_price()
+        if repair_price == 0:
+            return f'{self:accus} не нужно ремонтировать.'
+        if repair_price > 0 and who.money >= repair_price:
+            self.accumulated_damage = 0
+            who.money -= repair_price
+            return f'{who.name} успешно чинит {self.get_full_names("accus")}, потратив на это {howmany(repair_price, ['монету', 'монеты', 'монет'])}.'
+        return f'{who.name} не может сейчас починить {self.get_full_names("accus")}, у него нет столько монет.'
+    
+    
     def get_damage_decorator(self) -> list|None:
         return Shield._states_dictionary.get(self.accumulated_damage // 1, None)
     
@@ -336,11 +509,6 @@ class Shield (Protection):
     
     def get_repair_price(self):
         return self.accumulated_damage * Shield._repair_multiplier // 1
-    
-    
-    def repair(self) -> bool:
-        self.accumulated_damage = 0
-        return True
     
     
     def get_names_list(self, cases:list=None) -> list:

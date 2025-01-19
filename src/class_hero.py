@@ -134,13 +134,11 @@ class Hero:
                             'открыть': self.open,
                             'использовать': self.use,
                             'применить': self.use,
-                            'убрать': self.remove,
-                            'чинить': self.repair,
-                            'починить': self.repair,
+                            # 'убрать': self.remove,
+                            # 'чинить': self.repair,
+                            # 'починить': self.repair,
                             'отдохнуть': self.rest,
                             'отдыхать': self.rest,
-                            'бросить': self.drop,
-                            'выбросить': self.drop,
                             'сменить': self.change,
                             'поменять': self.change,
                             'test': self.test,
@@ -861,19 +859,19 @@ class Hero:
         tprint(self.game, message)
         
     
-    def take_out_weapon(self):
-        """Метод вызывается если герой был без оружие и достает его из рюкзака."""
+    # def take_out_weapon(self):
+    #     """Метод вызывается если герой был без оружие и достает его из рюкзака."""
         
-        message = []
-        second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} достает из рюкзака {second_weapon:accus} и берет в руку.')
-        if second_weapon.twohanded and not self.shield.empty:
-            self.removed_shield = self.shield
-            self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит приходится убрать за спину.')
-        self.backpack.remove(second_weapon, self)
-        self.weapon = second_weapon
-        tprint(self.game, message)
+    #     message = []
+    #     second_weapon = self.get_second_weapon()
+    #     message.append(f'{self.name} достает из рюкзака {second_weapon:accus} и берет в руку.')
+    #     if second_weapon.twohanded and not self.shield.empty:
+    #         self.removed_shield = self.shield
+    #         self.shield = self.game.no_shield
+    #         message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит приходится убрать за спину.')
+    #     self.backpack.remove(second_weapon, self)
+    #     self.weapon = second_weapon
+    #     tprint(self.game, message)
         
     
     def g(self, he_word:str, she_word:str) -> str:
@@ -889,49 +887,49 @@ class Hero:
         return she_word
     
     
-    def drop(self, item:str=None) -> bool:
-        """Метод обрабатывает команду "бросить". """
+    # def drop(self, item:str=None) -> bool:
+    #     """Метод обрабатывает команду "бросить". """
         
-        game = self.game
-        item = item.lower()
-        shield_in_hand = not self.shield.empty
-        shield_removed = not self.removed_shield.empty
-        if not item or item in ['все', 'всё']:
-            tprint(game, f'{self.name} {self.g("хотел", "хотела")} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
-        elif item.isdigit():
-            return self.drop_digit(item)
-        else:
-            if shield_in_hand and self.shield.check_name(item):
-                return self.drop_shield()
-            elif shield_removed and self.remove_shield.check_name(item):
-                return self.drop_removed_shield()
-            elif self.weapon.check_name(item):
-                return self.drop_weapon()
-            elif self.backpack.check_name(item):
-                return self.drop_backpack()
-            else:
-                return self.drop_item(item=item)
+    #     game = self.game
+    #     item = item.lower()
+    #     shield_in_hand = not self.shield.empty
+    #     shield_removed = not self.removed_shield.empty
+    #     if not item or item in ['все', 'всё']:
+    #         tprint(game, f'{self.name} {self.g("хотел", "хотела")} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
+    #     elif item.isdigit():
+    #         return self.drop_digit(item)
+    #     else:
+    #         if shield_in_hand and self.shield.check_name(item):
+    #             return self.drop_shield()
+    #         elif shield_removed and self.remove_shield.check_name(item):
+    #             return self.drop_removed_shield()
+    #         elif self.weapon.check_name(item):
+    #             return self.drop_weapon()
+    #         elif self.backpack.check_name(item):
+    #             return self.drop_backpack()
+    #         else:
+    #             return self.drop_item(item=item)
    
     
-    def drop_digit(self, number:str) -> bool:
-        """
-        Метод обрабатывает ситуацию, когда в команду "бросить" 
-        в качестве аргумента передан порядковый номер предмета.
+    # def drop_digit(self, number:str) -> bool:
+    #     """
+    #     Метод обрабатывает ситуацию, когда в команду "бросить" 
+    #     в качестве аргумента передан порядковый номер предмета.
         
-        """
+    #     """
         
-        game = self.game
-        room = self.current_position
-        number = int(number)
-        item = self.backpack.get_item_by_number(number)
-        if item:
-            room.loot.add(item)
-            self.backpack.remove(item, room)
-            tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
-            return True
-        else:
-            tprint(game, f'{self.name} не {self.g("нашел", "нашла")} такой вещи у себя в рюкзаке.')
-            return False
+    #     game = self.game
+    #     room = self.current_position
+    #     number = int(number)
+    #     item = self.backpack.get_item_by_number(number)
+    #     if item:
+    #         room.loot.add(item)
+    #         self.backpack.remove(item, room)
+    #         tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
+    #         return True
+    #     else:
+    #         tprint(game, f'{self.name} не {self.g("нашел", "нашла")} такой вещи у себя в рюкзаке.')
+    #         return False
     
     
     def drop_backpack(self) -> bool:
@@ -947,43 +945,43 @@ class Hero:
         return True    
     
     
-    def drop_shield(self) -> bool:
-        """Метод выбрасывания щита."""
+    # def drop_shield(self) -> bool:
+    #     """Метод выбрасывания щита."""
         
-        if self.shield.empty:
-            return False
-        game = self.game
-        room = self.current_position
-        room.loot.add(self.shield)
-        tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
-        self.shield = game.no_shield
-        return True
+    #     if self.shield.empty:
+    #         return False
+    #     game = self.game
+    #     room = self.current_position
+    #     room.loot.add(self.shield)
+    #     tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
+    #     self.shield = game.no_shield
+    #     return True
     
     
-    def drop_removed_shield(self) -> bool:
-        """Метод выбрасывания щита, который убран за спину."""
+    # def drop_removed_shield(self) -> bool:
+    #     """Метод выбрасывания щита, который убран за спину."""
         
-        if self.removed_shield.empty:
-            return False
-        game = self.game
-        room = self.current_position
-        room.loot.add(self.removed_shield)
-        tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
-        self.removed_shield = game.no_shield
-        return True
+    #     if self.removed_shield.empty:
+    #         return False
+    #     game = self.game
+    #     room = self.current_position
+    #     room.loot.add(self.removed_shield)
+    #     tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
+    #     self.removed_shield = game.no_shield
+    #     return True
     
     
-    def drop_weapon(self) -> bool:
-        """Метод выбрасывания оружия."""
+    # def drop_weapon(self) -> bool:
+    #     """Метод выбрасывания оружия."""
         
-        if self.weapon.empty:
-            return False
-        game = self.game
-        room = self.current_position
-        room.loot.add(self.weapon)
-        tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
-        self.weapon = game.no_weapon
-        return True
+    #     if self.weapon.empty:
+    #         return False
+    #     game = self.game
+    #     room = self.current_position
+    #     room.loot.add(self.weapon)
+    #     tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
+    #     self.weapon = game.no_weapon
+    #     return True
     
     
     def drop_item(self, item:str) -> bool:
@@ -1058,16 +1056,16 @@ class Hero:
         return None
     
     
-    def repair_shield_while_rest(self):
-        """Метод починки щита во время отдыха."""
+    # def repair_shield_while_rest(self):
+    #     """Метод починки щита во время отдыха."""
         
-        shield = self.get_shield()
-        if shield:
-            repair_price = shield.get_repair_price()
-            if repair_price > 0 and self.money >= repair_price:
-                shield.repair()
-                self.money -= repair_price
-                tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names("accus")}')
+    #     shield = self.get_shield()
+    #     if shield:
+    #         repair_price = shield.get_repair_price()
+    #         if repair_price > 0 and self.money >= repair_price:
+    #             shield.repair()
+    #             self.money -= repair_price
+    #             tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names("accus")}')
     
     
     def check_monster_in_ambush(self, place) -> bool:
@@ -1110,68 +1108,68 @@ class Hero:
         return True
     
     
-    def remove(self, what=None) -> bool:
-        """Метод обрабатывает команду "убрать". """
+    # def remove(self, what=None) -> bool:
+    #     """Метод обрабатывает команду "убрать". """
         
-        if not what:
-            tprint(self.game, f'{self.name} оглядывается по сторонам, \
-                находит какой-то мусор и закидывает его в самый темный угол комнаты.')
-            return False
-        if self.shield.check_name(what):
-            return self.remove_shield()
-        else:
-            tprint(self.game, f'{self.name} не понимает, как это можно убрать.')
-            return False
+    #     if not what:
+    #         tprint(self.game, f'{self.name} оглядывается по сторонам, \
+    #             находит какой-то мусор и закидывает его в самый темный угол комнаты.')
+    #         return False
+    #     if self.shield.check_name(what):
+    #         return self.remove_shield()
+    #     else:
+    #         tprint(self.game, f'{self.name} не понимает, как это можно убрать.')
+    #         return False
     
     
-    def remove_shield(self) -> bool:
-        """Метод убирания щита за спину."""
+    # def remove_shield(self) -> bool:
+    #     """Метод убирания щита за спину."""
         
-        if not self.shield.empty:
-            self.shield, self.removed_shield = self.removed_shield, self.shield
-            tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names("accus")} за спину.') 
-            return True
-        return False
+    #     if not self.shield.empty:
+    #         self.shield, self.removed_shield = self.removed_shield, self.shield
+    #         tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names("accus")} за спину.') 
+    #         return True
+    #     return False
         
     
-    def repair(self, what=None) -> bool:
-        """Метод обрабатывает команду "чинить". """
+    # def repair(self, what=None) -> bool:
+    #     """Метод обрабатывает команду "чинить". """
         
-        if not what:
-            tprint(self.game, f'{self.name} не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
-            return False
-        if self.shield.check_name(what) or self.removed_shield.check_name(what):
-            return self.repair_shield()
-        tprint(self.game, f'{self.name} не умеет чинить такие штуки.')
-        return False
+    #     if not what:
+    #         tprint(self.game, f'{self.name} не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
+    #         return False
+    #     if self.shield.check_name(what) or self.removed_shield.check_name(what):
+    #         return self.repair_shield()
+    #     tprint(self.game, f'{self.name} не умеет чинить такие штуки.')
+    #     return False
 
     
-    def repair_shield(self) -> bool:
-        """
-        Метод починки щита.
-        Щит чинится за деньги. Если у героя не хватает денег, 
-        то щит починен не будет.
+    # def repair_shield(self) -> bool:
+    #     """
+    #     Метод починки щита.
+    #     Щит чинится за деньги. Если у героя не хватает денег, 
+    #     то щит починен не будет.
         
-        """
+    #     """
         
-        game = self.game
-        shield = self.get_shield()
-        if not shield:
-            tprint(game, f'У {self.g("героя", "героини")} нет щита, так что и ремонтировать нечего.')
-            return False
-        repair_price = shield.get_repair_price()
-        if repair_price == 0:
-            tprint(game, f'{shield:accus} не нужно ремонтировать.')
-            return False
-        if self.money >= repair_price:
-            shield.repair()
-            self.money.how_much_money -= repair_price
-            tprint(game, f'{self.name} успешно чинит {shield:accus}')
-            self.decrease_restless(1)
-            return True
-        else:
-            tprint(game, f'{self.name} и {self.g("рад", "рада")} бы починить {shield:accus}, но {self.g("ему", "ей")} не хватает денег на запчасти.')
-            return False
+    #     game = self.game
+    #     shield = self.get_shield()
+    #     if not shield:
+    #         tprint(game, f'У {self.g("героя", "героини")} нет щита, так что и ремонтировать нечего.')
+    #         return False
+    #     repair_price = shield.get_repair_price()
+    #     if repair_price == 0:
+    #         tprint(game, f'{shield:accus} не нужно ремонтировать.')
+    #         return False
+    #     if self.money >= repair_price:
+    #         shield.repair()
+    #         self.money.how_much_money -= repair_price
+    #         tprint(game, f'{self.name} успешно чинит {shield:accus}')
+    #         self.decrease_restless(1)
+    #         return True
+    #     else:
+    #         tprint(game, f'{self.name} и {self.g("рад", "рада")} бы починить {shield:accus}, но {self.g("ему", "ей")} не хватает денег на запчасти.')
+    #         return False
         
     
     def get_second_weapon(self) -> Weapon:
@@ -2280,15 +2278,15 @@ class Hero:
         return None, ''
 
     
-    def take_out_shield(self) -> bool:
-        """Метод доставания щита из-за спины."""
+    # def take_out_shield(self) -> bool:
+    #     """Метод доставания щита из-за спины."""
         
-        if self.weapon.twohanded:
-            tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
-            return False
-        self.shield, self.removed_shield = self.removed_shield, self.shield
-        tprint(self.game, f'{self.name} достает {self.shield.get_full_names("accus")} из-за спины и берет его в руку.')
-        return True
+    #     if self.weapon.twohanded:
+    #         tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
+    #         return False
+    #     self.shield, self.removed_shield = self.removed_shield, self.shield
+    #     tprint(self.game, f'{self.name} достает {self.shield.get_full_names("accus")} из-за спины и берет его в руку.')
+    #     return True
     
     
     def use_item_from_backpack(self, item_string:str) -> bool:

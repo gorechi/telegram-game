@@ -47,6 +47,24 @@ class Weapon:
                 "in_combat": True,
                 "in_darkness": True
                 },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         self.room_actions = {
             "взять": {
@@ -92,6 +110,18 @@ class Weapon:
         if key:
             return self.lexemes.get(key, '')
         return self.lexemes
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания оружия.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        who.weapon = self.game.no_weapon
+        return f'{who.name} бросает {self.name} в угол комнаты.'
     
     
     def get_element_decorator(self) -> str|None:
