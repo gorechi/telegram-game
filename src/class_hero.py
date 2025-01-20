@@ -736,7 +736,10 @@ class Hero:
         message = []
         message.append(f'{self.name} может "{action}" следующие вещи:')
         for item in items:
-            message.append(f'{items.index(item) + 1}: {item.name}')
+            if not item.presentation:
+                message.append(f'{items.index(item) + 1}: {item.name}')
+            else:
+                message.append(f'{items.index(item) + 1}: {item.presentation()}')
         message.append('Герой должен назвать номер вещи или громко выкрикнуть "отмена" чтобы ничего не делать')
         self.to_do_list = items
         self.state = state_enum.ACTION

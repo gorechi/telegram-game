@@ -25,6 +25,7 @@ class ActionController():
         in_darkness: bool = False
         bulk: bool = False
         on_rest: bool = False
+        presentation: object = None
           
     
     def __init__(self, game, hero=None, room=None, fight=None):
@@ -55,6 +56,7 @@ class ActionController():
         actions = self.extract_actions(item)
         for action, value in actions.items():
             method = getattr(item, value.get("method", ''))
+            presentation_method = getattr(item, value.get("presentation", ''), None)
             new_item = self.Item(
                 item = item, 
                 names = item_names, 
@@ -62,7 +64,8 @@ class ActionController():
                 name = item_name,
                 in_combat = value.get("in_combat", False),
                 in_darkness = value.get("in_darkness", False),
-                bulk = value.get("bulk", False)
+                bulk = value.get("bulk", False),
+                presentation = presentation_method
                 )
             print('='*40)
             print(f'Создан item {new_item}')
