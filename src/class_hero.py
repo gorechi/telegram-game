@@ -2260,16 +2260,16 @@ class Hero:
         return self.open_furniture(what=item)     
         
     
-    def open_ladder(self) -> bool:
-        ladder, direction_string = self.choose_ladder_to_open()
-        key = self.backpack.get_first_item_by_class(Key)
-        if not ladder:
-            tprint(self.game, 'В этой комнате нет лестниц, которые нужно было бы отпирать.')
-            return False
-        self.backpack.remove(key)
-        ladder.locked = False
-        tprint(self.game, f'{self.name} отпирает {ladder:accus}, ведущую {direction_string}, ключом.')
-        return True
+    # def open_ladder(self) -> bool:
+    #     ladder, direction_string = self.choose_ladder_to_open()
+    #     key = self.backpack.get_first_item_by_class(Key)
+    #     if not ladder:
+    #         tprint(self.game, 'В этой комнате нет лестниц, которые нужно было бы отпирать.')
+    #         return False
+    #     self.backpack.remove(key)
+    #     ladder.locked = False
+    #     tprint(self.game, f'{self.name} отпирает {ladder:accus}, ведущую {direction_string}, ключом.')
+    #     return True
         
         
     def choose_ladder_to_open(self) -> tuple[Ladder|None, str]:

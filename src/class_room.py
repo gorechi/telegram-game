@@ -101,6 +101,8 @@ class Ladder:
         room = who.current_location
         direction = self.get_direction(room)
         key = who.backpack.get_first_item_by_class(Key)
+        if not key:
+            return f'У {who:gen} нет подходящего ключа чтобы отпереть эту лестницу.'
         who.backpack.remove(key)
         self.locked = False
         return f'{who.name} отпирает {self:accus}, ведущую {direction}, ключом.'
@@ -146,10 +148,61 @@ class Ladder:
 class Door:
     """Класс дверей."""
     
+    _directions = {
+        0: 'вверх',
+        1: 'направо',
+        2: 'вниз',
+        3: 'налево'
+    }
     
     def __init__(self, game):
         self.empty = True
         self.game = game
+        self.room_actions = {
+            "отпереть": {
+                "method": "unlock",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_unlock",
+                "condition": "is_locked"
+                },
+        }
+    
+    
+    def is_locked(self) -> bool:
+        return self.locked
+    
+    
+    def get_direction_index(self, room) -> int:
+        try:
+            index = room.doors.index(self)
+        except:
+            print(f'Дверь {self} не найдена в комнате {room}.')
+            return None
+        return index
+    
+    
+    def show_for_unlock(self, who) -> str:
+        room = who.current_location
+        direction_index = self.get_direction_index(room)
+        direction = Door._directions.get(direction_index, False)
+        if direction:
+            return f'Дверь, ведущая {direction}.'
+    
+    
+    def unlock(self, who, in_action:bool=False) -> str:
+        if not self.locked:
+            return 'Дверь не заперта, через нее вполне можно пройти.'
+        room = who.current_location
+        direction_index = self.get_direction_index(room)
+        direction = Door._directions.get(direction_index, False)
+        key = who.backpack.get_first_item_by_class(Key)
+        if not key:
+            return f'У {who:gen} нет подходящего ключа чтобы отпереть эту дверь.'
+        who.backpack.remove(key)
+        self.locked = False
+        return f'{who.name} отпирает дверь, ведущую {direction}, ключом.'
     
     
     def __bool__(self):
@@ -391,6 +444,7 @@ class Room:
         self.action_controller = ActionController(game=self.game, room=self)
         self.floor = floor
         self.doors = doors
+        self.generate_doors_actions()
         self.money:int = 0
         self.loot:Loot = Loot(self.game)
         self.secret_loot:Loot = Loot(self.game)
@@ -411,6 +465,13 @@ class Room:
         self.secret_word = self.get_secret_word()
         self.enter_point = False
 
+    
+    def generate_doors_actions(self):
+        for door in self.doors:
+            if not door.empty:
+                self.action_controller.add_actions(door)
+        return
+    
     
     def get_symbol_for_map(self) -> str:
         """
