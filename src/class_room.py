@@ -1,6 +1,7 @@
-from typing import NoReturn, Optional
+from typing import Optional
 
 from src.class_basic import Loot
+from src.class_items import Key
 from src.controllers.controller_actions import ActionController
 from src.functions.functions import pprint, randomitem, tprint, roll
 
@@ -60,6 +61,49 @@ class Ladder:
         self.locked = locked
         self.decorate()
         self.place()
+        self.room_actions = {
+            "отпереть": {
+                "method": "unlock",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_unlock",
+                "condition": "is_locked"
+                },
+        }
+    
+    
+    def is_locked(self) -> bool:
+        return self.locked
+    
+    
+    def get_direction(self, room) -> str:
+        if self.room_down == room:
+            return 'вверх'
+        if self.room_up == room:
+            return 'вниз'
+        return ''
+    
+    
+    def show_for_unlock(self, who) -> str:
+        room = who.current_location
+        direction = self.get_direction(room)
+        if direction == 'вверх':
+            return f'Люк в потолке, закрытый тяжелой крышкой.'
+        if direction == 'вниз':
+            return f'Квадратный люк в полу, плотно закрытый крышкой.'
+        return f'{self:nom}'
+    
+    
+    def unlock(self, who, in_action:bool=False) -> str:
+        if not self.locked:
+            return 'Лестница не заперта, по ней спокойно можно подниматься и спускаться.'
+        room = who.current_location
+        direction = self.get_direction(room)
+        key = who.backpack.get_first_item_by_class(Key)
+        who.backpack.remove(key)
+        self.locked = False
+        return f'{who.name} отпирает {self:accus}, ведущую {direction}, ключом.'
     
     
     def __format__(self, format:str) -> str:
@@ -73,6 +117,8 @@ class Ladder:
         if not isinstance(self.room_up, Room):
             self.room_up = self.get_random_room_up()
         self.room_up.ladder_down = self
+        self.room_down.action_controller.add_actions(self)
+        self.room_up.action_controller.add_actions(self)
         return True
     
     
