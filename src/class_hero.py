@@ -1972,74 +1972,74 @@ class Hero:
         return True
     
     
-    def check_if_hero_can_search(self) -> bool:
-        """
-        Метод проверяет, может ли герой обыскивать что-либо в комнате, 
-        в которой он находится.
+    # def check_if_hero_can_search(self) -> bool:
+    #     """
+    #     Метод проверяет, может ли герой обыскивать что-либо в комнате, 
+    #     в которой он находится.
         
-        """
+    #     """
         
-        game = self.game
-        room = self.current_position
-        enemy_in_room = room.monsters('first')
-        if not self.check_light():
-            tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
-            return False
-        if enemy_in_room:
-            tprint(game, f'{enemy_in_room.name} мешает толком осмотреть комнату.')
-            return False
-        if self.fear >= Hero._fear_limit:
-            tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
-                Страх сковал {self.g("его", "ее")} по рукам и ногам.')
-            return False
-        return True
+    #     game = self.game
+    #     room = self.current_position
+    #     enemy_in_room = room.monsters('first')
+    #     if not self.check_light():
+    #         tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
+    #         return False
+    #     if enemy_in_room:
+    #         tprint(game, f'{enemy_in_room.name} мешает толком осмотреть комнату.')
+    #         return False
+    #     if self.fear >= Hero._fear_limit:
+    #         tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
+    #             Страх сковал {self.g("его", "ее")} по рукам и ногам.')
+    #         return False
+    #     return True
     
     
-    def search_secret_place(self, item:str) -> bool:
-        """Метод обыскивания секретного места комнаты."""
+    # def search_secret_place(self, item:str) -> bool:
+    #     """Метод обыскивания секретного места комнаты."""
         
-        game = self.game
-        room = self.current_position
-        if room.secret_word.lower() == item.lower():
-            if not room.secret_loot.pile:
-                tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
-            else:
-                message = []
-                message.append(f'{self.name} осматривает {item} и находит:')
-                message += room.secret_loot.show_sorted()
-                room.secret_loot.reveal(room)
-                message.append('Все, что было спрятано, теперь лежит на виду.')
-                tprint(game, message)
-            return True
-        return False
+    #     game = self.game
+    #     room = self.current_position
+    #     if room.secret_word.lower() == item.lower():
+    #         if not room.secret_loot.pile:
+    #             tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
+    #         else:
+    #             message = []
+    #             message.append(f'{self.name} осматривает {item} и находит:')
+    #             message += room.secret_loot.show_sorted()
+    #             room.secret_loot.reveal(room)
+    #             message.append('Все, что было спрятано, теперь лежит на виду.')
+    #             tprint(game, message)
+    #         return True
+    #     return False
      
      
-    def search_corpse(self, item:str) -> bool:
-        """Метод обыскивания трупа."""
+    # def search_corpse(self, item:str) -> bool:
+    #     """Метод обыскивания трупа."""
         
-        game = self.game
-        room = self.current_position
-        if not room.has_a_corpse():
-            return False
-        corpse = None
-        if item.lower() == 'труп':
-            corpse = room.morgue[0]
-        else:
-            for candidate in room.morgue:
-                if item.lower() == candidate.name.lower():
-                    corpse = candidate
-        if not corpse:
-            return False
-        if not corpse.loot.pile:
-            tprint(game, f'{self.name} осматривает {corpse.name} и ничего не находит.')
-        else:
-            message = []
-            message.append(f'{self.name} осматривает {corpse.name} и находит:')
-            message += corpse.loot.show_sorted()
-            corpse.loot.reveal(room)
-            message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
-            tprint(game, message)
-        return True
+    #     game = self.game
+    #     room = self.current_position
+    #     if not room.has_a_corpse():
+    #         return False
+    #     corpse = None
+    #     if item.lower() == 'труп':
+    #         corpse = room.morgue[0]
+    #     else:
+    #         for candidate in room.morgue:
+    #             if item.lower() == candidate.name.lower():
+    #                 corpse = candidate
+    #     if not corpse:
+    #         return False
+    #     if not corpse.loot.pile:
+    #         tprint(game, f'{self.name} осматривает {corpse.name} и ничего не находит.')
+    #     else:
+    #         message = []
+    #         message.append(f'{self.name} осматривает {corpse.name} и находит:')
+    #         message += corpse.loot.show_sorted()
+    #         corpse.loot.reveal(room)
+    #         message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
+    #         tprint(game, message)
+    #     return True
         
     
     # def search_furniture(self, item:str) -> bool:
@@ -2088,11 +2088,11 @@ class Hero:
             return False
         if not item:
             return self.search_room()
-        if self.search_secret_place(item=item):
-            return True
-        if self.search_corpse(item=item):
-            return True
-        return self.search_furniture(item=item)
+        # if self.search_secret_place(item=item):
+        #     return True
+        # if self.search_corpse(item=item):
+        #     return True
+        # return self.search_furniture(item=item)
         
 
     def put_in_backpack(self, item) -> bool:
