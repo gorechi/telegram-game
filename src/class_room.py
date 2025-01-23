@@ -57,6 +57,7 @@ class Ladder:
     
     def __init__(self, room_down:'Room', room_up:Optional['Room']=None, locked:bool=False):
         self.room_up = room_up
+        self.name = 'лестница'
         self.room_down = room_down
         self.locked = locked
         self.decorate()
@@ -86,7 +87,7 @@ class Ladder:
     
     
     def show_for_unlock(self, who) -> str:
-        room = who.current_location
+        room = who.current_position
         direction = self.get_direction(room)
         if direction == 'вверх':
             return f'Люк в потолке, закрытый тяжелой крышкой.'
@@ -98,7 +99,7 @@ class Ladder:
     def unlock(self, who, in_action:bool=False) -> str:
         if not self.locked:
             return 'Лестница не заперта, по ней спокойно можно подниматься и спускаться.'
-        room = who.current_location
+        room = who.current_position
         direction = self.get_direction(room)
         key = who.backpack.get_first_item_by_class(Key)
         if not key:
@@ -143,6 +144,11 @@ class Ladder:
         if self.locked:
             return f'{self:nom} поднимается к люку в потолке, закрытому тяжелой крышкой.'.capitalize()
         return f'{self:nom} ведет куда-то вверх.'.capitalize()
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['лестница', 'лестницу']
+
 
 
 class Door:
@@ -158,6 +164,7 @@ class Door:
     def __init__(self, game):
         self.empty = True
         self.game = game
+        self.name = 'дверь'
         self.room_actions = {
             "отпереть": {
                 "method": "unlock",
@@ -184,7 +191,7 @@ class Door:
     
     
     def show_for_unlock(self, who) -> str:
-        room = who.current_location
+        room = who.current_position
         direction_index = self.get_direction_index(room)
         direction = Door._directions.get(direction_index, False)
         if direction:
@@ -194,7 +201,7 @@ class Door:
     def unlock(self, who, in_action:bool=False) -> str:
         if not self.locked:
             return 'Дверь не заперта, через нее вполне можно пройти.'
-        room = who.current_location
+        room = who.current_position
         direction_index = self.get_direction_index(room)
         direction = Door._directions.get(direction_index, False)
         key = who.backpack.get_first_item_by_class(Key)
@@ -203,6 +210,10 @@ class Door:
         who.backpack.remove(key)
         self.locked = False
         return f'{who.name} отпирает дверь, ведущую {direction}, ключом.'
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['дверь']
     
     
     def __bool__(self):

@@ -806,7 +806,7 @@ class Hero:
     def get_hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
-        weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
+        weapon_mastery = self.weapon_mastery.get(self.weapon.weapon_type, None)
         weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
         weapon_hit_chance = self.weapon.get_hit_chance()
         return self.check_dext(add=[weapon_mastery_level]) + weapon_hit_chance
@@ -815,7 +815,7 @@ class Hero:
     def parry_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса парирования атаки."""
         
-        weapon_mastery = self.weapon_mastery.get(self.weapon.type, None)
+        weapon_mastery = self.weapon_mastery.get(self.weapon.weapon_type, None)
         weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
         parry_chance = self.check_dext(add=[weapon_mastery_level])
         if self.poisoned:
