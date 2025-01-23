@@ -131,7 +131,7 @@ class Hero:
                             'забрать': self.take,
                             'подобрать': self.take,
                             'обыскать': self.search,
-                            'открыть': self.open,
+                            # 'открыть': self.open,
                             'использовать': self.use,
                             'применить': self.use,
                             # 'убрать': self.remove,
@@ -772,6 +772,8 @@ class Hero:
         tprint(self.game, action(self), 'direction')
         self.decrease_restless(2)
         self.state = state_enum.NO_STATE
+        if item.post_process:
+            item.post_process(self)
         
     
     def get_poison_protection(self) -> int:
@@ -2171,93 +2173,93 @@ class Hero:
         return False
     
     
-    def get_list_of_locked_objects(self, room:Room, what:str='') -> list:
-        """
-        Метод возвращает список всех запертых объектов в комнате.
-        Пока работает только с мебелью, после доработки будут добавлены двери.
+    # def get_list_of_locked_objects(self, room:Room, what:str='') -> list:
+    #     """
+    #     Метод возвращает список всех запертых объектов в комнате.
+    #     Пока работает только с мебелью, после доработки будут добавлены двери.
         
-        """
+    #     """
         
-        what_is_in_room = []
-        for furniture in room.furniture:
-            if what:
-                if furniture.locked and furniture.check_name(what):
-                    what_is_in_room.append(furniture)
-            else:
-                if furniture.locked:
-                    what_is_in_room.append(furniture)
-        return what_is_in_room
+    #     what_is_in_room = []
+    #     for furniture in room.furniture:
+    #         if what:
+    #             if furniture.locked and furniture.check_name(what):
+    #                 what_is_in_room.append(furniture)
+    #         else:
+    #             if furniture.locked:
+    #                 what_is_in_room.append(furniture)
+    #     return what_is_in_room
     
     
-    def check_if_hero_can_open(self) -> bool:
-        """Метод проверяет, может ли герой что-то открывать."""
+    # def check_if_hero_can_open(self) -> bool:
+    #     """Метод проверяет, может ли герой что-то открывать."""
         
-        game = self.game
-        fear = self.check_fear()
-        if fear:
-            tprint(game, fear)
-            return False
-        if not self.check_light():
-            tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')
-            return False
-        key = self.backpack.get_first_item_by_class(Key)
-        if not key:
-            tprint(game, 'Чтобы что-то открыть нужен хотя бы один ключ.')
-            return False
-        return True
-        
-    
-    def open_furniture(self, what:str) -> bool:
-        """Метод отпирания мебели при помощи ключа."""
-        
-        game = self.game
-        room = self.current_position
-        what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
-        key = self.backpack.get_first_item_by_class(Key)
-        if not what_is_locked:
-            tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
-            return False
-        if len(what_is_locked) > 1:
-            tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g("ему", "ей")} нужно открыть.')
-            return False
-        furniture = what_is_locked[0]
-        if furniture.check_trap():
-            tprint(game, f'К несчастью в {furniture:prep} кто-то установил ловушку.')
-            furniture.trap.trigger(self)
-            return False
-        self.backpack.remove(key)
-        furniture.locked = False
-        tprint(game, f'{self.name} отпирает {furniture:accus} ключом.')
-        return True
+    #     game = self.game
+    #     fear = self.check_fear()
+    #     if fear:
+    #         tprint(game, fear)
+    #         return False
+    #     if not self.check_light():
+    #         tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')
+    #         return False
+    #     key = self.backpack.get_first_item_by_class(Key)
+    #     if not key:
+    #         tprint(game, 'Чтобы что-то открыть нужен хотя бы один ключ.')
+    #         return False
+    #     return True
         
     
-    def open_door(self, direction:str) -> bool:
-        """Метод отпирания двери при помощи ключа."""
+    # def open_furniture(self, what:str) -> bool:
+    #     """Метод отпирания мебели при помощи ключа."""
         
-        game = self.game
-        room = self.current_position
-        key = self.backpack.get_first_item_by_class(Key)
-        door = room.doors[Hero._doors_dict[direction]]
-        if  not door.locked:
-            tprint(game, 'В той стороне нечего открывать.')
-            return False
-        else:
-            self.backpack.remove(key)
-            door.locked = False
-            tprint(game, f'{self.name} открывает дверь.')
-            return True
+    #     game = self.game
+    #     room = self.current_position
+    #     what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
+    #     key = self.backpack.get_first_item_by_class(Key)
+    #     if not what_is_locked:
+    #         tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
+    #         return False
+    #     if len(what_is_locked) > 1:
+    #         tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g("ему", "ей")} нужно открыть.')
+    #         return False
+    #     furniture = what_is_locked[0]
+    #     if furniture.check_trap():
+    #         tprint(game, f'К несчастью в {furniture:prep} кто-то установил ловушку.')
+    #         furniture.trap.trigger(self)
+    #         return False
+    #     self.backpack.remove(key)
+    #     furniture.locked = False
+    #     tprint(game, f'{self.name} отпирает {furniture:accus} ключом.')
+    #     return True
+        
+    
+    # def open_door(self, direction:str) -> bool:
+    #     """Метод отпирания двери при помощи ключа."""
+        
+    #     game = self.game
+    #     room = self.current_position
+    #     key = self.backpack.get_first_item_by_class(Key)
+    #     door = room.doors[Hero._doors_dict[direction]]
+    #     if  not door.locked:
+    #         tprint(game, 'В той стороне нечего открывать.')
+    #         return False
+    #     else:
+    #         self.backpack.remove(key)
+    #         door.locked = False
+    #         tprint(game, f'{self.name} открывает дверь.')
+    #         return True
     
     
-    def open(self, item:str='') -> bool:
-        """Метод обрабатывает команду "открыть". """
+    # def open(self, item:str='') -> bool:
+    #     """Метод обрабатывает команду "открыть". """
         
-        if not self.check_if_hero_can_open():
-            return False
-        if Hero._doors_dict.get(item, False):
-            return self.open_door(direction=item)
-        if item in ['люк', 'лестницу']:
-            return self.open_ladder()
-        return self.open_furniture(what=item)     
+    #     if not self.check_if_hero_can_open():
+    #         return False
+    #     if Hero._doors_dict.get(item, False):
+    #         return self.open_door(direction=item)
+    #     if item in ['люк', 'лестницу']:
+    #         return self.open_ladder()
+    #     return self.open_furniture(what=item)     
         
     
     # def open_ladder(self) -> bool:
@@ -2272,13 +2274,13 @@ class Hero:
     #     return True
         
         
-    def choose_ladder_to_open(self) -> tuple[Ladder|None, str]:
-        room = self.current_position
-        if room.ladder_up and room.ladder_up.locked:
-            return room.ladder_up, 'вверх'
-        if room.ladder_down and room.ladder_down.locked:
-            return room.ladder_down, 'вниз'
-        return None, ''
+    # def choose_ladder_to_open(self) -> tuple[Ladder|None, str]:
+    #     room = self.current_position
+    #     if room.ladder_up and room.ladder_up.locked:
+    #         return room.ladder_up, 'вверх'
+    #     if room.ladder_down and room.ladder_down.locked:
+    #         return room.ladder_down, 'вниз'
+    #     return None, ''
 
     
     # def take_out_shield(self) -> bool:

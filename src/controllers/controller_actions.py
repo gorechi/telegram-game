@@ -27,6 +27,7 @@ class ActionController():
         on_rest: bool = False
         presentation: object = None
         condition: object = None
+        post_process: object = None
           
     
     def __init__(self, game, hero=None, room=None, fight=None):
@@ -59,6 +60,7 @@ class ActionController():
             method = getattr(item, value.get("method", ''))
             presentation_method = getattr(item, value.get("presentation", ''), None)
             condition_method = getattr(item, value.get("condition", ''), None)
+            post_process_method = getattr(item, value.get("post_process", ''), None)
             new_item = self.Item(
                 item = item, 
                 names = item_names, 
@@ -69,6 +71,7 @@ class ActionController():
                 bulk = value.get("bulk", False),
                 presentation = presentation_method,
                 condition = condition_method,
+                post_process = post_process_method,
                 )
             print('='*40)
             print(f'Создан item {new_item}')
