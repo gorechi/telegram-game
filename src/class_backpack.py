@@ -60,6 +60,26 @@ class Backpack:
                 "in_darkness": True,
                 },
         }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "забрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
     
     def get_name_for_show(self, who) -> str:
@@ -207,16 +227,15 @@ class Backpack:
         return False
     
     
-    def take(self, who) -> bool:
-        game = self.game
+    def take(self, who, in_action:bool=False) -> str:
+        room = who.current_position
         if not who.backpack.no_backpack:
-            tprint(game, f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.')
-            return False
+            return f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.'
         who.backpack = self
         self.owner = who
-        tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.')
         who.action_controller.add_actions(self)
-        return True
+        room.action_controller.remove_actions(self)
+        return f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.'
     
     
     def get_names_list(self, cases:list=None) -> list:

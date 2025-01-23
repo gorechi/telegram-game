@@ -2042,43 +2042,43 @@ class Hero:
         return True
         
     
-    def search_furniture(self, item:str) -> bool:
-        """Метод обыскивания мебели."""
+    # def search_furniture(self, item:str) -> bool:
+    #     """Метод обыскивания мебели."""
         
-        room = self.current_position
-        game = self.game
-        what_to_search = None
-        for furniture in room.furniture:
-            if furniture.check_name(item):
-                what_to_search = furniture
-        if not what_to_search:
-            tprint(game, 'В комнате нет такой вещи.')
-            return False
-        if what_to_search.locked:
-            tprint(game, f'Нельзя обыскать {what_to_search:accus}. Там заперто.')
-            return False
-        if what_to_search.check_trap():
-            tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
-            what_to_search.trap.trigger(self)
-            return False
-        if self.check_monster_in_ambush(place=what_to_search):
-            return False
-        return self.get_loot_from_furniture(what=what_to_search)
+    #     room = self.current_position
+    #     game = self.game
+    #     what_to_search = None
+    #     for furniture in room.furniture:
+    #         if furniture.check_name(item):
+    #             what_to_search = furniture
+    #     if not what_to_search:
+    #         tprint(game, 'В комнате нет такой вещи.')
+    #         return False
+    #     if what_to_search.locked:
+    #         tprint(game, f'Нельзя обыскать {what_to_search:accus}. Там заперто.')
+    #         return False
+    #     if what_to_search.check_trap():
+    #         tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
+    #         what_to_search.trap.trigger(self)
+    #         return False
+    #     if self.check_monster_in_ambush(place=what_to_search):
+    #         return False
+    #     return self.get_loot_from_furniture(what=what_to_search)
         
     
-    def get_loot_from_furniture(self, what:Furniture) -> bool:
-        """Метод извлекает весь лут из обысканной мебели."""
+    # def get_loot_from_furniture(self, what:Furniture) -> bool:
+    #     """Метод извлекает весь лут из обысканной мебели."""
         
-        room = self.current_position
-        if what.loot == 0:
-            tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
-            return False
-        message = [f'{self.name} осматривает {what:accus} и находит:']
-        message += what.loot.show_sorted()
-        what.loot.reveal(room)
-        message.append('Все, что было спрятано, теперь лежит на виду.')
-        tprint(self.game, message)
-        return True
+    #     room = self.current_position
+    #     if what.loot == 0:
+    #         tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
+    #         return False
+    #     message = [f'{self.name} осматривает {what:accus} и находит:']
+    #     message += what.loot.show_sorted()
+    #     what.loot.reveal(room)
+    #     message.append('Все, что было спрятано, теперь лежит на виду.')
+    #     tprint(self.game, message)
+    #     return True
     
     
     def search(self, item:str=None) -> bool:

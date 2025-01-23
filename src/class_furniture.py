@@ -27,6 +27,13 @@ class Furniture:
                 "condition": "is_locked",
                 "post_process": "after_unlock"
                 },
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "after_search"
+                },
         }
 
     
@@ -35,6 +42,10 @@ class Furniture:
     
     
     def after_unlock(self, who):
+        return
+    
+    
+    def after_search(self, who):
         return
     
     
@@ -124,3 +135,25 @@ class Furniture:
             very_new_key.place(floor)
         self.room.action_controller.add_actions(self)
         return True
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания мебели.
+        """
+        room = self.current_position
+        if self.locked:
+            return f'Нельзя обыскать {self:accus}. Там заперто.'
+        # if what_to_search.check_trap():
+        #     tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
+        #     what_to_search.trap.trigger(self)
+        #     return False
+        # if self.check_monster_in_ambush(place=what_to_search):
+        #     return False
+        if self.loot == 0:
+            return f'{self.name} {self.empty_text}'.capitalize()
+        message = [f'{who.name} осматривает {self:accus} и находит:']
+        message += self.loot.show_sorted()
+        self.loot.reveal(room)
+        message.append('Все, что было спрятано, теперь лежит на виду.')
+        return message
