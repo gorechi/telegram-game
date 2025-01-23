@@ -100,7 +100,7 @@ class Hero:
         self.armor = self.game.no_armor
         self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
-        self.backpack = Backpack(self.game)
+        self.get_backpack()
         self.money = Money(self.game, 0)
         self.current_position = None
         self.current_fight = None
@@ -172,6 +172,12 @@ class Hero:
     def __str__(self):
         return f'<Hero: name = {self.name}>'
 
+    
+    def get_backpack(self):
+        new_backpack = Backpack(self.game)
+        self.action_controller.add_actions(new_backpack)
+        self.backpack = new_backpack
+    
     
     def is_hero(self) -> bool:
         return True
@@ -945,6 +951,7 @@ class Hero:
         game = self.game
         room = self.current_position
         room.loot.add(self.backpack)
+        self.action_controller.remove_actions(self.backpack)
         tprint(game, f'{self.name} снимает рюкзак и кладет в угол комнаты.')
         self.backpack = game.no_backpack
         return True    

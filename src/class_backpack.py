@@ -20,7 +20,27 @@ class Backpack:
             "prep": "рюкзаке",
             "inst": "рюкзаком"
         }
+        self.hero_actions = {
+            "осмотреть": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "get_name_for_show",
+                },
+            "проверить": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "get_name_for_show",
+                },
+        }
 
+    
+    def get_name_for_show(self, who) -> str:
+        return "Рюкзак героя"
+    
     
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
@@ -123,7 +143,7 @@ class Backpack:
         return can_use
 
 
-    def show(self, who) -> list:
+    def show(self, who, in_action:bool=False) -> list:
         """Метод генерирует описание рюкзака."""
         
         message = []
@@ -159,4 +179,9 @@ class Backpack:
         who.backpack = self
         self.owner = who
         tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.')
+        who.action_controller.add_actions(self)
         return True
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['рюкзак']
