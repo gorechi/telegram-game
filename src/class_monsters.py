@@ -1236,7 +1236,20 @@ class Corpse():
         self.description:str = self.generate_description()
         self.place(room)
         self.can_resurrect:bool = can_resurrect
+        self.room_actions = {
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "after_search"
+                },
+        }
         
+    
+    def after_search(self, who):
+        return
+    
     
     def try_to_rise(self) -> bool:
         """Пытается воскресить существо, если это возможно."""
@@ -1249,23 +1262,31 @@ class Corpse():
     
     
     def rise_from_dead(self):
-        """Воскрешает существо и удаляет труп из игры."""
+        """
+        Воскрешает существо и удаляет труп из игры.
+        """
         self.creature.resurrect()
         self.creature.take_loot(self.loot)
         self.room.morgue.remove(self)
         self.game.all_corpses.remove(self)
+        self.room.action_controller.delete_actions_by_item(self)
         return True
     
     
     def place(self, room) -> bool:
-        """Размещает труп в указанной комнате."""
+        """
+        Размещает труп в указанной комнате.
+        """
         room.morgue.append(self)
+        room.action_controller.add_actions(self)
         self.game.all_corpses.append(self)
         return True
     
     
     def generate_description(self) -> str:
-        """Генерирует описание трупа."""
+        """
+        Генерирует описание трупа.
+        """
         place = choice(Corpse._places)
         state = choice(Corpse._states)
         depiction = choice(Corpse._depiction)
@@ -1283,5 +1304,23 @@ class Corpse():
             tprint (self.game, f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.')
             return False
         return who.increase_monster_knowledge(self.creature.monster_type)
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['труп', self.name]
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания трупа.
+        """
+        if not self.loot.pile:
+            return f'{who.name} осматривает {self.name} и ничего не находит.'
+        message = []
+        message.append(f'{who.name} осматривает {self.name} и находит:')
+        message += self.loot.show_sorted()
+        self.loot.reveal(self.room)
+        message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
+        return message
         
         

@@ -122,7 +122,7 @@ class Backpack:
         """
         room = who.current_position
         room.loot.add(self)
-        who.action_controller.remove_actions(self)
+        who.action_controller.delete_actions_by_item(self)
         room.action_controller.add_actions(self)
         who.backpack = who.game.no_backpack
         return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
@@ -234,7 +234,7 @@ class Backpack:
         who.backpack = self
         self.owner = who
         who.action_controller.add_actions(self)
-        room.action_controller.remove_actions(self)
+        room.action_controller.delete_actions_by_item(self)
         return f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.'
     
     
