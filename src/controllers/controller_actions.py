@@ -121,6 +121,6 @@ class ActionController():
             items_list = [item for item in items_list if item.in_combat == True]
         final_list = list()
         for item in items_list:
-            if item.condition and item.condition():
+            if item.condition is None or (callable(item.condition) and item.condition()):
                 final_list.append(item)
         return final_list

@@ -35,6 +35,30 @@ class Backpack:
                 "in_darkness": False,
                 "presentation": "get_name_for_show",
                 },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "снять": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
         }
 
     
@@ -70,6 +94,18 @@ class Backpack:
         
         self.insides.remove(item)
         item.place = place
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания рюкзака.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.action_controller.remove_actions(self)
+        room.action_controller.add_actions(self)
+        who.backpack = who.game.no_backpack
+        return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
         
     
     def get_items_by_class(self, item_class) -> list:
