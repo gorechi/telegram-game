@@ -452,6 +452,7 @@ class Room:
     
     def __init__(self, game, floor, doors):
         self.game = game
+        self.name = 'комната'
         self.action_controller = ActionController(game=self.game, room=self)
         self.floor = floor
         self.doors = doors
@@ -475,13 +476,49 @@ class Room:
         self.decorate()
         self.secret_word = self.get_secret_word()
         self.enter_point = False
+        self.generate_actions()
 
+    
+    def generate_actions(self):
+        self.room_actions = {
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
+        }
+        self.action_controller.add_actions(self)
+    
     
     def generate_doors_actions(self):
         for door in self.doors:
             if not door.empty:
                 self.action_controller.add_actions(door)
         return
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['комната', 'комнату']
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания комнаты.
+        """
+        message = []
+        if who.check_monster_in_ambush(place=self):
+            return ''
+        for furniture in self.furniture:
+            message.append(str(furniture))
+        if not self.loot.empty and len(self.loot.pile) > 0:
+            message.append('В комнате есть:')
+            message += self.loot.show_sorted()
+        else:
+            message.append('В комнате нет ничего интересного.')
+        if self.has_a_corpse():
+            message + self.show_corpses()
+        return message
     
     
     def get_symbol_for_map(self) -> str:

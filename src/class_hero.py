@@ -129,7 +129,7 @@ class Hero:
                             'взять': self.take,
                             'забрать': self.take,
                             'подобрать': self.take,
-                            'обыскать': self.search,
+                            # 'обыскать': self.search,
                             # 'открыть': self.open,
                             'использовать': self.use,
                             'применить': self.use,
@@ -1952,24 +1952,24 @@ class Hero:
         return True
 
     
-    def search_room(self) -> bool:
-        """Метод обыскивания комнаты."""
+    # def search_room(self) -> bool:
+    #     """Метод обыскивания комнаты."""
         
-        room = self.current_position
-        message = []
-        if self.check_monster_in_ambush(place=room):
-            return False
-        for furniture in room.furniture:
-            message.append(str(furniture))
-        if not room.loot.empty and len(room.loot.pile) > 0:
-            message.append('В комнате есть:')
-            message += room.loot.show_sorted()
-        else:
-            message.append('В комнате нет ничего интересного.')
-        if room.has_a_corpse():
-            message + room.show_corpses()
-        tprint(self.game, message)
-        return True
+    #     room = self.current_position
+    #     message = []
+    #     if self.check_monster_in_ambush(place=room):
+    #         return False
+    #     for furniture in room.furniture:
+    #         message.append(str(furniture))
+    #     if not room.loot.empty and len(room.loot.pile) > 0:
+    #         message.append('В комнате есть:')
+    #         message += room.loot.show_sorted()
+    #     else:
+    #         message.append('В комнате нет ничего интересного.')
+    #     if room.has_a_corpse():
+    #         message + room.show_corpses()
+    #     tprint(self.game, message)
+    #     return True
     
     
     # def check_if_hero_can_search(self) -> bool:
@@ -2081,18 +2081,18 @@ class Hero:
     #     return True
     
     
-    def search(self, item:str=None) -> bool:
-        """Метод обрабатывает команду "обыскать". """
+    # def search(self, item:str=None) -> bool:
+    #     """Метод обрабатывает команду "обыскать". """
         
-        if not self.check_if_hero_can_search():
-            return False
-        if not item:
-            return self.search_room()
-        # if self.search_secret_place(item=item):
-        #     return True
-        # if self.search_corpse(item=item):
-        #     return True
-        # return self.search_furniture(item=item)
+    #     if not self.check_if_hero_can_search():
+    #         return False
+    #     if not item:
+    #         return self.search_room()
+    #     # if self.search_secret_place(item=item):
+    #     #     return True
+    #     # if self.search_corpse(item=item):
+    #     #     return True
+    #     # return self.search_furniture(item=item)
         
 
     def put_in_backpack(self, item) -> bool:
