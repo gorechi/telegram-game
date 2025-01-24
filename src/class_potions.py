@@ -8,11 +8,27 @@ class Potion:
         self.game = game
         self.empty = False
         self.owner = None
-        self.hero_actions = {
-            "пить": "use",
-            "выпить": "use",
-            "попить": "use"
-            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
+
 
     
     def __format__(self, format:str) -> str:
@@ -52,16 +68,15 @@ class Potion:
             furniture.put(self)
         else:
             room.loot.add(self)
+        room.action_controller.add_actions(self)
         return True
 
        
-    def take(self, who):
-        if not who.backpack.no_backpack:
-            who.backpack.append(self)
-            self.owner = who
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
-            return True
-        return False
+    def take(self, who, in_action:bool=False):
+        who.backpack.append(self)
+        self.owner = who
+        who.action_contoller.add_actions(self)
+        return f'{who.name} забирает {self:accus} себе.'
     
     
     def check_if_can_be_used(self, in_action: bool) -> bool:
@@ -79,39 +94,77 @@ class HealPotion(Potion):
     
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                }
+            }
         
     
-    def use(self, who_using, in_action:bool) -> bool:
-        owner = self.owner
-        if not owner or not self.check_if_can_be_used(in_action):
-            return False
-        if (owner.start_health - owner.health) < self.effect:
-            heal = dice(1, (owner.start_health - owner.health))
+    def use(self, who, in_action:bool=False) -> str:
+        if not in_action:
+            return 'Это зелье можно использовать только в бою!'
+        if (who.start_health - who.health) < self.effect:
+            heal = dice(1, (who.start_health - who.health))
         else:
             heal = dice(1, self.effect)
-        owner.health += heal
-        text = f'{owner:nom} восполняет {howmany(heal, ["единицу жизни", "единицы жизни", "диниц жизни"])}'
-        if owner.poisoned:
-            owner.poisoned = False
-            text += ' и излечивается от отравления'
-        tprint(self.game, text)
-        owner.backpack.remove(self)
-        return True
+        who.health += heal
+        message = f'{who:nom} восполняет {howmany(heal, ["единицу жизни", "единицы жизни", "диниц жизни"])}'
+        if who.poisoned:
+            who.poisoned = False
+            message += ' и излечивается от отравления'
+        who.backpack.remove(self)
+        return message
     
 
 class HealthPotion(Potion):
 
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                }
+            }
     
     
-    def use(self, who_using, in_action:bool) -> bool:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.start_health += self.effect
-        self.owner.health += self.effect
-        tprint(self.game, f'{self.owner.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(self.owner.health)}.')
-        self.owner.backpack.remove(self)
+    def use(self, who, in_action:bool=False) -> str:
+        if in_action:
+            return 'Это зелье нельзя использовать в бою!'
+        who.start_health += self.effect
+        who.health += self.effect
+        tprint(self.game, f'{who.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(who.health)}.')
+        who.backpack.remove(self)
         return True
     
 
@@ -119,9 +172,29 @@ class StrengthPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                }
+            }
        
     
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.stren.increase_base_die(self.effect)
@@ -135,9 +208,29 @@ class StrengtheningPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                }
+            }
     
         
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.stren.add_temporary(self.effect)
@@ -150,9 +243,29 @@ class DexterityPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                }
+            }
 
     
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.dext.increase_base_die(self.effect)
@@ -166,9 +279,29 @@ class EvasionPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                }
+            }
         
      
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.dext.add_temporary(self.effect)
@@ -181,9 +314,29 @@ class IntelligencePotion(Potion):
     
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                }
+            }
         
     
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.intel.increase_base_die(self.effect)
@@ -197,9 +350,29 @@ class EnlightmentPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                }
+            }
         
     
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.intel.add_temporary(self.effect)
@@ -212,6 +385,26 @@ class Antidote(Potion):
             
     def __init__(self, game):
         super().__init__(game)
+        self.hero_actions = {
+            "пить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выпить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "попить": {
+                "method": "use",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                }
+            }
 
         
     def check_if_can_be_used(self, in_action: bool) -> bool:
@@ -222,7 +415,7 @@ class Antidote(Potion):
         return True
     
     
-    def use(self, who_using, in_action:bool) -> bool:
+    def use(self, who, in_action:bool=False) -> str:
         if not self.owner or not self.check_if_can_be_used(in_action):
             return False
         self.owner.poisoned = False

@@ -141,7 +141,7 @@ class Furniture:
         """
         Метод обыскивания мебели.
         """
-        room = self.current_position
+        room = who.current_position
         if self.locked:
             return f'Нельзя обыскать {self:accus}. Там заперто.'
         # if what_to_search.check_trap():

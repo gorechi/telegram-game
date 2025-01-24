@@ -733,6 +733,9 @@ class Hero:
             else:
                 tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
             return False
+        if item and len(items) == 1:
+            action_item = items[0]
+            return self.do_single_action(action_item)
         items = self.bulk_actions(items)
         if not items:
             tprint(self.game, f'У героя закончились варианты сделать еще что-то подобное.') 
@@ -772,13 +775,18 @@ class Hero:
             tprint(self.game, f'У {self:gen} нет столько подходящих вещей.', 'read')
             return False
         item = self.to_do_list[message]
+        self.do_single_action(item)
+        self.state = state_enum.NO_STATE
+        
+    
+    def do_single_action(self, item) -> bool:
         action = item.action
         tprint(self.game, action(self), 'direction')
         self.decrease_restless(2)
-        self.state = state_enum.NO_STATE
         if item.post_process:
             item.post_process(self)
-        
+        return True
+    
     
     def get_poison_protection(self) -> int:
         protection = self.poison_protection.roll()
