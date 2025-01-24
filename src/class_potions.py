@@ -129,6 +129,7 @@ class HealPotion(Potion):
             who.poisoned = False
             message += ' и излечивается от отравления'
         who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
         return message
     
 
@@ -163,9 +164,9 @@ class HealthPotion(Potion):
             return 'Это зелье нельзя использовать в бою!'
         who.start_health += self.effect
         who.health += self.effect
-        tprint(self.game, f'{who.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(who.health)}.')
         who.backpack.remove(self)
-        return True
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} увеличивает свое максимальное здоровье на {str(self.effect)} до {str(who.health)}.'
     
 
 class StrengthPotion(Potion):
@@ -195,13 +196,13 @@ class StrengthPotion(Potion):
        
     
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.stren.increase_base_die(self.effect)
-        self.owner.start_stren.increase_base_die(self.effect)
-        tprint(self.game, f'{self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if in_action:
+            return 'Это зелье нельзя использовать в бою!'
+        who.stren.increase_base_die(self.effect)
+        who.start_stren.increase_base_die(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} увеличивает свою силу на {self.effect} до {who.stren.text()}.'
     
 
 class StrengtheningPotion(Potion):
@@ -231,12 +232,12 @@ class StrengtheningPotion(Potion):
     
         
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.stren.add_temporary(self.effect)
-        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою силу на {self.effect} до {self.owner.stren.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if not in_action:
+            return 'Это зелье можно использовать только в бою!'
+        who.stren.add_temporary(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'На время боя {who.name} увеличивает свою силу на {self.effect} до {who.stren.text()}.'
 
 
 class DexterityPotion(Potion):
@@ -266,13 +267,13 @@ class DexterityPotion(Potion):
 
     
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.dext.increase_base_die(self.effect)
-        self.owner.start_dext.increase_base_die(self.effect)
-        tprint(self.game, f'{self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if in_action:
+            return 'Это зелье нельзя использовать в бою!'
+        who.dext.increase_base_die(self.effect)
+        who.start_dext.increase_base_die(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} увеличивает свою ловкость на {self.effect} до {who.dext.text()}.'
 
 
 class EvasionPotion(Potion):
@@ -302,12 +303,12 @@ class EvasionPotion(Potion):
         
      
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.dext.add_temporary(self.effect)
-        tprint(self.game, f'На время боя {self.owner.name} увеличивает свою ловкость на {self.effect} до {self.owner.dext.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if not in_action:
+            return 'Это зелье можно использовать только в бою!'
+        who.dext.add_temporary(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'На время боя {who.name} увеличивает свою ловкость на {self.effect} до {who.dext.text()}.'
     
     
 class IntelligencePotion(Potion):
@@ -337,13 +338,13 @@ class IntelligencePotion(Potion):
         
     
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.intel.increase_base_die(self.effect)
-        self.owner.start_intel.increase_base_die(self.effect)
-        tprint(self.game, f'{self.owner.name} увеличивает свой интеллект на {self.effect} до {self.owner.intel.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if in_action:
+            return 'Это зелье нельзя использовать в бою!'
+        who.intel.increase_base_die(self.effect)
+        who.start_intel.increase_base_die(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} увеличивает свой интеллект на {self.effect} до {who.intel.text()}.'
     
 
 class EnlightmentPotion(Potion):
@@ -373,12 +374,12 @@ class EnlightmentPotion(Potion):
         
     
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.intel.add_temporary(self.effect)
-        tprint(self.game, f'На время боя {self.owner.name} увеличивает свой интеллект на {self.effect} до {self.owner.intel.text()}.')
-        self.owner.backpack.remove(self)
-        return True
+        if not in_action:
+            return 'Это зелье можно использовать только в бою!'
+        who.intel.add_temporary(self.effect)
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'На время боя {who.name} увеличивает свой интеллект на {self.effect} до {who.intel.text()}.'
 
 
 class Antidote(Potion):
@@ -406,20 +407,12 @@ class Antidote(Potion):
                 }
             }
 
-        
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        game = self.game
-        if not self.owner.poisoned and self.owner.fear == 0:
-            tprint(game, f'{self.owner.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.')
-            return False
-        return True
-    
-    
+
     def use(self, who, in_action:bool=False) -> str:
-        if not self.owner or not self.check_if_can_be_used(in_action):
-            return False
-        self.owner.poisoned = False
-        self.owner.fear = 0
-        tprint(self.game, f'{self.owner.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.')
-        self.owner.backpack.remove(self)
-        return True
+        if not who.poisoned and who.fear == 0:
+            return f'{who.name} не чувствует никакого недомогания и решает приберечь зелье на попозже.'
+        who.poisoned = False
+        who.fear = 0
+        who.backpack.remove(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} излечивается от отравления, избавляется от всех страхов и теперь прекрасно себя чувствует.'

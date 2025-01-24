@@ -4,7 +4,6 @@ from src.class_basic import Money
 from src.class_potions import Potion
 from src.class_monsters import Monster, Vampire
 from src.class_protection import Armor, Shield
-from src.class_furniture import Furniture
 from src.class_room import Room
 from src.class_weapon import Weapon
 from src.class_backpack import Backpack
