@@ -126,9 +126,9 @@ class Hero:
                             'идти': self.go,
                             'атаковать': self.fight,
                             'напасть': self.fight,
-                            'взять': self.take,
-                            'забрать': self.take,
-                            'подобрать': self.take,
+                            # 'взять': self.take,
+                            # 'забрать': self.take,
+                            # 'подобрать': self.take,
                             # 'обыскать': self.search,
                             # 'открыть': self.open,
                             'использовать': self.use,
@@ -138,8 +138,8 @@ class Hero:
                             # 'починить': self.repair,
                             'отдохнуть': self.rest,
                             'отдыхать': self.rest,
-                            'сменить': self.change,
-                            'поменять': self.change,
+                            # 'сменить': self.change,
+                            # 'поменять': self.change,
                             'test': self.test,
                             'тест': self.test,
                             'обезвредить': self.disarm,
@@ -828,45 +828,45 @@ class Hero:
         return max(parry_chance, 0)
     
     
-    def change(self, what:str=None):
-        """Метод обрабатывает команду "сменить". """
+    # def change(self, what:str=None):
+    #     """Метод обрабатывает команду "сменить". """
         
-        if what not in ['оружие']:
-            tprint(self.game, f'{self.name} не знает, зачем нужно это менять.')
-        if what == 'оружие':
-            self.change_weapon_actions()
+    #     if what not in ['оружие']:
+    #         tprint(self.game, f'{self.name} не знает, зачем нужно это менять.')
+    #     if what == 'оружие':
+    #         self.change_weapon_actions()
     
     
-    def change_weapon_actions(self):
-        """Метод моделирует различные варианты смены оружия."""
+    # def change_weapon_actions(self):
+    #     """Метод моделирует различные варианты смены оружия."""
         
-        second_weapon = self.get_second_weapon()
-        if not self.weapon.empty and not second_weapon.empty:
-            self.change_weapon()
-        elif self.weapon.empty and not second_weapon.empty:
-            self.take_out_weapon()
-        elif not self.weapon.empty and second_weapon.empty:
-            tprint(self.game, f'{self.name} не может сменить оружие из-за того, что оно у {self.g("него", "нее")} одно.')
-        else:
-            tprint(self.game, f'{self.name} не может сменить оружие. У {self.g("него", "нее")} и оружия-то нет.')
+    #     second_weapon = self.get_second_weapon()
+    #     if not self.weapon.empty and not second_weapon.empty:
+    #         self.change_weapon()
+    #     elif self.weapon.empty and not second_weapon.empty:
+    #         self.take_out_weapon()
+    #     elif not self.weapon.empty and second_weapon.empty:
+    #         tprint(self.game, f'{self.name} не может сменить оружие из-за того, что оно у {self.g("него", "нее")} одно.')
+    #     else:
+    #         tprint(self.game, f'{self.name} не может сменить оружие. У {self.g("него", "нее")} и оружия-то нет.')
     
        
-    def change_weapon(self):
-        """Метод вызывается если герой может сменить оружие и меняет его."""
+    # def change_weapon(self):
+    #     """Метод вызывается если герой может сменить оружие и меняет его."""
         
-        message = []
-        second_weapon = self.get_second_weapon()
-        message.append(f'{self.name} убирает {self.weapon:accus} в рюкзак и берет в руки {second_weapon:accus}.')
-        if second_weapon.twohanded and not self.shield.empty:
-            self.removed_shield = self.shield
-            self.shield = self.game.no_shield
-            message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
-        elif not second_weapon.twohanded and not self.removed_shield.empty:
-            message.append(f'У {self.g("героя", "героини")} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
-        self.backpack.remove(second_weapon, self)
-        self.backpack.append(self.weapon)
-        self.weapon = second_weapon
-        tprint(self.game, message)
+    #     message = []
+    #     second_weapon = self.get_second_weapon()
+    #     message.append(f'{self.name} убирает {self.weapon:accus} в рюкзак и берет в руки {second_weapon:accus}.')
+    #     if second_weapon.twohanded and not self.shield.empty:
+    #         self.removed_shield = self.shield
+    #         self.shield = self.game.no_shield
+    #         message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
+    #     elif not second_weapon.twohanded and not self.removed_shield.empty:
+    #         message.append(f'У {self.g("героя", "героини")} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
+    #     self.backpack.remove(second_weapon, self)
+    #     self.backpack.append(self.weapon)
+    #     self.weapon = second_weapon
+    #     tprint(self.game, message)
         
     
     # def take_out_weapon(self):

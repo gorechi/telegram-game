@@ -65,6 +65,22 @@ class Weapon:
                 "in_combat": False,
                 "in_darkness": True
                 },
+            "сменить": {
+                "method": "change",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_change",
+                "condition": "can_be_changed"
+                },
+            "поменять": {
+                "method": "change",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_change",
+                "condition": "can_be_changed"
+                },
             }
         self.room_actions = {
             "взять": {
@@ -87,6 +103,41 @@ class Weapon:
                 }
         }
 
+    
+    def name_for_change(self, who) -> str:
+        second_weapon = who.get_second_weapon()
+        if not second_weapon.empty:
+            return f'{self.show()} (меняется на {second_weapon.show()})'
+        return self.show()
+    
+    
+    def can_be_changed(self, who) -> bool:
+        second_weapon = who.get_second_weapon()
+        if who.weapon == self and not second_weapon.empty:
+            return True
+        return False
+    
+    
+    def change(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод смены оружия.
+        """
+        message = []
+        second_weapon = who.get_second_weapon()
+        if not self.weapon.empty and second_weapon.empty:
+            return f'{who.name} не может сменить оружие из-за того, что оно у {who.g("него", "нее")} одно.'
+        message.append(f'{who.name} убирает {self:accus} в рюкзак и берет в руки {second_weapon:accus}.')
+        if second_weapon.twohanded and not who.shield.empty:
+            who.removed_shield = who.shield
+            who.shield = who.game.no_shield
+            message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
+        elif not second_weapon.twohanded and not who.removed_shield.empty:
+            message.append(f'У {who.g("героя", "героини")} теперь одноручное оружие, поэтому {who:pronoun} может достать щит из-за спины.')
+        who.backpack.remove(second_weapon, who)
+        who.backpack.append(self)
+        who.weapon = second_weapon
+        return message
+    
     
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
