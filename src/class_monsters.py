@@ -1244,6 +1244,18 @@ class Corpse():
                 "in_darkness": False,
                 "post_process": "after_search"
                 },
+            "изучить": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
+            "изучать": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
         }
         
     
@@ -1252,7 +1264,9 @@ class Corpse():
     
     
     def try_to_rise(self) -> bool:
-        """Пытается воскресить существо, если это возможно."""
+        """
+        Пытается воскресить существо, если это возможно.
+        """
         if not self.creature or not self.can_resurrect:
             return False
         die = self.creature.__class__._resurrection_die
@@ -1297,12 +1311,11 @@ class Corpse():
         return message.lower() == self.name
     
     
-    def get_examined(self, who) -> bool:
+    def examine(self, who, in_action:bool=False) -> str:
         if self.examined:
-            return False
+            return f'{who.name} уже осматривал {self.name} и не находит ничего нового.'
         if self.try_to_rise():
-            tprint (self.game, f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.')
-            return False
+            return f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.'
         return who.increase_monster_knowledge(self.creature.monster_type)
     
     
