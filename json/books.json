@@ -2,6 +2,7 @@
     {
         "class_name": "ThrustingWeaponBook",
         "decoration": "о мушкетерах",
+        "examine_text": "Эта книга будет полезна всем, кто использует в бою колющее оружие.",
         "can_use_in_fight": false,
         "base_price": 7,
         "price_dice": {
@@ -17,6 +18,7 @@
     {
         "class_name": "CuttingWeaponBook",
         "decoration": "о пиратах",
+        "examine_text": "Эта книга поможет лучше разобраться с приемами рубящего оружия.",
         "can_use_in_fight": false,
         "base_price": 7,
         "price_dice": {
@@ -32,6 +34,7 @@
     {
         "class_name": "BluntgWeaponBook",
         "decoration": "о викингах",
+        "examine_text": "Эта книга написана для всех, кто предпочитает ударное оружие в бою.",
         "can_use_in_fight": false,
         "base_price": 7,
         "price_dice": {
@@ -47,6 +50,7 @@
     {
         "class_name": "TrapsBook",
         "decoration": "о взломщиках",
+        "examine_text": "Эта книга рассказывает о тайных воровских искусствах обезвреживания ловушек.",
         "can_use_in_fight": false,
         "base_price": 7,
         "price_dice": {
@@ -62,6 +66,7 @@
     {
         "class_name": "WisdomBook",
         "decoration": "об ученых",
+        "examine_text": "Эта книга полна мудрости и знаний, которые помогут читателю стать умнее.",
         "can_use_in_fight": false,
         "base_price": 20,
         "price_dice": {

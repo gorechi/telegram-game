@@ -197,17 +197,17 @@ class Monster:
     
     def generate_weapon_text(self) -> str:
         if not self.weapon.empty:
-            return f'+d{self.weapon.damage}+{self.weapon.perm_damage()}'
+            return f'+{self.weapon.damage.text()}'
         return ''
     
     
     def generate_protection_text(self) -> str:
         if not self.shield.empty and self.armor.empty:
-            return f', защита - d{self.shield.protection}+{self.shield.perm_protection()}'
+            return f', защита - {self.shield.protection.text()}'
         elif self.shield.empty and not self.armor.empty:
-            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()}'
+            return f', защита - {self.armor.protection.text()}'
         elif not self.shield.empty and not self.armor.empty:
-            return f', защита - d{self.armor.protection}+{self.armor.perm_protection()} + d{self.shield.protection}+{self.shield.perm_protection()}'
+            return f', защита - {self.armor.protection.text()} + {self.shield.protection.text()}'
         return ''
 
     
@@ -1080,7 +1080,7 @@ class Vampire(Monster):
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in floor.plan if (not a.monster_in_ambush() and not a.light and not a == old_place)]
+            empty_rooms = [room for room in floor.plan if (not room.monster_in_ambush() and not room == old_place)]
             room = randomitem(empty_rooms)
         places_to_hide = []
         for i in room.furniture:
@@ -1236,10 +1236,37 @@ class Corpse():
         self.description:str = self.generate_description()
         self.place(room)
         self.can_resurrect:bool = can_resurrect
+        self.room_actions = {
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "after_search"
+                },
+            "изучить": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
+            "изучать": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
+        }
         
     
+    def after_search(self, who):
+        return
+    
+    
     def try_to_rise(self) -> bool:
-        """Пытается воскресить существо, если это возможно."""
+        """
+        Пытается воскресить существо, если это возможно.
+        """
         if not self.creature or not self.can_resurrect:
             return False
         die = self.creature.__class__._resurrection_die
@@ -1249,23 +1276,31 @@ class Corpse():
     
     
     def rise_from_dead(self):
-        """Воскрешает существо и удаляет труп из игры."""
+        """
+        Воскрешает существо и удаляет труп из игры.
+        """
         self.creature.resurrect()
         self.creature.take_loot(self.loot)
         self.room.morgue.remove(self)
         self.game.all_corpses.remove(self)
+        self.room.action_controller.delete_actions_by_item(self)
         return True
     
     
     def place(self, room) -> bool:
-        """Размещает труп в указанной комнате."""
+        """
+        Размещает труп в указанной комнате.
+        """
         room.morgue.append(self)
+        room.action_controller.add_actions(self)
         self.game.all_corpses.append(self)
         return True
     
     
     def generate_description(self) -> str:
-        """Генерирует описание трупа."""
+        """
+        Генерирует описание трупа.
+        """
         place = choice(Corpse._places)
         state = choice(Corpse._states)
         depiction = choice(Corpse._depiction)
@@ -1276,12 +1311,29 @@ class Corpse():
         return message.lower() == self.name
     
     
-    def get_examined(self, who) -> bool:
+    def examine(self, who, in_action:bool=False) -> str:
         if self.examined:
-            return False
+            return f'{who.name} уже осматривал {self.name} и не находит ничего нового.'
         if self.try_to_rise():
-            tprint (self.game, f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.')
-            return False
+            return f'{who.name} пытается осмотреть {self.name}, но неожиданно он возвращается к жизни.'
         return who.increase_monster_knowledge(self.creature.monster_type)
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['труп', self.name]
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания трупа.
+        """
+        if not self.loot.pile:
+            return f'{who.name} осматривает {self.name} и ничего не находит.'
+        message = []
+        message.append(f'{who.name} осматривает {self.name} и находит:')
+        message += self.loot.show_sorted()
+        self.loot.reveal(self.room)
+        message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
+        return message
         
         

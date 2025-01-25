@@ -1,8 +1,8 @@
-from random import randint as dice
-from typing import NoReturn, Optional
+from typing import Optional
 
-from src.class_basic import Loot, Money
+from src.class_basic import Loot
 from src.class_items import Key
+from src.controllers.controller_actions import ActionController
 from src.functions.functions import pprint, randomitem, tprint, roll
 
 
@@ -57,10 +57,56 @@ class Ladder:
     
     def __init__(self, room_down:'Room', room_up:Optional['Room']=None, locked:bool=False):
         self.room_up = room_up
+        self.name = 'лестница'
         self.room_down = room_down
         self.locked = locked
         self.decorate()
         self.place()
+        self.room_actions = {
+            "отпереть": {
+                "method": "unlock",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_unlock",
+                "condition": "is_locked"
+                },
+        }
+    
+    
+    def is_locked(self) -> bool:
+        return self.locked
+    
+    
+    def get_direction(self, room) -> str:
+        if self.room_down == room:
+            return 'вверх'
+        if self.room_up == room:
+            return 'вниз'
+        return ''
+    
+    
+    def show_for_unlock(self, who) -> str:
+        room = who.current_position
+        direction = self.get_direction(room)
+        if direction == 'вверх':
+            return f'Люк в потолке, закрытый тяжелой крышкой.'
+        if direction == 'вниз':
+            return f'Квадратный люк в полу, плотно закрытый крышкой.'
+        return f'{self:nom}'
+    
+    
+    def unlock(self, who, in_action:bool=False) -> str:
+        if not self.locked:
+            return 'Лестница не заперта, по ней спокойно можно подниматься и спускаться.'
+        room = who.current_position
+        direction = self.get_direction(room)
+        key = who.backpack.get_first_item_by_class(Key)
+        if not key:
+            return f'У {who:gen} нет подходящего ключа чтобы отпереть эту лестницу.'
+        who.backpack.remove(key)
+        self.locked = False
+        return f'{who.name} отпирает {self:accus}, ведущую {direction}, ключом.'
     
     
     def __format__(self, format:str) -> str:
@@ -74,6 +120,8 @@ class Ladder:
         if not isinstance(self.room_up, Room):
             self.room_up = self.get_random_room_up()
         self.room_up.ladder_down = self
+        self.room_down.action_controller.add_actions(self)
+        self.room_up.action_controller.add_actions(self)
         return True
     
     
@@ -96,15 +144,78 @@ class Ladder:
         if self.locked:
             return f'{self:nom} поднимается к люку в потолке, закрытому тяжелой крышкой.'.capitalize()
         return f'{self:nom} ведет куда-то вверх.'.capitalize()
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['лестница', 'лестницу']
+
 
 
 class Door:
     """Класс дверей."""
     
+    _directions = {
+        0: 'вверх',
+        1: 'направо',
+        2: 'вниз',
+        3: 'налево'
+    }
     
     def __init__(self, game):
+        self.locked = False
+        self.closed = True
         self.empty = True
         self.game = game
+        self.name = 'дверь'
+        self.room_actions = {
+            "отпереть": {
+                "method": "unlock",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_unlock",
+                "condition": "is_locked"
+                },
+        }
+    
+    
+    def is_locked(self) -> bool:
+        return self.locked
+    
+    
+    def get_direction_index(self, room) -> int:
+        try:
+            index = room.doors.index(self)
+        except:
+            print(f'Дверь {self} не найдена в комнате {room}.')
+            return None
+        return index
+    
+    
+    def show_for_unlock(self, who) -> str:
+        room = who.current_position
+        direction_index = self.get_direction_index(room)
+        direction = Door._directions.get(direction_index, False)
+        if direction:
+            return f'Дверь, ведущая {direction}.'
+    
+    
+    def unlock(self, who, in_action:bool=False) -> str:
+        if not self.locked:
+            return 'Дверь не заперта, через нее вполне можно пройти.'
+        room = who.current_position
+        direction_index = self.get_direction_index(room)
+        direction = Door._directions.get(direction_index, False)
+        key = who.backpack.get_first_item_by_class(Key)
+        if not key:
+            return f'У {who:gen} нет подходящего ключа чтобы отпереть эту дверь.'
+        who.backpack.remove(key)
+        self.locked = False
+        return f'{who.name} отпирает дверь, ведущую {direction}, ключом.'
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['дверь']
     
     
     def __bool__(self):
@@ -343,8 +454,11 @@ class Room:
     
     def __init__(self, game, floor, doors):
         self.game = game
+        self.name = 'комната'
+        self.action_controller = ActionController(game=self.game, room=self)
         self.floor = floor
         self.doors = doors
+        self.generate_doors_actions()
         self.money:int = 0
         self.loot:Loot = Loot(self.game)
         self.secret_loot:Loot = Loot(self.game)
@@ -364,7 +478,50 @@ class Room:
         self.decorate()
         self.secret_word = self.get_secret_word()
         self.enter_point = False
+        self.generate_actions()
 
+    
+    def generate_actions(self):
+        self.room_actions = {
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                },
+        }
+        self.action_controller.add_actions(self)
+    
+    
+    def generate_doors_actions(self):
+        for door in self.doors:
+            if not door.empty:
+                self.action_controller.add_actions(door)
+        return
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['комната', 'комнату']
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания комнаты.
+        """
+        message = []
+        if who.check_monster_in_ambush(place=self):
+            return ''
+        for furniture in self.furniture:
+            message.append(str(furniture))
+        if not self.loot.empty and len(self.loot.pile) > 0:
+            message.append('В комнате есть:')
+            message += self.loot.show_sorted()
+        else:
+            message.append('В комнате нет ничего интересного.')
+        if self.has_a_corpse():
+            message + self.show_corpses()
+        return message
+    
     
     def get_symbol_for_map(self) -> str:
         """
@@ -751,7 +908,7 @@ class Room:
         return None
     
     
-    def turn_on_light(self, who) -> NoReturn:
+    def turn_on_light(self, who) -> list[str]:
         
         """Метод зажигания в комнате света. """
         
@@ -762,15 +919,9 @@ class Room:
                 f'{who.name} зажигает факел и комната озаряется светом']
         if monster:
             if monster.frightening:
-                message.append(
-                        f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
+                message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
                 who.fear += 1
-        tprint(self.game, message)
-        self.show(who)
-        self.map()
-        if monster:
-            if monster.aggressive:
-                who.fight(monster.name, True)
+        return message
                 
     
     def get_random_unlocked_furniture(self):

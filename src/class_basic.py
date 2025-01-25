@@ -34,15 +34,23 @@ class Loot:
             return len(self.pile) == other
     
     
-    def get_empty(self):
-        self.pile=[]
+    def reveal(self, room):
+        for item in self.pile:
+            room.loot.add(item)
+            room.action_controller.add_actions(item)
+        self.clear()
+        return True
+    
+    
+    def clear(self):
+        self.pile=list()
         
     
     def transfer(self, other_loot):
         if not isinstance(other_loot, Loot):
             return False
         other_loot.pile.extend(self.pile)
-        self.pile = []
+        self.clear()
         return True
     
     
@@ -136,6 +144,27 @@ class Money:
         self.how_much_money = how_much_money
         self.empty = False
         self.generate_name()
+        self.hero_actions = {}
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
     
     def generate_name(self):
@@ -233,3 +262,10 @@ class Money:
 
     def get_sum(self) ->int:
         return self.how_much_money
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['деньги', 'монеты']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list

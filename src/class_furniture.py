@@ -12,19 +12,60 @@ class Furniture:
     def __init__(self, game):
         """
         Инициализирует объект класса мебели
-
         """
-
         self.game = game
         self.locked:bool = False
         self.opened:bool = True
         self.empty:bool = False
         self.room:Room = None
+        self.room_actions = {
+            "отпереть": {
+                "method": "unlock",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "condition": "is_locked",
+                "post_process": "after_unlock"
+                },
+            "обыскать": {
+                "method": "search",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "after_search"
+                },
+        }
 
     
     def __str__(self):
         return self.where + ' ' + self.state + ' ' + self.name
     
+    
+    def after_unlock(self, who):
+        return
+    
+    
+    def after_search(self, who):
+        return
+    
+    
+    def is_locked(self) -> bool:
+        return self.locked
+
+    
+    def unlock(self, who, in_action:bool=False) -> str:
+        """
+        Метод отпирания мебели при помощи ключа.
+        """
+        if not self.locked:
+            return 'Тут не заперто, можно без проблем посмотреть, что там внутри.'
+        key = who.backpack.get_first_item_by_class(Key)
+        if not key:
+            return f'У {who:gen} нет подходящего ключа чтобы что-то отпирать.'
+        who.backpack.remove(key)
+        self.locked = False
+        return f'{who.name} отпирает {self:accus} ключом.'
+
     
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
@@ -92,4 +133,27 @@ class Furniture:
             self.locked = True
             very_new_key = Key(self.game)
             very_new_key.place(floor)
+        self.room.action_controller.add_actions(self)
         return True
+    
+    
+    def search(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обыскивания мебели.
+        """
+        room = who.current_position
+        if self.locked:
+            return f'Нельзя обыскать {self:accus}. Там заперто.'
+        # if what_to_search.check_trap():
+        #     tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
+        #     what_to_search.trap.trigger(self)
+        #     return False
+        # if self.check_monster_in_ambush(place=what_to_search):
+        #     return False
+        if self.loot == 0:
+            return f'{self.name} {self.empty_text}'.capitalize()
+        message = [f'{who.name} осматривает {self:accus} и находит:']
+        message += self.loot.show_sorted()
+        self.loot.reveal(room)
+        message.append('Все, что было спрятано, теперь лежит на виду.')
+        return message

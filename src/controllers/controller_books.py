@@ -14,7 +14,8 @@ class BooksController(Controller):
         base_price: int
         price_dice: dict
         texts: list
-        can_use_in_fight: bool      
+        can_use_in_fight: bool
+        examine_text: str      
     
     
     _classes = {
@@ -100,8 +101,7 @@ class BooksController(Controller):
             "prep": "Большой",
             "inst": "Большой"
           }
-    )    
-    
+    )
     
     def __init__(self, game):
         self.game = game

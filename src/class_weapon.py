@@ -28,7 +28,116 @@ class Weapon:
         self.game = game
         self.runes = []
         self.empty = False
+        self.hero_actions = {
+            "использовать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "экипировать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "выбрать": {
+                "method": "use",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "сменить": {
+                "method": "change",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_change",
+                "condition": "can_be_changed"
+                },
+            "поменять": {
+                "method": "change",
+                "batch": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_change",
+                "condition": "can_be_changed"
+                },
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
+    
+    def name_for_change(self, who) -> str:
+        second_weapon = who.get_second_weapon()
+        if not second_weapon.empty:
+            return f'{self.show()} (меняется на {second_weapon.show()})'
+        return self.show()
+    
+    
+    def can_be_changed(self, who) -> bool:
+        second_weapon = who.get_second_weapon()
+        if who.weapon == self and not second_weapon.empty:
+            return True
+        return False
+    
+    
+    def change(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод смены оружия.
+        """
+        message = []
+        second_weapon = who.get_second_weapon()
+        if not self.weapon.empty and second_weapon.empty:
+            return f'{who.name} не может сменить оружие из-за того, что оно у {who.g("него", "нее")} одно.'
+        message.append(f'{who.name} убирает {self:accus} в рюкзак и берет в руки {second_weapon:accus}.')
+        if second_weapon.twohanded and not who.shield.empty:
+            who.removed_shield = who.shield
+            who.shield = who.game.no_shield
+            message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
+        elif not second_weapon.twohanded and not who.removed_shield.empty:
+            message.append(f'У {who.g("героя", "героини")} теперь одноручное оружие, поэтому {who:pronoun} может достать щит из-за спины.')
+        who.backpack.remove(second_weapon, who)
+        who.backpack.append(self)
+        who.weapon = second_weapon
+        return message
+    
     
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
@@ -52,6 +161,18 @@ class Weapon:
         if key:
             return self.lexemes.get(key, '')
         return self.lexemes
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания оружия.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        who.weapon = self.game.no_weapon
+        return f'{who.name} бросает {self.name} в угол комнаты.'
     
     
     def get_element_decorator(self) -> str|None:
@@ -150,8 +271,7 @@ class Weapon:
         return self.damage.roll()
 
     
-    def take(self, who):
-        game = self.game
+    def take(self, who, in_action=False) -> list[str]:
         message = [f'{who.name} берет {self:accus}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
@@ -171,7 +291,9 @@ class Weapon:
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
                 who.backpack.append(self)
-        tprint(game, message)
+        who.action_controller.add_actions(self)
+        who.current_position.action_controller.delete_actions_by_item(self)
+        return message
 
     
     def show(self):
@@ -183,27 +305,25 @@ class Weapon:
         return f'{name} ({damage_string}), {self.type}'.capitalize()
 
     
-    def use(self, who, in_action=False):
-        game = self.game
-        if who.weapon.empty:
-            who.weapon = self
-        else:
+    def use(self, who, in_action=False) -> list[str]:
+        if not who.weapon.empty:
+            if who.weapon == self:
+                return [f'{who.name} уже использует {self:accus} в качестве оружия.']
             who.backpack.append(who.weapon)
-            who.weapon = self
             who.backpack.remove(self, who)
-            message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
-            if not who.shield.empty and self.twohanded:
-                shield = who.shield
-                who.removed_shield = shield
-                who.shield = game.no_shield
-                message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
-            if not who.removed_shield.empty and not self.twohanded:
-                shield = who.removed_shield
-                who.shield = shield
-                who.removed_shield = game.no_shield
-                message.append(f'Из-за того, что новое оружие одноручное, '
-                               f'{who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
-        tprint(game, message)
+        who.weapon = self
+        message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
+        if not who.shield.empty and self.twohanded:
+            shield = who.shield
+            who.removed_shield = shield
+            who.shield = self.game.no_shield
+            message.append('Из-за того, что новое оружие двуручное, щит пришлось убрать за спину.')
+        if not who.removed_shield.empty and not self.twohanded:
+            shield = who.removed_shield
+            who.shield = shield
+            who.removed_shield = self.game.no_shield
+            message.append(f'Из-за того, что новое оружие одноручное, {who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
+        return message
 
     
     def place(self, castle, room_to_place = None):

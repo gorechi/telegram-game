@@ -18,8 +18,8 @@ class state_enum(Enum):
     LEVEL_UP = 3
     USE_IN_FIGHT = 4
     TRADE = 5
-    READ = 6
     DRINK = 7
+    ACTION = 8
 
 class move_enum(Enum):
     """

@@ -20,7 +20,71 @@ class Backpack:
             "prep": "рюкзаке",
             "inst": "рюкзаком"
         }
+        self.hero_actions = {
+            "осмотреть": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "get_name_for_show",
+                },
+            "проверить": {
+                "method": "show",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "get_name_for_show",
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "снять": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True,
+                },
+        }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "забрать": {
+                "method": "take",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
 
+    
+    def get_name_for_show(self, who) -> str:
+        return "Рюкзак героя"
+    
     
     def __format__(self, format:str) -> str:
         return self.lexemes.get(format, '')
@@ -50,6 +114,18 @@ class Backpack:
         
         self.insides.remove(item)
         item.place = place
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания рюкзака.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.action_controller.delete_actions_by_item(self)
+        room.action_controller.add_actions(self)
+        who.backpack = who.game.no_backpack
+        return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
         
     
     def get_items_by_class(self, item_class) -> list:
@@ -123,7 +199,7 @@ class Backpack:
         return can_use
 
 
-    def show(self, who) -> list:
+    def show(self, who, in_action:bool=False) -> list:
         """Метод генерирует описание рюкзака."""
         
         message = []
@@ -151,12 +227,16 @@ class Backpack:
         return False
     
     
-    def take(self, who) -> bool:
-        game = self.game
+    def take(self, who, in_action:bool=False) -> str:
+        room = who.current_position
         if not who.backpack.no_backpack:
-            tprint(game, f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.')
-            return False
+            return f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.'
         who.backpack = self
         self.owner = who
-        tprint(game, f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.')
-        return True
+        who.action_controller.add_actions(self)
+        room.action_controller.delete_actions_by_item(self)
+        return f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.'
+    
+    
+    def get_names_list(self, cases:list=None) -> list:
+        return ['рюкзак']

@@ -103,7 +103,7 @@ def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
     if can_use:
         keys.append('использовать')
     keys.append('бежать')
-    if not game.player.weapon.empty and game.player.second_weapon():
+    if not game.player.weapon.empty and game.player.get_second_weapon():
         keys.append('сменить оружие')
     keyboard = list(generate_keyboard(keys=keys, keys_in_row=2))
     markup.keyboard = keyboard
