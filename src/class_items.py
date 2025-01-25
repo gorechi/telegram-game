@@ -106,7 +106,25 @@ class Matches:
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         self.room_actions = {
             "взять": {
@@ -193,7 +211,6 @@ class Matches:
         
         if not who:
             return False
-        room = who.current_position
         if not who.backpack.no_backpack:
             matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
             if matches_in_backpack:
@@ -201,7 +218,7 @@ class Matches:
             else:
                 who.put_in_backpack(self)
             return f'{who.name} забирает {self:accus} себе.'
-        return 'ТЕХДОЛГ В МЕТОДЕ Take() спичек'
+        return f'{who.name} не может забрать спички себе - {who.g("ему", "ей")} некуда их положить.'
 
     
     def use(self, who_is_using=None, in_action=False) -> str|list[str]:
@@ -233,6 +250,19 @@ class Matches:
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания спичек.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} бросает спички на пол.'
+
   
 
 class Map:
@@ -282,7 +312,25 @@ class Map:
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         self.room_actions = {
             "взять": {
@@ -370,7 +418,6 @@ class Map:
             return False, 'Во время боя это совершенно неуместно!'
 
 
-    
     def show_map(self):
         
         """
@@ -403,7 +450,6 @@ class Map:
         """ 
         Метод вызывается когда кто-то забирает карту себе. 
         """
-        room = who.current_position
         if not who.backpack.no_backpack:
             who.put_in_backpack(self)
             return f'{who.name} забирает {self:accus} себе.'
@@ -415,6 +461,18 @@ class Map:
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания карты.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} неосмотрительно оставляет карту лежать в пыли.'
 
 
 class Key:
@@ -433,7 +491,26 @@ class Key:
         }
         self.description = 'Ключ, пригодный для дверей и сундуков'
         self.empty = False
-        self.hero_actions = {}
+        self.hero_actions = {
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+        }
         self.room_actions = {
             "взять": {
                 "method": "take",
@@ -488,7 +565,6 @@ class Key:
 
     
     def take(self, who):
-        room = who.current_position
         if not who.backpack.no_backpack:
             who.put_in_backpack(self)
             return f'{who.name} забирает {self.name} себе.'
@@ -500,3 +576,15 @@ class Key:
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list
+
+
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания ключа.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'Непонятно зачем, но {who.name} бросает ключ в угол комнаты.'

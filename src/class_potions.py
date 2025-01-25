@@ -73,9 +73,9 @@ class Potion:
 
        
     def take(self, who, in_action:bool=False):
-        who.backpack.append(self)
-        self.owner = who
-        who.action_contoller.add_actions(self)
+        if who.backpack.no_backpack:
+            return f'{who.name} не может взять зелье потому что {who.g('ему', 'ей')} некуда его положить.'
+        who.put_in_backpack(self)
         return f'{who.name} забирает {self:accus} себе.'
     
     
@@ -88,6 +88,18 @@ class Potion:
             tprint(game, 'Это зелье нельзя использовать в бою!')
             return False
         return True
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания зелья.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} аккуратно ставит пузырек с зельем подальше от посторонних глаз.'
 
 
 class HealPotion(Potion):
@@ -112,7 +124,25 @@ class HealPotion(Potion):
                 "batch": False,
                 "in_combat": True,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         
     
@@ -155,7 +185,25 @@ class HealthPotion(Potion):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
     
     
@@ -191,7 +239,25 @@ class StrengthPotion(Potion):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
        
     
@@ -227,7 +293,25 @@ class StrengtheningPotion(Potion):
                 "batch": False,
                 "in_combat": True,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
     
         
@@ -262,7 +346,25 @@ class DexterityPotion(Potion):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
 
     
@@ -298,7 +400,25 @@ class EvasionPotion(Potion):
                 "batch": False,
                 "in_combat": True,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         
      
@@ -333,7 +453,25 @@ class IntelligencePotion(Potion):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         
     
@@ -369,7 +507,25 @@ class EnlightmentPotion(Potion):
                 "batch": False,
                 "in_combat": True,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         
     
@@ -404,7 +560,25 @@ class Antidote(Potion):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": True
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
 
 
