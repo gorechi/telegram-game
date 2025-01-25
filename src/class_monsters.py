@@ -965,7 +965,8 @@ class Plant(Monster):
         if room_to_place:
             room = room_to_place
         else:
-            empty_rooms = [a for a in floor.plan if (not a.monsters() and not a.monster_in_ambush())]
+            empty_rooms = [room for room in floor.plan if (not room.monsters() 
+                                                           and not room.monster_in_ambush())]
             room = randomitem(empty_rooms)
         self.current_position = room
         self.floor = floor
