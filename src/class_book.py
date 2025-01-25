@@ -23,7 +23,25 @@ class Book:
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
             }
         self.room_actions = {
             "взять": {
@@ -57,6 +75,18 @@ class Book:
     
     def on_create(self):
         return True
+    
+    
+    def drop(self, who, in_action:bool=False) -> str:
+        """
+        Метод выбрасывания книги.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} аккуратно кладет {self.name} в укромное местечко.'
     
     
     def check_name(self, message:str) -> bool:
@@ -103,12 +133,10 @@ class Book:
 
     
     def take(self, who):
-        room = who.current_position
-        if not who.backpack.no_backpack:
-            who.put_in_backpack(self)
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
-            return True
-        return False
+        if who.backpack.no_backpack:
+            return f'{who.name} не может взять книгу потому что {who.g('ему', 'ей')} некуда ее положить.'
+        who.put_in_backpack(self)
+        return f'{who.name} забирает {self:accus} себе.'
     
 
 class ThrustingWeaponBook(Book):

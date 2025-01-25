@@ -26,7 +26,46 @@ class Rune:
     def __init__(self, game):
         self.game = game
         self.empty = False
-        
+        self.hero_actions = {
+            "бросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "выбросить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            "оставить": {
+                "method": "drop",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": True
+                },
+            }
+        self.room_actions = {
+            "взять": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "брать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "собрать": {
+                "method": "take",
+                "batch": True,
+                "in_combat": False,
+                "in_darkness": False
+                }
+        }
          
     
     def __str__(self) -> str:
@@ -51,16 +90,16 @@ class Rune:
     
     
     def on_create(self):
-        
-        """ Метод вызывается после создания экземпляра класса. Ничего не делает. """
-        
+        """ 
+        Метод вызывается после создания экземпляра класса. Ничего не делает. 
+        """
         return True
 
     
     def place(self, castle, room=None) -> bool:
-        
-        """ Метод раскидывания рун по замку. """
-        
+        """ 
+        Метод раскидывания рун по замку. 
+        """
         rooms_with_secrets = castle.secret_rooms()
         if not room:
             rooms = castle.plan
@@ -72,38 +111,41 @@ class Rune:
             furniture.put(self)
         else:
             room.loot.add(self)
+        room.action_controller.add_actions(self)
         return True
 
     
     def element(self) -> int:
-        
-        """ Метод возвращает элемент руны в виде целого числа. """
-        
+        """ 
+        Метод возвращает элемент руны в виде целого числа. 
+        """
         return int(self.element)
 
     
-    def take(self, who):
-        
-        """ Метод вызывается когда кто-то забирает руну себе. """
-        
-        if not who.backpack.no_backpack:
-            who.backpack.append(self)
-            tprint(self.game, f'{who.name} забирает {self:accus} себе.')
+    def take(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод вызывается когда кто-то забирает руну себе. 
+        """
+        if who.backpack.no_backpack:
+            return f'{who.name} не может взять рунУ потому что {who.g('ему', 'ей')} некуда ее положить.'
+        who.put_in_backpack(self)
+        return f'{who.name} забирает {self:accus} себе.'
 
     
     def show(self) -> str:
-        
-        """ Метод возвращает описание руны в виде строки. """
-        
+        """ 
+        Метод возвращает описание руны в виде строки. 
+        """
         return f'{self.description} - урон + {str(self.damage)} или защита + {str(self.defence)}'.capitalize()
 
     
-    def use(self, who_is_using, in_action:bool=False) -> str:
-        
-        """ 
-        Метод использования руны. Возвращает строку ответа и ничего не делает 
-        так как руну использовать нельзя.
-        
+    def drop(self, who, in_action:bool=False) -> str:
         """
-        
-        tprint(self.game, f'{who_is_using.name} не знает, как использовать такие штуки.')
+        Метод выбрасывания руны.
+        """
+        room = who.current_position
+        room.loot.add(self)
+        who.backpack.remove(item=self, place=room)
+        room.action_controller.add_actions(self)
+        who.action_controller.delete_actions_by_item(self)
+        return f'{who.name} бросает {self:accus} на пол.'

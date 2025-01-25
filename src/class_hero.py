@@ -2102,7 +2102,9 @@ class Hero:
         
 
     def put_in_backpack(self, item) -> bool:
+        self.current_position.loot.remove(item)
         self.backpack.append(item)
+        item.owner = self
         self.action_controller.add_actions(item)
         self.current_position.action_controller.delete_actions_by_item(item)
         return True
