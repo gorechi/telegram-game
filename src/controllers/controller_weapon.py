@@ -15,7 +15,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Большой",
-            "accus": "Большого",
+            "accus": "Большой",
             "gen": "Большого",
             "dat": "Большому",
             "prep": "Большом",
@@ -45,7 +45,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Малый",
-            "accus": "Малого",
+            "accus": "Малый",
             "gen": "Малого",
             "dat": "Малому",
             "prep": "Малом",
@@ -75,7 +75,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Старый",
-            "accus": "Старого",
+            "accus": "Старый",
             "gen": "Старого",
             "dat": "Старому",
             "prep": "Старом",
@@ -105,7 +105,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Новый",
-            "accus": "Нового",
+            "accus": "Новый",
             "gen": "Нового",
             "dat": "Новому",
             "prep": "Новом",
@@ -138,7 +138,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Большой",
-            "accus": "Большого",
+            "accus": "Большой",
             "gen": "Большого",
             "dat": "Большому",
             "prep": "Большом",
@@ -168,7 +168,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Малый",
-            "accus": "Малого",
+            "accus": "Малый",
             "gen": "Малого",
             "dat": "Малому",
             "prep": "Малом",
@@ -198,7 +198,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Старый",
-            "accus": "Старого",
+            "accus": "Старый",
             "gen": "Старого",
             "dat": "Старому",
             "prep": "Старом",
@@ -228,7 +228,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Тяжелый",
-            "accus": "Тяжелого",
+            "accus": "Тяжелый",
             "gen": "Тяжелого",
             "dat": "Тяжелому",
             "prep": "Тяжелом",
@@ -261,7 +261,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Большой",
-            "accus": "Большого",
+            "accus": "Большой",
             "gen": "Большого",
             "dat": "Большому",
             "prep": "Большом",
@@ -291,7 +291,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Малый",
-            "accus": "Малого",
+            "accus": "Малый",
             "gen": "Малого",
             "dat": "Малому",
             "prep": "Малом",
@@ -321,7 +321,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Старый",
-            "accus": "Старого",
+            "accus": "Старый",
             "gen": "Старого",
             "dat": "Старому",
             "prep": "Старом",
@@ -351,7 +351,7 @@ class WeaponController(Controller):
         0: 
             {
             "nom": "Новый",
-            "accus": "Нового",
+            "accus": "Новый",
             "gen": "Нового",
             "dat": "Новому",
             "prep": "Новом",
