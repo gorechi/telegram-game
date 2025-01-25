@@ -73,14 +73,10 @@ class ActionController():
                 condition = condition_method,
                 post_process = post_process_method,
                 )
-            print('='*40)
-            print(f'Создан item {new_item}')
-            print('='*40)
             self.items.append(new_item)
             if not self.actions.get(action, None):
                 self.actions[action] = []
             self.actions[action].append(new_item)
-        print(f'actions: {self.actions}')
         return True
     
     
@@ -91,8 +87,6 @@ class ActionController():
         items_to_delete = self.get_items_by_filters(item=item)
         for key, value in self.actions.items():
             self.actions[key] = [item for item in value if item not in items_to_delete]
-        print('-'*40)
-        print(f'actions: {self.actions}')
         return True
     
     

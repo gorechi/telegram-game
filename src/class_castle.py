@@ -25,15 +25,15 @@ class Floor:
         """
         Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
         """
-        directions = {0: -self.rooms,
+        floor = room.floor
+        directions = {0: -floor.rooms,
                       1: 1,
-                      2: self.rooms,
+                      2: floor.rooms,
                       3: -1}
-        print("directions:", directions)
         available_rooms = []
         for index, door in enumerate(room.doors):
             if door and not door.locked and not door.empty:
-                available_rooms.append(self.plan[room.position + directions[index]])
+                available_rooms.append(floor.plan[room.position + directions[index]])
         if ladders:
             if room.ladder_down and not room.ladder_down.locked:
                 available_rooms.append(room.ladder_down.room_down)

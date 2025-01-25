@@ -162,6 +162,8 @@ class Door:
     }
     
     def __init__(self, game):
+        self.locked = False
+        self.closed = True
         self.empty = True
         self.game = game
         self.name = 'дверь'
