@@ -145,8 +145,8 @@ class Hero:
                             'торговать': self.trade,
                             # 'изучить': self.examine,
                             # 'изучать': self.examine,
-                            'выпить': self.drink,
-                            'пить': self.drink,
+                            # 'выпить': self.drink,
+                            # 'пить': self.drink,
                             'улучшить': self.enchant}    
     
     
