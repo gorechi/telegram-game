@@ -176,7 +176,30 @@ class Door:
                 "presentation": "show_for_unlock",
                 "condition": "is_locked"
                 },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_unlock"
+                },
         }
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        """
+        Метод генерирует текст сообщения когда герой осматривает дверь.
+        """
+        room = who.current_position
+        if self.empty:
+            message = f'{who.name} осматривает стену и не находит ничего заслуживающего внимания.'
+        elif who.check_fear():
+            message = f'{who.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
+        else:
+            direction = self.get_direction(room)
+            what_position = room.position + who.floor.directions_dict[direction]
+            room_behind_the_door = who.floor.plan[what_position]
+            message = room_behind_the_door.show_through_key_hole(who)
+        return message
     
     
     def is_locked(self) -> bool:
@@ -489,8 +512,37 @@ class Room:
                 "in_combat": False,
                 "in_darkness": False,
                 },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "map"
+                },
+            "осмотреться": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "map"
+                },
+            "оглядеться": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "post_process": "map"
+                },
         }
         self.action_controller.add_actions(self)
+    
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        if self.light:
+            message = self.show_with_light_on(who)
+        else:
+            message = self.show_with_light_off()
+        return message
     
     
     def generate_doors_actions(self):

@@ -81,6 +81,13 @@ class Weapon:
                 "presentation": "name_for_change",
                 "condition": "can_be_changed"
                 },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
+                },
             }
         self.room_actions = {
             "взять": {
@@ -100,9 +107,28 @@ class Weapon:
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
 
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        return self.show()
+    
+    
+    def show_for_examine_hero(self, who) -> str:
+        return f'{self.name} (в руках у героя)'
+    
+    
+    def show_for_examine_room(self, who) -> str:
+        return f'{self.name} (лежит в комнате)'
+    
     
     def name_for_change(self, who) -> str:
         second_weapon = who.get_second_weapon()

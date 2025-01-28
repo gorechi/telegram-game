@@ -56,6 +56,15 @@ class Protection:
         return f'{name_string} ({self.protection.text()})'
     
     
+    def show_for_examine_hero(self, who) -> str:
+        return f'{self.name} (в руках у героя)'
+    
+    
+    def show_for_examine_room(self, who) -> str:
+        return f'{self.name} (лежит в комнате)'
+
+    
+    
     def on_create(self):
         return True
 
@@ -168,6 +177,13 @@ class Armor(Protection):
                 "in_combat": False,
                 "in_darkness": True
                 },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
+                },
         }
         self.room_actions = {
             "взять": {
@@ -187,7 +203,14 @@ class Armor(Protection):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
   
     
@@ -201,6 +224,10 @@ class Armor(Protection):
             names_list.append(self.lexemes.get(case, '').lower())
             names_list.append(self.get_element_names(case).lower())
         return names_list
+    
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        return self.show()
     
     
     def place(self, castle, room_to_place = None):
@@ -378,7 +405,8 @@ class Shield (Protection):
                 "method": "examine",
                 "batch": False,
                 "in_combat": True,
-                "in_darkness": False
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
                 },
             }
         self.room_actions = {
@@ -399,7 +427,14 @@ class Shield (Protection):
                 "batch": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
     
     

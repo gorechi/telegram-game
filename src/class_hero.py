@@ -117,37 +117,61 @@ class Hero:
         self.save_room = self.floor.plan[0]
         self.wounds = {}
         self.last_move = move_enum.DOWN
-        self.command_dict = {'осмотреть': self.look,
-                            'подняться': self.go_up,
-                            'подниматься': self.go_up,
-                            'спуститься': self.go_down,
-                            'спускаться': self.go_down,
-                            'идти': self.go,
-                            'атаковать': self.fight,
-                            'напасть': self.fight,
-                            # 'взять': self.take,
-                            # 'забрать': self.take,
-                            # 'подобрать': self.take,
-                            # 'обыскать': self.search,
-                            # 'открыть': self.open,
-                            'использовать': self.use,
-                            'применить': self.use,
-                            # 'убрать': self.remove,
-                            # 'чинить': self.repair,
-                            # 'починить': self.repair,
-                            'отдохнуть': self.rest,
-                            'отдыхать': self.rest,
-                            # 'сменить': self.change,
-                            # 'поменять': self.change,
-                            'test': self.test,
-                            'тест': self.test,
-                            'обезвредить': self.disarm,
-                            'торговать': self.trade,
-                            # 'изучить': self.examine,
-                            # 'изучать': self.examine,
-                            # 'выпить': self.drink,
-                            # 'пить': self.drink,
-                            'улучшить': self.enchant}    
+        self.command_dict = {
+            'подняться': self.go_up,
+            'подниматься': self.go_up,
+            'спуститься': self.go_down,
+            'спускаться': self.go_down,
+            'идти': self.go,
+            'атаковать': self.fight,
+            'напасть': self.fight,
+            'использовать': self.use,
+            'применить': self.use,
+            'test': self.test,
+            'тест': self.test,
+            'обезвредить': self.disarm,
+            'торговать': self.trade,
+            'улучшить': self.enchant
+            }
+        self.hero_actions = {
+            "отдохнуть": {
+                "method": "rest",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "отдыхать": {
+                "method": "rest",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False
+                },
+            "осмотреть": {
+                "method": "examine",
+                "batch": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "name_for_examine"
+                },
+            }
+        self.action_controller.add_actions(self)
+        
+        
+    def get_names_list(self, cases:list=None) -> list:
+        names_list = ['себя', 'себе', 'героя', 'героиню']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
+    
+    
+    def name_for_examine(self, who) -> str:
+        return f'Себя {self.g('самого', 'саму')}'
+    
+    
+    def examine(self, who, in_action:bool=False) -> list[str]:
+        if not self.check_light():
+            return 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.'
+        return self.show(return_message=True)   
     
     
     def on_create(self):
@@ -244,35 +268,10 @@ class Hero:
         return self.check_dext(against=3, add=[2])
     
     
-    # def examine(self, what:str) -> bool:
-    #     if not self.check_light():
-    #         tprint(self.game, f'В этой комнате так темно, что {self.g("герой", "героиня")} не может изучить даже собственную ладонь.')
-    #         return False
-    #     items_list = self.find_what_to_examine()
-    #     if not items_list:
-    #         tprint(self.game, 'В этой комнате нечего изучать. Это довольно скучная комната.')
-    #         return False
-    #     if what:
-    #         items_list = [item for item in items_list if item.check_name(what)]
-    #         if not items_list:
-    #             tprint(self.game, 'Эту штуку нельзя изучить.')
-    #             return False
-    #     for item in items_list:
-    #         item.get_examined(self)
-    #     return True 
-    
-    
     def increase_monster_knowledge(self, monster_type) -> bool:
         knowledge = self.monster_knowledge.get(monster_type, 0)
         self.monster_knowledge[monster_type] = knowledge + 1
         return f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}'
-                   
-    
-    # def find_what_to_examine(self) -> list:
-    #     items = []
-    #     if self.current_position.has_a_corpse():
-    #         items.extend(self.current_position.morgue)
-    #     return [item for item in items if not item.examined]
     
     
     def go_down(self, what:str) -> bool:
@@ -601,19 +600,7 @@ class Hero:
         :return: Целое число, представляющее шанс на успешное обезвреживание ловушки.
         """
         return self.check_dext(add=[self.trap_mastery])
-                
-        
-    # def generate_map_text(self, in_action: bool = False) -> list[bool, str]:
-    #     if not in_action:
-    #         if self.fear >= Hero._fear_limit:
-    #             return False, f'{self.name} от страха не может сосредоточиться и что-то разобрать на карте.'
-    #         elif not self.current_position.light:
-    #             return False, 'В комнате слишком темно чтобы разглядывать карту'
-    #         else:
-    #             return True, f'{self.name} смотрит на карту этажа замка.'
-    #     else:
-    #         return False, 'Во время боя это совершенно неуместно!'
-    
+   
     
     def intel_wound(self) -> str:
         """
@@ -832,62 +819,6 @@ class Hero:
         if self.poisoned:
             parry_chance -= self.dext.base_die() // 2
         return max(parry_chance, 0)
-    
-    
-    # def change(self, what:str=None):
-    #     """Метод обрабатывает команду "сменить". """
-        
-    #     if what not in ['оружие']:
-    #         tprint(self.game, f'{self.name} не знает, зачем нужно это менять.')
-    #     if what == 'оружие':
-    #         self.change_weapon_actions()
-    
-    
-    # def change_weapon_actions(self):
-    #     """Метод моделирует различные варианты смены оружия."""
-        
-    #     second_weapon = self.get_second_weapon()
-    #     if not self.weapon.empty and not second_weapon.empty:
-    #         self.change_weapon()
-    #     elif self.weapon.empty and not second_weapon.empty:
-    #         self.take_out_weapon()
-    #     elif not self.weapon.empty and second_weapon.empty:
-    #         tprint(self.game, f'{self.name} не может сменить оружие из-за того, что оно у {self.g("него", "нее")} одно.')
-    #     else:
-    #         tprint(self.game, f'{self.name} не может сменить оружие. У {self.g("него", "нее")} и оружия-то нет.')
-    
-       
-    # def change_weapon(self):
-    #     """Метод вызывается если герой может сменить оружие и меняет его."""
-        
-    #     message = []
-    #     second_weapon = self.get_second_weapon()
-    #     message.append(f'{self.name} убирает {self.weapon:accus} в рюкзак и берет в руки {second_weapon:accus}.')
-    #     if second_weapon.twohanded and not self.shield.empty:
-    #         self.removed_shield = self.shield
-    #         self.shield = self.game.no_shield
-    #         message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит тоже приходится убрать.')
-    #     elif not second_weapon.twohanded and not self.removed_shield.empty:
-    #         message.append(f'У {self.g("героя", "героини")} теперь одноручное оружие, поэтому {self:pronoun} может достать щит из-за спины.')
-    #     self.backpack.remove(second_weapon, self)
-    #     self.backpack.append(self.weapon)
-    #     self.weapon = second_weapon
-    #     tprint(self.game, message)
-        
-    
-    # def take_out_weapon(self):
-    #     """Метод вызывается если герой был без оружие и достает его из рюкзака."""
-        
-    #     message = []
-    #     second_weapon = self.get_second_weapon()
-    #     message.append(f'{self.name} достает из рюкзака {second_weapon:accus} и берет в руку.')
-    #     if second_weapon.twohanded and not self.shield.empty:
-    #         self.removed_shield = self.shield
-    #         self.shield = self.game.no_shield
-    #         message.append(f'Из-за того, что {second_weapon:nom} - двуручное оружие, щит приходится убрать за спину.')
-    #     self.backpack.remove(second_weapon, self)
-    #     self.weapon = second_weapon
-    #     tprint(self.game, message)
         
     
     def g(self, he_word:str, she_word:str) -> str:
@@ -903,141 +834,29 @@ class Hero:
         return she_word
     
     
-    # def drop(self, item:str=None) -> bool:
-    #     """Метод обрабатывает команду "бросить". """
-        
-    #     game = self.game
-    #     item = item.lower()
-    #     shield_in_hand = not self.shield.empty
-    #     shield_removed = not self.removed_shield.empty
-    #     if not item or item in ['все', 'всё']:
-    #         tprint(game, f'{self.name} {self.g("хотел", "хотела")} бы бросить все и уйти в пекари, но в последний момент берет себя в руки и продолжает приключение.')
-    #     elif item.isdigit():
-    #         return self.drop_digit(item)
-    #     else:
-    #         if shield_in_hand and self.shield.check_name(item):
-    #             return self.drop_shield()
-    #         elif shield_removed and self.remove_shield.check_name(item):
-    #             return self.drop_removed_shield()
-    #         elif self.weapon.check_name(item):
-    #             return self.drop_weapon()
-    #         elif self.backpack.check_name(item):
-    #             return self.drop_backpack()
-    #         else:
-    #             return self.drop_item(item=item)
-   
-    
-    # def drop_digit(self, number:str) -> bool:
-    #     """
-    #     Метод обрабатывает ситуацию, когда в команду "бросить" 
-    #     в качестве аргумента передан порядковый номер предмета.
-        
-    #     """
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     number = int(number)
-    #     item = self.backpack.get_item_by_number(number)
-    #     if item:
-    #         room.loot.add(item)
-    #         self.backpack.remove(item, room)
-    #         tprint(game, f'{self.name} бросает {item.name} на пол комнаты.')
-    #         return True
-    #     else:
-    #         tprint(game, f'{self.name} не {self.g("нашел", "нашла")} такой вещи у себя в рюкзаке.')
-    #         return False
-    
-    
-    # def drop_backpack(self) -> bool:
-    #     """Метод выбрасывания рюкзака."""
-        
-    #     if self.backpack.no_backpack:
-    #         return False
-    #     game = self.game
-    #     room = self.current_position
-    #     room.loot.add(self.backpack)
-    #     self.action_controller.remove_actions(self.backpack)
-    #     tprint(game, f'{self.name} снимает рюкзак и кладет в угол комнаты.')
-    #     self.backpack = game.no_backpack
-    #     return True    
-    
-    
-    # def drop_shield(self) -> bool:
-    #     """Метод выбрасывания щита."""
-        
-    #     if self.shield.empty:
-    #         return False
-    #     game = self.game
-    #     room = self.current_position
-    #     room.loot.add(self.shield)
-    #     tprint(game, f'{self.name} швыряет {self.shield.name} на пол комнаты.')
-    #     self.shield = game.no_shield
-    #     return True
-    
-    
-    # def drop_removed_shield(self) -> bool:
-    #     """Метод выбрасывания щита, который убран за спину."""
-        
-    #     if self.removed_shield.empty:
-    #         return False
-    #     game = self.game
-    #     room = self.current_position
-    #     room.loot.add(self.removed_shield)
-    #     tprint(game, f'{self.name} достает {self.removed_shield.name} из-за спины и ставит его к стене.')
-    #     self.removed_shield = game.no_shield
-    #     return True
-    
-    
-    # def drop_weapon(self) -> bool:
-    #     """Метод выбрасывания оружия."""
-        
-    #     if self.weapon.empty:
-    #         return False
-    #     game = self.game
-    #     room = self.current_position
-    #     room.loot.add(self.weapon)
-    #     tprint(game, f'{self.name} бросает {self.weapon.name} в угол комнаты.')
-    #     self.weapon = game.no_weapon
-    #     return True
-    
-    
-    def drop_item(self, item:str) -> bool:
-        """Метод выбрасывания вещи из рюкзака."""
-        
-        game = self.game
+    def rest(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обрабатывает команду "отдохнуть". 
+        """
         room = self.current_position
-        item_to_drop = self.backpack.get_first_item_by_name(item)
-        if item_to_drop:
-            self.backpack.remove(item_to_drop, room)
-            room.loot.add(item_to_drop)
-            tprint(game, f'{self.name} бросает {item_to_drop.name} на пол комнаты.')
-            return True
-        else:
-            tprint(game, f'{self.name} роется в рюкзаке, но не находит ничего такого.')
-            return False
-    
-    
-    def rest(self, what=None):
-        """Метод обрабатывает команду "отдохнуть". """
-        
-        room = self.current_position
-        if not self.check_rest_possibility(room=room):
-            return False
-        if self.check_monster_in_ambush(place=room):
-            return False
-        self.repair_shield_while_rest()
-        self.sleep_while_rest()
+        rest_not_posible = self.check_rest_possibility(room=room)
+        if rest_not_posible:
+            return rest_not_posible
+        monster_in_ambush = self.check_monster_in_ambush(place=room)
+        if monster_in_ambush:
+            return monster_in_ambush
         self.poisoned = False
         self.health = self.start_health
         self.save_room = room
         self.restless = 10
-        return True
+        return self.sleep_while_rest()
     
     
-    def sleep_while_rest(self):
-        """Метод моделирует сон героя во время отдыха."""
-        
-        message = []
+    def sleep_while_rest(self) -> list[str]:
+        """
+        Метод моделирует сон героя во время отдыха.
+        """
+        message = list()
         dream_count = Hero._nightmare_probability.roll()
         if dream_count == 1:
             message.append(f'Провалившись в сон {self.name} видит ужасный кошмар. \
@@ -1049,16 +868,14 @@ class Hero:
         stolen_item = self.get_robbed_while_sleep()
         if stolen_item:
             message.append(stolen_item)
-        tprint(self.game, message)
+        return message
         
     
     def get_robbed_while_sleep(self) -> str:
         """
         Метод моделирует то, что героя ограбили во время сна.
         Метод возвращает строку текста, которая добавляется к сообщению о сне.
-        
         """
-        
         steal_count = Hero._steal_probability.roll()
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
@@ -1073,121 +890,34 @@ class Hero:
         return None
     
     
-    # def repair_shield_while_rest(self):
-    #     """Метод починки щита во время отдыха."""
-        
-    #     shield = self.get_shield()
-    #     if shield:
-    #         repair_price = shield.get_repair_price()
-    #         if repair_price > 0 and self.money >= repair_price:
-    #             shield.repair()
-    #             self.money -= repair_price
-    #             tprint(self.game, f'Пока отдыхает {self.name} успешно чинит {shield.get_full_names("accus")}')
-    
-    
-    def check_monster_in_ambush(self, place) -> bool:
+    def check_monster_in_ambush(self, place) -> list[str]:
         """
-        Метод проверки, выскочил ли из засады монстр.
-        
-        Принимает на вход:
-        - place - объект места, в котором может спрятаться монстр.
-        Сейчас используются классы Room и Furniture.
-        
-        Если монстр выскакивает из засады, то сразу же начинается схватка.
-        """
-        
+        Метод проверки, выскочил ли из засады монстр.        
+        """    
         monster = place.monster_in_ambush()
-        message = []
+        message = list()
         if monster:
             monster.hiding_place = None
             message.append(f'Неожиданно из засады выскакивает {monster.name} и нападает на {self:accus}.')
             if monster.frightening:
                 message.append(f'{monster.name} очень {monster.g("страшный", "страшная")} и {self.name} пугается до икоты.')
                 self.fear += 1
-            tprint(self.game, message)
-            self.fight(monster.name, True)
-            return True
-        return False
+        return message
     
     
-    def check_rest_possibility(self, room:Room) -> bool:
-        """Метод проверки, может ли герой отдыхать в комнате."""
-        
+    def check_rest_possibility(self, room:Room) -> list[str]:
+        """
+        Метод проверки, может ли герой отдыхать в комнате.
+        """
         cant_rest, rest_place = room.can_rest()
-        message = []
+        message = list()
         if self.restless > 0:
             cant_rest.append(f'У {self.g("героя", "героини")} столько нерастраченной энергии, что {self.g("ему", "ей")} не сидится на месте')
         if not rest_place or len(cant_rest) > 0:
             message.append('В этой комнате нельзя этого делать.')
             message.append(randomitem(cant_rest))
-            tprint(self.game, message)
-            return False
-        return True
-    
-    
-    # def remove(self, what=None) -> bool:
-    #     """Метод обрабатывает команду "убрать". """
-        
-    #     if not what:
-    #         tprint(self.game, f'{self.name} оглядывается по сторонам, \
-    #             находит какой-то мусор и закидывает его в самый темный угол комнаты.')
-    #         return False
-    #     if self.shield.check_name(what):
-    #         return self.remove_shield()
-    #     else:
-    #         tprint(self.game, f'{self.name} не понимает, как это можно убрать.')
-    #         return False
-    
-    
-    # def remove_shield(self) -> bool:
-    #     """Метод убирания щита за спину."""
-        
-    #     if not self.shield.empty:
-    #         self.shield, self.removed_shield = self.removed_shield, self.shield
-    #         tprint(self.game, f'{self.name} убирает {self.removed_shield.get_full_names("accus")} за спину.') 
-    #         return True
-    #     return False
-        
-    
-    # def repair(self, what=None) -> bool:
-    #     """Метод обрабатывает команду "чинить". """
-        
-    #     if not what:
-    #         tprint(self.game, f'{self.name} не может чинить что-нибудь. Нужно понимать, какую вещь ремонтировать.')
-    #         return False
-    #     if self.shield.check_name(what) or self.removed_shield.check_name(what):
-    #         return self.repair_shield()
-    #     tprint(self.game, f'{self.name} не умеет чинить такие штуки.')
-    #     return False
-
-    
-    # def repair_shield(self) -> bool:
-    #     """
-    #     Метод починки щита.
-    #     Щит чинится за деньги. Если у героя не хватает денег, 
-    #     то щит починен не будет.
-        
-    #     """
-        
-    #     game = self.game
-    #     shield = self.get_shield()
-    #     if not shield:
-    #         tprint(game, f'У {self.g("героя", "героини")} нет щита, так что и ремонтировать нечего.')
-    #         return False
-    #     repair_price = shield.get_repair_price()
-    #     if repair_price == 0:
-    #         tprint(game, f'{shield:accus} не нужно ремонтировать.')
-    #         return False
-    #     if self.money >= repair_price:
-    #         shield.repair()
-    #         self.money.how_much_money -= repair_price
-    #         tprint(game, f'{self.name} успешно чинит {shield:accus}')
-    #         self.decrease_restless(1)
-    #         return True
-    #     else:
-    #         tprint(game, f'{self.name} и {self.g("рад", "рада")} бы починить {shield:accus}, но {self.g("ему", "ей")} не хватает денег на запчасти.')
-    #         return False
-        
+        return message
+       
     
     def get_second_weapon(self) -> Weapon:
         """
@@ -1298,15 +1028,7 @@ class Hero:
         """
         Метод обрабатывает команду "убежать". 
         Запускается когда герой сбегает из боя.
-
-        Входящие параметры:
-        - target - Монстр, от которого убегает герой
-
-        Исходящие параметры:
-        - Возвращает текст сообщения в виде массива строк
-        
-        """
-        
+        """        
         room = self.current_position
         available_directions = room.get_available_directions()
         self.rage.reset()
@@ -1500,7 +1222,7 @@ class Hero:
             tprint(game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
 
     
-    def show(self):
+    def show(self, return_message:bool=False):
         """
         Метод генерирует и выводит на экран описание персонажа
         
@@ -1514,6 +1236,8 @@ class Hero:
         message.append(self.show_weapon())
         message.append(self.show_protection())
         message.append(self.show_mastery())
+        if return_message:
+            return message
         tprint(self.game, message)
 
     
@@ -1698,79 +1422,79 @@ class Hero:
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
     
     
-    def show_backpack(self):
-        """Метод генерирует описание рюкзака героя."""
+    # def show_backpack(self):
+    #     """Метод генерирует описание рюкзака героя."""
         
-        message = []
-        if not self.check_light():
-            message.append('В комнате слишком темно чтобы рыться в рюкзаке')
-        else:
-            message += self.backpack.show(self)
-            message.append(self.money.show())
-            if not self.removed_shield.empty:
-                message.append(f'За спиной у {self.g("героя", "героини")} висит {self.removed_shield.get_full_names("nom")}')
-        tprint(self.game, message)
-        return True
+    #     message = []
+    #     if not self.check_light():
+    #         message.append('В комнате слишком темно чтобы рыться в рюкзаке')
+    #     else:
+    #         message += self.backpack.show(self)
+    #         message.append(self.money.show())
+    #         if not self.removed_shield.empty:
+    #             message.append(f'За спиной у {self.g("героя", "героини")} висит {self.removed_shield.get_full_names("nom")}')
+    #     tprint(self.game, message)
+    #     return True
     
     
-    def key_hole(self, direction):
-        """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
+    # def key_hole(self, direction):
+    #     """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
         
-        room = self.current_position
-        door = room.doors[Hero._doors_dict[direction]]
-        if door.empty:
-            message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
-        elif self.fear >= Hero._fear_limit:
-            message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
-        else:
-            what_position = room.position + self.floor.directions_dict[direction]
-            room_behind_the_door = self.floor.plan[what_position]
-            message = room_behind_the_door.show_through_key_hole(self)
-        tprint(self.game, message)
-        return True
+    #     room = self.current_position
+    #     door = room.doors[Hero._doors_dict[direction]]
+    #     if door.empty:
+    #         message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
+    #     elif self.fear >= Hero._fear_limit:
+    #         message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
+    #     else:
+    #         what_position = room.position + self.floor.directions_dict[direction]
+    #         room_behind_the_door = self.floor.plan[what_position]
+    #         message = room_behind_the_door.show_through_key_hole(self)
+    #     tprint(self.game, message)
+    #     return True
        
-    def look_at_shield(self) -> str:
-        """Метод генерирует текст осмотра своего щита."""
+    # def look_at_shield(self) -> str:
+    #     """Метод генерирует текст осмотра своего щита."""
         
-        if not self.check_light():
-            return 'Из-за темноты нельзя осмотреть даже собственный щит.'
-        else:
-            return self.shield.show()
+    #     if not self.check_light():
+    #         return 'Из-за темноты нельзя осмотреть даже собственный щит.'
+    #     else:
+    #         return self.shield.show()
     
-    def look_at_weapon(self) -> str:
-        """Метод генерирует текст осмотра собственного оружия."""
+    # def look_at_weapon(self) -> str:
+    #     """Метод генерирует текст осмотра собственного оружия."""
         
-        if not self.check_light():
-            return 'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
-        else:
-            return self.weapon.show()
+    #     if not self.check_light():
+    #         return 'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
+    #     else:
+    #         return self.weapon.show()
         
-    def look_at_armor(self) -> str:
-        """Метод генерирует текст осмотра своих доспехов."""
+    # def look_at_armor(self) -> str:
+    #     """Метод генерирует текст осмотра своих доспехов."""
         
-        if not self.check_light():
-            return 'Так темно, что не видно, что на тебе надето.'
-        else:
-            return self.armor.show()
+    #     if not self.check_light():
+    #         return 'Так темно, что не видно, что на тебе надето.'
+    #     else:
+    #         return self.armor.show()
 
     
-    def look_at_furniture(self, what:str) -> list[str]:
-        """Метод генерирует текст осмотра мебели."""
+    # def look_at_furniture(self, what:str) -> list[str]:
+    #     """Метод генерирует текст осмотра мебели."""
         
-        room = self.current_position
-        message = []
-        for furniture in room.furniture:
-            if furniture.lexemes["accus"].find(what) != -1:
-                message += (furniture.show())
-                message.append(self.get_trap_text(furniture))
-        return message
+    #     room = self.current_position
+    #     message = []
+    #     for furniture in room.furniture:
+    #         if furniture.lexemes["accus"].find(what) != -1:
+    #             message += (furniture.show())
+    #             message.append(self.get_trap_text(furniture))
+    #     return message
     
     
-    def get_trap_text(self, item) -> str|None:
-        trap = item.trap
-        if trap.activated and self.detect_trap(trap):
-            return trap.get_detection_text()
-        return None
+    # def get_trap_text(self, item) -> str|None:
+    #     trap = item.trap
+    #     if trap.activated and self.detect_trap(trap):
+    #         return trap.get_detection_text()
+    #     return None
     
     
     def detect_trap(self, trap) -> bool:
@@ -1790,41 +1514,41 @@ class Hero:
         return trap.seen
     
     
-    def look(self, what:str=''):
-        """Метод обрабатывает команду "осмотреть". """
+    # def look(self, what:str=''):
+    #     """Метод обрабатывает команду "осмотреть". """
         
-        game = self.game
-        room = self.current_position
-        if what:
-            what = what.lower()
-        if not self.check_light():
-            tprint(game, 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
-            return
-        if not what:
-            room.show(game.player)
-            room.map()
-            return
-        if what == 'себя':
-            self.show()
-            return
-        if what == 'рюкзак':
-            self.show_backpack()
-            return
-        if self.floor.directions_dict.get(what):
-            self.key_hole(what)
-            return
-        if self.weapon.check_name(what):
-            tprint(game, self.look_at_weapon())
-            return
-        if self.shield.check_name(what):
-            tprint(game, self.look_at_shield())
-            return
-        if self.armor.check_name(what):
-            tprint(game, self.look_at_armor())
-            return
-        if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
-            tprint(game, self.look_at_furniture(what=what))
-            return
+    #     game = self.game
+    #     room = self.current_position
+    #     if what:
+    #         what = what.lower()
+    #     # if not self.check_light():
+    #     #     tprint(game, 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
+    #     #     return
+    #     # if not what:
+    #     #     room.show(game.player)
+    #     #     room.map()
+    #     #     return
+    #     # if what == 'себя':
+    #     #     self.show()
+    #     #     return
+    #     # if what == 'рюкзак':
+    #     #     self.show_backpack()
+    #     #     return
+    #     # if self.floor.directions_dict.get(what):
+    #     #     self.key_hole(what)
+    #     #     return
+    #     # if self.weapon.check_name(what):
+    #     #     tprint(game, self.look_at_weapon())
+    #     #     return
+    #     # if self.shield.check_name(what):
+    #     #     tprint(game, self.look_at_shield())
+    #     #     return
+    #     # if self.armor.check_name(what):
+    #     #     tprint(game, self.look_at_armor())
+    #     #     return
+    #     # if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
+    #     #     tprint(game, self.look_at_furniture(what=what))
+    #         return
 
     
     def check_monster_and_figth(self):
@@ -1956,149 +1680,6 @@ class Hero:
             )
         new_fight.start()
         return True
-
-    
-    # def search_room(self) -> bool:
-    #     """Метод обыскивания комнаты."""
-        
-    #     room = self.current_position
-    #     message = []
-    #     if self.check_monster_in_ambush(place=room):
-    #         return False
-    #     for furniture in room.furniture:
-    #         message.append(str(furniture))
-    #     if not room.loot.empty and len(room.loot.pile) > 0:
-    #         message.append('В комнате есть:')
-    #         message += room.loot.show_sorted()
-    #     else:
-    #         message.append('В комнате нет ничего интересного.')
-    #     if room.has_a_corpse():
-    #         message + room.show_corpses()
-    #     tprint(self.game, message)
-    #     return True
-    
-    
-    # def check_if_hero_can_search(self) -> bool:
-    #     """
-    #     Метод проверяет, может ли герой обыскивать что-либо в комнате, 
-    #     в которой он находится.
-        
-    #     """
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     enemy_in_room = room.monsters('first')
-    #     if not self.check_light():
-    #         tprint(game, 'В комнате настолько темно, что невозможно что-то отыскать.')
-    #         return False
-    #     if enemy_in_room:
-    #         tprint(game, f'{enemy_in_room.name} мешает толком осмотреть комнату.')
-    #         return False
-    #     if self.fear >= Hero._fear_limit:
-    #         tprint(game, f'{self.name} не хочет заглядывать в неизвестные места. \
-    #             Страх сковал {self.g("его", "ее")} по рукам и ногам.')
-    #         return False
-    #     return True
-    
-    
-    # def search_secret_place(self, item:str) -> bool:
-    #     """Метод обыскивания секретного места комнаты."""
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     if room.secret_word.lower() == item.lower():
-    #         if not room.secret_loot.pile:
-    #             tprint(game, f'{self.name} осматривает {item} и ничего не находит.')
-    #         else:
-    #             message = []
-    #             message.append(f'{self.name} осматривает {item} и находит:')
-    #             message += room.secret_loot.show_sorted()
-    #             room.secret_loot.reveal(room)
-    #             message.append('Все, что было спрятано, теперь лежит на виду.')
-    #             tprint(game, message)
-    #         return True
-    #     return False
-     
-     
-    # def search_corpse(self, item:str) -> bool:
-    #     """Метод обыскивания трупа."""
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     if not room.has_a_corpse():
-    #         return False
-    #     corpse = None
-    #     if item.lower() == 'труп':
-    #         corpse = room.morgue[0]
-    #     else:
-    #         for candidate in room.morgue:
-    #             if item.lower() == candidate.name.lower():
-    #                 corpse = candidate
-    #     if not corpse:
-    #         return False
-    #     if not corpse.loot.pile:
-    #         tprint(game, f'{self.name} осматривает {corpse.name} и ничего не находит.')
-    #     else:
-    #         message = []
-    #         message.append(f'{self.name} осматривает {corpse.name} и находит:')
-    #         message += corpse.loot.show_sorted()
-    #         corpse.loot.reveal(room)
-    #         message.append('Все ценное, что было у трупа, теперь разбросано по полу комнаты.')
-    #         tprint(game, message)
-    #     return True
-        
-    
-    # def search_furniture(self, item:str) -> bool:
-    #     """Метод обыскивания мебели."""
-        
-    #     room = self.current_position
-    #     game = self.game
-    #     what_to_search = None
-    #     for furniture in room.furniture:
-    #         if furniture.check_name(item):
-    #             what_to_search = furniture
-    #     if not what_to_search:
-    #         tprint(game, 'В комнате нет такой вещи.')
-    #         return False
-    #     if what_to_search.locked:
-    #         tprint(game, f'Нельзя обыскать {what_to_search:accus}. Там заперто.')
-    #         return False
-    #     if what_to_search.check_trap():
-    #         tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
-    #         what_to_search.trap.trigger(self)
-    #         return False
-    #     if self.check_monster_in_ambush(place=what_to_search):
-    #         return False
-    #     return self.get_loot_from_furniture(what=what_to_search)
-        
-    
-    # def get_loot_from_furniture(self, what:Furniture) -> bool:
-    #     """Метод извлекает весь лут из обысканной мебели."""
-        
-    #     room = self.current_position
-    #     if what.loot == 0:
-    #         tprint(self.game, f'{what.name} {what.empty_text}'.capitalize())
-    #         return False
-    #     message = [f'{self.name} осматривает {what:accus} и находит:']
-    #     message += what.loot.show_sorted()
-    #     what.loot.reveal(room)
-    #     message.append('Все, что было спрятано, теперь лежит на виду.')
-    #     tprint(self.game, message)
-    #     return True
-    
-    
-    # def search(self, item:str=None) -> bool:
-    #     """Метод обрабатывает команду "обыскать". """
-        
-    #     if not self.check_if_hero_can_search():
-    #         return False
-    #     if not item:
-    #         return self.search_room()
-    #     # if self.search_secret_place(item=item):
-    #     #     return True
-    #     # if self.search_corpse(item=item):
-    #     #     return True
-    #     # return self.search_furniture(item=item)
         
 
     def put_in_backpack(self, item) -> bool:
@@ -2107,70 +1688,6 @@ class Hero:
         item.owner = self
         self.action_controller.add_actions(item)
         self.current_position.action_controller.delete_actions_by_item(item)
-        return True
-    
-    
-    def can_take(self, obj) -> bool:
-        """
-        Метод проверяет, может ли герой взять объект себе.
-        На вход передается любой объект из игры.
-        
-        """
-        
-        classes = [Weapon, Shield, Armor]
-        for i in classes:
-            if isinstance(obj, i):
-                return False
-        return True
-
-    
-    def take(self, item:str='все') -> bool:
-        """Метод обрабатывает команду "взять". """
-        
-        game = self.game
-        current_loot = self.current_position.loot
-        if current_loot.empty:
-            tprint(game, 'Здесь нечего брать.')
-            return False
-        backpack_is_taken = self.try_to_take_backpack()
-        if item in ['все', 'всё', '']:
-            item_is_taken = self.take_all()
-        else:
-            item_is_taken = self.take_item_by_name(item)
-        if not item_is_taken and not backpack_is_taken:
-            tprint(game, 'Такой вещи здесь нет.')
-        return item_is_taken or backpack_is_taken
-
-    
-    def try_to_take_backpack(self) -> bool:
-        if not self.backpack.no_backpack:
-            return False
-        current_loot = self.current_position.loot        
-        backpacks = current_loot.get_items_by_class(Backpack)
-        if backpacks:
-            backpacks[0].take(self)
-            current_loot.remove(backpacks[0])
-            return True
-        tprint(self.game, f'У {self.g("героя", "героини")} нет рюкзака, поэтому {self:pronoun} может взять только то, что может нести в руках')
-        return False
-    
-    
-    def take_item_by_name(self, name):
-        current_loot = self.current_position.loot
-        item = current_loot.get_first_item_by_name(name)
-        if item:
-            item.take(self)
-            current_loot.remove(item)
-            return True
-        return False
-    
-    
-    def take_all(self):
-        loot = self.current_position.loot
-        can_take_items = [item for item in loot.pile if self.can_take(item)]
-        for item in can_take_items:
-            item.take(self)
-            loot.remove(item)
         return True
     
     
@@ -2185,127 +1702,6 @@ class Hero:
         if self.fear >= Hero._fear_limit:
             return f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.'
         return False
-    
-    
-    # def get_list_of_locked_objects(self, room:Room, what:str='') -> list:
-    #     """
-    #     Метод возвращает список всех запертых объектов в комнате.
-    #     Пока работает только с мебелью, после доработки будут добавлены двери.
-        
-    #     """
-        
-    #     what_is_in_room = []
-    #     for furniture in room.furniture:
-    #         if what:
-    #             if furniture.locked and furniture.check_name(what):
-    #                 what_is_in_room.append(furniture)
-    #         else:
-    #             if furniture.locked:
-    #                 what_is_in_room.append(furniture)
-    #     return what_is_in_room
-    
-    
-    # def check_if_hero_can_open(self) -> bool:
-    #     """Метод проверяет, может ли герой что-то открывать."""
-        
-    #     game = self.game
-    #     fear = self.check_fear()
-    #     if fear:
-    #         tprint(game, fear)
-    #         return False
-    #     if not self.check_light():
-    #         tprint(game, f'{self.name} шарит в темноте руками, но не нащупывает ничего интересного')
-    #         return False
-    #     key = self.backpack.get_first_item_by_class(Key)
-    #     if not key:
-    #         tprint(game, 'Чтобы что-то открыть нужен хотя бы один ключ.')
-    #         return False
-    #     return True
-        
-    
-    # def open_furniture(self, what:str) -> bool:
-    #     """Метод отпирания мебели при помощи ключа."""
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     what_is_locked = self.get_list_of_locked_objects(room=room, what=what)
-    #     key = self.backpack.get_first_item_by_class(Key)
-    #     if not what_is_locked:
-    #         tprint(game, 'В комнате нет такой вещи, которую можно открыть.')
-    #         return False
-    #     if len(what_is_locked) > 1:
-    #         tprint(game, f'В комнате слишком много запертых вещей. {self.name} не понимает, что {self.g("ему", "ей")} нужно открыть.')
-    #         return False
-    #     furniture = what_is_locked[0]
-    #     if furniture.check_trap():
-    #         tprint(game, f'К несчастью в {furniture:prep} кто-то установил ловушку.')
-    #         furniture.trap.trigger(self)
-    #         return False
-    #     self.backpack.remove(key)
-    #     furniture.locked = False
-    #     tprint(game, f'{self.name} отпирает {furniture:accus} ключом.')
-    #     return True
-        
-    
-    # def open_door(self, direction:str) -> bool:
-    #     """Метод отпирания двери при помощи ключа."""
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     key = self.backpack.get_first_item_by_class(Key)
-    #     door = room.doors[Hero._doors_dict[direction]]
-    #     if  not door.locked:
-    #         tprint(game, 'В той стороне нечего открывать.')
-    #         return False
-    #     else:
-    #         self.backpack.remove(key)
-    #         door.locked = False
-    #         tprint(game, f'{self.name} открывает дверь.')
-    #         return True
-    
-    
-    # def open(self, item:str='') -> bool:
-    #     """Метод обрабатывает команду "открыть". """
-        
-    #     if not self.check_if_hero_can_open():
-    #         return False
-    #     if Hero._doors_dict.get(item, False):
-    #         return self.open_door(direction=item)
-    #     if item in ['люк', 'лестницу']:
-    #         return self.open_ladder()
-    #     return self.open_furniture(what=item)     
-        
-    
-    # def open_ladder(self) -> bool:
-    #     ladder, direction_string = self.choose_ladder_to_open()
-    #     key = self.backpack.get_first_item_by_class(Key)
-    #     if not ladder:
-    #         tprint(self.game, 'В этой комнате нет лестниц, которые нужно было бы отпирать.')
-    #         return False
-    #     self.backpack.remove(key)
-    #     ladder.locked = False
-    #     tprint(self.game, f'{self.name} отпирает {ladder:accus}, ведущую {direction_string}, ключом.')
-    #     return True
-        
-        
-    # def choose_ladder_to_open(self) -> tuple[Ladder|None, str]:
-    #     room = self.current_position
-    #     if room.ladder_up and room.ladder_up.locked:
-    #         return room.ladder_up, 'вверх'
-    #     if room.ladder_down and room.ladder_down.locked:
-    #         return room.ladder_down, 'вниз'
-    #     return None, ''
-
-    
-    # def take_out_shield(self) -> bool:
-    #     """Метод доставания щита из-за спины."""
-        
-    #     if self.weapon.twohanded:
-    #         tprint(self.game, f'{self.name} воюет двуручным оружием, поэтому не может взять щит.')
-    #         return False
-    #     self.shield, self.removed_shield = self.removed_shield, self.shield
-    #     tprint(self.game, f'{self.name} достает {self.shield.get_full_names("accus")} из-за спины и берет его в руку.')
-    #     return True
     
     
     def use_item_from_backpack(self, item_string:str) -> bool:
@@ -2442,129 +1838,6 @@ class Hero:
         if self.armor.element() in Rune._glowing_elements:
             return True
         return False
-        
-    
-    # def get_book(self, item:str) -> Book|None:
-    #     """
-    #     Метод поиска книги в рюкзаке.
-    #     Принимает на вход строку из команды игрока.
-    #     Если передана пустая строка или просто "книга", 
-    #     возвращает случайную книку.
-    #     Если передана конкретная книга, возвращает ее.
-        
-    #     """
-        
-    #     game = self.game
-    #     if not item or item == 'книгу':
-    #         book = self.backpack.get_random_item_by_class(Book)
-    #         message = f'{self.name} роется в рюкзаке и находит первую попавшуюся книгу.'
-    #     else:
-    #         book = self.backpack.get_first_item_by_name(item)
-    #         message = f'{self.name} читает {book:accus}.'
-    #     if book:
-    #         tprint(game, message)
-    #         return book
-    #     return None 
-    
-    
-    # def read(self, what:str=None) -> bool:
-    #     """
-    #     Метод обрабатывает команду "читать".       
-    #     """
-    #     game = self.game
-    #     if what and what.lower() in ['карту', 'карта']:
-    #         return self.use_item_from_backpack('карта')
-    #     self.book_list = self.backpack.get_items_by_class(Book)
-    #     if not self.book_list:
-    #         tprint(game, 'В рюкзаке нет ни одной книги.', 'direction')
-    #         return False
-    #     message = []
-    #     message.append(f'{self.name} может прочитать следующие книги:')
-    #     for book in self.book_list:
-    #         message.append(f'{str(self.book_list.index(book) + 1)}: {str(book)}')
-    #     message.append('Выберите номер книги или скажите "отмена" чтобы ничего не читать')
-    #     self.state = state_enum.READ
-    #     tprint(game, message, 'read')
-    #     return True
-        
-    
-    # def read_actions(self, message:str) -> bool:
-        
-    #     """
-    #     Метод обрабатывает команды игрока когда он читает книги.
-        
-    #     Возвращает:
-    #     - True - если удалось прочитать книгу
-    #     - False - если по любой причине книгу прочитать не удалось
-        
-    #     """
-        
-    #     book_list = self.book_list
-    #     if message == 'отмена':
-    #         tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего читать.', 'direction')
-    #         self.state = state_enum.NO_STATE
-    #         return False
-    #     if not message.isdigit():
-    #         tprint(self.game, f'Чтобы прочитать книгу {self:dat} нужно выбрать ее по ее номеру.', 'read')
-    #         return False
-    #     message = int(message) - 1
-    #     if not message < len(book_list):
-    #         tprint(self.game, f'У {self:gen} нет столько книг.', 'read')
-    #         return False
-    #     book = book_list[message]
-    #     self.backpack.remove(book)           
-    #     tprint(self.game, book.use(self), 'direction')
-    #     self.decrease_restless(2)
-    #     self.state = state_enum.NO_STATE
-    #     return True
-    
-    
-    def drink(self, what:str=None) -> bool:
-        """
-        Метод обрабатывает команду "пить".       
-        """
-        game = self.game
-        self.potion_list = self.backpack.get_items_by_class(Potion)
-        if not self.potion_list:
-            tprint(game, 'В рюкзаке нет ни одного зелья.', 'direction')
-            return False
-        message = []
-        message.append(f'{self.name} может выпить следующие зелья:')
-        for potion in self.potion_list:
-            message.append(f'{self.potion_list.index(potion) + 1}: {str(potion)}')
-        message.append('Выберите номер зелья или скажите "отмена" чтобы ничего не пить')
-        self.state = state_enum.DRINK
-        tprint(game, message, 'read')
-        return True
-        
-    
-    def drink_actions(self, message:str) -> bool:
-        
-        """
-        Метод обрабатывает команды игрока когда он пьет зелья.
-        
-        Возвращает:
-        - True - если удалось выпить зелье
-        - False - если по любой причине выпить не удалось
-        
-        """
-        
-        if message == 'отмена':
-            tprint(self.game, f'{self.name} теряет всякое желание пить какие-то зелья.', 'direction')
-            self.state = state_enum.NO_STATE
-            return False
-        if not message.isdigit():
-            tprint(self.game, f'Чтобы выпить зелье {self:dat} нужно выбрать его по номеру.', 'read')
-            return False
-        message = int(message) - 1
-        if not message < len(self.potion_list):
-            tprint(self.game, f'У {self:gen} нет столько зелий.', 'read')
-            return False
-        potion = self.potion_list[message]
-        if potion.check_if_can_be_used(in_action=False):
-            potion.use(self, in_action=False)
-            self.state = state_enum.NO_STATE
-        return True
     
     
     def decrease_restless(self, number:int) -> bool:
