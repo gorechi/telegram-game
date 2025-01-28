@@ -91,37 +91,37 @@ class Matches:
         self.hero_actions = {
             "осмотреть": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "пересчитать": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "посчитать": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -129,19 +129,19 @@ class Matches:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -212,7 +212,7 @@ class Matches:
         if not who:
             return False
         if not who.backpack.no_backpack:
-            matches_in_backpack = who.backpack.get_first_item_by_class(Matches)
+            matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
             if matches_in_backpack:
                 matches_in_backpack + self
             else:
@@ -291,43 +291,43 @@ class Map:
         self.hero_actions = {
             "смотреть": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "использовать": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "прочитать": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "читать": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -335,19 +335,19 @@ class Map:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -494,19 +494,19 @@ class Key:
         self.hero_actions = {
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -514,19 +514,19 @@ class Key:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }

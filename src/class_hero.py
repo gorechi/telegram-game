@@ -1,9 +1,8 @@
-from src.class_items import Key, Map
+from src.class_items import Map
 from src.class_rune import Rune
 from src.class_basic import Money
-from src.class_potions import Potion
 from src.class_monsters import Monster, Vampire
-from src.class_protection import Armor, Shield
+from src.class_protection import Shield
 from src.class_room import Room
 from src.class_weapon import Weapon
 from src.class_backpack import Backpack
@@ -136,27 +135,64 @@ class Hero:
         self.hero_actions = {
             "отдохнуть": {
                 "method": "rest",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
                 },
             "отдыхать": {
                 "method": "rest",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "name_for_examine"
                 },
+            "лечиться": {
+                "method": "heal",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_examine"
+                },
+            "лечить": {
+                "method": "heal",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_examine"
+                },
+            "вылечиться": {
+                "method": "heal",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_examine"
+                },
+            "вылечить": {
+                "method": "heal",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "name_for_examine"
+                },
             }
-        self.action_controller.add_actions(self)
         
         
+    def heal(self, who, in_action:bool=False) -> str:
+        if in_action:
+            potion = self.backpack.get_random_item_by_class('HealPotion')
+        else:
+            potion = self.backpack.get_random_item_by_class('Antidote')
+        if not potion:
+            return f'{self:nom} не может поправить здоровье так как у {self.g('него','нее')} нет подходящих зелий.'
+        return potion.use(self, in_action)
+    
+    
     def get_names_list(self, cases:list=None) -> list:
         names_list = ['себя', 'себе', 'героя', 'героиню']
         for case in cases:
@@ -180,6 +216,7 @@ class Hero:
         self.start_intel = self.intel.copy()
         self.start_rage = self.rage.copy()
         self.start_health = self.health
+        self.action_controller.add_actions(self)
         return None
     
     
@@ -351,7 +388,6 @@ class Hero:
             state_enum.TRADE: self.trade_actions,
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
             state_enum.FIGHT: self.fight_actions,
-            state_enum.DRINK: self.drink_actions,
             state_enum.ACTION: self.free_action
         }
         if command in Hero._level_up_commands and self.state == state_enum.LEVEL_UP:
@@ -401,7 +437,7 @@ class Hero:
             return False
         tprint(game, f'{self.name} улучшает {self.selected_item:accus} новой руной.', 'direction')
         self.backpack.remove(chosen_rune)
-        self.rune_list = self.backpack.get_items_by_class(Rune)
+        self.rune_list = self.backpack.get_items_by_class('Rune')
         self.state = state_enum.NO_STATE
         return True
     
@@ -539,13 +575,6 @@ class Hero:
     def disarm_trap(self) -> bool:
         """
         Пытается обезвредить ловушку в текущем помещении.
-
-        Метод проверяет наличие ловушки в текущем помещении (`current_position`). Если ловушка отсутствует,
-        выводит сообщение о том, что герой не видит ловушек, и возвращает `False`. В случае обнаружения ловушки
-        формирует сообщение о попытке обезвреживания и вызывает метод `try_to_disarm_trap()` для попытки обезвреживания.
-        Результат работы `try_to_disarm_trap()` добавляется к сообщению, которое затем выводится.
-
-        :return: Возвращает `True`, если ловушка успешно обезврежена, иначе `False`.
         """
         trap = self.current_position.get_trap()
         if not trap:
@@ -559,17 +588,6 @@ class Hero:
     def try_to_disarm_trap(self, trap) -> list[str]:
         """
         Пытается обезвредить ловушку, с которой столкнулся герой.
-
-        Этот метод сначала рассчитывает шанс героя на успешное обезвреживание ловушки, 
-        затем сравнивает его со сложностью ловушки. Если шанс обезвреживания меньше сложности ловушки, 
-        ловушка срабатывает, вызывая соответствующий метод. В противном случае ловушка считается успешно обезвреженной, 
-        и герой получает опыт в обезвреживании ловушек.
-
-        Параметры:
-            - trap: Объект ловушки, которую необходимо обезвредить.
-
-        Возвращает:
-            Список строк, описывающих результат попытки обезвреживания ловушки.
         """
         disarm_chance = self.get_disarm_trap_chance()
         trap_difficulty = trap.get_difficulty()
@@ -584,8 +602,6 @@ class Hero:
     def increase_trap_mastery(self):
         """
         Увеличивает мастерство героя в обезвреживании ловушек на 1.
-        
-        Этот метод увеличивает значение атрибута `trap_mastery` на единицу, что отражает улучшение навыков героя в обнаружении и обезвреживании ловушек.
         """
         self.trap_mastery += 1    
 
@@ -593,11 +609,6 @@ class Hero:
     def get_disarm_trap_chance(self) -> int:
         """
         Рассчитывает и возвращает шанс героя на успешное обезвреживание ловушки.
-        
-        Шанс обезвреживания ловушки зависит от ловкости (`dext`) героя и его мастерства обезвреживания ловушек (`trap_mastery`).
-        Значение шанса определяется путем броска кубика с параметрами, зависящими от указанных атрибутов.
-        
-        :return: Целое число, представляющее шанс на успешное обезвреживание ловушки.
         """
         return self.check_dext(add=[self.trap_mastery])
    
@@ -605,9 +616,6 @@ class Hero:
     def intel_wound(self) -> str:
         """
         Наносит персонажу ранение, влияющее на интеллект, увеличивая счетчик таких ранений на 1.
-        Возвращает строку, описывающую получение ранения персонажем.
-        
-        :return: Строка с описанием получения ранения.
         """
         wound = self.wounds.get('intel', 0)
         self.wounds['intel'] = wound + 1
@@ -617,9 +625,6 @@ class Hero:
     def stren_wound(self) -> str:
         """
         Наносит персонажу ранение, влияющее на силу, увеличивая счетчик таких ранений на 1.
-        Возвращает строку, описывающую получение ранения персонажем.
-        
-        :return: Строка с описанием получения ранения.
         """
         wound = self.wounds.get('stren', 0)
         self.wounds['stren'] = wound + 1
@@ -629,9 +634,6 @@ class Hero:
     def dex_wound(self) -> str:
         """
         Наносит персонажу ранение, влияющее на ловкость, увеличивая счетчик таких ранений на 1.
-        Возвращает строку, описывающую получение ранения персонажем.
-        
-        :return: Строка с описанием получения ранения.
         """
         wound = self.wounds.get('dex', 0)
         self.wounds['dex'] = wound + 1
@@ -661,12 +663,7 @@ class Hero:
     
     def do(self, command:str):
         """
-        Метод обрабатывает команды, переданные герою и 
-        передает управление соответствующей команде функции.
-        
-        Входящие параметры:
-        - command - команда от пользователя, полученная из чата игры
-        
+        Метод обрабатывает команды, переданные герою и передает управление соответствующей команде функции.
         """
         parts = command.split(' ', maxsplit=1)
         action, item = parts if len(parts) == 2 else (parts[0], None)
@@ -719,9 +716,9 @@ class Hero:
             else:
                 tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
             return False
-        if item and len(items) == 1:
-            action_item = items[0]
-            return self.do_single_action(action_item)
+        first_item = items[0]
+        if len(items) == 1 and (item or first_item.item == self or first_item.item == self.current_position):
+            return self.do_single_action(first_item)
         items = self.bulk_actions(items)
         if not items:
             tprint(self.game, f'У героя закончились варианты сделать еще что-то подобное.') 
@@ -730,7 +727,7 @@ class Hero:
         message.append(f'{self.name} может "{action}" следующие вещи:')
         for item in items:
             if not item.presentation:
-                message.append(f'{items.index(item) + 1}: {item.name}')
+                message.append(f'{items.index(item) + 1}: {item.name.capitalize()}')
             else:
                 message.append(f'{items.index(item) + 1}: {item.presentation(self)}')
         message.append('Герой должен назвать номер вещи или громко выкрикнуть "отмена" чтобы ничего не делать')
@@ -880,7 +877,7 @@ class Hero:
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
             stealing_monster = randomitem(all_monsters)
-            all_items = self.backpack.get_items_except_class(Key)
+            all_items = self.backpack.get_items_except_class('Key')
             if all_items:
                 item = randomitem(all_items)
                 item_is_taken = stealing_monster.take(item)
@@ -926,7 +923,7 @@ class Hero:
         Если оружие не найдено, возвращается объект "Пустое оружие".
         
         """       
-        item = self.backpack.get_first_item_by_class(Weapon)
+        item = self.backpack.get_first_item_by_class('Weapon')
         if item:
             return item
         return self.game.no_weapon
@@ -1683,7 +1680,8 @@ class Hero:
         
 
     def put_in_backpack(self, item) -> bool:
-        self.current_position.loot.remove(item)
+        if self.current_position.loot.is_item_in_loot(item):
+            self.current_position.loot.remove(item)
         self.backpack.append(item)
         item.owner = self
         self.action_controller.add_actions(item)
@@ -1726,7 +1724,7 @@ class Hero:
     
     
     def get_map(self) -> Map|None:
-        maps = self.backpack.get_items_by_class(Map)
+        maps = self.backpack.get_items_by_class('Map')
         return next((map for map in maps if map.floor == self.floor), None)
     
     
@@ -1746,7 +1744,7 @@ class Hero:
         """Метод проверки, может ли герой что-то улучшать."""
         
         game = self.game
-        rune_list = self.backpack.get_items_by_class(Rune)
+        rune_list = self.backpack.get_items_by_class('Rune')
         if item == '':
             tprint(game, f'{self.name} не понимает, что {self.g("ему", "ей")} надо улучшить.')
             return False
@@ -1804,7 +1802,7 @@ class Hero:
         
         """
         game = self.game
-        self.rune_list = self.backpack.get_items_by_class(Rune)
+        self.rune_list = self.backpack.get_items_by_class('Rune')
         message = []
         self.selected_item = self.chose_what_to_enchant(item)
         message.append(f'{self.name} может использовать следующие руны:')

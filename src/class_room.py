@@ -65,7 +65,7 @@ class Ladder:
         self.room_actions = {
             "отпереть": {
                 "method": "unlock",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_unlock",
@@ -101,7 +101,7 @@ class Ladder:
             return 'Лестница не заперта, по ней спокойно можно подниматься и спускаться.'
         room = who.current_position
         direction = self.get_direction(room)
-        key = who.backpack.get_first_item_by_class(Key)
+        key = who.backpack.get_first_item_by_class('Key')
         if not key:
             return f'У {who:gen} нет подходящего ключа чтобы отпереть эту лестницу.'
         who.backpack.remove(key)
@@ -170,7 +170,7 @@ class Door:
         self.room_actions = {
             "отпереть": {
                 "method": "unlock",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_unlock",
@@ -178,7 +178,7 @@ class Door:
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_unlock"
@@ -195,7 +195,7 @@ class Door:
         elif who.check_fear():
             message = f'{who.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
-            direction = self.get_direction(room)
+            direction = self.get_direction_index(room)
             what_position = room.position + who.floor.directions_dict[direction]
             room_behind_the_door = who.floor.plan[what_position]
             message = room_behind_the_door.show_through_key_hole(who)
@@ -229,7 +229,7 @@ class Door:
         room = who.current_position
         direction_index = self.get_direction_index(room)
         direction = Door._directions.get(direction_index, False)
-        key = who.backpack.get_first_item_by_class(Key)
+        key = who.backpack.get_first_item_by_class('Key')
         if not key:
             return f'У {who:gen} нет подходящего ключа чтобы отпереть эту дверь.'
         who.backpack.remove(key)
@@ -508,33 +508,37 @@ class Room:
         self.room_actions = {
             "обыскать": {
                 "method": "search",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map"
+                "post_process": "map_for_examine"
                 },
             "осмотреться": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map"
+                "post_process": "map_for_examine"
                 },
             "оглядеться": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map"
+                "post_process": "map_for_examine"
                 },
         }
         self.action_controller.add_actions(self)
+    
+    
+    def map_for_examine(self, who):
+        self.map()
     
     
     def examine(self, who, in_action:bool=False) -> str:
@@ -812,21 +816,9 @@ class Room:
     def show_through_key_hole(self, who):
         """
         Отображает, что можно увидеть через замочную скважину двери.
-
-        Параметры:
-            who (object): Объект, представляющий персонажа, заглядывающего в замочную скважину.
-
-        Возвращает:
-            list: Список строк, описывающих, что можно увидеть через замочную скважину.
-
-        Если в комнате есть торговец, метод вызывает метод 'show_through_key_hole' объекта торговца и возвращает его результат.
-        Если в комнате нет монстра, метод добавляет в список 'message' строку, указывающую, что персонаж не может ничего толком разглядеть через замочную скважину.
-        Если в комнате есть монстр, метод добавляет в список 'message' строку, указывающую, что персонаж может видеть монстра через замочную скважину.
-        Если уровень вони в комнате больше 0, метод добавляет в список 'message' строку, указывающую, что из замочной скважины воняет чем-то омерзительным.
-
         """
-        if self.traider:
-            return self.traider.show_through_key_hole()
+        if self.trader:
+            return self.trader.show_through_key_hole()
         monster = self.monsters('first')
         message = []
         if not monster:
@@ -841,12 +833,6 @@ class Room:
     def furniture_types(self):
         """
         Возвращает список уникальных типов мебели, присутствующих в комнате.
-
-        Возвращает:
-            list: Список строк, каждая из которых представляет уникальный тип мебели в комнате.
-
-        Метод проходит по объектам мебели в комнате и проверяет, присутствует ли тип каждого объекта мебели уже в списке 'types'. 
-        Если нет, он добавляет тип в список. В конце концов, метод возвращает список уникальных типов мебели.
         """
         types = []
         for furniture in self.furniture:
@@ -858,15 +844,6 @@ class Room:
     def clear_from_monsters(self):
         """
         Очищает комнату от всех монстров.
-
-        Этот метод получает список монстров, находящихся в комнате, используя метод 'monsters'. 
-        Затем он проходит по каждому монстру в списке и вызывает метод 'place' для монстра, передавая в качестве аргумента атрибут 'floor' комнаты.
-
-        Параметры:
-            Нет
-
-        Возвращает:
-            Нет
         """
         monsters = self.monsters()
         for monster in monsters:

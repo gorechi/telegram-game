@@ -53,31 +53,36 @@ class ActionController():
     
     
     def add_actions(self, item:ItemProtocol) -> bool:
-        item_name = item.name
-        item_names = item.get_names_list(['nom', "accus"])
         actions = self.extract_actions(item)
         for action, value in actions.items():
-            method = getattr(item, value.get("method", ''))
-            presentation_method = getattr(item, value.get("presentation", ''), None)
-            condition_method = getattr(item, value.get("condition", ''), None)
-            post_process_method = getattr(item, value.get("post_process", ''), None)
-            new_item = self.Item(
-                item = item, 
-                names = item_names, 
-                action = method, 
-                name = item_name,
-                in_combat = value.get("in_combat", False),
-                in_darkness = value.get("in_darkness", False),
-                bulk = value.get("bulk", False),
-                presentation = presentation_method,
-                condition = condition_method,
-                post_process = post_process_method,
-                )
+            new_item = self.make_new_action_item(item, value)
             self.items.append(new_item)
             if not self.actions.get(action, None):
-                self.actions[action] = []
+                self.actions[action] = list()
             self.actions[action].append(new_item)
         return True
+    
+    
+    def make_new_action_item(self, item:ItemProtocol, value:dict) -> Item:
+        item_name = item.name
+        item_names = item.get_names_list(['nom', "accus"])
+        method = getattr(item, value.get("method", ''))
+        presentation_method = getattr(item, value.get("presentation", ''), None)
+        condition_method = getattr(item, value.get("condition", ''), None)
+        post_process_method = getattr(item, value.get("post_process", ''), None)
+        new_item = self.Item(
+            item = item, 
+            names = item_names, 
+            action = method, 
+            name = item_name,
+            in_combat = value.get("in_combat", False),
+            in_darkness = value.get("in_darkness", False),
+            bulk = value.get("bulk", False),
+            presentation = presentation_method,
+            condition = condition_method,
+            post_process = post_process_method,
+            )
+        return new_item
     
     
     def delete_actions_by_item(self, item) -> bool:
@@ -107,14 +112,17 @@ class ActionController():
         Возвращает список экземпляров дата-класса Item, которые имеют заданное имя.
         """
         items_list = self.actions.get(action, list())
-        if name:
-            return [item for item in items_list if (name.lower() in item.names)]
         if in_darkness:
             items_list = [item for item in items_list if item.in_darkness == True]
         if in_combat:
             items_list = [item for item in items_list if item.in_combat == True]
-        final_list = list()
+        temporary_list = list()
         for item in items_list:
             if item.condition is None or (callable(item.condition) and item.condition()):
-                final_list.append(item)
-        return final_list
+                temporary_list.append(item)
+        filtered_by_name = list()
+        if name:
+            filtered_by_name = [item for item in temporary_list if (name.lower() in item.names)]
+        if filtered_by_name:
+            return filtered_by_name
+        return temporary_list

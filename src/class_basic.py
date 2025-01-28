@@ -32,6 +32,10 @@ class Loot:
     def __eq__(self, other) -> bool:
         if isinstance(other, int):
             return len(self.pile) == other
+        
+    
+    def is_item_in_loot(self, item) -> bool:
+        return item in self.pile
     
     
     def reveal(self, room):
@@ -76,7 +80,7 @@ class Loot:
 
     
     def get_items_by_class(self, item_class) -> list:
-        return [item for item in self.pile if isinstance(item, item_class)]
+        return [item for item in self.pile if type(item).__name__ == item_class]
         
         
     def show_sorted(self) -> list:
@@ -148,19 +152,19 @@ class Money:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -247,10 +251,10 @@ class Money:
         return self
 
 
-    def take(self, lucky_one):
-        lucky_one.money.how_much_money += self.how_much_money
-        tprint(self.game, f'{lucky_one.name} {lucky_one.g("забрал", "забрала")} {howmany(self.how_much_money, ["монету", "монеты", "монет"])}')
-        self.generate_name()
+    def take(self, who, in_action:bool=False) -> str:
+        who.money += self
+        who.current_position.loot.remove(self)
+        return f'{who.name} {who.g("забрал", "забрала")} {howmany(self.how_much_money, ["монету", "монеты", "монет"])}'
 
 
     def show(self):

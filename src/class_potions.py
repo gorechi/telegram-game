@@ -11,19 +11,19 @@ class Potion:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -68,7 +68,7 @@ class Potion:
             furniture.put(self)
         else:
             room.loot.add(self)
-        room.action_controller.add_actions(self)
+            room.action_controller.add_actions(self)
         return True
 
        
@@ -109,37 +109,37 @@ class HealPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -170,37 +170,37 @@ class HealthPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -224,37 +224,37 @@ class StrengthPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -278,37 +278,37 @@ class StrengtheningPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -331,37 +331,37 @@ class DexterityPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -385,37 +385,37 @@ class EvasionPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -438,37 +438,37 @@ class IntelligencePotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -492,37 +492,37 @@ class EnlightmentPotion(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -545,37 +545,37 @@ class Antidote(Potion):
         self.hero_actions = {
             "пить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выпить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "попить": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },

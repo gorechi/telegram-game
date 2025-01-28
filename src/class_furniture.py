@@ -21,7 +21,7 @@ class Furniture:
         self.room_actions = {
             "отпереть": {
                 "method": "unlock",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "condition": "is_locked",
@@ -29,14 +29,14 @@ class Furniture:
                 },
             "обыскать": {
                 "method": "search",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "post_process": "after_search"
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 },
@@ -65,7 +65,7 @@ class Furniture:
         """
         if not self.locked:
             return 'Тут не заперто, можно без проблем посмотреть, что там внутри.'
-        key = who.backpack.get_first_item_by_class(Key)
+        key = who.backpack.get_first_item_by_class('Key')
         if not key:
             return f'У {who:gen} нет подходящего ключа чтобы что-то отпирать.'
         who.backpack.remove(key)

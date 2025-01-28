@@ -31,43 +31,43 @@ class Weapon:
         self.hero_actions = {
             "использовать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "экипировать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выбрать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "сменить": {
                 "method": "change",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
@@ -75,7 +75,7 @@ class Weapon:
                 },
             "поменять": {
                 "method": "change",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
@@ -83,7 +83,7 @@ class Weapon:
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_examine_hero"
@@ -92,25 +92,25 @@ class Weapon:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_examine_room"
