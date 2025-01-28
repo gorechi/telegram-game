@@ -56,6 +56,15 @@ class Protection:
         return f'{name_string} ({self.protection.text()})'
     
     
+    def show_for_examine_hero(self, who) -> str:
+        return f'{self.name} (в руках у героя)'
+    
+    
+    def show_for_examine_room(self, who) -> str:
+        return f'{self.name} (лежит в комнате)'
+
+    
+    
     def on_create(self):
         return True
 
@@ -164,30 +173,44 @@ class Armor(Protection):
         self.hero_actions = {
             "снять": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
+                },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
                 },
         }
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
   
     
@@ -201,6 +224,10 @@ class Armor(Protection):
             names_list.append(self.lexemes.get(case, '').lower())
             names_list.append(self.get_element_names(case).lower())
         return names_list
+    
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        return self.show()
     
     
     def place(self, castle, room_to_place = None):
@@ -316,90 +343,98 @@ class Shield (Protection):
         self.hero_actions = {
             "использовать": {
                 "method": "take_out",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "экипировать": {
                 "method": "take_out",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "достать": {
                 "method": "take_out",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выбрать": {
                 "method": "take_out",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "чинить": {
                 "method": "repair",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "починить": {
                 "method": "repair",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "убрать": {
                 "method": "take_away",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "осмотреть": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
-                "in_darkness": False
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
                 },
             }
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "подобрать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
     
     

@@ -31,43 +31,43 @@ class Weapon:
         self.hero_actions = {
             "использовать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "экипировать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "выбрать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "сменить": {
                 "method": "change",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
@@ -75,34 +75,60 @@ class Weapon:
                 },
             "поменять": {
                 "method": "change",
-                "batch": False,
+                "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
                 "condition": "can_be_changed"
                 },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_hero"
+                },
             }
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
-                }
+                },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "presentation": "show_for_examine_room"
+                },
         }
 
+    
+    def examine(self, who, in_action:bool=False) -> str:
+        return self.show()
+    
+    
+    def show_for_examine_hero(self, who) -> str:
+        return f'{self.name} (в руках у героя)'
+    
+    
+    def show_for_examine_room(self, who) -> str:
+        return f'{self.name} (лежит в комнате)'
+    
     
     def name_for_change(self, who) -> str:
         second_weapon = who.get_second_weapon()

@@ -21,7 +21,7 @@ class Furniture:
         self.room_actions = {
             "отпереть": {
                 "method": "unlock",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "condition": "is_locked",
@@ -29,10 +29,16 @@ class Furniture:
                 },
             "обыскать": {
                 "method": "search",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "post_process": "after_search"
+                },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
                 },
         }
 
@@ -59,7 +65,7 @@ class Furniture:
         """
         if not self.locked:
             return 'Тут не заперто, можно без проблем посмотреть, что там внутри.'
-        key = who.backpack.get_first_item_by_class(Key)
+        key = who.backpack.get_first_item_by_class('Key')
         if not key:
             return f'У {who:gen} нет подходящего ключа чтобы что-то отпирать.'
         who.backpack.remove(key)
@@ -156,4 +162,15 @@ class Furniture:
         message += self.loot.show_sorted()
         self.loot.reveal(room)
         message.append('Все, что было спрятано, теперь лежит на виду.')
+        return message
+    
+    
+    def examine(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод генерирует текст осмотра мебели.
+        """
+        message = list()
+        message += (self.show())
+        if self.trap.activated and who.detect_trap(self.trap):
+            message.append(self.trap.get_detection_text())
         return message

@@ -23,39 +23,39 @@ class Backpack:
         self.hero_actions = {
             "осмотреть": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "get_name_for_show",
                 },
             "проверить": {
                 "method": "show",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "get_name_for_show",
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
                 },
             "снять": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
                 },
@@ -63,19 +63,19 @@ class Backpack:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "забрать": {
                 "method": "take",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 }
@@ -128,8 +128,8 @@ class Backpack:
         return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
         
     
-    def get_items_by_class(self, item_class) -> list:
-        return [item for item in self.insides if isinstance(item, item_class)]
+    def get_items_by_class(self, item_class:str) -> list:
+        return [item for item in self.insides if type(item).__name__ == item_class]
 
     
     def get_items_list(self) -> list:
@@ -148,14 +148,14 @@ class Backpack:
         return False
 
 
-    def get_first_item_by_class(self, item_class):
+    def get_first_item_by_class(self, item_class:str):
         """
         Метод принимает на вход класс вещи и
         и возвращает первую найденную в рюкзаке вещь этого класса.
         """
         
         for item in self.insides:
-            if isinstance(item, item_class):
+            if type(item).__name__ == item_class:
                 return item
         return False
 
@@ -168,8 +168,8 @@ class Backpack:
         return len(self.insides) == 0
     
     
-    def get_items_except_class(self, item_class) -> list:
-        return [item for item in self.insides if not isinstance(item, item_class)]
+    def get_items_except_class(self, item_class:str) -> list:
+        return [item for item in self.insides if not type(item).__name__ == item_class]
     
     
     def get_random_item(self):
@@ -178,8 +178,8 @@ class Backpack:
         return False
 
 
-    def get_random_item_by_class(self, item_class):
-        items_list = [item for item in self.insides if isinstance(item, item_class)]
+    def get_random_item_by_class(self, item_class:str):
+        items_list = [item for item in self.insides if type(item).__name__ == item_class]
         if items_list:
             return randomitem(items_list)
         return False
@@ -210,7 +210,7 @@ class Backpack:
         message.append(f'{who.name} осматривает свой рюкзак и обнаруживает в нем:')
         for i, item in enumerate(self.insides):
             description = f'{str(i + 1)}: {item.show()}'
-            if isinstance(item, Weapon):
+            if type(item).__name__ == 'Weapon':
                 weapon_mastery = who.weapon_mastery[item.type]['level']
                 if weapon_mastery > 0:
                     description += f', мастерство - {weapon_mastery}'

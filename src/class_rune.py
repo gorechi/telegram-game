@@ -29,19 +29,19 @@ class Rune:
         self.hero_actions = {
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -49,19 +49,19 @@ class Rune:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }

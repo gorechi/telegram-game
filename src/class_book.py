@@ -8,37 +8,37 @@ class Book:
         self.hero_actions = {
             "читать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "прочитать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "почитать": {
                 "method": "use",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "бросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "выбросить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
             "оставить": {
                 "method": "drop",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
                 },
@@ -46,19 +46,19 @@ class Book:
         self.room_actions = {
             "взять": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "брать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 },
             "собрать": {
                 "method": "take",
-                "batch": True,
+                "bulk": True,
                 "in_combat": False,
                 "in_darkness": False
                 }

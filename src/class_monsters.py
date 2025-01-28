@@ -7,7 +7,7 @@ from src.class_protection import Armor, Shield
 from src.class_weapon import Weapon
 from src.class_fight import Fight
 from src.class_dice import Dice
-from src.functions.functions import howmany, randomitem, tprint, roll
+from src.functions.functions import howmany, randomitem, roll
 
 
 class Monster:
@@ -371,7 +371,7 @@ class Monster:
     def take_weapon_from_loot(self, loot:Loot) -> bool:
         """Метод обрабатывает ситуацию, когда монстр выбирает оружие из лута."""
         
-        all_weapons = loot.get_items_by_class(Weapon)
+        all_weapons = loot.get_items_by_class('Weapon')
         if self.preferred_weapon:
             weapons = [i for i in all_weapons if i.type == self.preferred_weapon]
         else:
@@ -415,7 +415,7 @@ class Monster:
         Метод позволяет монстру выбрать щит из лута. Если монстр не может носить щиты, у него уже есть двуручное оружие,
         или в луте нет щитов, метод возвращает False. В противном случае монстр берет случайный щит из лута и метод возвращает True.
         """
-        all_sields = loot.get_items_by_class(Shield)
+        all_sields = loot.get_items_by_class('Shield')
         if not self.carry_shield or self.weapon.twohanded or not all_sields:
             return False
         shield = randomitem(all_sields)
@@ -439,7 +439,7 @@ class Monster:
         может ли монстр носить доспехи и есть ли доспехи в луте. Если одно из условий не выполняется, метод возвращает False.
         В противном случае монстр берет случайные доспехи из лута, и метод возвращает True.
         """
-        all_armor = loot.get_items_by_class(Armor)
+        all_armor = loot.get_items_by_class('Armor')
         if not self.armor.empty or not self.wear_armor or not all_armor:
             return False
         armor = randomitem(all_armor)
@@ -465,7 +465,7 @@ class Monster:
         """
         if not self.carry_money:
             return False
-        current_money = self.loot.get_items_by_class(Money)
+        current_money = self.loot.get_items_by_class('Money')
         if current_money:
             current_money = current_money + item
         else:
@@ -1240,20 +1240,20 @@ class Corpse():
         self.room_actions = {
             "обыскать": {
                 "method": "search",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 "post_process": "after_search"
                 },
             "изучить": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 },
             "изучать": {
                 "method": "examine",
-                "batch": False,
+                "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
                 },

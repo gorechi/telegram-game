@@ -4,7 +4,6 @@ from src.class_basic import Money
 from src.class_book import Book
 from src.class_potions import Potion
 from src.class_backpack import Backpack
-from src.class_furniture import Furniture
 from src.functions.functions import randomitem, tprint, roll, howmany
 
 from dataclasses import dataclass
@@ -285,7 +284,7 @@ class Scribe(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
-        books:list[Book] = backpack.get_items_by_class(Book)
+        books:list[Book] = backpack.get_items_by_class('Book')
         if not books:
             self.goods_to_buy.clear()
             return False
@@ -376,7 +375,7 @@ class RuneMerchant(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
-        runes:list[Rune] = backpack.get_items_by_class(Rune)
+        runes:list[Rune] = backpack.get_items_by_class('Rune')
         if not runes:
             self.goods_to_buy.clear()
             return False
@@ -467,7 +466,7 @@ class PotionsMerchant(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
-        potions:list[Potion] = backpack.get_items_by_class(Potion)
+        potions:list[Potion] = backpack.get_items_by_class('Potion')
         if not potions:
             self.goods_to_buy.clear()
             return False
