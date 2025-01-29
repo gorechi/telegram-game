@@ -6,7 +6,7 @@ class ItemProtocol(Protocol):
     Протокол для объектов, которые можно использовать.
     """
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         ...
     
     name: str
@@ -39,6 +39,15 @@ class ActionController():
         self.items = []
         
     
+    def get_room(self):
+        if self.room:
+            return self.room
+        if self.hero:
+            return self.hero.current_position
+        if self.fight:
+            return self.fight.hero.current_position
+    
+    
     def extract_actions(self, item:ItemProtocol) -> dict:
         """
         Извлекает действия из протокола предмета.
@@ -65,7 +74,7 @@ class ActionController():
     
     def make_new_action_item(self, item:ItemProtocol, value:dict) -> Item:
         item_name = item.name
-        item_names = item.get_names_list(['nom', "accus"])
+        item_names = item.get_names_list(['nom', "accus"], room=self.get_room())
         method = getattr(item, value.get("method", ''))
         presentation_method = getattr(item, value.get("presentation", ''), None)
         condition_method = getattr(item, value.get("condition", ''), None)

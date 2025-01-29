@@ -721,16 +721,16 @@ class Hero:
             return self.do_single_action(first_item)
         items = self.bulk_actions(items)
         if not items:
-            tprint(self.game, f'У героя закончились варианты сделать еще что-то подобное.') 
+            tprint(self.game, f'У героя закончились варианты как сделать что-то подобное.') 
             return True
         message = []
-        message.append(f'{self.name} может "{action}" следующие вещи:')
+        message.append(f'Действие "{action}" доступно для следующих штук или достопочтенных особ:')
         for item in items:
             if not item.presentation:
                 message.append(f'{items.index(item) + 1}: {item.name.capitalize()}')
             else:
                 message.append(f'{items.index(item) + 1}: {item.presentation(self)}')
-        message.append('Герой должен назвать номер вещи или громко выкрикнуть "отмена" чтобы ничего не делать')
+        message.append(f'{self.g('Герой должен', 'Героиня должна')} назвать номер вещи или крикнуть "отмена" во всю силу своих легких, чтобы ничего не делать')
         self.to_do_list = items
         self.state = state_enum.ACTION
         tprint(self.game, message, 'read')
@@ -1562,28 +1562,25 @@ class Hero:
                 self.fight(monster.name)
     
     
-    def go(self, direction:str):
-        """Метод обрабатывает команду "идти". """
+    # def go(self, direction:str):
+    #     """Метод обрабатывает команду "идти". """
         
-        direction_number = Hero._doors_dict.get(direction, 5)
-        if direction_number == 5:
-            tprint(self.game, f'{self.name} не знает такого направления!')
-            return False
-        if self.check_light():
-            return self.go_with_light_on(direction_number)
-        return self.go_with_light_off(direction_number)
+    #     direction_number = Hero._doors_dict.get(direction, 5)
+    #     if direction_number == 5:
+    #         tprint(self.game, f'{self.name} не знает такого направления!')
+    #         return False
+    #     if self.check_light():
+    #         return self.go_with_light_on(direction_number)
+    #     return self.go_with_light_off(direction_number)
     
     
     def go_with_light_on(self, direction:int) -> bool:
         door = self.current_position.doors[direction]
         if door.empty:
-            tprint(self.game, f'Там нет двери. {self.name} не может туда пройти!')
-            return False
+            return f'Там нет двери. {self.name} не может туда пройти!'
         if door.locked:
-            tprint(self.game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
-            return False
-        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
-        new_position = self.floor.plan[new_room_number]
+            return f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!'
+        new_position = door.get_another_room(self.current_position)
         self.last_move = move_enum.get_move_by_number(direction)
         return self.move(new_position)
     
@@ -1598,8 +1595,7 @@ class Hero:
         if door.empty or door.locked:
             tprint(self.game, f'В темноте {self.name} врезается во что-то носом.')
             return False
-        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
-        new_position = self.floor.plan[new_room_number]
+        new_position = door.get_another_room(self.current_position)
         self.last_move = move_enum.get_move_by_number(direction)
         return self.move(new_position)
     

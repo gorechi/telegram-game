@@ -224,7 +224,7 @@ class Weapon:
         return bool([name for name in names_list if message.lower() in name.lower()])
 
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['оружие']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

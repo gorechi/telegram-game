@@ -94,7 +94,7 @@ class Book:
         return message.lower() in names_list
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['книга', 'книгу', 'книжка', 'книжку']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

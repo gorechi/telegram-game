@@ -146,7 +146,7 @@ class Ladder:
         return f'{self:nom} ведет куда-то вверх.'.capitalize()
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         return ['лестница', 'лестницу']
 
 
@@ -163,6 +163,7 @@ class Door:
     
     def __init__(self, game):
         self.locked = False
+        self.rooms = []
         self.closed = True
         self.empty = True
         self.game = game
@@ -183,7 +184,25 @@ class Door:
                 "in_darkness": False,
                 "presentation": "show_for_unlock"
                 },
+            "идти": {
+                "method": "go",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "presentation": "show_for_unlock"
+                },
         }
+    
+    
+    def go(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод обрабатывает команду Идти
+        """
+        direction_number = self.get_direction_index(who.current_position)
+        if who.check_light():
+            return who.go_with_light_on(direction_number)
+        return who.go_with_light_off(direction_number)
+    
     
     def examine(self, who, in_action:bool=False) -> str:
         """
@@ -195,11 +214,15 @@ class Door:
         elif who.check_fear():
             message = f'{who.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
         else:
-            direction = self.get_direction_index(room)
-            what_position = room.position + who.floor.directions_dict[direction]
-            room_behind_the_door = who.floor.plan[what_position]
+            room_behind_the_door = self.get_another_room(room)
             message = room_behind_the_door.show_through_key_hole(who)
         return message
+    
+    
+    def get_another_room(self, room) -> 'Room':
+        if room not in self.rooms or len(self.rooms) < 2:
+            return None
+        return [another_room for another_room in self.rooms if not another_room == room][0]
     
     
     def is_locked(self) -> bool:
@@ -237,8 +260,14 @@ class Door:
         return f'{who.name} отпирает дверь, ведущую {direction}, ключом.'
     
     
-    def get_names_list(self, cases:list=None) -> list:
-        return ['дверь']
+    def get_names_list(self, cases:list=None, room=None) -> list:
+        names = ['дверь']
+        if room:
+            index = self.get_direction_index(room)
+            direction = Door._directions.get(index, False)
+            if direction:
+                names.append(direction)
+        return names
     
     
     def __bool__(self):
@@ -481,6 +510,7 @@ class Room:
         self.action_controller = ActionController(game=self.game, room=self)
         self.floor = floor
         self.doors = doors
+        self.link_doors()
         self.generate_doors_actions()
         self.money:int = 0
         self.loot:Loot = Loot(self.game)
@@ -537,6 +567,11 @@ class Room:
         self.action_controller.add_actions(self)
     
     
+    def link_doors(self):
+        for door in self.doors:
+            door.rooms.append(self)
+    
+    
     def map_for_examine(self, who):
         self.map()
     
@@ -556,7 +591,7 @@ class Room:
         return
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         return ['комната', 'комнату']
     
     

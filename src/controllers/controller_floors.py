@@ -73,10 +73,7 @@ class FloorsController(Controller):
         all_rooms = self.create_rooms_plan(f, r)
         all_doors = []
         for _ in range(f * r):
-            doors = []
-            for _ in range(4):
-                door = Door(self.game)
-                doors.append(door)
+            doors = [Door(self.game) for _ in range(4)]
             all_doors.append(doors)
         for index, doors in enumerate(all_doors):
             row = index // r

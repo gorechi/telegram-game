@@ -268,7 +268,7 @@ class Money:
         return self.how_much_money
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['деньги', 'монеты']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

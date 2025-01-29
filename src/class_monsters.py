@@ -268,7 +268,7 @@ class Monster:
         return message.lower() in names_list
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['монстр', 
                       'врага', 
                       'монстра', 
@@ -1320,7 +1320,7 @@ class Corpse():
         return who.increase_monster_knowledge(self.creature.monster_type)
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         return ['труп', self.name]
     
     

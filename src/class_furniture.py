@@ -100,7 +100,7 @@ class Furniture:
         return False
     
     
-    def get_names_list(self, cases:list=[]) -> list:
+    def get_names_list(self, cases:list=[], room=None) -> list:
         names_list = self.basic_lexemes
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

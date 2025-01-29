@@ -45,7 +45,7 @@ class Spell:
         return message.lower() in names_list
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['заклинание']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -245,7 +245,7 @@ class Matches:
         return f'{who.g("Герой", "Героиня")} бержно убирает оставшиеся спички в рюкзак'
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['спички', 'спичку', 'спичка']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -456,7 +456,7 @@ class Map:
         return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = []
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -571,7 +571,7 @@ class Key:
         return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             
         
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = []
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
