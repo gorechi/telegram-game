@@ -238,5 +238,5 @@ class Backpack:
         return f'{who.name} радостно надевает рюкзак. Наконец-то {who:pronoun} может носить с собой необходимые вещи.'
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         return ['рюкзак']

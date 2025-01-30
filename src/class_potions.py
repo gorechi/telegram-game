@@ -44,7 +44,7 @@ class Potion:
         return message.lower() in names_list
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['зелье', 'напиток']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

@@ -218,7 +218,7 @@ class Armor(Protection):
         return True
 
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['защита', 'защиту', 'доспех', 'доспехи']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -546,7 +546,7 @@ class Shield (Protection):
         return self.accumulated_damage * Shield._repair_multiplier // 1
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['щит']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

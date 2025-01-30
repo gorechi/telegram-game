@@ -90,6 +90,7 @@ class Hero:
     
     def __init__(self, game):
         self.game = game
+        self.current_position = None
         self.action_controller = ActionController(game=self.game, hero=self)
         self.poisoned = False
         self.trader = None
@@ -99,7 +100,6 @@ class Hero:
         self.removed_shield = self.game.no_shield
         self.get_backpack()
         self.money = Money(self.game, 0)
-        self.current_position = None
         self.current_fight = None
         self.state = state_enum.NO_STATE
         self.game_is_over = False
@@ -121,7 +121,7 @@ class Hero:
             'подниматься': self.go_up,
             'спуститься': self.go_down,
             'спускаться': self.go_down,
-            'идти': self.go,
+            # 'идти': self.go,
             'атаковать': self.fight,
             'напасть': self.fight,
             'использовать': self.use,
@@ -193,7 +193,7 @@ class Hero:
         return potion.use(self, in_action)
     
     
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['себя', 'себе', 'героя', 'героиню']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -721,16 +721,16 @@ class Hero:
             return self.do_single_action(first_item)
         items = self.bulk_actions(items)
         if not items:
-            tprint(self.game, f'У героя закончились варианты сделать еще что-то подобное.') 
+            tprint(self.game, f'У героя закончились варианты как сделать что-то подобное.') 
             return True
         message = []
-        message.append(f'{self.name} может "{action}" следующие вещи:')
+        message.append(f'Действие "{action}" доступно для следующих штук или достопочтенных особ:')
         for item in items:
             if not item.presentation:
                 message.append(f'{items.index(item) + 1}: {item.name.capitalize()}')
             else:
                 message.append(f'{items.index(item) + 1}: {item.presentation(self)}')
-        message.append('Герой должен назвать номер вещи или громко выкрикнуть "отмена" чтобы ничего не делать')
+        message.append(f'{self.g('Герой должен', 'Героиня должна')} назвать номер вещи или крикнуть "отмена" во всю силу своих легких, чтобы ничего не делать')
         self.to_do_list = items
         self.state = state_enum.ACTION
         tprint(self.game, message, 'read')
@@ -1562,46 +1562,47 @@ class Hero:
                 self.fight(monster.name)
     
     
-    def go(self, direction:str):
-        """Метод обрабатывает команду "идти". """
+    # def go(self, direction:str):
+    #     """Метод обрабатывает команду "идти". """
         
-        direction_number = Hero._doors_dict.get(direction, 5)
-        if direction_number == 5:
-            tprint(self.game, f'{self.name} не знает такого направления!')
-            return False
-        if self.check_light():
-            return self.go_with_light_on(direction_number)
-        return self.go_with_light_off(direction_number)
+    #     direction_number = Hero._doors_dict.get(direction, 5)
+    #     if direction_number == 5:
+    #         tprint(self.game, f'{self.name} не знает такого направления!')
+    #         return False
+    #     if self.check_light():
+    #         return self.go_with_light_on(direction_number)
+    #     return self.go_with_light_off(direction_number)
+    
+    
+    def check_disturbed_monsters (self, who) -> None:
+        return True
     
     
     def go_with_light_on(self, direction:int) -> bool:
         door = self.current_position.doors[direction]
         if door.empty:
-            tprint(self.game, f'Там нет двери. {self.name} не может туда пройти!')
-            return False
+            return f'Там нет двери. {self.name} не может туда пройти!'
         if door.locked:
-            tprint(self.game, f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!')
-            return False
-        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
-        new_position = self.floor.plan[new_room_number]
+            return f'Эта дверь заперта. {self.name} не может туда пройти, нужен ключ!'
+        new_position = door.get_another_room(self.current_position)
         self.last_move = move_enum.get_move_by_number(direction)
-        return self.move(new_position)
+        self.move(new_position)
+        return ''
     
     
-    def go_with_light_off(self, direction:int) -> bool:
+    def go_with_light_off(self, direction:int) -> str:
         door = self.current_position.doors[direction]
         going_back = self.check_if_going_back(direction)
         if not going_back:
-            sneak = self.sneak_through_dark_room()
+            sneak, sneak_text = self.sneak_through_dark_room()
             if not sneak:
-                return False
+                return sneak_text
         if door.empty or door.locked:
-            tprint(self.game, f'В темноте {self.name} врезается во что-то носом.')
-            return False
-        new_room_number = self.current_position.position + self.floor.directions_dict[direction]
-        new_position = self.floor.plan[new_room_number]
+            return f'В темноте {self.name} врезается во что-то носом.'
+        new_position = door.get_another_room(self.current_position)
         self.last_move = move_enum.get_move_by_number(direction)
-        return self.move(new_position)
+        self.move(new_position)
+        return ''
     
     
     def sneak_through_dark_room(self) -> bool:
@@ -1609,24 +1610,22 @@ class Hero:
         if room.has_a_monster():
             for monster in room.monsters():
                 if not self.check_if_sneak_past_monster(monster):
-                    tprint(self.game, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.')
-                    self.fight(monster.name)
-                    return False
+                    monster.disturbed = True
+                    return False, f'{self.name} в темноте задевает что-то живое плечом и это что-то нападает.'
         if room.ladder_down:
             stayed = self.try_not_to_fall_down()
             if not stayed:
-                return False
+                self.descend(self.current_position)
+                return False, f'{self.name} медленно пробирается через темноту, но в какой-то момент перестает чувствовать пол под ногами и кубарем скатывается по лестнице вниз.'
         if room.has_furniture() and not self.check_if_sneak_past_furniture():
             self.generate_noise(2)
-            tprint(self.game, f'{self.name} в темноте врезается в какую-то мебель. Раздается оглушительный грохот.')
-        return True
+            return False, f'{self.name} в темноте врезается в какую-то мебель. Раздается оглушительный грохот.'
+        return True, ''
     
     
     def try_not_to_fall_down(self) -> bool:
         check_target = self.dext.base_die() // 2
         if not self.dext_check(against=check_target):
-            tprint(self.game, f'{self.name} медленно пробирается через темноту, но в какой-то момент перестает чувствовать пол под ногами и кубарем скатывается по лестнице вниз.')
-            self.descend(self.current_position)
             return False
         return True
     
