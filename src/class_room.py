@@ -189,9 +189,14 @@ class Door:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
-                "presentation": "show_for_unlock"
+                "presentation": "show_for_unlock",
+                "post_process": "check_disturbed_monsters"
                 },
         }
+    
+    
+    def check_disturbed_monsters (self, who) -> None:
+        who.check_disturbed_monsters()
     
     
     def go(self, who, in_action:bool=False) -> list[str]:

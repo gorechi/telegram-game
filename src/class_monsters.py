@@ -128,6 +128,7 @@ class Monster:
         self.run = False
         self.alive = True
         self.hide = False
+        self.disturbed = False
         self.weapon = self.game.no_weapon
         self.shield = self.game.no_shield
         self.removed_shield = self.game.no_shield
@@ -720,6 +721,7 @@ class Monster:
         """
         Обрабатывает поражение монстра. Определяет, умрет ли монстр, станет зомби или получит ранение в зависимости от результата броска кубика.
         """
+        self.disturbed = False
         die = 15 if self.can_resurrect else 10
         result = roll([die])
         if result < 6 or self.wounded or not self.can_run:
@@ -867,6 +869,7 @@ class Monster:
         Восстанавливает здоровье монстра до начального уровня после победы.
         """
         self.health = self.start_health
+        self.disturbed = False
 
     
     def place(self, floor, room_to_place=None, old_place=None):
@@ -941,6 +944,7 @@ class Plant(Monster):
         и пытается размножиться в соседние комнаты.
         """
         self.health = self.start_health
+        self.disturbed = False
         self.grow()
 
 
