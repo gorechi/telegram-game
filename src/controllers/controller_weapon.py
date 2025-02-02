@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.class_weapon import Weapon
+from src.class_weapon import Weapon, Torch
 from src.class_controller import Controller
 from src.functions.functions import randomitem
 
@@ -396,6 +396,7 @@ class WeaponController(Controller):
         
     _classes = {
         "Weapon": Weapon,
+        "Torch": Torch,
     }       
         
     def __init__(self, game):
@@ -406,7 +407,8 @@ class WeaponController(Controller):
         
     
     def additional_actions(self, weapon) -> bool:
-        self.decorate(weapon)
+        if not type(weapon) == Torch:
+            self.decorate(weapon)
         return True
     
     

@@ -1826,7 +1826,7 @@ class Hero:
         """Метод проверки, есть ли в комнате свет."""
         
         room = self.current_position
-        if room.light:
+        if room.light or room.torch.burning:
             return True
         if self.weapon.element() in Rune._glowing_elements:
             return True

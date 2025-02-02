@@ -490,5 +490,37 @@
       "random": true,
       "value": [6, 8]
       }
+  },
+  {
+    "class_name": "Torch",
+    "lexemes":{
+      "nom": "факел",
+      "accus": "факел",
+      "gen": "факела",
+      "dat": "факелу",
+      "prep": "факеле",
+      "inst": "факелом"
+    },
+    "actions":[
+      "бьет",
+      "стукает",
+      "колотит"
+    ], 
+    "gender": 0,
+    "name": "Факел", 
+    "weapon_type": "ударное", 
+    "twohanded": false,
+    "damage": {
+      "dice": true,
+      "random": true,
+      "value": [5, 8]
+      },
+    "enchantable": false,
+    "fencing": false, 
+    "hit_chance": {
+      "dice": true,
+      "random": true,
+      "value": [4, 5]
+      }
   }
 ]

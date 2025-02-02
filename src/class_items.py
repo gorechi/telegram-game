@@ -162,6 +162,7 @@ class Matches:
     
     def get_quantity_text(self, quantity:int) -> str:
         quantity_text = {
+            quantity == 0: 'Пустой спичечный коробок',
             quantity == 1: 'Коробок со всего одной спичкой',
             quantity == 2: 'Коробок, в котором болтается пара спичек',
             quantity > 2 and quantity <= 5: 'Коробок, в котором есть немного спичек',
@@ -262,9 +263,13 @@ class Matches:
         room.action_controller.add_actions(self)
         who.action_controller.delete_actions_by_item(self)
         return f'{who.name} бросает спички на пол.'
+    
+    
+    def use_one(self):
+        if self.quantity > 0:
+            self.quantity -= 1
 
   
-
 class Map:
 
     _width_coefficient = 72
