@@ -149,6 +149,27 @@ class Monster:
             self.leg_wound,
             self.become_a_zombie
         ]
+        self.room_actions = {
+            "атаковать": {
+                "method": "be_attacked",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "presentation": "get_name"
+                },
+        }
+        
+    def get_names_list(self, cases:list=None, room=None) -> list:
+        names_list = ['монстр', 'монстра', 'враг', 'врага']
+        for case in cases:
+            names_list.append(self.lexemes.get(case, '').lower())
+        return names_list
+    
+    
+    def get_name(self, who) -> str:
+        if who.current_position.check_light():
+            return f'{self:accus}'.capitalize()
+        return 'Кого-то, прячущегося в темноте'
 
     
     def __format__(self, format:str) -> str:
