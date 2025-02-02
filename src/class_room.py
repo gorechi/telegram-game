@@ -649,7 +649,9 @@ class Room:
     def set_torch(self):
         if not self.light or roll([Room._torch_die]) != Room._torch_die:
             return False
-        return True
+        new_torch = self.game.weapon_controller.get_random_objects_by_class_name('Torch')
+        new_torch.place(self.floor, self)
+        return new_torch
 
     
     def has_a_corpse(self) -> bool:
@@ -810,8 +812,9 @@ class Room:
         message = []
         decoration = self.get_decoration_for_show()
         monster_text = self.get_monster_text_for_show()
+        torch_text = ', освещеннуб факелом' if self.torch else ''
         message.append(f'{player.name} попадает в {decoration} '
-                       f'комнату {self.decoration2}. {self.decoration4}')
+                       f'комнату {self.decoration2}{torch_text}. {self.decoration4}')
         message.extend(self.show_furniture())
         message.extend(self.get_ladders_text())
         if self.trader:
@@ -977,20 +980,20 @@ class Room:
         return None
     
     
-    def turn_on_light(self, who) -> list[str]:
+    # def turn_on_light(self, who) -> list[str]:
         
-        """Метод зажигания в комнате света. """
+    #     """Метод зажигания в комнате света. """
         
-        self.light = True
-        self.torch = True
-        monster = self.monsters('first')
-        message = [
-                f'{who.name} зажигает факел и комната озаряется светом']
-        if monster:
-            if monster.frightening:
-                message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
-                who.fear += 1
-        return message
+    #     self.light = True
+    #     self.torch = True
+    #     monster = self.monsters('first')
+    #     message = [
+    #             f'{who.name} зажигает факел и комната озаряется светом']
+    #     if monster:
+    #         if monster.frightening:
+    #             message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
+    #             who.fear += 1
+    #     return message
                 
     
     def get_random_unlocked_furniture(self):

@@ -160,9 +160,13 @@ class Weapon:
         elif not second_weapon.twohanded and not who.removed_shield.empty:
             message.append(f'У {who.g("героя", "героини")} теперь одноручное оружие, поэтому {who:pronoun} может достать щит из-за спины.')
         who.backpack.remove(second_weapon, who)
-        who.backpack.append(self)
+        self.place_into_backpack(who)
         who.weapon = second_weapon
         return message
+    
+    
+    def place_into_backpack(self, who):
+        who.backpack.append(self)
     
     
     def __format__(self, format:str) -> str:
@@ -304,19 +308,17 @@ class Weapon:
             who.weapon = self
             message.append(f'{who.name} теперь использует {self:accus} в качестве оружия.')
             if who.weapon.twohanded and not who.shield.empty:
-                shield = who.shield
-                who.shield = self.game.no_shield
-                who.removed_shield = shield
+                who.shield.take_away(who)
                 message.append(f'Из-за того, что {who.g("герой взял", "героиня взяла")} двуручное оружие, '
-                               f'{who.g("ему", "ей")} пришлось убрать {shield.get_full_names("accus")} за спину.')
+                               f'{who.g("ему", "ей")} пришлось убрать {who.removed_shield.get_full_names("accus")} за спину.')
         else:
             if not second_weapon.empty:
                 message.append(f'В рюкзаке для нового оружия нет места, поэтому приходится бросить {who.weapon.name}.')
-                who.drop(who.weapon.name)
+                who.weapon.drop(who)
                 who.weapon = self
             else:
                 message.append('В рюкзаке находится место для второго оружия. Во время схватки можно "Сменить" оружие.')
-                who.backpack.append(self)
+                self.place_into_backpack(who)
         who.action_controller.add_actions(self)
         who.current_position.action_controller.delete_actions_by_item(self)
         return message
@@ -352,11 +354,11 @@ class Weapon:
         return message
 
     
-    def place(self, castle, room_to_place = None):
+    def place(self, floor, room_to_place = None):
         if room_to_place:
             room = room_to_place
         else:
-            room = randomitem(castle.plan)
+            room = randomitem(floor.plan)
         monster = room.monsters('random')
         if monster:
             if monster.carry_weapon:
@@ -367,4 +369,155 @@ class Weapon:
             if furniture.can_contain_weapon:
                 furniture.put(self)
                 return True
+        room.action_controller.add_actions(self)
         room.loot.add(self)
+        
+
+class Torch(Weapon):
+    
+    def __init__(self, game):
+        super().__init__(game)
+        self.hero_actions |= {
+            "поджечь": {
+                "method": "fire",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_hero",
+                "condition": "is_not_burning"
+                },
+            "зажечь": {
+                "method": "fire",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_hero",
+                "condition": "is_not_burning"
+                },
+            "потушить": {
+                "method": "extinguish",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_hero",
+                "condition": "is_burning"
+                },
+        }
+        self.room_actions |= {
+            "поджечь": {
+                "method": "fire_in_room",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_room",
+                "condition": "is_not_burning"
+                },
+            "зажечь": {
+                "method": "fire_in_room",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_room",
+                "condition": "is_not_burning"
+                },
+            "потушить": {
+                "method": "extinguish_in_room",
+                "bulk": False,
+                "in_combat": True,
+                "in_darkness": True,
+                "presentation": "show_for_examine_room",
+                "condition": "is_burning"
+                },
+        }
+        self.burning = False
+
+
+    def extinguish(self, who, in_action:bool=False) -> str:
+        self.burning = False
+        if who.check_light():
+            return f'{who.name} тушит факел, который держит руке.'
+        return f'{who.name} тушит факел, который держит руке. Комната погружается во тьму.'
+    
+    
+    def extinguish_in_room(self, who, in_action:bool=False) -> str:
+        self.burning = False
+        if who.check_light():
+            return f'{who.name} тушит факел, который освещает комнату.'
+        return f'{who.name} тушит факел, который освещает комнату. Комната погружается во тьму'
+    
+    
+    def fire(self, who, in_action:bool=False) -> str:
+        matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
+        if matches_in_backpack and matches_in_backpack.quantity > 0:
+            matches_in_backpack.use_one()
+            self.burning = True
+            return f'{who.name} поджигает {self:nom} спичками.'
+        return f'{who.name} не может поджечь {self:nom}, так как у него нет спичек.'
+    
+    
+    def fire_in_room(self, who, in_action:bool=False) -> str:
+        matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
+        if matches_in_backpack and matches_in_backpack.quantity > 0:
+            matches_in_backpack.use_one()
+            self.burning = True
+            who.current_position.light = True
+            return f'{who.name} поджигает {self:nom} спичками и комната озаряется светом.'
+        return f'{who.name} не может поджечь {self:nom}, так как у него нет спичек.'            
+    
+    
+    def is_not_burning(self) -> bool:
+        return not self.burning
+    
+    
+    def is_burning(self) -> bool:
+        return self.burning
+    
+    
+    def place_into_backpack(self, who):
+        who.backpack.append(self)
+        self.burning = False
+        
+
+    def show_for_examine_hero(self, who) -> str:
+        if self.burning:
+            return f'горящий {self:nom} в руках у {who:gen}'
+        return f'потухший {self:nom}, принадлежащий {who:dat}'
+    
+    
+    def show_for_examine_room(self, who) -> str:
+        if self.burning:
+            return f'горящий {self:nom}, находящийся в комнате'
+        return f'потухший {self:nom}, находящийся в комнате'
+    
+    
+    def light(self):
+        self.burning = True
+        
+    
+    def element(self):
+        if self.burning:
+            return 2
+        return 0
+    
+    
+    def show(self):
+        damage_string = self.damage.text()
+        if self.burning:
+            name = 'Горящий факел'
+        else:
+            name = 'Потухший факел'
+        return f'{name} ({damage_string}), {self.type}'.capitalize()
+    
+    
+    def place(self, floor, room_to_place = None) -> bool:
+        if room_to_place:
+            room = room_to_place
+        else:
+            rooms_without_torches = [room for room in floor.plan if not room.torch]
+            room = randomitem(rooms_without_torches)
+        if not room:
+            return False
+        room.torch = self
+        room.light = True
+        room.action_controller.add_actions(self)
+        return True
