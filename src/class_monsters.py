@@ -159,6 +159,19 @@ class Monster:
                 },
         }
         
+    
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        return False
+    
+    
+    def be_attacked(self, who, in_action:bool=False) -> str:
+        who.fight(self)
+        return ''
+    
+    
     def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = ['монстр', 'монстра', 'враг', 'врага']
         for case in cases:
@@ -709,6 +722,7 @@ class Monster:
         self.game.monsters_controller.resurect_monster(self)
         self.alive = True
         self.get_weaker()
+        room.action_controller.add_actions(self)
         return True
     
     
@@ -721,7 +735,8 @@ class Monster:
             return False
         self.gather_loot()
         corpse_name = f'труп {self:gen}'
-        new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)  # noqa: F841
+        new_corpse = Corpse(self.game, corpse_name, self.loot, self.current_position, self, not for_good)
+        self.current_position.action_controller.delete_actions_by_item(self)
         return True
         
     
@@ -932,6 +947,7 @@ class Monster:
             floor.stink(room, 3)
             floor.stink_map()
         self.floor = floor
+        room.action_controller.add_actions(self)
         print(f'Монстр {self.name} помещен в комнату {room.position} этажа {floor.floor_number}.')
         return True
 
@@ -949,6 +965,13 @@ class Plant(Monster):
         super().__init__(game)
         self.empty = False
         self.hiding_place = None
+        
+        
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        return False
 
 
     def grow_in_room(self, room):
@@ -996,6 +1019,7 @@ class Plant(Monster):
         self.current_position = room
         self.floor = floor
         floor.monsters_in_rooms[room].append(self)
+        room.action_controller.add_actions(self)
     
     
     def generate_mele_attack(self, target) -> int:
@@ -1034,6 +1058,12 @@ class Berserk(Monster):
         self.empty = False
 
    
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        return True
+    
     
     def generate_mele_attack(self, target):
         self.rage = (int(self.start_health) - int(self.health)) // Berserk._rage_coefficient
@@ -1069,6 +1099,16 @@ class Vampire(Monster):
         """
         super().__init__(game)
         self.empty = False
+        
+        
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        hero = fight.hero
+        if hero.check_light() or hero.weapon.element() in [12, 15, 24]:
+            return False
+        return True
 
     
     def choose_target(self, fight:Fight):
@@ -1118,6 +1158,7 @@ class Vampire(Monster):
         self.hiding_place = where_to_hide
         self.floor = floor
         floor.monsters_in_rooms[room].append(self)
+        room.action_controller.add_actions(self)
         return True
 
 
@@ -1134,6 +1175,16 @@ class Animal(Monster):
             self.leg_wound,
             self.become_a_zombie
         ]
+    
+    
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        for enemy in fight.fighters:
+            if self.stren < enemy.stren:
+                return False
+        return True
 
 
 class Human(Monster):
@@ -1150,6 +1201,13 @@ class Demon(Monster):
     def __init__(self, game):
         super().__init__(game)
         self.empty = False
+        
+    
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        return True
 
 
 class WalkingDead(Monster):
@@ -1170,6 +1228,13 @@ class WalkingDead(Monster):
             self.become_a_zombie,
             self.become_a_zombie,
         ]
+        
+    
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        return True
 
 
 class Skeleton(Monster):
@@ -1260,7 +1325,6 @@ class Corpse():
         self.examined:bool = False
         self.creature = creature
         self.description:str = self.generate_description()
-        self.place(room)
         self.can_resurrect:bool = can_resurrect
         self.room_actions = {
             "обыскать": {
@@ -1283,6 +1347,8 @@ class Corpse():
                 "in_darkness": False,
                 },
         }
+        self.place(room)
+        
         
     
     def after_search(self, who):

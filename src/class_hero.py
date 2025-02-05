@@ -122,8 +122,8 @@ class Hero:
             'спуститься': self.go_down,
             'спускаться': self.go_down,
             # 'идти': self.go,
-            'атаковать': self.fight,
-            'напасть': self.fight,
+            # 'атаковать': self.fight,
+            # 'напасть': self.fight,
             'использовать': self.use,
             'применить': self.use,
             'test': self.test,
@@ -1559,7 +1559,7 @@ class Hero:
         monster = room.monsters('first')
         if monster:
             if monster.aggressive and self.check_light():
-                self.fight(monster.name)
+                self.fight(monster)
     
     
     # def go(self, direction:str):
@@ -1653,21 +1653,21 @@ class Hero:
         """Метод обрабатывает команду "атаковать". """
         
         room = self.current_position
-        monsters_in_room = room.monsters()
-        if not monsters_in_room:
-            tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
-            return False
-        monsters_to_fight = []
-        if enemy:
-            for monster in monsters_in_room:
-                if monster.check_name(enemy):
-                    monsters_to_fight.append(monster)
-            if not monsters_to_fight:
-                tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
-                return False
-        if not enemy:
-            monsters_to_fight = monsters_in_room
-        monsters_to_fight.append(self)
+        # monsters_in_room = room.monsters()
+        # if not monsters_in_room:
+        #     tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
+        #     return False
+        # monsters_to_fight = []
+        # if enemy:
+        #     for monster in monsters_in_room:
+        #         if monster.check_name(enemy):
+        #             monsters_to_fight.append(monster)
+        #     if not monsters_to_fight:
+        #         tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
+        #         return False
+        # if not enemy:
+        #     monsters_to_fight = monsters_in_room
+        monsters_to_fight = [self, enemy]
         new_fight = Fight(
             game=self.game, 
             hero=self, 
