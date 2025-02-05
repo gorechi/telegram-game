@@ -111,7 +111,7 @@ class Fight:
     def gather_enemies(self) -> None:
         enemies_in_room = self.room.monsters()
         for enemy in enemies_in_room:
-            if not enemy in self.fighters and enemy.want_to_fight(self):
+            if enemy not in self.fighters and enemy.want_to_fight(self):
                 self.add_fighter(enemy)
 
 

@@ -712,7 +712,7 @@ class Hero:
         items = self.get_items_for_action(action, item, in_darkness, in_combat)
         if not items:
             if in_darkness:
-                tprint(self.game, f'В комнате слишком темно чтобы делать что-то такое.') 
+                tprint(self.game, 'В комнате слишком темно чтобы делать что-то такое.') 
             else:
                 tprint(self.game, f'{self.name} не видит смысла сейчас делать подобные глупости!')
             return False
@@ -721,7 +721,7 @@ class Hero:
             return self.do_single_action(first_item)
         items = self.bulk_actions(items)
         if not items:
-            tprint(self.game, f'У героя закончились варианты как сделать что-то подобное.') 
+            tprint(self.game, 'У героя закончились варианты как сделать что-то подобное.') 
             return True
         message = []
         message.append(f'Действие "{action}" доступно для следующих штук или достопочтенных особ:')
@@ -1575,7 +1575,12 @@ class Hero:
     
     
     def check_disturbed_monsters (self, who) -> None:
-        return True
+        room = self.current_position
+        for monster in room.monsters():
+            if monster.disturbed:
+                self.fight(monster, True)
+                return True
+        return False
     
     
     def go_with_light_on(self, direction:int) -> bool:
@@ -1649,10 +1654,9 @@ class Hero:
         return True
     
     
-    def fight(self, enemy=None):
+    def fight(self, enemy=None, enemy_started:bool=False):
         """Метод обрабатывает команду "атаковать". """
         
-        room = self.current_position
         # monsters_in_room = room.monsters()
         # if not monsters_in_room:
         #     tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
@@ -1667,11 +1671,15 @@ class Hero:
         #         return False
         # if not enemy:
         #     monsters_to_fight = monsters_in_room
+        if enemy_started:
+            who_started = enemy
+        else:
+            who_started = self
         monsters_to_fight = [self, enemy]
         new_fight = Fight(
             game=self.game, 
             hero=self, 
-            who_started=self, 
+            who_started=who_started, 
             fighters=monsters_to_fight
             )
         new_fight.start()

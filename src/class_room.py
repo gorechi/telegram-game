@@ -1,7 +1,6 @@
 from typing import Optional
 
 from src.class_basic import Loot
-from src.class_items import Key
 from src.controllers.controller_actions import ActionController
 from src.functions.functions import pprint, randomitem, tprint, roll
 
@@ -90,9 +89,9 @@ class Ladder:
         room = who.current_position
         direction = self.get_direction(room)
         if direction == 'вверх':
-            return f'Люк в потолке, закрытый тяжелой крышкой.'
+            return 'Люк в потолке, закрытый тяжелой крышкой.'
         if direction == 'вниз':
-            return f'Квадратный люк в полу, плотно закрытый крышкой.'
+            return 'Квадратный люк в полу, плотно закрытый крышкой.'
         return f'{self:nom}'
     
     
@@ -237,7 +236,7 @@ class Door:
     def get_direction_index(self, room) -> int:
         try:
             index = room.doors.index(self)
-        except:
+        except Exception:
             print(f'Дверь {self} не найдена в комнате {room}.')
             return None
         return index

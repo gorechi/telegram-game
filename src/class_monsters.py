@@ -155,7 +155,7 @@ class Monster:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
-                "presentation": "get_name"
+                "presentation": "get_name_for_being_attacked"
                 },
         }
         
@@ -164,7 +164,13 @@ class Monster:
         """
         Метод проверяет, хочет ли монстр участвовать в схватке.
         """
+        if self.disturbed:
+            return True
         return False
+    
+    
+    def calm_down(self):
+        self.disturbed = False
     
     
     def be_attacked(self, who, in_action:bool=False) -> str:
@@ -173,13 +179,13 @@ class Monster:
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
-        names_list = ['монстр', 'монстра', 'враг', 'врага']
+        names_list = ['монстр', 'монстра', 'враг', 'врага', 'противник', 'противника']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
         return names_list
     
     
-    def get_name(self, who) -> str:
+    def get_name_for_being_attacked(self, who) -> str:
         if who.current_position.check_light():
             return f'{self:accus}'.capitalize()
         return 'Кого-то, прячущегося в темноте'
@@ -301,19 +307,6 @@ class Monster:
         else:
             names_list =  ['противник', 'противника']
         return message.lower() in names_list
-    
-    
-    def get_names_list(self, cases:list=None, room=None) -> list:
-        names_list = ['монстр', 
-                      'врага', 
-                      'монстра', 
-                      'враг', 
-                      'противника', 
-                      'противник',
-                      self.name[0].lower()]
-        for case in cases:
-            names_list.append(self.lexemes.get(case, '').lower())
-        return names_list
     
     
     def get_name(self, case:str) -> str:
@@ -757,7 +750,7 @@ class Monster:
         """
         Обрабатывает поражение монстра. Определяет, умрет ли монстр, станет зомби или получит ранение в зависимости от результата броска кубика.
         """
-        self.disturbed = False
+        self.calm_down()
         die = 15 if self.can_resurrect else 10
         result = roll([die])
         if result < 6 or self.wounded or not self.can_run:
@@ -905,7 +898,7 @@ class Monster:
         Восстанавливает здоровье монстра до начального уровня после победы.
         """
         self.health = self.start_health
-        self.disturbed = False
+        self.calm_down()
 
     
     def place(self, floor, room_to_place=None, old_place=None):
