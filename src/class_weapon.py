@@ -1,4 +1,4 @@
-from src.functions.functions import randomitem, tprint
+from src.functions.functions import randomitem
 from src.class_dice import Dice
 
 
