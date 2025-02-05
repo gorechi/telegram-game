@@ -17,6 +17,7 @@ class Fight:
         self.hero = hero
         self.who_started = who_started
         self.fighters = fighters
+        self.room = self.hero.current_position
         self.finished = False
         self.exp:int = 0
         self.light:bool = self.check_light()
@@ -75,7 +76,7 @@ class Fight:
         self.queue.popleft()
     
     
-    def sequence(self):
+    def sequence(self) -> None:
         while self.queue[0] != self.hero:
             fighter = self.queue[0]
             message = fighter.attack(self)
@@ -106,11 +107,23 @@ class Fight:
         self.show_sides()
         return True            
 
+    
+    def gather_enemies(self) -> None:
+        enemies_in_room = self.room.monsters()
+        for enemy in enemies_in_room:
+            if not enemy in self.fighters and enemy.want_to_fight(self):
+                self.add_fighter(enemy)
 
+
+    def add_fighter(self, fighter) -> None:
+        self.fighters.append(fighter)
+    
+    
     def start(self):
         if self.hero:
             self.hero.state = state_enum.FIGHT
             self.hero.current_fight = self
+        self.gather_enemies()
         self.show_sides()
         self.sequence()
         
