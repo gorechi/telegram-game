@@ -55,7 +55,7 @@ class Furniture:
         return
     
     
-    def is_locked(self) -> bool:
+    def is_locked(self, room=None) -> bool:
         return self.locked
 
     
