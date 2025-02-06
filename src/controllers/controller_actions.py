@@ -122,12 +122,12 @@ class ActionController():
         """
         items_list = self.actions.get(action, list())
         if in_darkness:
-            items_list = [item for item in items_list if item.in_darkness == True]
+            items_list = [item for item in items_list if item.in_darkness]
         if in_combat:
-            items_list = [item for item in items_list if item.in_combat == True]
+            items_list = [item for item in items_list if item.in_combat]
         temporary_list = list()
         for item in items_list:
-            if item.condition is None or (callable(item.condition) and item.condition()):
+            if item.condition is None or (callable(item.condition) and item.condition(self.get_room())):
                 temporary_list.append(item)
         filtered_by_name = list()
         if name:

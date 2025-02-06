@@ -70,10 +70,34 @@ class Ladder:
                 "presentation": "show_for_unlock",
                 "condition": "is_locked"
                 },
+            "спуститься": {
+                "method": "go_down",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "presentation": "show_for_go",
+                "condition": "going_down"
+                },
+            "подняться": {
+                "method": "go_up",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "presentation": "show_for_go",
+                "condition": "going_up"
+                },
         }
     
     
-    def is_locked(self) -> bool:
+    def going_down(self, room=None) -> bool:
+        return self.get_direction(room) == 'вниз'
+    
+
+    def going_up(self, room=None) -> bool:
+        return self.get_direction(room) == 'вверх'
+
+    
+    def is_locked(self, room=None) -> bool:
         return self.locked
     
     
@@ -85,6 +109,23 @@ class Ladder:
         return ''
     
     
+    def go_down(self, who, in_action:bool=False) -> str:
+        if not who.check_light():
+            return who.go_down_with_light_off()
+        return who.go_down_with_light_on()
+
+
+    def go_up(self, who, in_action:bool=False) -> str:
+        if not who.check_light():
+            return who.go_up_with_light_off()
+        return who.go_up_with_light_on()
+
+    
+    def show_for_go(self, who) -> str:
+        direction = self.get_direction(who.current_position)
+        return f'Лестница, ведущая {direction}'
+    
+
     def show_for_unlock(self, who) -> str:
         room = who.current_position
         direction = self.get_direction(room)
@@ -229,7 +270,7 @@ class Door:
         return [another_room for another_room in self.rooms if not another_room == room][0]
     
     
-    def is_locked(self) -> bool:
+    def is_locked(self, room=None) -> bool:
         return self.locked
     
     

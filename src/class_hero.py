@@ -117,13 +117,6 @@ class Hero:
         self.wounds = {}
         self.last_move = move_enum.DOWN
         self.command_dict = {
-            'подняться': self.go_up,
-            'подниматься': self.go_up,
-            'спуститься': self.go_down,
-            'спускаться': self.go_down,
-            # 'идти': self.go,
-            # 'атаковать': self.fight,
-            # 'напасть': self.fight,
             'использовать': self.use,
             'применить': self.use,
             'test': self.test,
@@ -311,17 +304,16 @@ class Hero:
         return f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}'
     
     
-    def go_down(self, what:str) -> bool:
-        if not self.check_light():
-            return self.go_down_with_light_off()
-        return self.go_down_with_light_on()
+    # def go_down(self, what:str) -> bool:
+    #     if not self.check_light():
+    #         return self.go_down_with_light_off()
+    #     return self.go_down_with_light_on()
     
     
-    def go_down_with_light_off(self) -> bool:
+    def go_down_with_light_off(self) -> str:
         room = self.current_position
         if not room.ladder_down or room.ladder_down.locked:
-            tprint (self.game, f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.')
-            return False
+            return f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.'
         return self.descend(room)
 
 
@@ -331,29 +323,25 @@ class Hero:
         return self.move(room_to_go)
     
     
-    def go_down_with_light_on(self) -> bool:
+    def go_down_with_light_on(self) -> str:
         room = self.current_position
         if not room.ladder_down:
-            tprint (self.game, f'{self:nom} в недоумении смотрит на абсолютно ровный пол.' 
-                    f'Как только {self.g("ему", "ей")} могла прийти в голову такая идея?')
-            return False
+            return f'{self:nom} в недоумении смотрит на абсолютно ровный пол. Как только {self.g("ему", "ей")} могла прийти в голову такая идея?'
         if room.ladder_down.locked:
-           tprint (self.game, 'Крышка люка в полу не открывается. Похоже, она заперта.')
-           return False
+           return 'Крышка люка в полу не открывается. Похоже, она заперта.'
         return self.descend(room)
     
     
-    def go_up(self, what:str) -> bool:
-        if not self.check_light():
-            return self.go_up_with_light_off()
-        return self.go_up_with_light_on()
+    # def go_up(self, what:str) -> bool:
+    #     if not self.check_light():
+    #         return self.go_up_with_light_off()
+    #     return self.go_up_with_light_on()
     
     
     def go_up_with_light_off(self) -> bool:
         room = self.current_position
         if not room.ladder_up or room.ladder_up.locked:
-            tprint (self.game, f'{self:nom} ничего не может разглядеть в такой темноте.')
-            return False
+            return f'{self:nom} ничего не может разглядеть в такой темноте.'
         return self.ascend(room)
 
 
@@ -366,11 +354,9 @@ class Hero:
     def go_up_with_light_on(self) -> bool:
         room = self.current_position
         if not room.ladder_up:
-            tprint (self.game, f'{self:nom} и {self.g("хотел", "хотела")} бы забраться повыше, но в этой комнате нет такой возможности.')
-            return False
+            return f'{self:nom} и {self.g("хотел", "хотела")} бы забраться повыше, но в этой комнате нет такой возможности.'
         if room.ladder_up.locked:
-           tprint (self.game, f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.')
-           return False
+           return f'{self:nom} пытается поднять крышку люка, ведущего наверх, но она не поддается. Похоже, она заперта.'
         return self.ascend(room)
 
          
@@ -1643,7 +1629,7 @@ class Hero:
         return direction == self.last_move.countermove
        
     
-    def move(self, new_position:Room) -> bool:
+    def move(self, new_position:Room) -> str:
         self.game.trigger_on_movement()
         self.current_position = new_position
         self.current_position.visited = True
@@ -1651,7 +1637,7 @@ class Hero:
         self.current_position.map()
         self.decrease_restless(1)
         self.check_monster_and_figth()
-        return True
+        return ''
     
     
     def fight(self, enemy=None, enemy_started:bool=False):

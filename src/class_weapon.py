@@ -71,7 +71,6 @@ class Weapon:
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
-                "condition": "can_be_changed"
                 },
             "поменять": {
                 "method": "change",
@@ -79,7 +78,6 @@ class Weapon:
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
-                "condition": "can_be_changed"
                 },
             "осмотреть": {
                 "method": "examine",
@@ -465,11 +463,11 @@ class Torch(Weapon):
         return f'{who.name} не может поджечь {self:nom}, так как у него нет спичек.'            
     
     
-    def is_not_burning(self) -> bool:
+    def is_not_burning(self, room=None) -> bool:
         return not self.burning
     
     
-    def is_burning(self) -> bool:
+    def is_burning(self, room=None) -> bool:
         return self.burning
     
     
