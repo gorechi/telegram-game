@@ -1094,7 +1094,8 @@ class Hero:
         """Метод проверяет, смог ли герой сломать вражеский щит."""
         
         shield = target.shield
-        if not shield.empty and shield.check_if_broken(total_attack):
+        mastery = self.mastery['щиты']
+        if not shield.empty and shield.check_if_broken(total_attack, mastery):
             return f' {self.name} наносит настолько сокрушительный удар, что ломает щит соперника.'
         return None    
     
@@ -1201,7 +1202,7 @@ class Hero:
             tprint(game, f'У {self.g("героя", "героини")} нет щита, так что защищаться {self:pronoun} не может.')
         else:
             self.hide = True
-            self.rage.increase_base_die()
+            self.rage.increase_base_die(self.mastery['щиты'] + 1)
             tprint(game, f'{self.name} уходит в глухую защиту, терпит удары и накапливает ярость.')
 
     
@@ -1233,7 +1234,7 @@ class Hero:
                 mastery_text += f' {mastery} ({self.mastery[mastery]["level"]})'
         if mastery_text:
             mastery_text = mastery_text[1::]
-            text = f'{self.g("Герой", "Героиня")} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
+            text = f'{self.g("Герой", "Героиня")} обладает знаниями про {normal_count(mastery_text, "(")}.'
             return text
         return ''
     
@@ -1311,7 +1312,7 @@ class Hero:
             result += self.shield.protect(attacker)
             self.damage_shield()
         if not self.armor.empty:
-            result += self.armor.protect(attacker)
+            result += self.armor.protect(attacker, self.mastery['доспехи'])
         if self.try_to_parry(attacker=attacker):
             result = -1
         return result

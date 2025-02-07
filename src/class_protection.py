@@ -1,9 +1,6 @@
-﻿from math import ceil
-from random import randint as dice
+﻿from random import randint as dice
 
 from src.functions.functions import randomitem, tprint, howmany
-
-from src.class_dice import Dice
 
 class Protection:
     
@@ -110,18 +107,18 @@ class Protection:
             return ' ' + Protection._elements_dictionary[self.element()]
 
 
-    def protect(self, who):
+    def protect(self, who, mastery:int=0):
         if who.hide:
             who.hide = False
-            return self.protection.roll()
+            return self.protection.roll(add=[mastery])
         if who.weapon.empty or who.weapon.element() == 0 or self.element() == 0:
-            return self.protection.roll()
+            return self.protection.roll(add=[mastery])
         base_damage = [who.weapon.damage.base_die() // 2]
         if who.weapon.element() in Protection._weakness_dictionary[self.element()]:
-            return self.perm_protection.roll(subtract=base_damage)
+            return self.perm_protection.roll(subtract=base_damage, add=[mastery])
         elif self.element() in Protection._weakness_dictionary[who.weapon.element()]:
-            return self.perm_protection.roll(add=base_damage)
-        return self.protection.roll()
+            return self.perm_protection.roll(add=base_damage.append(mastery))
+        return self.protection.roll(add=[mastery])
 
     
     def show(self) -> str:
@@ -524,9 +521,9 @@ class Shield (Protection):
         return Shield._states_dictionary.get(self.accumulated_damage // 1, None)
     
     
-    def check_if_broken(self, attack:int=0) -> bool:
+    def check_if_broken(self, attack:int=0, mastery:int=0) -> bool:
         damage_limit = dice(1, Shield._crushed_upper_limit)
-        damage_to_shield = attack * self.accumulated_damage
+        damage_to_shield = (attack + mastery) * self.accumulated_damage
         if damage_limit < damage_to_shield:
             self.game.all_shields.remove(self)
             self.user.shield = self.game.no_shield
