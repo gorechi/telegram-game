@@ -82,23 +82,31 @@
       "2": 4, 
       "3": 7, 
       "4": 10},
-    "weapon_mastery": {
-      "рубящее": {
+    "mastery": {
+      "рубящее оружие": {
         "counter": 0,
         "level": 0
         }, 
-      "колющее": {
+      "колющее оружие": {
         "counter": 0,
         "level": 0
         }, 
-      "ударное": {
+      "ударное оружие": {
         "counter": 0,
         "level": 0
         }, 
       "": {
         "counter": 0,
         "level": 0
-        }
+        },
+      "щиты": {
+        "counter": 0,
+        "level": 0
+        },
+      "доспехи": {
+        "counter": 0,
+        "level": 0
+        }  
     },
     "monster_knowledge": {}
   }

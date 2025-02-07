@@ -1,4 +1,4 @@
-from random import randint, sample
+from random import randint
 
 class Dice():
     

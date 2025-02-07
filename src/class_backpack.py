@@ -1,5 +1,4 @@
-from src.functions.functions import randomitem, tprint
-from src.class_weapon import Weapon
+from src.functions.functions import randomitem
 
 class Backpack:
     
@@ -48,12 +47,6 @@ class Backpack:
                 "in_darkness": True,
                 },
             "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True,
-                },
-            "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
@@ -211,9 +204,9 @@ class Backpack:
         for i, item in enumerate(self.insides):
             description = f'{str(i + 1)}: {item.show()}'
             if type(item).__name__ == 'Weapon':
-                weapon_mastery = who.weapon_mastery[item.type]['level']
-                if weapon_mastery > 0:
-                    description += f', мастерство - {weapon_mastery}'
+                mastery = who.mastery[item.type]['level']
+                if mastery > 0:
+                    description += f', мастерство - {mastery}'
             message.append(description)
         return message
     

@@ -35,7 +35,7 @@ class HeroController(Controller):
         levels: list
         elements: dict
         element_levels: dict
-        weapon_mastery: dict
+        mastery: dict
         initiative: dict
         trap_mastery: int
         rage: dict
