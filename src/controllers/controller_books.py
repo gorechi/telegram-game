@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeaponBook, TrapsBook, WisdomBook
+from src.class_book import Book, ThrustingWeaponBook, CuttingWeaponBook, BluntgWeaponBook, TrapsBook, WisdomBook, ShieldsBook, ArmorBook
 from src.class_controller import Controller
 from src.functions.functions import randomitem
 
@@ -24,7 +24,9 @@ class BooksController(Controller):
         "CuttingWeaponBook": CuttingWeaponBook,
         "BluntgWeaponBook": BluntgWeaponBook,
         "TrapsBook": TrapsBook,
-        "WisdomBook": WisdomBook
+        "WisdomBook": WisdomBook,
+        "ShieldsBook": ShieldsBook,
+        "ArmorBook": ArmorBook
     }
     
     _names = {

@@ -82,7 +82,7 @@
       "2": 4, 
       "3": 7, 
       "4": 10},
-    "weapon_mastery": {
+    "mastery": {
       "рубящее": {
         "counter": 0,
         "level": 0
@@ -98,7 +98,15 @@
       "": {
         "counter": 0,
         "level": 0
-        }
+        },
+      "щит": {
+        "counter": 0,
+        "level": 0
+        },
+      "доспехи": {
+        "counter": 0,
+        "level": 0
+        }  
     },
     "monster_knowledge": {}
   }

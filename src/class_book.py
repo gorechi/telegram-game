@@ -1,4 +1,4 @@
-from src.functions.functions import randomitem, tprint
+from src.functions.functions import randomitem
 
 class Book:
         
@@ -146,7 +146,7 @@ class ThrustingWeaponBook(Book):
     
             
     def increase_mastery(self, who) -> str:
-        who.weapon_mastery['колющее']['level'] += 1
+        who.mastery['колющее']['level'] += 1
         return f'{who.name} теперь немного лучше знает, как использовать колющее оружие.'
 
 
@@ -157,7 +157,7 @@ class CuttingWeaponBook(Book):
     
             
     def increase_mastery(self, who) -> str:
-        who.weapon_mastery['рубящее']['level'] += 1
+        who.mastery['рубящее']['level'] += 1
         return f'{who.name} теперь немного лучше знает, как использовать рубящее оружие.'
     
     
@@ -168,7 +168,7 @@ class BluntgWeaponBook(Book):
     
             
     def increase_mastery(self, who) -> str:
-        who.weapon_mastery['ударное']['level'] += 1
+        who.mastery['ударное']['level'] += 1
         return f'{who.name} теперь немного лучше знает, как использовать ударное оружие.'
 
 
@@ -193,3 +193,26 @@ class WisdomBook(Book):
         who.intel.increase_modifier(1)
         who.start_intel.increase_modifier(1)
         return f'{who.name} чувствует, что {who.g("стал", "стала")} немного умнее'
+    
+
+class ShieldsBook(Book):
+    
+    def __init__(self, game):
+        super().__init__(game)
+    
+            
+    def increase_mastery(self, who) -> str:
+        who.mastery['щит']['level'] += 1
+        return f'{who.name} теперь немного лучше знает, как использовать щиты.'
+    
+
+class ArmorBook(Book):
+    
+    def __init__(self, game):
+        super().__init__(game)
+    
+            
+    def increase_mastery(self, who) -> str:
+        who.mastery['доспехи']['level'] += 1
+        return f'{who.name} теперь немного лучше знает, как пользоваться доспехами.'
+

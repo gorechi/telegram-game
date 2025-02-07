@@ -787,18 +787,18 @@ class Hero:
     def get_hit_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса попадания героем по монстру."""
         
-        weapon_mastery = self.weapon_mastery.get(self.weapon.weapon_type, None)
-        weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
+        mastery = self.mastery.get(self.weapon.weapon_type, None)
+        mastery_level = mastery['level'] if mastery else 0
         weapon_hit_chance = self.weapon.get_hit_chance()
-        return self.check_dext(add=[weapon_mastery_level]) + weapon_hit_chance
+        return self.check_dext(add=[mastery_level]) + weapon_hit_chance
     
     
     def parry_chance(self) -> int:
         """Метод рассчитывает и возвращает значение шанса парирования атаки."""
         
-        weapon_mastery = self.weapon_mastery.get(self.weapon.weapon_type, None)
-        weapon_mastery_level = weapon_mastery['level'] if weapon_mastery else 0
-        parry_chance = self.check_dext(add=[weapon_mastery_level])
+        mastery = self.mastery.get(self.weapon.weapon_type, None)
+        mastery_level = mastery['level'] if mastery else 0
+        parry_chance = self.check_dext(add=[mastery_level])
         if self.poisoned:
             parry_chance -= self.dext.base_die() // 2
         return max(parry_chance, 0)
@@ -1065,8 +1065,8 @@ class Hero:
         if isinstance(target, Vampire) and self.weapon.element() == 4:
             return target.health
         weapon_attack = self.weapon.attack(target)
-        weapon_mastery = self.weapon_mastery[self.weapon.type]['level']
-        critical_probability = weapon_mastery * Hero._critical_step
+        mastery = self.mastery[self.weapon.type]['level']
+        critical_probability = mastery * Hero._critical_step
         if randint(1, 100) <= critical_probability and not self.poisoned:
             weapon_attack = weapon_attack * Hero._critical_multiplier
         return weapon_attack
@@ -1099,13 +1099,13 @@ class Hero:
         return None    
     
         
-    def increase_weapon_mastery(self) -> str:
+    def increase_mastery(self) -> str:
         """Метод увеличивает мастерство владения определенным типом оружия по итогу схватки."""
         
         if self.weapon.empty:
             return None
         weapon_type = self.weapon.type
-        mastery = self.weapon_mastery.get(weapon_type)
+        mastery = self.mastery.get(weapon_type)
         mastery['counter'] += randint(1, 10)/100
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
@@ -1139,7 +1139,7 @@ class Hero:
                 damage_string,
                 self.break_enemy_shield(target=target, total_attack=total_attack),
                 self.poison_enemy(target=target),
-                self.increase_weapon_mastery()
+                self.increase_mastery()
             ] 
         target.health -= total_damage
         self.rage.reset()
@@ -1228,9 +1228,9 @@ class Hero:
         """Метод генерирует описание мастерства персонажа."""
         
         mastery_text = ''
-        for mastery in self.weapon_mastery:
-            if self.weapon_mastery[mastery]['level'] > 0:
-                mastery_text += f' {mastery} ({self.weapon_mastery[mastery]["level"]})'
+        for mastery in self.mastery:
+            if self.mastery[mastery]['level'] > 0:
+                mastery_text += f' {mastery} ({self.mastery[mastery]["level"]})'
         if mastery_text:
             mastery_text = mastery_text[1::]
             text = f'{self.g("Герой", "Героиня")} обладает знаниями про {normal_count(mastery_text, "(")} оружие.'
