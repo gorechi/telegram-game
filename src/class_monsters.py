@@ -1188,6 +1188,18 @@ class Human(Monster):
         self.empty = False
 
 
+    def want_to_fight(self, fight:'Fight') -> bool:
+        """
+        Метод проверяет, хочет ли монстр участвовать в схватке.
+        """
+        if self.disturbed:
+            return True
+        for fighter in fight.fighters:
+            if isinstance(fighter, Human):
+                return True
+        return False
+    
+
 class Demon(Monster):
     """Класс Human наследует класс Monster и представляет собой тип монстра - демон."""
     

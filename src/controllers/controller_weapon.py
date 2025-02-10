@@ -407,7 +407,7 @@ class WeaponController(Controller):
         
     
     def additional_actions(self, weapon) -> bool:
-        if not type(weapon) == Torch:
+        if type(weapon) is not Torch:
             self.decorate(weapon)
         return True
     
