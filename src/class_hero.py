@@ -1406,81 +1406,6 @@ class Hero:
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
     
     
-    # def show_backpack(self):
-    #     """Метод генерирует описание рюкзака героя."""
-        
-    #     message = []
-    #     if not self.check_light():
-    #         message.append('В комнате слишком темно чтобы рыться в рюкзаке')
-    #     else:
-    #         message += self.backpack.show(self)
-    #         message.append(self.money.show())
-    #         if not self.removed_shield.empty:
-    #             message.append(f'За спиной у {self.g("героя", "героини")} висит {self.removed_shield.get_full_names("nom")}')
-    #     tprint(self.game, message)
-    #     return True
-    
-    
-    # def key_hole(self, direction):
-    #     """Метод генерирует текст сообщения когда герой смотрит через замочную скважину."""
-        
-    #     room = self.current_position
-    #     door = room.doors[Hero._doors_dict[direction]]
-    #     if door.empty:
-    #         message = f'{self.name} осматривает стену и не находит ничего заслуживающего внимания.'
-    #     elif self.fear >= Hero._fear_limit:
-    #         message = f'{self.name} не может заставить себя заглянуть в замочную скважину. Слишком страшно.'
-    #     else:
-    #         what_position = room.position + self.floor.directions_dict[direction]
-    #         room_behind_the_door = self.floor.plan[what_position]
-    #         message = room_behind_the_door.show_through_key_hole(self)
-    #     tprint(self.game, message)
-    #     return True
-       
-    # def look_at_shield(self) -> str:
-    #     """Метод генерирует текст осмотра своего щита."""
-        
-    #     if not self.check_light():
-    #         return 'Из-за темноты нельзя осмотреть даже собственный щит.'
-    #     else:
-    #         return self.shield.show()
-    
-    # def look_at_weapon(self) -> str:
-    #     """Метод генерирует текст осмотра собственного оружия."""
-        
-    #     if not self.check_light():
-    #         return 'В такой темноте оружие можно только ощупать, но это не даст полезной информации.'
-    #     else:
-    #         return self.weapon.show()
-        
-    # def look_at_armor(self) -> str:
-    #     """Метод генерирует текст осмотра своих доспехов."""
-        
-    #     if not self.check_light():
-    #         return 'Так темно, что не видно, что на тебе надето.'
-    #     else:
-    #         return self.armor.show()
-
-    
-    # def look_at_furniture(self, what:str) -> list[str]:
-    #     """Метод генерирует текст осмотра мебели."""
-        
-    #     room = self.current_position
-    #     message = []
-    #     for furniture in room.furniture:
-    #         if furniture.lexemes["accus"].find(what) != -1:
-    #             message += (furniture.show())
-    #             message.append(self.get_trap_text(furniture))
-    #     return message
-    
-    
-    # def get_trap_text(self, item) -> str|None:
-    #     trap = item.trap
-    #     if trap.activated and self.detect_trap(trap):
-    #         return trap.get_detection_text()
-    #     return None
-    
-    
     def detect_trap(self, trap) -> bool:
         """
         Пытается обнаружить ловушку, основываясь на интеллекте героя, его мастерстве обнаружения ловушек и ранениях.
@@ -1496,43 +1421,6 @@ class Hero:
             trap.seen = True
             self.current_position.last_seen_trap = trap
         return trap.seen
-    
-    
-    # def look(self, what:str=''):
-    #     """Метод обрабатывает команду "осмотреть". """
-        
-    #     game = self.game
-    #     room = self.current_position
-    #     if what:
-    #         what = what.lower()
-    #     # if not self.check_light():
-    #     #     tprint(game, 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.')
-    #     #     return
-    #     # if not what:
-    #     #     room.show(game.player)
-    #     #     room.map()
-    #     #     return
-    #     # if what == 'себя':
-    #     #     self.show()
-    #     #     return
-    #     # if what == 'рюкзак':
-    #     #     self.show_backpack()
-    #     #     return
-    #     # if self.floor.directions_dict.get(what):
-    #     #     self.key_hole(what)
-    #     #     return
-    #     # if self.weapon.check_name(what):
-    #     #     tprint(game, self.look_at_weapon())
-    #     #     return
-    #     # if self.shield.check_name(what):
-    #     #     tprint(game, self.look_at_shield())
-    #     #     return
-    #     # if self.armor.check_name(what):
-    #     #     tprint(game, self.look_at_armor())
-    #     #     return
-    #     # if [f for f in room.furniture if f.lexemes["accus"].find(what) != -1]:
-    #     #     tprint(game, self.look_at_furniture(what=what))
-    #         return
 
     
     def check_monster_and_figth(self):
@@ -1547,18 +1435,6 @@ class Hero:
         if monster:
             if monster.aggressive and self.check_light():
                 self.fight(monster)
-    
-    
-    # def go(self, direction:str):
-    #     """Метод обрабатывает команду "идти". """
-        
-    #     direction_number = Hero._doors_dict.get(direction, 5)
-    #     if direction_number == 5:
-    #         tprint(self.game, f'{self.name} не знает такого направления!')
-    #         return False
-    #     if self.check_light():
-    #         return self.go_with_light_on(direction_number)
-    #     return self.go_with_light_off(direction_number)
     
     
     def check_disturbed_monsters (self, who) -> None:
@@ -1590,11 +1466,19 @@ class Hero:
             if not sneak:
                 return sneak_text
         if door.empty or door.locked:
+            if self.check_noise():
+                self.current_position.noise(3)
             return f'В темноте {self.name} врезается во что-то носом.'
         new_position = door.get_another_room(self.current_position)
         self.last_move = move_enum.get_move_by_number(direction)
         self.move(new_position)
         return ''
+    
+
+    def check_noise(self) -> bool:
+        if self.weapon.noisy or self.shield.noisy or self.armor.noisy:
+            return True
+        return False
     
     
     def sneak_through_dark_room(self) -> bool:
@@ -1622,10 +1506,6 @@ class Hero:
         return True
     
     
-    def generate_noise(self, noise_level:int) -> None:
-        return
-    
-    
     def check_if_going_back(self, direction:int) -> bool:
         return direction == self.last_move.countermove
        
@@ -1643,21 +1523,6 @@ class Hero:
     
     def fight(self, enemy=None, enemy_started:bool=False):
         """Метод обрабатывает команду "атаковать". """
-        
-        # monsters_in_room = room.monsters()
-        # if not monsters_in_room:
-        #     tprint(self.game, 'Не нужно кипятиться. Тут некого атаковать')
-        #     return False
-        # monsters_to_fight = []
-        # if enemy:
-        #     for monster in monsters_in_room:
-        #         if monster.check_name(enemy):
-        #             monsters_to_fight.append(monster)
-        #     if not monsters_to_fight:
-        #         tprint(self.game, f'{self.name} не может атаковать. В комнате нет такого существа.')
-        #         return False
-        # if not enemy:
-        #     monsters_to_fight = monsters_in_room
         if enemy_started:
             who_started = enemy
         else:

@@ -612,6 +612,52 @@ class Room:
         self.action_controller.add_actions(self)
     
     
+    def noise(self, noise_level:int, noise_source=None):
+        """
+        Функция распространения шума по замку.
+        """
+        self.noise_trigger(noise_source)
+        available_rooms = self.get_rooms_around()
+        if noise_level > 1:
+            for next_room in available_rooms:
+                next_room.noise(noise_level - 1, self)
+        return True
+    
+
+    def stink(self, stink_level:int):
+        """
+        Функция распространения вони по замку.
+        """
+        if self.stink >= stink_level:
+            return True
+        else:
+            self.stink = stink_level
+        available_rooms = self.get_rooms_around()
+        if stink_level > 1:
+            for next_room in available_rooms:
+                self.stink(next_room, stink_level - 1)
+        return True
+    
+    
+    def get_rooms_around(self) -> list:
+        """
+        Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
+        """
+        available_rooms = []
+        for door in self.doors:
+            if door and not door.locked and not door.empty:
+                available_rooms.append(door.get_another_room(self))
+        if self.ladder_down and not self.ladder_down.locked:
+            available_rooms.append(self.ladder_down.room_down)
+        if self.ladder_up and not self.ladder_up.locked:
+            available_rooms.append(self.ladder_up.room_up)
+        return available_rooms
+    
+
+    def noise_trigger(self, noise_source):
+        return
+    
+    
     def link_doors(self):
         for door in self.doors:
             door.rooms.append(self)
