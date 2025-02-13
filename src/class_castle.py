@@ -21,25 +21,20 @@ class Floor:
         return True
     
     
-    def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
-        """
-        Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
-        """
-        floor = room.floor
-        directions = {0: -floor.rooms,
-                      1: 1,
-                      2: floor.rooms,
-                      3: -1}
-        available_rooms = []
-        for door in room.doors:
-            if door and not door.locked and not door.empty:
-                available_rooms.append(door.get_another_room(room))
-        if ladders:
-            if room.ladder_down and not room.ladder_down.locked:
-                available_rooms.append(room.ladder_down.room_down)
-            if room.ladder_up and not room.ladder_up.locked:
-                available_rooms.append(room.ladder_up.room_up)
-        return available_rooms
+    # def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
+    #     """
+    #     Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
+    #     """
+    #     available_rooms = []
+    #     for door in room.doors:
+    #         if door and not door.locked and not door.empty:
+    #             available_rooms.append(door.get_another_room(room))
+    #     if ladders:
+    #         if room.ladder_down and not room.ladder_down.locked:
+    #             available_rooms.append(room.ladder_down.room_down)
+    #         if room.ladder_up and not room.ladder_up.locked:
+    #             available_rooms.append(room.ladder_up.room_up)
+    #     return available_rooms
     
     
     def create_ladders(self, next_floor) -> bool:
@@ -257,21 +252,21 @@ class Floor:
         return [i for i in self.plan if i.secret_word]
     
     
-    def stink(self, room:Room, stink_level:int):
-        """
-        Функция распространения вони по замку.\n
-        Распространяет вонь через открытые и закрытые двери, постепенно уменьшая уровень.\n
-        Уровень вони записывается в параметр stink комнаты.
-        """
-        if room.stink >= stink_level:
-            return True
-        else:
-            room.stink = stink_level
-        available_rooms = self.get_rooms_around(room)
-        if stink_level > 1:
-            for next_room in available_rooms:
-                self.stink(next_room, stink_level - 1)
-        return True
+    # def stink(self, room:Room, stink_level:int):
+    #     """
+    #     Функция распространения вони по замку.\n
+    #     Распространяет вонь через открытые и закрытые двери, постепенно уменьшая уровень.\n
+    #     Уровень вони записывается в параметр stink комнаты.
+    #     """
+    #     if room.stink >= stink_level:
+    #         return True
+    #     else:
+    #         room.stink = stink_level
+    #     available_rooms = self.get_rooms_around(room)
+    #     if stink_level > 1:
+    #         for next_room in available_rooms:
+    #             self.stink(next_room, stink_level - 1)
+    #     return True
 
     
     def stink_map(self):

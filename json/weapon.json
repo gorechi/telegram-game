@@ -15,6 +15,7 @@
       "колет"
     ], 
     "gender": 0,
+    "noisy": true,
     "name": "Меч", 
     "weapon_type": "рубящее", 
     "twohanded": false,
@@ -47,6 +48,7 @@
       "колет"
     ], 
     "gender": 0,
+    "noisy": true,
     "name": "Двуручный меч", 
     "weapon_type": "рубящее", 
     "twohanded": true,
@@ -80,6 +82,7 @@
       "вспарывает"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Сабля", 
     "weapon_type": "рубящее", 
     "twohanded": false,
@@ -112,6 +115,7 @@
       "вспарывает"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Катана", 
     "weapon_type": "рубящее", 
     "twohanded": true,
@@ -145,6 +149,7 @@
       "вспарывает"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Рапира", 
     "weapon_type": "колющее", 
     "twohanded": false,
@@ -178,6 +183,7 @@
       "вспарывает"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Пика", 
     "weapon_type": "колющее", 
     "twohanded": true,
@@ -210,6 +216,7 @@
       "протыкает"
     ], 
     "gender": 2,
+    "noisy": true,
     "name": "Копье", 
     "weapon_type": "колющее", 
     "twohanded": true,
@@ -243,6 +250,7 @@
       "бьет"
     ], 
     "gender": 0,
+    "noisy": true,
     "name": "Топор", 
     "weapon_type": "рубящее", 
     "twohanded": false,
@@ -276,6 +284,7 @@
       "бьет"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Секира", 
     "weapon_type": "рубящее", 
     "twohanded": true,
@@ -309,6 +318,7 @@
       "вспарывает"
     ], 
     "gender": 0,
+    "noisy": false,
     "name": "Кинжал", 
     "weapon_type": "колющее", 
     "twohanded": false,
@@ -342,6 +352,7 @@
       "шарахает"
     ], 
     "gender": 1,
+    "noisy": false,
     "name": "Дубина", 
     "weapon_type": "ударное", 
     "twohanded": false,
@@ -375,6 +386,7 @@
       "шарахает"
     ], 
     "gender": 1,
+    "noisy": false,
     "name": "Палица", 
     "weapon_type":"ударное", 
     "twohanded": false,
@@ -409,6 +421,7 @@
       "стукает"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Булава", 
     "weapon_type": "ударное", 
     "twohanded": false,
@@ -442,6 +455,7 @@
       "крушит"
     ], 
     "gender": 0,
+    "noisy": true,
     "name": "Молот", 
     "weapon_type": "ударное", 
     "twohanded": true,
@@ -475,6 +489,7 @@
       "ранит"
     ], 
     "gender": 1,
+    "noisy": true,
     "name": "Шпага", 
     "weapon_type": "колющее", 
     "twohanded": false,
@@ -507,7 +522,8 @@
       "колотит"
     ], 
     "gender": 0,
-    "name": "Факел", 
+    "name": "Факел",
+    "noisy": false, 
     "weapon_type": "ударное", 
     "twohanded": false,
     "damage": {

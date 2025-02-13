@@ -17,6 +17,7 @@ class ProtectionController(Controller):
         protection: dict
         enchantable: bool
         actions: list
+        noisy: bool
         
     _classes = {
         "Armor": Armor,

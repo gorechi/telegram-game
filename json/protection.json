@@ -3,6 +3,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Круглый щит",
     "lexemes": {
       "nom": "Круглый щит",
@@ -27,6 +28,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Большой щит",
     "lexemes": {
       "nom": "Большой щит",
@@ -51,6 +53,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Малый щит",
     "lexemes": {
       "nom": "Малый щит",
@@ -75,6 +78,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Старый щит",
     "lexemes": {
       "nom": "Старый щит",
@@ -99,6 +103,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Тяжелый щит",
     "lexemes": {
       "nom": "Тяжелый щит",
@@ -123,6 +128,7 @@
     "class_name": "Shield",
     "gender": 0,
     "protection_type": "щит",
+    "noisy": true,
     "name": "Новый щит",
     "lexemes": {
       "nom": "Новый щит",
@@ -146,6 +152,7 @@
   {
     "class_name": "Armor",
     "protection_type": "кованый",
+    "noisy": true,
     "gender": 1,
     "name": "кираса",
     "lexemes": {
@@ -170,6 +177,7 @@
   {
     "class_name": "Armor",
     "protection_type": "кованый",
+    "noisy": true,
     "gender": 1,
     "name": "броня",
     "lexemes": {
@@ -194,6 +202,7 @@
   {
     "class_name": "Armor",
     "protection_type": "кованый",
+    "noisy": true,
     "gender": 1,
     "name": "кольчуга",
     "lexemes": {
@@ -218,6 +227,7 @@
   {
     "class_name": "Armor",
     "protection_type": "кожаный",
+    "noisy": false,
     "gender": 1,
     "name": "защита",
     "lexemes": {

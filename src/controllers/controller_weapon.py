@@ -393,6 +393,7 @@ class WeaponController(Controller):
         hit_chance: dict
         twohanded: bool
         fencing: bool
+        noisy: bool
         
     _classes = {
         "Weapon": Weapon,
