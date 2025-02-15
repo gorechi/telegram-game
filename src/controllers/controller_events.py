@@ -51,7 +51,7 @@ class EventsController():
     
     def execute_event(self, event) -> None:
         method = getattr(event.subject, event.subject_method_name, None)
-        if method:
+        if method and callable(method):
             method(event.object)
 
     
