@@ -93,37 +93,43 @@ class Matches:
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "пересчитать": {
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "посчитать": {
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             }
         self.room_actions = {
@@ -131,19 +137,22 @@ class Matches:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
 
@@ -298,43 +307,50 @@ class Map:
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 2
                 },
             "использовать": {
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 2
                 },
             "прочитать": {
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 2
                 },
             "читать": {
                 "method": "show",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 2
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             }
         self.room_actions = {
@@ -342,19 +358,22 @@ class Map:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
     
@@ -501,19 +520,22 @@ class Key:
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
         }
         self.room_actions = {
@@ -521,19 +543,22 @@ class Key:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
 

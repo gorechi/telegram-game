@@ -10,37 +10,43 @@ class Book:
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 5
                 },
             "прочитать": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 5
                 },
             "почитать": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 5
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             }
         self.room_actions = {
@@ -48,19 +54,22 @@ class Book:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
 

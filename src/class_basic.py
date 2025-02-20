@@ -1,4 +1,4 @@
-from src.functions.functions import howmany, tprint
+from src.functions.functions import howmany
 
 from typing import Union
 
@@ -154,19 +154,22 @@ class Money:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
 

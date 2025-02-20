@@ -68,7 +68,8 @@ class Ladder:
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_unlock",
-                "condition": "is_locked"
+                "condition": "is_locked",
+                "duration": 2
                 },
             "спуститься": {
                 "method": "go_down",
@@ -76,7 +77,8 @@ class Ladder:
                 "in_combat": False,
                 "in_darkness": True,
                 "presentation": "show_for_go",
-                "condition": "going_down"
+                "condition": "going_down",
+                "duration": 1
                 },
             "подняться": {
                 "method": "go_up",
@@ -84,7 +86,8 @@ class Ladder:
                 "in_combat": False,
                 "in_darkness": True,
                 "presentation": "show_for_go",
-                "condition": "going_up"
+                "condition": "going_up",
+                "duration": 1
                 },
         }
     
@@ -215,14 +218,16 @@ class Door:
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "show_for_unlock",
-                "condition": "is_locked"
+                "condition": "is_locked",
+                "duration": 2
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_unlock"
+                "presentation": "show_for_unlock",
+                "duration": 1
                 },
             "идти": {
                 "method": "go",
@@ -230,7 +235,8 @@ class Door:
                 "in_combat": False,
                 "in_darkness": True,
                 "presentation": "show_for_unlock",
-                "post_process": "check_disturbed_monsters"
+                "post_process": "check_disturbed_monsters",
+                "duration": 1
                 },
         }
     
@@ -586,27 +592,31 @@ class Room:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 2
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map_for_examine"
+                "post_process": "map_for_examine",
+                "duration": 1
                 },
             "осмотреться": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map_for_examine"
+                "post_process": "map_for_examine",
+                "duration": 1
                 },
             "оглядеться": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "map_for_examine"
+                "post_process": "map_for_examine",
+                "duration": 1
                 },
         }
         self.action_controller.add_actions(self)

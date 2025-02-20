@@ -131,47 +131,54 @@ class Hero:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 10
                 },
             "отдыхать": {
                 "method": "rest",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 10
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "name_for_examine"
+                "presentation": "name_for_examine",
+                "duration": 1
                 },
             "лечиться": {
                 "method": "heal",
                 "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
-                "presentation": "name_for_examine"
+                "presentation": "name_for_examine",
+                "duration": 3
                 },
             "лечить": {
                 "method": "heal",
                 "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
-                "presentation": "name_for_examine"
+                "presentation": "name_for_examine",
+                "duration": 3
                 },
             "вылечиться": {
                 "method": "heal",
                 "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
-                "presentation": "name_for_examine"
+                "presentation": "name_for_examine",
+                "duration": 3
                 },
             "вылечить": {
                 "method": "heal",
                 "bulk": False,
                 "in_combat": True,
                 "in_darkness": True,
-                "presentation": "name_for_examine"
+                "presentation": "name_for_examine",
+                "duration": 3
                 },
             }
         
@@ -725,9 +732,12 @@ class Hero:
     
     def bulk_actions(self, items:list) -> list:
         items_for_bulk_actions = [item for item in items if item.bulk]
+        total_duration = 0
         for item in items_for_bulk_actions:
             tprint(self.game, item.action(self))
+            total_duration += item.duration
             items.remove(item)
+        self.game.events_controller.execute_all_events(total_duration)
         return items
             
 
@@ -754,6 +764,7 @@ class Hero:
         self.decrease_restless(2)
         if item.post_process:
             item.post_process(self)
+        self.game.events_controller.execute_all_events(item.duration)
         return True
     
     

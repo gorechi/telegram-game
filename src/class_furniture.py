@@ -25,20 +25,23 @@ class Furniture:
                 "in_combat": False,
                 "in_darkness": False,
                 "condition": "is_locked",
-                "post_process": "after_unlock"
+                "post_process": "after_unlock",
+                "duration": 2
                 },
             "обыскать": {
                 "method": "search",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "after_search"
+                "post_process": "after_search",
+                "duration": 2
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 1
                 },
         }
 

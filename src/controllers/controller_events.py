@@ -9,6 +9,7 @@ class EventsController():
         event_object: object = None
         subject_method_name: str
         counter: int = 0
+        parameters: dict = None
     
     def __init__(self, game):
         self.game = game
@@ -28,13 +29,15 @@ class EventsController():
                      event_subject: object,
                      method_name: str,
                      event_object: object = None,
-                     counter: int = 0
+                     counter: int = 0,
+                     parameters: dict = None
                      ) -> None:
         new_event = EventsController.Event(
             event_subject=event_subject,
             event_object=event_object,
             subject_method_name=method_name,
-            counter=counter
+            counter=counter,
+            parameters=parameters
         )
         if counter > 0:
             self.pending_events.append(new_event)
