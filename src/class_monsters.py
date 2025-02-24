@@ -155,11 +155,44 @@ class Monster:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
+                "condition": "is_not_hiding",
                 "presentation": "get_name_for_being_attacked",
                 "duration": 20
                 },
         }
         
+    def is_not_hiding(self):
+        return not self.hide
+    
+    
+    def attack_from_ambush(self, who):
+        self.stop_hiding()
+        self.fight(who)
+        
+        
+    def stop_hiding(self):
+        self.hide = False
+        self.hiding_place = None
+    
+    
+    def fight(self, enemy=None):
+        """
+        Монстр инициирует схватку с врагом. 
+        """
+        enemies_to_fight = [self, enemy]
+        if enemy.is_hero():
+            hero = enemy
+        else:
+            hero = None
+        new_fight = Fight(
+            game=self.game, 
+            hero=hero, 
+            who_started=self, 
+            fighters=enemies_to_fight
+            )
+        new_fight.start()
+        return True
+    
     
     def want_to_fight(self, fight:'Fight') -> bool:
         """

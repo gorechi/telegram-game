@@ -3,14 +3,6 @@ from src.functions.functions import randomitem, roll
 class Trap:
     """
     Класс, представляющий ловушку.
-
-    Атрибуты:
-        game (Game): Экземпляр игры, связанный с ловушкой.
-        activated (bool): Указывает, активирована ли ловушка.
-
-    Методы:
-        __init__(game): Инициализирует ловушку с данным экземпляром игры.
-        deactivate() -> bool: Обезвреживает ловушку и возвращает True.
     """
     
     types = [
@@ -31,7 +23,7 @@ class Trap:
     ]
     
     
-    def __init__(self, game, where=None, limit=0):
+    def __init__(self, game):
         self.game = game
         self.activated = False
         self.seen = False
@@ -83,16 +75,6 @@ class Trap:
     def trigger(self, target) -> list[str]:
         """
         Активирует ловушку и применяет её эффекты к цели.
-
-        Этот метод копирует список типов ловушек, выбирает случайный тип и применяет соответствующее действие к цели.
-        Если у ловушки нет метода для выбранного типа, возбуждается исключение.
-        После активации ловушка деактивируется, становится видимой и помечается как сработавшая.
-
-        Args:
-            target: Цель, к которой применяется эффект ловушки.
-
-        Returns:
-            Список строк с сообщениями о последствиях активации ловушки.
         """
         types = Trap.types.copy()
         message = ['От неловкого прикосновения в ловушка начинает противно щелкать, а потом взрывается.']
@@ -150,4 +132,9 @@ class Trap:
         if target.backpack.empty:
             return False
         return True
- """        
+ """
+ 
+class StrengthTrap(Trap):
+     
+     def __init__(self, game):
+        super().__init__(game)
