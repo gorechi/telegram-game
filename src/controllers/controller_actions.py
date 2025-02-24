@@ -28,6 +28,7 @@ class ActionController():
         presentation: object = None
         condition: object = None
         post_process: object = None
+        duration: int = 1
           
     
     def __init__(self, game, hero=None, room=None, fight=None):
@@ -90,6 +91,7 @@ class ActionController():
             presentation = presentation_method,
             condition = condition_method,
             post_process = post_process_method,
+            duration = value.get("duration", 1)
             )
         return new_item
     

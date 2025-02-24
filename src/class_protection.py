@@ -172,14 +172,16 @@ class Armor(Protection):
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_examine_hero"
+                "presentation": "show_for_examine_hero",
+                "duration": 1
                 },
         }
         self.room_actions = {
@@ -187,26 +189,30 @@ class Armor(Protection):
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "брать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "собрать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 1
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_examine_room"
+                "presentation": "show_for_examine_room",
+                "duration": 1
                 },
         }
   
@@ -342,68 +348,79 @@ class Shield (Protection):
                 "method": "take_out",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "экипировать": {
                 "method": "take_out",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "достать": {
                 "method": "take_out",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выбрать": {
                 "method": "take_out",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "чинить": {
                 "method": "repair",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 5
                 },
             "починить": {
                 "method": "repair",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 5
                 },
             "убрать": {
                 "method": "take_away",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": True,
                 "in_darkness": False,
-                "presentation": "show_for_examine_hero"
+                "presentation": "show_for_examine_hero",
+                "duration": 1
                 },
             }
         self.room_actions = {
@@ -411,26 +428,30 @@ class Shield (Protection):
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "подобрать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_examine_room"
+                "presentation": "show_for_examine_room",
+                "duration": 1
                 },
         }
     

@@ -1,4 +1,4 @@
-from src.functions.functions import randomitem, tprint
+from src.functions.functions import randomitem
 
 class Rune:
     
@@ -31,19 +31,22 @@ class Rune:
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             }
         self.room_actions = {
@@ -51,19 +54,22 @@ class Rune:
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
          

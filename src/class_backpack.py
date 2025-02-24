@@ -26,6 +26,7 @@ class Backpack:
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "get_name_for_show",
+                "duration": 1
                 },
             "проверить": {
                 "method": "show",
@@ -33,24 +34,28 @@ class Backpack:
                 "in_combat": False,
                 "in_darkness": False,
                 "presentation": "get_name_for_show",
+                "duration": 1
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
+                "duration": 0
                 },
             "снять": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
+                "duration": 0
                 },
         }
         self.room_actions = {
@@ -58,19 +63,22 @@ class Backpack:
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "забрать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
         }
 

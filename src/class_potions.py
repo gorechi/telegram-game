@@ -8,26 +8,52 @@ class Potion:
         self.game = game
         self.empty = False
         self.owner = None
+        self.hero_actions = {
+            "бросить": {
+                "method": "drop",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "duration": 0
+                },
+            "выбросить": {
+                "method": "drop",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "duration": 0
+                },
+            "оставить": {
+                "method": "drop",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "duration": 0
+                },
+            }
         self.room_actions = {
             "взять": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": True,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 }
-        }
+            }
 
 
     
@@ -106,42 +132,27 @@ class HealPotion(Potion):
     
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
         
@@ -167,42 +178,27 @@ class HealthPotion(Potion):
 
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
     
@@ -221,7 +217,7 @@ class StrengthPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
@@ -236,24 +232,6 @@ class StrengthPotion(Potion):
                 },
             "попить": {
                 "method": "use",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True
@@ -275,42 +253,27 @@ class StrengtheningPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
     
@@ -328,42 +291,27 @@ class DexterityPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
 
@@ -382,42 +330,27 @@ class EvasionPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
         
@@ -435,42 +368,27 @@ class IntelligencePotion(Potion):
     
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
         
@@ -489,42 +407,27 @@ class EnlightmentPotion(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
         
@@ -542,42 +445,27 @@ class Antidote(Potion):
             
     def __init__(self, game):
         super().__init__(game)
-        self.hero_actions = {
+        self.hero_actions |= {
             "пить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
-                },
-            "бросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "выбросить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
-                },
-            "оставить": {
-                "method": "drop",
-                "bulk": False,
-                "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
 

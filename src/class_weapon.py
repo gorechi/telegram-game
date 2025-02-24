@@ -33,37 +33,43 @@ class Weapon:
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "экипировать": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбрать": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": True,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "бросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "выбросить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "оставить": {
                 "method": "drop",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 0
                 },
             "сменить": {
                 "method": "change",
@@ -71,6 +77,7 @@ class Weapon:
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
+                "duration": 0
                 },
             "поменять": {
                 "method": "change",
@@ -78,13 +85,15 @@ class Weapon:
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "name_for_change",
+                "duration": 0
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_examine_hero"
+                "presentation": "show_for_examine_hero",
+                "duration": 1
                 },
             }
         self.room_actions = {
@@ -92,26 +101,30 @@ class Weapon:
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "брать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "собрать": {
                 "method": "take",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": False
+                "in_darkness": False,
+                "duration": 0
                 },
             "осмотреть": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "presentation": "show_for_examine_room"
+                "presentation": "show_for_examine_room",
+                "duration": 1
                 },
         }
 
@@ -382,7 +395,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_hero",
-                "condition": "is_not_burning"
+                "condition": "is_not_burning",
+                "duration": 1
                 },
             "зажечь": {
                 "method": "fire",
@@ -390,7 +404,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_hero",
-                "condition": "is_not_burning"
+                "condition": "is_not_burning",
+                "duration": 1
                 },
             "потушить": {
                 "method": "extinguish",
@@ -398,7 +413,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_hero",
-                "condition": "is_burning"
+                "condition": "is_burning",
+                "duration": 1
                 },
         }
         self.room_actions |= {
@@ -408,7 +424,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_room",
-                "condition": "is_not_burning"
+                "condition": "is_not_burning",
+                "duration": 1
                 },
             "зажечь": {
                 "method": "fire_in_room",
@@ -416,7 +433,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_room",
-                "condition": "is_not_burning"
+                "condition": "is_not_burning",
+                "duration": 1
                 },
             "потушить": {
                 "method": "extinguish_in_room",
@@ -424,7 +442,8 @@ class Torch(Weapon):
                 "in_combat": True,
                 "in_darkness": True,
                 "presentation": "show_for_examine_room",
-                "condition": "is_burning"
+                "condition": "is_burning",
+                "duration": 1
                 },
         }
         self.burning = False

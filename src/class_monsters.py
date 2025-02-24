@@ -155,7 +155,8 @@ class Monster:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": True,
-                "presentation": "get_name_for_being_attacked"
+                "presentation": "get_name_for_being_attacked",
+                "duration": 20
                 },
         }
         
@@ -1337,19 +1338,22 @@ class Corpse():
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "post_process": "after_search"
+                "post_process": "after_search",
+                "duration": 2
                 },
             "изучить": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 2
                 },
             "изучать": {
                 "method": "examine",
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
+                "duration": 2
                 },
         }
         self.place(room)

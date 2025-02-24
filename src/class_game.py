@@ -8,6 +8,7 @@ from src.controllers.controller_potions import PotionsController
 from src.controllers.controller_runes import RunesController
 from src.controllers.controller_furniture import FurnitureController
 from src.controllers.controller_floors import FloorsController
+from src.controllers.controller_events import EventsController
 
 
 class Empty():
@@ -54,6 +55,7 @@ class Game():
         self.runes_controller = RunesController(self)
         self.furniture_controller = FurnitureController(self)
         self.floors_controller = FloorsController(self)
+        self.events_controller = EventsController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')
