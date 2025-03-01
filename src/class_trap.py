@@ -1,4 +1,4 @@
-from src.functions.functions import randomitem, roll
+from src.functions.functions import randomitem
 
 class Trap:
     """
@@ -28,9 +28,6 @@ class Trap:
         self.activated = False
         self.seen = False
         self.triggered = False
-        self.difficulty = self.set_difficulty(limit)
-        self.detection_text = None
-        self.where = where
         self.actions = {
             'intel': self.damage_intel,
             'stren': self.damage_stren,
@@ -41,19 +38,6 @@ class Trap:
         }
     
     
-    def get_detection_text(self) -> str:
-        if self.detection_text:
-            return self.detection_text
-        texts = Trap.detection_texts
-        text = randomitem(texts)
-        self.detection_text = text
-        return text     
-    
-    
-    def set_difficulty(self, limit:int):
-        self.difficulty = roll([limit])
-        
-
     def get_disarm_difficulty(self) -> int:
         return self.difficulty * 2
     
@@ -133,8 +117,3 @@ class Trap:
             return False
         return True
  """
- 
-class StrengthTrap(Trap):
-     
-     def __init__(self, game):
-        super().__init__(game)
