@@ -4,7 +4,6 @@ from src.class_furniture import Furniture
 from src.class_controller import Controller
 from src.class_dice import Dice
 from src.class_basic import Money, Loot
-from src.class_room import Trap
 from src.functions.functions import randomitem
 
 class FurnitureController(Controller):
@@ -72,5 +71,5 @@ class FurnitureController(Controller):
         
     
     def add_trap(self, furniture: Furniture):
-        new_trap = Trap(self.game, furniture)
+        new_trap = self.game.traps_controller.get_random_object_by_filters()
         furniture.trap = new_trap

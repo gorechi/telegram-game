@@ -58,7 +58,7 @@ class Controller:
     
     
     def create_object_from_template(self, template):
-        """Создает монстра из шаблона"""
+        """Создает объект из шаблона"""
 
         if not isinstance(template, self.__class__.Template):
             raise TypeError(f"Параметр 'template' должен быть экземпляром класса Template, а передан {type(template)} {template}.")

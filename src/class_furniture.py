@@ -157,8 +157,14 @@ class Furniture:
         #     tprint(game, f'К несчастью в {what_to_search:prep} кто-то установил ловушку.')
         #     what_to_search.trap.trigger(self)
         #     return False
-        # if self.check_monster_in_ambush(place=what_to_search):
-        #     return False
+        monster = self.monster_in_ambush()
+        if monster:
+            self.game.events_controller.create_event(
+                event_subject = monster,
+                method_name = 'attack_from_ambush',
+                event_object = who
+            )
+            return False
         if self.loot == 0:
             return f'{self.name} {self.empty_text}'.capitalize()
         message = [f'{who.name} осматривает {self:accus} и находит:']
