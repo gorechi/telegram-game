@@ -13,15 +13,7 @@ class Trap:
         #'weapon',
         #'backpack'
     ]
-    
-    detection_texts = [
-        'Сбоку отчетливо виден какой-то странный механизм.',
-        'Тоненький волосок прикреплен к крышке.',
-        'Изнутри слышно какое-то странное пощелкивание.',
-        'В щели между крышкой и корпусом видно натянутую нитку.',
-        'Кто-то явно что-то делал с крышкой - щель с одной стороны шире, чем с другой.'
-    ]
-    
+        
     
     def __init__(self, game):
         self.game = game
@@ -40,6 +32,10 @@ class Trap:
     
     def get_disarm_difficulty(self) -> int:
         return self.difficulty * 2
+    
+
+    def get_detection_text(self) -> str:
+        return self.detection_text
     
     
     def deactivate(self) -> bool:

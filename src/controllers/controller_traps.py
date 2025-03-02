@@ -10,12 +10,9 @@ class TrapsController(Controller):
     @dataclass
     class Template():
         class_name: str
-        can_use_in_fight: bool
         name: str
-        effect: int
         description: str
         lexemes: dict
-        base_price: int
 
     detection_texts = [
         'Сбоку отчетливо виден какой-то странный механизм.',
@@ -38,17 +35,10 @@ class TrapsController(Controller):
     
     
     def additional_actions(self, trap) -> bool:
-        self.set_difficulty(trap)
         self.set_detection_text(trap)
         return True
     
 
-    def set_difficulty(self, trap):
-        return
-    
-
-    def get_detection_text(self, trap):
-        texts = TrapsController.detection_texts
-        text = randomitem(texts)
-        trap.detection_text = text
+    def set_detection_text(self, trap):
+        trap.detection_text = randomitem(TrapsController.detection_texts)
         return
