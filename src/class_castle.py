@@ -249,7 +249,8 @@ class Floor:
         """
         Возвращает список комнат, в которых есть секретные тайные места
         """
-        return [i for i in self.plan if i.secret_word]
+        return list()
+        # return [i for i in self.plan if i.has_secrets()]
     
     
     # def stink(self, room:Room, stink_level:int):

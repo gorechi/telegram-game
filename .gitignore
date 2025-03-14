@@ -127,3 +127,4 @@ dmypy.json
 .idea/workspace.xml
 test.py
 constants.py
+.qodo

@@ -10,6 +10,7 @@ from src.controllers.controller_furniture import FurnitureController
 from src.controllers.controller_floors import FloorsController
 from src.controllers.controller_events import EventsController
 from src.controllers.controller_traps import TrapsController
+from src.controllers.controller_secret_places import SecretPlacesController
 
 
 class Empty():
@@ -58,6 +59,7 @@ class Game():
         self.floors_controller = FloorsController(self)
         self.events_controller = EventsController(self)
         self.traps_controller = TrapsController(self)
+        self.secret_places_controller = SecretPlacesController(self)
         self.all_corpses = []
         self.all_traders = []
         self.no_weapon = self.weapon_controller.get_empty_object_by_class_name('Weapon')

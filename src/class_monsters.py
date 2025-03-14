@@ -971,7 +971,7 @@ class Monster:
             self.hiding_place = randomitem(places_to_hide)
         if self.stink:
             print(f'Монстр воняет в комнате {room.position}.')
-            room.stink(3)
+            room.set_stink(3)
             floor.stink_map()
         self.floor = floor
         room.action_controller.add_actions(self)

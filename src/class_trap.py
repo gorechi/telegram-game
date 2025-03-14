@@ -50,6 +50,13 @@ class Trap:
             return False
         self.activated = True
         return True
+    
+
+    def on_create(self):
+        """ 
+        Метод вызывается после создания экземпляра класса. Ничего не делает. 
+        """
+        return True
       
     
     def trigger(self, target) -> list[str]:
