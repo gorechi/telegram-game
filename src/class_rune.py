@@ -102,21 +102,30 @@ class Rune:
         return True
 
     
-    def place(self, castle, room=None) -> bool:
+    def place(self, floor, room=None) -> bool:
         """ 
-        Метод раскидывания рун по замку. 
+        Метод раскидывания рун по этажу замка. 
         """
-        rooms_with_secrets = castle.secret_rooms()
         if not room:
-            rooms = castle.plan
-            room = randomitem(rooms)
-        if room in rooms_with_secrets:
-            room.secret_loot.add(self)
-        elif room.furniture:
+            secret = self.game.secret_places_controller.get_random_secret_by_floor(floor)
+            if secret:
+                secret.loot.add(self)
+                return True
+            else:
+                room = randomitem(floor.plan)
+        return self.place_in_room(room)
+          
+        
+    def place_in_room(self, room) -> bool:    
+        secret = self.game.secret_places_controller.get_random_secret_by_room(room)
+        if secret:
+            secret.loot.add(self)
+            return True
+        if room.furniture:
             furniture = randomitem(room.furniture)
             furniture.put(self)
-        else:
-            room.loot.add(self)
+            return True
+        room.loot.add(self)
         room.action_controller.add_actions(self)
         return True
 
