@@ -99,7 +99,7 @@ class Controller:
     
 
     def create_object_by_name(self, name:str):
-        """Создает монстра по имени"""
+        """Создает объект по имени"""
         
         template = self.get_template_by_name(name)
         if not template:

@@ -6,10 +6,10 @@ class EventsController():
     @dataclass
     class Event():
         event_subject: object
-        event_object: object = None
         subject_method_name: str
         counter: int = 0
         parameters: dict = None
+        event_object: object = None
     
     def __init__(self, game):
         self.game = game

@@ -1,4 +1,4 @@
-from random import randint, sample
+from random import randint, sample, choice
 
 from PIL import Image, ImageDraw, ImageFont
 from telebot import types
@@ -45,16 +45,8 @@ def roll(dice:list|tuple) -> int:
 
 
 def randomitem(items_list, how_many:int=1, need_number:bool=False):
-    """Возвращает случайные элементы списка
-
-    Args:
-        items_list - список, из которого нужно начитать случайный элемент\n
-        need_number (boolean) - признак того, что кроме самого элемента нужно вернуть и его номер в списке\n
-        how_many (integer) - число случайных элементов списка, которые нужно вернуть\n
-
-    Returns:
-        Если how_many = 1, возвращается один случайный элемент списка items_list\n
-        Если how_many > 1, возвращается список из how_many случайных элементов списка items_list. Элементы не повторяются.
+    """
+    Возвращает случайные элементы списка или кортежа
     """
     if not (isinstance(items_list, list) or isinstance(items_list, tuple)):
         raise TypeError('В метод randomitem передан не массив или кортеж')
@@ -69,6 +61,18 @@ def randomitem(items_list, how_many:int=1, need_number:bool=False):
             return item, index
         return item
     return sample(items_list, how_many)
+
+
+def randomitem_dict(dictionary):
+    """
+    Возвращает случайные элементы словаря
+    """
+    if not isinstance(dictionary, dict):
+        raise TypeError('В метод randomitem_dict передан не словарь')
+    if not dictionary:
+        raise ValueError('В метод randomitem_dict передан пустой словарь')
+    random_key = choice(list(dictionary.keys()))
+    return random_key, dictionary[random_key]
 
 
 def howmany(number:int, options_list:list[str]) -> str:

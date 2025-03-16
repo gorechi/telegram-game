@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.class_castle import Floor
-from src.class_room import Room, Door, Ladder
+from src.class_room import Room, Door
 from src.class_controller import Controller
 from src.class_basic import Money
 from src.class_items import Key

@@ -19,23 +19,7 @@ class Floor:
         Выполняет дополнительные действия после инициации экземпляра класса Floor
         """
         return True
-    
-    
-    # def get_rooms_around(self, room:Room, ladders:bool=True) -> list[Room]:
-    #     """
-    #     Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
-    #     """
-    #     available_rooms = []
-    #     for door in room.doors:
-    #         if door and not door.locked and not door.empty:
-    #             available_rooms.append(door.get_another_room(room))
-    #     if ladders:
-    #         if room.ladder_down and not room.ladder_down.locked:
-    #             available_rooms.append(room.ladder_down.room_down)
-    #         if room.ladder_up and not room.ladder_up.locked:
-    #             available_rooms.append(room.ladder_up.room_up)
-    #     return available_rooms
-    
+        
     
     def create_ladders(self, next_floor) -> bool:
         """
@@ -249,7 +233,8 @@ class Floor:
         """
         Возвращает список комнат, в которых есть секретные тайные места
         """
-        return [i for i in self.plan if i.secret_word]
+        return list()
+        # return [i for i in self.plan if i.has_secrets()]
     
     
     # def stink(self, room:Room, stink_level:int):
