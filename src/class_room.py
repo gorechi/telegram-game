@@ -825,9 +825,7 @@ class Room:
     def generate_secrets(self, secret_places):
         for place in secret_places:
             new_secret = self.game.secret_places_controller.create_object_by_name(place)
-            new_secret.room = self
-            new_secret.floor = self.floor
-            self.secrets.append(new_secret)
+            new_secret.place(self)
         if self.secrets:
             self.has_secrets = True
 
