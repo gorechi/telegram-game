@@ -28,6 +28,7 @@ class ActionController():
         presentation: object = None
         condition: object = None
         post_process: object = None
+        hidden: object = None
         duration: int = 1
           
     
@@ -80,6 +81,7 @@ class ActionController():
         presentation_method = getattr(item, value.get("presentation", ''), None)
         condition_method = getattr(item, value.get("condition", ''), None)
         post_process_method = getattr(item, value.get("post_process", ''), None)
+        hidden_method = getattr(item, value.get("hidden", ''), None)
         new_item = self.Item(
             item = item, 
             names = item_names, 
@@ -91,6 +93,7 @@ class ActionController():
             presentation = presentation_method,
             condition = condition_method,
             post_process = post_process_method,
+            hidden = hidden_method,
             duration = value.get("duration", 1)
             )
         return new_item

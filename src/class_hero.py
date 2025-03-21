@@ -712,6 +712,7 @@ class Hero:
         first_item = items[0]
         if len(items) == 1 and (item or first_item.item == self or first_item.item == self.current_position):
             return self.do_single_action(first_item)
+        items = self.exclude_hidden_items(items)
         items = self.bulk_actions(items)
         if not items:
             tprint(self.game, 'У героя закончились варианты как сделать что-то подобное.') 
@@ -728,6 +729,10 @@ class Hero:
         self.state = state_enum.ACTION
         tprint(self.game, message, 'read')
         return True
+    
+    
+    def exclude_hidden_items(self, items:list) -> list:
+        return [item for item in items if not (callable(item.hidden) and item.hidden())]
     
     
     def bulk_actions(self, items:list) -> list:

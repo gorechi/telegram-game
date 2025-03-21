@@ -16,10 +16,18 @@ class SecretPlace:
                 "bulk": False,
                 "in_combat": False,
                 "in_darkness": False,
-                "condition": "is_revealed",
+                "hidden": "is_not_revealed",
                 "duration": 2
                 },
         }
+
+    
+    def __format__(self, format:str) -> str:
+        return self.lexemes.get(format, '')
+
+    
+    def is_not_revealed(self):
+        return not self.revealed
 
     
     def check_name(self, message:str) -> bool:
@@ -27,7 +35,7 @@ class SecretPlace:
         return message.lower() in names_list
     
 
-    def get_names_list(self, cases:list=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         names_list = list()
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -55,10 +63,6 @@ class SecretPlace:
         self.revealed = True
         return message
 
-
-    def is_revealed(self):
-        return self.revealed
-    
 
     def place(self, room):
         self.room = room
