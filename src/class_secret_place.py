@@ -1,6 +1,8 @@
 
 class SecretPlace:
-    
+    """ 
+    Класс серетов, которые могут быть размещены в комнате и скрыты в е описании    
+    """
     def __init__(self, game):
         self.game = game
         self.name = None
@@ -23,19 +25,31 @@ class SecretPlace:
 
     
     def __format__(self, format:str) -> str:
+        """ 
+        Обрабатывает запрос на отображение экземпляра класса в виде форматированной строки 
+        """
         return self.lexemes.get(format, '')
 
     
     def is_not_revealed(self):
+        """ 
+        Возвращает True если секрет еще ни разу не обыскивали
+        """
         return not self.revealed
 
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Отрабатывает запрос на проверку имени экземпляра класса
+        """
         names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
 
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список имен экземпляра класса
+        """
         names_list = list()
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -65,6 +79,9 @@ class SecretPlace:
 
 
     def place(self, room):
+        """ 
+        Размещает секрет в комнате
+        """
         self.room = room
         self.floor = room.floor
         room.secrets.append(self)

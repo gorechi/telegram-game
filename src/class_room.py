@@ -6,7 +6,9 @@ from src.functions.functions import pprint, randomitem, tprint, roll, randomitem
 
 
 class Ladder:
-    
+    """ 
+    Класс лестниц.    
+    """
     _lexemes:dict = {
             "nom": "лестница",
             "accus": "лестницу",
@@ -93,18 +95,30 @@ class Ladder:
     
     
     def going_down(self, room=None) -> bool:
+        """ 
+        Возвращает True если лестница ведет вниз
+        """
         return self.get_direction(room) == 'вниз'
     
 
     def going_up(self, room=None) -> bool:
+        """ 
+        Возвращает True если лестница ведет вверх
+        """
         return self.get_direction(room) == 'вверх'
 
     
     def is_locked(self, room=None) -> bool:
+        """ 
+        Возвращает True если лестница заперта
+        """
         return self.locked
     
     
     def get_direction(self, room) -> str:
+        """ 
+        Возвращает текст направления лестницы из указанной комнаты - вниз или вверх
+        """
         if self.room_down == room:
             return 'вверх'
         if self.room_up == room:
@@ -113,23 +127,35 @@ class Ladder:
     
     
     def go_down(self, who, in_action:bool=False) -> str:
+        """ 
+        Обрабатывает спуск по лестнице
+        """
         if not who.check_light():
             return who.go_down_with_light_off()
         return who.go_down_with_light_on()
 
 
     def go_up(self, who, in_action:bool=False) -> str:
+        """ 
+        Обрабатывает подъем по лестнице
+        """
         if not who.check_light():
             return who.go_up_with_light_off()
         return who.go_up_with_light_on()
 
     
     def show_for_go(self, who) -> str:
+        """ 
+        Возвращает текст описани для команды 'идти'
+        """
         direction = self.get_direction(who.current_position)
         return f'Лестница, ведущая {direction}'
     
 
     def show_for_unlock(self, who) -> str:
+        """ 
+        Возвращает текст описания для команды 'отпереть'
+        """
         room = who.current_position
         direction = self.get_direction(room)
         if direction == 'вверх':
@@ -140,6 +166,9 @@ class Ladder:
     
     
     def unlock(self, who, in_action:bool=False) -> str:
+        """ 
+        Обрабатывает действие Отпереть
+        """
         if not self.locked:
             return 'Лестница не заперта, по ней спокойно можно подниматься и спускаться.'
         room = who.current_position
@@ -153,10 +182,16 @@ class Ladder:
     
     
     def __format__(self, format:str) -> str:
+        """ 
+        Возвращает представление экземпляра класса в виде форматированной строки
+        """
         return self.lexemes.get(format, '')
 
     
     def place(self) -> bool:
+        """ 
+        Размещает лестницу в замке
+        """
         if not isinstance(self.room_down, Room):
             raise TypeError(f'К лестнице привязан неправильный объект {self.room_down.__class__.__name__} в качестве нижней комнаты.')
         self.room_down.ladder_up = self
@@ -169,6 +204,9 @@ class Ladder:
     
     
     def decorate(self) -> None:
+        """ 
+        Генерирует описание и лексемы лестницы
+        """
         self.lexemes = {}
         first_words = randomitem(Ladder._first_decorators)
         second_words = randomitem(Ladder._second_decorators)
@@ -178,18 +216,27 @@ class Ladder:
 
     
     def show_in_room_as_ladder_down(self) -> str:
+        """ 
+        Возвращает текст описания лестницы, ведущей вниз, для описания комнаты
+        """
         if self.locked:
             return 'В полу имеется квадратный люк, плотно закрытый крышкой.'
         return f'{self:nom} спускается вниз в темноту.'.capitalize()
         
 
     def show_in_room_as_ladder_up(self) -> str:
+        """ 
+        Возвращает текст описания лестницы, ведущей вверх, для описания комнаты
+        """
         if self.locked:
             return f'{self:nom} поднимается к люку в потолке, закрытому тяжелой крышкой.'.capitalize()
         return f'{self:nom} ведет куда-то вверх.'.capitalize()
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список имен лестницы
+        """
         return ['лестница', 'лестницу']
 
 
@@ -241,10 +288,6 @@ class Door:
         }
     
     
-    def check_disturbed_monsters (self, who) -> None:
-        who.check_disturbed_monsters()
-    
-    
     def go(self, who, in_action:bool=False) -> list[str]:
         """
         Метод обрабатывает команду Идти
@@ -271,16 +314,25 @@ class Door:
     
     
     def get_another_room(self, room) -> 'Room':
+        """ 
+        Возвращает комнату, в которую ведет дверь
+        """
         if room not in self.rooms or len(self.rooms) < 2:
             return None
         return [another_room for another_room in self.rooms if not another_room == room][0]
     
     
     def is_locked(self, room=None) -> bool:
+        """ 
+        Возвращает True если дверь заперта
+        """
         return self.locked
     
     
     def get_direction_index(self, room) -> int:
+        """ 
+        Возвращает целочисленный индекс направления, в котором ведет дверь
+        """
         try:
             index = room.doors.index(self)
         except Exception:
@@ -290,6 +342,9 @@ class Door:
     
     
     def show_for_unlock(self, who) -> str:
+        """ 
+        Возвращает описание для команды Отпереть
+        """
         room = who.current_position
         direction_index = self.get_direction_index(room)
         direction = Door._directions.get(direction_index, False)
@@ -298,6 +353,9 @@ class Door:
     
     
     def unlock(self, who, in_action:bool=False) -> str:
+        """ 
+        Обрабатывает команду Отпереть
+        """
         if not self.locked:
             return 'Дверь не заперта, через нее вполне можно пройти.'
         room = who.current_position
@@ -312,6 +370,9 @@ class Door:
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список текстовых представлений двери
+        """
         names = ['дверь']
         if room:
             index = self.get_direction_index(room)
@@ -322,10 +383,16 @@ class Door:
     
     
     def __bool__(self):
+        """ 
+        Преобразует состояние двери boolean
+        """
         return not self.empty
     
     
     def __format__(self, format_string:str):
+        """ 
+        Возвращает представление экземпляра класса в виде форматированной строки
+        """
         if format_string == 'horizontal':
             if self.empty:
                 return '='
@@ -343,6 +410,9 @@ class Door:
 
     
     def activate(self):
+        """ 
+        Активирует дверь
+        """
         self.empty = False
         self.locked = False
         self.closed = True
@@ -572,6 +642,9 @@ class Room:
 
     
     def generate_actions(self):
+        """ 
+        Генерирует действия, которые можно совершить с комнатой.
+        """
         self.room_actions = {
             "обыскать": {
                 "method": "search",
@@ -651,19 +724,31 @@ class Room:
     
 
     def noise_trigger(self, noise_source):
+        """ 
+        Обрабатывает событие возникновения в комнате шума
+        """
         return
     
     
     def link_doors(self):
+        """ 
+        Связывает комнату с ее дверями
+        """
         for door in self.doors:
             door.rooms.append(self)
     
     
     def map_for_examine(self, who):
+        """ 
+        Возвращает план комнаты для команды Осмотреть
+        """
         self.map()
     
     
     def examine(self, who, in_action:bool=False) -> str:
+        """ 
+        Обрабатывает команду Осмотреть
+        """
         if self.light:
             message = self.show_with_light_on(who)
         else:
@@ -672,6 +757,9 @@ class Room:
     
     
     def generate_doors_actions(self):
+        """ 
+        Добавляет действия дверей комнаты в массив действий комнтаы
+        """
         for door in self.doors:
             if not door.empty:
                 self.action_controller.add_actions(door)
@@ -679,6 +767,9 @@ class Room:
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список текстовых представлений экземпляра класса
+        """
         return ['комната', 'комнату']
     
     
@@ -729,6 +820,9 @@ class Room:
     
     
     def set_torch(self):
+        """ 
+        Зажигает в комнате факел
+        """
         if not self.light or roll([Room._torch_die]) != Room._torch_die:
             return False
         new_torch = self.game.weapon_controller.get_random_objects_by_class_name('Torch')[0]
@@ -773,6 +867,9 @@ class Room:
 
     
     def has_furniture(self) -> bool:
+        """ 
+        Возвращает True если в комнате есть мебель
+        """
         return bool(self.furniture)
     
     
@@ -823,6 +920,9 @@ class Room:
     
 
     def generate_secrets(self, secret_places):
+        """ 
+        Генерирует в комнате секретные места
+        """
         for place in secret_places:
             new_secret = self.game.secret_places_controller.create_object_by_name(place)
             new_secret.place(self)
@@ -878,6 +978,9 @@ class Room:
 
     
     def show_with_light_off(self) -> list[str]:
+        """ 
+        Генерирует описание комнаты если в ней выключен свет
+        """
         monster = self.monsters('first')
         message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
         if monster:
@@ -887,6 +990,9 @@ class Room:
     
     
     def show_with_light_on(self, player) -> list[str]:
+        """ 
+        Генерирует описание комнаты если в ней включен свет
+        """
         message = []
         decoration = self.get_decoration_for_show()
         monster_text = self.get_monster_text_for_show()
@@ -903,6 +1009,9 @@ class Room:
         
 
     def get_ladders_text(self) -> list[str]:
+        """ 
+        Генерирует описание лестниц, которые ведут из комнаты
+        """
         message = []
         if self.ladder_down:
             message.append(self.ladder_down.show_in_room_as_ladder_down())
@@ -912,6 +1021,9 @@ class Room:
     
     
     def get_monster_text_for_show(self) -> list[str]:
+        """ 
+        Генерирует описание находящихся в комнате монстров
+        """
         monsters = self.monsters()
         message = []
         if not monsters:
@@ -922,12 +1034,18 @@ class Room:
     
     
     def get_decoration_for_show(self) -> str:
+        """ 
+        Добавляет в описание комнаты упоминание того, что она освещена факелом
+        """
         if self.torch:
             return f'освещенную факелом {self.decoration1}'
         return self.decoration1
     
     
     def get_stink_text(self) -> str|None:
+        """ 
+        Генерирует описание комнаты если в ней что-то воняет
+        """
         if self.stink > 0:
             return f'{Room._stink_levels[self.stink]} воняет чем-то очень неприятным.'
         return None
@@ -971,6 +1089,9 @@ class Room:
     
     
     def monsters(self, mode=None):
+        """ 
+        Возвращает список монстров, находящихся в комнате
+        """
         all_monsters = self.floor.monsters_in_rooms[self]
         if all_monsters:
             if mode == 'random':
@@ -984,11 +1105,17 @@ class Room:
         
     
     def has_a_monster(self) -> bool:
+        """ 
+        Возвращает True если в комнате есть хотя бы один монстр
+        """
         monsters = self.floor.monsters_in_rooms[self]
         return bool(monsters)
     
     
     def monster_in_ambush(self):
+        """ 
+        Возвращает монстра, сидящего в засаде
+        """
         monsters = self.monsters()
         if monsters:
             for monster in self.monsters():
@@ -998,6 +1125,9 @@ class Room:
     
     
     def map(self):
+        """ 
+        Генерирует план комнаты
+        """
         if not self.light:
             return False
         message = []
@@ -1019,6 +1149,9 @@ class Room:
 
     
     def get_symbol_for_plan(self) -> str:
+        """ 
+        Возвращает символ, который должен отображаться на плане комнаты
+        """
         monster = self.monsters('first')
         if monster:
             return self.get_monsters_symbol()
@@ -1028,10 +1161,16 @@ class Room:
     
     
     def get_number_of_monsters(self) -> int:
+        """ 
+        Возвращает количество монстров в комнате
+        """
         return len(self.floor.monsters_in_rooms[self])
     
     
     def get_monsters_symbol(self) -> str:
+        """ 
+        Возвращает первую букву имени монстра или символ, обозначающий, что монстров несколько
+        """
         number_of_monsters = self.get_number_of_monsters()
         if number_of_monsters == 1:
             return '~'
@@ -1039,17 +1178,26 @@ class Room:
         
     
     def get_second_line_for_plan(self) -> str:
+        """ 
+        Возвращает вторую строку для генерации плана
+        """
         if self.ladder_up:
             return '║  #║'
         return '║   ║'
     
     
     def get_fourth_line_for_plan(self) -> str:
+        """ 
+        Возвращает четвертую строку для генерации плана
+        """
         if self.ladder_down:
             return '║#  ║'
         return '║   ║'
     
     def lock(self):
+        """ 
+        Запирает комнату
+        """
         for door in self.doors:
             if not door.empty:
                 door.locked = True
@@ -1074,6 +1222,9 @@ class Room:
                 
     
     def get_random_unlocked_furniture(self):
+        """ 
+        Возвращает случаный незапертый объект мебели, находящийся в комнате
+        """
         if self.furniture:
             furniture_list = [f for f in self.furniture if not f.locked]
             if furniture_list:
