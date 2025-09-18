@@ -184,6 +184,9 @@ class Hero:
         
         
     def heal(self, who, in_action:bool=False) -> str:
+        """
+        Метод лечения героя при помощи зелий.
+        """
         if in_action:
             potion = self.backpack.get_random_item_by_class('HealPotion')
         else:
@@ -194,6 +197,9 @@ class Hero:
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """
+        Возвращает список имен героя в различных падежах.
+        """
         names_list = ['себя', 'себе', 'героя', 'героиню']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -201,16 +207,25 @@ class Hero:
     
     
     def name_for_examine(self, who) -> str:
+        """
+        Возвращает имя героя для осмотра.
+        """
         return f'Себя {self.g('самого', 'саму')}'
     
     
     def examine(self, who, in_action:bool=False) -> list[str]:
+        """
+        Метод осмотра героя.
+        """
         if not self.check_light():
             return 'В комнате совершенно неподходящая обстановка чтобы что-то осматривать. Сперва надо зажечь свет.'
         return self.show(return_message=True)   
     
     
     def on_create(self):
+        """
+        Метод выполняет дополнительные действия при создании героя.
+        """
         self.start_stren = self.stren.copy()
         self.start_dext = self.dext.copy()
         self.start_intel = self.intel.copy()
@@ -221,6 +236,9 @@ class Hero:
     
     
     def __format__(self, format:str) -> str:
+        """
+        Метод возвращает строку с именем героя в нужном падеже.
+        """
         if format == 'pronoun':
             if self.gender == 0:
                 return 'он'
@@ -229,29 +247,47 @@ class Hero:
          
     
     def __str__(self):
+        """
+        Метод возвращает строковое представление героя.
+        """
         return f'<Hero: name = {self.name}>'
 
     
     def get_backpack(self):
+        """
+        Метод создает рюкзак героя.
+        """
         new_backpack = Backpack(self.game)
         self.action_controller.add_actions(new_backpack)
         self.backpack = new_backpack
     
     
     def is_hero(self) -> bool:
+        """
+        Метод проверяет, является ли объект героем.
+        """
         return True
     
     
     def generate_initiative(self) -> int:
+        """
+        Метод генерирует инициативу героя.
+        """
         return self.initiative.roll() + self.dext.roll()
         
     
     def test(self, commands:list=None):
+        """
+        Метод для тестирования героя.
+        """
         self.game.test(self)
         tprint(self.game, 'Тестирование началось')
         
     
     def check_stren(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        """
+        Проверяет силу героя.
+        """
         if self.check_light():
             multiplier += self.rage.roll()
         subtract.append(self.wounds.get('stren', 0))
@@ -267,6 +303,9 @@ class Hero:
     
     
     def check_dext(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        """
+        Проверяет ловкость героя.
+        """
         subtract.append(self.wounds.get('dext', 0))
         result = self.dext.roll(
                 subtract = subtract,
@@ -279,6 +318,9 @@ class Hero:
     
     
     def check_intel(self, against:int=None, add:list[int]=[], subtract:list[int]=[], multiplier:int=1) -> bool:
+        """
+        Проверяет интеллект героя.
+        """
         subtract.append(self.wounds.get('intel', 0))
         subtract.append(self.rage.base_die() - 1)
         result = self.intel.roll(
@@ -292,20 +334,32 @@ class Hero:
     
     
     def check_if_sneak_past_monster(self, monster: Monster) -> bool:
+        """
+        Проверяет, сможет ли герой проскочить мимо монстра.
+        """
         return self.check_dext(against=monster.size.roll())
     
     
     def place(self, room):
+        """
+        Метод помещает героя в комнату.
+        """
         self.current_position = room
         room.visited = True
         self.last_move = move_enum.START
     
     
     def check_if_sneak_past_furniture(self) -> bool:
+        """
+        Проверяет, сможет ли герой проскочить мимо мебели.
+        """
         return self.check_dext(against=3, add=[2])
     
     
     def increase_monster_knowledge(self, monster_type) -> bool:
+        """
+        Метод увеличивает знание героя о типе монстра.
+        """
         knowledge = self.monster_knowledge.get(monster_type, 0)
         self.monster_knowledge[monster_type] = knowledge + 1
         return f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}'
@@ -318,6 +372,9 @@ class Hero:
     
     
     def go_down_with_light_off(self) -> str:
+        """
+        Метод спуска героя вниз в темноте.
+        """
         room = self.current_position
         if not room.ladder_down or room.ladder_down.locked:
             return f'{self:nom} шарит в темноте ногой по полу, но не находит, куда можно было бы спуститься.'
@@ -325,12 +382,18 @@ class Hero:
 
 
     def descend(self, room) -> bool:
+        """
+        Метод спуска героя вниз.
+        """
         room_to_go = room.ladder_down.room_down
         self.last_move = move_enum.DOWNSTAIRS
         return self.move(room_to_go)
     
     
     def go_down_with_light_on(self) -> str:
+        """
+        Метод спуска героя вниз при включенном свете.
+        """
         room = self.current_position
         if not room.ladder_down:
             return f'{self:nom} в недоумении смотрит на абсолютно ровный пол. Как только {self.g("ему", "ей")} могла прийти в голову такая идея?'
@@ -346,6 +409,9 @@ class Hero:
     
     
     def go_up_with_light_off(self) -> bool:
+        """
+        Метод подъема героя вверх в темноте.
+        """
         room = self.current_position
         if not room.ladder_up or room.ladder_up.locked:
             return f'{self:nom} ничего не может разглядеть в такой темноте.'
@@ -353,12 +419,18 @@ class Hero:
 
 
     def ascend(self, room):
+        """
+        Метод подъема героя вверх.
+        """
         room_to_go = room.ladder_up.room_up
         self.last_move = move_enum.UPSTAIRS
         return self.move(room_to_go)
     
     
     def go_up_with_light_on(self) -> bool:
+        """
+        Метод подъема героя вверх при включенном свете.
+        """
         room = self.current_position
         if not room.ladder_up:
             return f'{self:nom} и {self.g("хотел", "хотела")} бы забраться повыше, но в этой комнате нет такой возможности.'
@@ -483,6 +555,9 @@ class Hero:
     
     
     def select_enemy(self, enemy_text:str):
+        """
+        Метод выбирает цель для атаки героя.
+        """
         enemies = self.current_fight.get_targets(self)
         if str(enemy_text).isdigit():
             try:
@@ -502,6 +577,9 @@ class Hero:
         
     
     def trade_actions(self, message:str) -> bool:
+        """
+        Метод обрабатывает команды игрока когда он торгует с торговцем.
+        """
         action, target = split_actions(message)
         if not self.trader:
             tprint(self.game, 'Похоже, торговец отказывается общаться и торговля сейчас невозможна.')
@@ -518,6 +596,9 @@ class Hero:
     
     
     def leave_shop(self):
+        """
+        Метод обрабатывает команду "уйти" из лавки торговца.
+        """
         self.state = state_enum.NO_STATE
         tprint(self.game, f'{self.name} покидает лавку {self.trader:gen}.')
         self.trader = None
@@ -525,12 +606,18 @@ class Hero:
     
     
     def buy_item(self, target:str) -> bool:
+        """
+        Метод обрабатывает команду "купить" у торговца.
+        """
         result = self.trader.sell(target, self)
         if result:
             tprint(self.game, self.trader.get_prices(self.backpack))
     
     
     def sell_item(self, target:str) -> bool:
+        """
+        Метод обрабатывает команду "продать" торговцу.
+        """
         result = self.trader.buy(target, self)
         if result:
             tprint(self.game, self.trader.get_prices(self.backpack))
@@ -634,6 +721,9 @@ class Hero:
         
             
     def get_weakness(self, weapon:Weapon) -> float:
+        """
+        Метод возвращает коэффициент уязвимости героя к элементу оружия.
+        """
         element = str(weapon.element())
         weakness = self.weakness.get(element, None)
         return weakness if weakness else 0
@@ -678,12 +768,18 @@ class Hero:
     
     
     def check_fight(self) -> bool:
+        """
+        Метод проверяет, находится ли герой в бою.
+        """
         if self.current_fight:
             return True
         return False
             
         
     def get_items_for_action(self, action:str, item:str=None, in_darkness:bool=False, in_combat:bool=False, bulk:bool=False) -> list:
+        """
+        Метод возвращает список предметов, подходящих для выполнения действия.
+        """
         hero_items_list = self.action_controller.get_items_by_action_and_name(
             action = action, 
             name = item, 
@@ -700,6 +796,11 @@ class Hero:
     
     
     def do_from_dictionary(self, action:str, item:str=None):
+        """
+        Метод выполняет действие героя, если оно возможно.
+        1. Проверяет, возможно ли действие в текущих условиях (темнота, бой).
+        2. Получает список предметов, подходящих для выполнения действия.   
+        """
         in_darkness = not self.check_light()
         in_combat = self.check_fight()
         items = self.get_items_for_action(action, item, in_darkness, in_combat)
@@ -732,10 +833,20 @@ class Hero:
     
     
     def exclude_hidden_items(self, items:list) -> list:
+        """
+        Метод исключает из списка предметы, которые скрыты от героя.
+        1. Если у предмета есть атрибут hidden, который является функцией, вызывается эта функция.
+        2. Если функция возвращает True, предмет исключается из списка.
+        """
         return [item for item in items if not (callable(item.hidden) and item.hidden())]
     
     
     def bulk_actions(self, items:list) -> list:
+        """
+        Метод выполняет все действия, которые можно выполнить сразу для всех подходящих предметов.
+        1. Из списка предметов выбираются те, которые можно выполнить сразу (атрибут bulk = True).
+        2. Для каждого такого предмета вызывается метод action.
+        """
         items_for_bulk_actions = [item for item in items if item.bulk]
         total_duration = 0
         for item in items_for_bulk_actions:
@@ -747,6 +858,9 @@ class Hero:
             
 
     def free_action(self, message:str):
+        """
+        Метод обрабатывает команды игрока когда он выбирает что-то сделать из списка доступных действий.
+        """
         if message == 'отмена':
             tprint(self.game, f'{self.name} неожиданно решает, что не хочет ничего делать.', 'direction')
             self.state = state_enum.NO_STATE
@@ -764,6 +878,10 @@ class Hero:
         
     
     def do_single_action(self, item) -> bool:
+        """
+        Метод выполняет действие с одним предметом.
+        1. Вызывает метод action предмета.
+        """
         action = item.action
         tprint(self.game, action(self), 'direction')
         self.decrease_restless(2)
@@ -774,6 +892,9 @@ class Hero:
     
     
     def get_poison_protection(self) -> int:
+        """
+        Метод рассчитывает и возвращает значение защиты героя от отравления.
+        """
         protection = self.poison_protection.roll()
         if self.armor.is_poisoned() or self.shield.is_poisoned():
             protection += 2
@@ -932,6 +1053,10 @@ class Hero:
 
     
     def generate_in_fight_description(self, index:int) -> str:
+        """
+        Метод генерирует строку описания героя для вывода в чат во время боя.
+        1. В начале строки идет порядковый номер героя в бою.
+        """
         line = f'{index}: {self.name}: сила - {self.stren.text()}'
         line += self.generate_weapon_text()
         line += self.generate_protection_text()
@@ -940,12 +1065,20 @@ class Hero:
     
     
     def generate_weapon_text(self) -> str:
+        """
+        Метод генерирует текст описания оружия героя для вывода в чат во время боя.
+        1. Если у героя нет оружия, возвращается пустая строка.
+        2. Если у героя есть оружие, возвращается строка с описанием урона оружия.
+        """
         if not self.weapon.empty:
             return f'{self.weapon.damage.text()}'
         return ''
     
     
     def generate_protection_text(self) -> str:
+        """
+        Метод генерирует текст описания защиты героя для вывода в чат во время боя.
+        """
         if not self.shield.empty and self.armor.empty:
             return f', защита - {self.shield.protection.text()}'
         elif self.shield.empty and not self.armor.empty:
@@ -1335,6 +1468,9 @@ class Hero:
 
     
     def reset_dice(self):
+        """
+        Метод сбрасывает все характеристики героя к стартовым значениям.
+        """
         self.stren = self.start_stren.copy()
         self.dext = self.start_dext.copy()
         self.intel = self.start_intel.copy()
@@ -1398,6 +1534,9 @@ class Hero:
 
     
     def increase_health(self, amount:int=3) -> bool:
+        """
+        Метод увеличивает здоровье героя.
+        """
         self.health += amount
         self.start_health += amount
         tprint(self.game, f'{self.name} получает {howmany(amount, ['единица', 'единицы', 'единиц'])} здоровья.', 'direction')
@@ -1405,18 +1544,27 @@ class Hero:
     
     
     def increase_strength(self, amount:int=1) -> bool:
+        """
+        Метод увеличивает силу героя.
+        """
         self.stren.increase_base_die(amount)
         self.start_stren.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою силу на {amount}.', 'direction')
     
     
     def increase_dexterity(self, amount:int=1) -> bool:
+        """
+        Метод увеличивает ловкость героя.
+        """
         self.dext.increase_base_die(amount)
         self.start_dext.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою ловкость на {amount}.', 'direction')
     
     
     def increase_intelligence(self, amount:int=1) -> bool:
+        """
+        Метод увеличивает интеллект героя.
+        """
         self.intel.increase_base_die(amount)
         self.start_intel.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
@@ -1454,6 +1602,10 @@ class Hero:
     
     
     def check_disturbed_monsters (self, who) -> None:
+        """
+        Метод проверяет, есть ли в комнате монстры, которые были взбудоражены героем.
+        Если такие монстры есть, то начинается бой с первым из них.
+        """
         room = self.current_position
         for monster in room.monsters():
             if monster.disturbed:
@@ -1463,6 +1615,9 @@ class Hero:
     
     
     def go_with_light_on(self, direction:int) -> bool:
+        """
+        Метод обрабатывает команду "идти" когда свет включен.
+        """
         door = self.current_position.doors[direction]
         if door.empty:
             return f'Там нет двери. {self.name} не может туда пройти!'
@@ -1475,6 +1630,11 @@ class Hero:
     
     
     def go_with_light_off(self, direction:int) -> str:
+        """
+        Метод обрабатывает команду "идти" когда свет выключен.
+        1. Если герой идет назад, то он не проверяет ловушки и не пытается прокрасться.
+        2. Если герой идет вперед, то он пытается прокрасться.
+        """
         door = self.current_position.doors[direction]
         going_back = self.check_if_going_back(direction)
         if not going_back:
@@ -1492,12 +1652,20 @@ class Hero:
     
 
     def check_noise(self) -> bool:
+        """
+        Метод проверяет, издает ли герой шум при передвижении в темноте.
+        1. Если герой издает шум, то возвращается True.
+        """
         if self.weapon.noisy or self.shield.noisy or self.armor.noisy:
             return True
         return False
     
     
     def sneak_through_dark_room(self) -> bool:
+        """
+        Метод пытается прокрасться героя через темную комнату.
+        1. Если герой сталкивается с монстром, то возвращается False.
+        """
         room = self.current_position
         if room.has_a_monster():
             for monster in room.monsters():
@@ -1516,6 +1684,9 @@ class Hero:
     
     
     def try_not_to_fall_down(self) -> bool:
+        """
+        Метод проверки, что герой не упадет с лестницы вниз в темноте.
+        """
         check_target = self.dext.base_die() // 2
         if not self.dext_check(against=check_target):
             return False
@@ -1523,10 +1694,16 @@ class Hero:
     
     
     def check_if_going_back(self, direction:int) -> bool:
+        """
+        Метод проверки, идет ли герой назад.
+        """
         return direction == self.last_move.countermove
        
     
     def move(self, new_position:Room) -> str:
+        """
+        Метод перемещает героя в новую комнату.
+        """
         self.game.trigger_on_movement()
         self.current_position = new_position
         self.current_position.visited = True
@@ -1555,6 +1732,9 @@ class Hero:
         
 
     def put_in_backpack(self, item) -> bool:
+        """
+        Метод кладет вещь в рюкзак героя.
+        """
         if self.current_position.loot.is_item_in_loot(item):
             self.current_position.loot.remove(item)
         self.backpack.append(item)
@@ -1599,6 +1779,9 @@ class Hero:
     
     
     def get_map(self) -> Map|None:
+        """
+        Метод ищет в рюкзаке героя карту текущего этажа.
+        """
         maps = self.backpack.get_items_by_class('Map')
         return next((map for map in maps if map.floor == self.floor), None)
     

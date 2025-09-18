@@ -75,6 +75,9 @@ class Game():
         
 
     def check_endgame(self) -> bool:
+        """
+        Проверяет, достигнут ли конец игры.
+        """
         if True in [
             self.monsters_controller.check_endgame()
             ]:
@@ -89,6 +92,9 @@ class Game():
 
     
     def check_traders_update(self) -> bool:
+        """
+        Проверяет, нужно ли обновить товары у торговцев.
+        """
         if self.traders_update_counter > 0:
             self.traders_update_counter -= 1
             return False
@@ -97,6 +103,9 @@ class Game():
     
     
     def update_traders(self) -> bool:
+        """
+        Обновляет товары у всех торговцев.
+        """
         for trader in self.all_traders:
             trader.get_goods()
         return True
@@ -111,12 +120,18 @@ class Game():
         
     
     def __del__ (self):
+        """
+        Метод вызывается при удалении объекта игры.
+        """
         print("=" * 40)
         print('Игра удалена')
         print("=" * 40)
      
     
     def test(self, hero):
+        """
+            Метод для тестирования игры.
+        """
         book1 = self.books_controller.get_random_object_by_filters()
         book2 = self.books_controller.get_random_object_by_filters()
         book1.take(self.player)
