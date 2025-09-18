@@ -29,6 +29,9 @@ class Controller:
 
 
     def get_random_objects_by_class_name(self, class_name:str, how_many:int=1) -> list:
+        """
+        Создает несколько объектов по имени класса.
+        """
         templates = self.get_templates_by_class_name(class_name)
         objects = []
         for _ in range(how_many):
@@ -77,6 +80,9 @@ class Controller:
 
     
     def additional_actions(self, item) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке объекта.
+        """
         return True
     
 

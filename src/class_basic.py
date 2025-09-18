@@ -4,6 +4,9 @@ from typing import Union
 
 
 class Loot:
+    """
+    Класс для управления лутом.    
+    """
     def __init__(self, game):
         self.game = game
         self.pile = []
@@ -11,10 +14,16 @@ class Loot:
 
 
     def __str__(self):
+        """
+        Метод возвращает строковое представление лута.
+        """
         return 'loot'
 
 
     def __add__(self, other) -> bool:
+        """
+        Метод объединяет два лута в один.
+        """
         if not isinstance(other, Loot):
             return False
         self.pile.extend(other.pile)
@@ -22,23 +31,38 @@ class Loot:
     
     
     def add(self, obj):
+        """
+        Метод добавляет объект в лут.
+        """
         self.pile.append(obj)
 
 
     def remove(self, obj):
+        """
+        Метод удаляет объект из лута.
+        """
         self.pile.remove(obj)
     
     
     def __eq__(self, other) -> bool:
+        """
+        Метод сравнивает лут с числом по количеству предметов в нем.
+        """
         if isinstance(other, int):
             return len(self.pile) == other
         
     
     def is_item_in_loot(self, item) -> bool:
+        """
+        Метод проверяет, есть ли предмет в луте.
+        """
         return item in self.pile
     
     
     def reveal(self, room):
+        """
+        Метод перемещает все предметы из лута в комнату.
+        """
         for item in self.pile:
             room.loot.add(item)
             room.action_controller.add_actions(item)
@@ -47,10 +71,16 @@ class Loot:
     
     
     def clear(self):
+        """
+        Метод очищает лут.
+        """
         self.pile=list()
         
     
     def transfer(self, other_loot):
+        """
+        Метод переносит все предметы из этого лута в другой лут.
+        """
         if not isinstance(other_loot, Loot):
             return False
         other_loot.pile.extend(self.pile)
@@ -80,10 +110,17 @@ class Loot:
 
     
     def get_items_by_class(self, item_class) -> list:
+        """
+        Метод принимает на вход класс вещи и
+        и возвращает список вещей в луте этого класса.
+        """
         return [item for item in self.pile if type(item).__name__ == item_class]
         
         
     def show_sorted(self) -> list:
+        """
+        Метод возвращает отсортированный список предметов в луте.
+        """
         items = self.pile
         items_dict = {}
         sorted_list = []
@@ -103,7 +140,9 @@ class Loot:
 
 
 class Money:
-    
+    """
+    Класс для управления деньгами.    
+    """
     _groups = (10, 20, 30)
     """Значения для разделения денег на кучки."""
 
@@ -175,6 +214,14 @@ class Money:
 
     
     def generate_name(self):
+        """
+        Функция генерирует имя для кучи денег в зависимости от их количества.
+        Варианты:
+        0-10 - несколько монет
+        11-20 - кучка монет
+        21-30 - груда монет
+        31 и больше - много монет
+        """
         piles = {
             0 <= self.how_much_money and self.how_much_money <= Money._groups[0]: 0,
             Money._groups[0] < self.how_much_money and self.how_much_money <= Money._groups[1]: 1,
@@ -186,22 +233,37 @@ class Money:
 
     
     def check_name(self, message:str) -> bool:
+        """
+        Функция проверяет, относится ли сообщение к деньгам.
+        """
         return message.lower() in ['деньги', self.lexemes["nom"], self.lexemes["accus"]]
     
     
     def __format__(self, format:str) -> str:
+        """
+        Метод форматирования имени денег в различных падежах.
+        """
         return self.lexemes.get(format, '')
     
     
     def __repr__(self):
+        """
+        Метод возвращает строковое представление денег.
+        """
         return str(self.how_much_money)
     
     
     def __int__(self) -> int:
+        """
+        Метод возвращает количество денег как целое число.
+        """
         return self.how_much_money
 
     
     def __eq__(self, other:Union[int, 'Money']) -> bool:
+        """
+        Метод сравнивает деньги с числом или с другим объектом класса Money по количеству денег.
+        """
         if isinstance(other, int):
             return self.how_much_money == other
         if isinstance(other, Money):
@@ -209,6 +271,9 @@ class Money:
 
     
     def __ge__(self, other:Union[int, 'Money']) -> bool:
+        """
+        Метод проверяет если денег больше или равно числа или другого объекта класса Money. 
+        """
         if isinstance(other, int):
             return self.how_much_money >= other
         if isinstance(other, Money):
@@ -216,6 +281,9 @@ class Money:
     
     
     def __gt__(self, other:Union[int, 'Money']) -> bool:
+        """
+        Метод проверяет если денег строго больше числа или другого объекта класса Money.
+        """
         if isinstance(other, int):
             return self.how_much_money > other
         if isinstance(other, Money):
@@ -223,6 +291,9 @@ class Money:
     
     
     def __le__(self, other:Union[int, 'Money']) -> bool:
+        """
+        Метод проверяет если денег меньше или равно числа или другого объекта класса Money.
+        """
         if isinstance(other, int):
             return self.how_much_money <= other
         if isinstance(other, Money):
@@ -230,6 +301,9 @@ class Money:
     
     
     def __lt__(self, other:Union[int, 'Money']) -> bool:
+        """
+        Метод проверяет если денег строго меньше числа или другого объекта класса Money.
+        """
         if isinstance(other, int):
             return self.how_much_money < other
         if isinstance(other, Money):
@@ -237,6 +311,9 @@ class Money:
 
     
     def __add__(self, other:Union[int, 'Money']) -> 'Money':
+        """
+        Метод увеличивает количество денег на заданное число или на количество другого объекта класса Money.
+        """
         if isinstance(other, int):
             self.how_much_money += other
         elif isinstance(other, Money):
@@ -246,6 +323,9 @@ class Money:
 
     
     def __sub__(self, other:Union[int, 'Money']) -> 'Money':
+        """
+        Метод уменьшает количество денег на заданное число или на количество другого объекта класса Money.
+        """
         if isinstance(other, int):
             self.how_much_money -= other
         elif isinstance(other, Money):
@@ -255,12 +335,18 @@ class Money:
 
 
     def take(self, who, in_action:bool=False) -> str:
+        """
+        Метод позволяет герою или монстру взять деньги из комнаты.
+        """
         who.money += self
         who.current_position.loot.remove(self)
         return f'{who.name} {who.g("забрал", "забрала")} {howmany(self.how_much_money, ["монету", "монеты", "монет"])}'
 
 
     def show(self):
+        """
+        Метод возвращает строковое представление денег.
+        """
         if self >= 1:
             return howmany(self.how_much_money, ["монета", "монеты", "монет"])
         else:
@@ -268,10 +354,16 @@ class Money:
         
 
     def get_sum(self) ->int:
+        """
+        Метод возвращает количество денег как целое число.
+        """
         return self.how_much_money
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """
+        Метод возвращает список имен денег в различных падежах.
+        """
         names_list = ['деньги', 'монеты']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

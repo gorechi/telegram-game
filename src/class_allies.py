@@ -33,6 +33,9 @@ class Trader:
     
     @classmethod
     def random_trader(cls, game, floor) -> 'Trader':
+        """
+        Функция возвращает случайного торговца.
+        """
         trader_class = randomitem(cls.__subclasses__())
         new_trader = trader_class(game, floor)
         return new_trader
@@ -40,6 +43,9 @@ class Trader:
     
     @staticmethod
     def search_item_by_index(items_list:list, index:int) -> Union[Book, Rune, Potion, Matches, None]:
+        """
+        Функция ищет предмет в списке по его индексу.
+        """
         for item in items_list:
             if item.index == index:
                 return item
@@ -48,6 +54,9 @@ class Trader:
     
     @staticmethod
     def search_item_by_name(items_list:list, name:str) -> Union[Book, Rune, Potion, Matches, None]:
+        """
+        Функция ищет предмет в списке по его имени.
+        """
         if not name or not isinstance(name, str):
             raise ValueError('В метод randomitem передан пустой массив')
         for item in items_list:
@@ -73,9 +82,16 @@ class Trader:
     
     
     def __format__(self, format:str) -> str:
+        """
+        Функция форматирует имя торговца в зависимости от падежа.
+        """
         return self.lexemes.get(format, '')
     
+    
     def sell(self, item_text:str, who) -> bool:
+        """
+        Функция продает предмет у торговца.
+        """
         item_in_shop = self.get_item_by_text(item_text, 'sell')
         if not item_in_shop:
             tprint(self.game, f'{self:nom} растерянно качает головой, явно не понимая, о чем идет речь.')
@@ -94,6 +110,9 @@ class Trader:
      
      
     def buy(self, item_text:str, who) -> bool:
+        """
+        Функция покупает предмет у торговца.
+        """
         item_to_buy = self.get_item_by_text(item_text, 'buy')
         if not item_to_buy:
             tprint(self.game, f'{self:nom} на такое предложение даже не поднимает глаз от какого-то документа. Ему не нужен подобный хлам.')
@@ -111,18 +130,27 @@ class Trader:
    
         
     def take_money(self, who, amount) -> bool:
+        """
+        Функция принимает деньги от героя.
+        """
         who.money -= amount
         self.money += amount
         return True
     
     
     def give_money(self, who, amount) -> bool:
+        """
+        Функция отдает деньги герою.
+        """
         who.money += amount
         self.money -= amount
         return True
 
     
     def give_item(self, who, item_to_give:ItemInShop) -> bool:
+        """
+        Функция отдает предмет герою.
+        """
         item = item_to_give.item
         who.backpack.append(item)
         self.shop.remove(item_to_give)
@@ -131,6 +159,9 @@ class Trader:
     
     
     def take_item(self, who, item_to_take:ItemInShop) -> bool:
+        """
+        Функция принимает предмет от героя.
+        """
         item = item_to_take.item
         price = self.evaluate(item)
         item_to_take.price = price
@@ -158,6 +189,9 @@ class Trader:
       
     
     def get_item_by_text(self, text:str, mode: Literal['buy', 'sell']) -> Union[Book, Rune, Potion, Matches, None]:
+        """
+        Функция ищет предмет по тексту в зависимости от режима (покупка или продажа).
+        """
         if mode == 'sell':
             items_list = self.shop
         elif mode == 'buy':
@@ -171,6 +205,9 @@ class Trader:
     
     
     def update_index(self, list_of_items:list) -> bool:
+        """
+        Функция обновляет индексы предметов в списке.
+        """
         index = 0
         for item in list_of_items:
             index += 1
@@ -179,11 +216,17 @@ class Trader:
     
     
     def update_indexes(self) -> None:
+        """
+        Функция обновляет индексы предметов в списках товаров и покупок.
+        """
         self.update_index(self.goods_to_buy)
         self.update_index(self.shop)
      
     
     def place(self, room=None):
+        """
+        Функция размещает торговца в комнате.
+        """
         if room:
             traders_room = room
         else:
@@ -199,10 +242,16 @@ class Trader:
     
     
     def show_through_key_hole(self) -> str|list:
+        """
+        Функция показывает торговца через замочную скважину.
+        """
         return 'Видно кусок витрины, наполненной разноцветными непонятными вещицами.'
     
     
     def get_prices(self, backpack:Backpack) -> list[str]:
+        """
+        Функция оценивает вещи в рюкзаке героя и генерирует текст с ценами.
+        """
         self.evaluate_items(backpack)
         message = self.generate_selling_text()
         message.extend(self.generate_buying_text())
@@ -246,6 +295,9 @@ class Scribe(Trader):
     
     
     def get_goods(self) -> bool:
+        """
+        Функция генерирует книги для продажи у книжника.
+        """
         self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
         for _ in range(how_many_books):
@@ -258,10 +310,16 @@ class Scribe(Trader):
 
     
     def evaluate(self, book:Book) -> int:
+        """
+        Функция оценивает книгу для продажи.
+        """
         return book.base_price + roll(Scribe._sell_price_modifier)
 
 
     def generate_selling_text(self) -> list[str]:
+        """
+        Функция генерирует текст с книгами на продажу.
+        """
         if not self.shop:
             return ['На полках торговца пусто. Ему нечего предложить на продажу.']
         message = ['В лавке торговца на полках стоят следующие книги:']
@@ -273,6 +331,9 @@ class Scribe(Trader):
 
 
     def generate_buying_text(self) -> list[str]:
+        """
+        Функция генерирует текст с книгами, которые книжник готов купить.
+        """
         if not self.goods_to_buy:
             return ['Книжник не хочет ничего покупать у героя.']
         message = ['Книжник с удовольствием приобрел бы у героя следующие вещи по сходной цене:']
@@ -284,6 +345,9 @@ class Scribe(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
+        """
+        Функция оценивает книги в рюкзаке героя для покупки.
+        """
         books:list[Book] = backpack.get_items_by_class('Book')
         if not books:
             self.goods_to_buy.clear()
@@ -299,6 +363,9 @@ class Scribe(Trader):
     
     
     def show(self) -> str:
+        """
+        Функция показывает книжника в комнате.
+        """
         return 'У стены, под лампой среди пыльных томов сидит торговец книгами.'
 
 
@@ -337,6 +404,9 @@ class RuneMerchant(Trader):
     
     
     def get_goods(self) -> bool:
+        """
+        Функция генерирует книги для продажи у торговца рунами.
+        """
         self.shop = []
         how_many_runes = roll([RuneMerchant._runes_quantity_die])
         for _ in range(how_many_runes):
@@ -349,10 +419,16 @@ class RuneMerchant(Trader):
 
     
     def evaluate(self, rune:Rune) -> int:
+        """
+        Функция оценивает руну для продажи.
+        """
         return rune.base_price + roll(RuneMerchant._sell_price_modifier)
 
 
     def generate_selling_text(self) -> list[str]:
+        """
+        Функция генерирует текст с рунами на продажу.
+        """
         if not self.shop:
             return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
         message = ['Перед торговцем на прилавке разложены следующие руны:']
@@ -364,6 +440,9 @@ class RuneMerchant(Trader):
 
 
     def generate_buying_text(self) -> list[str]:
+        """
+        Функция генерирует текст с рунами, которые торговец готов купить.
+        """
         if not self.goods_to_buy:
             return ['Торговец рунами не хочет ничего покупать у героя.']
         message = ['Торговец рунами с удовольствием приобрел бы у героя следующие руны:']
@@ -375,6 +454,9 @@ class RuneMerchant(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
+        """
+        Функция оценивает руны в рюкзаке героя для покупки.
+        """
         runes:list[Rune] = backpack.get_items_by_class('Rune')
         if not runes:
             self.goods_to_buy.clear()
@@ -390,6 +472,9 @@ class RuneMerchant(Trader):
     
     
     def show(self) -> str:
+        """
+        Функция показывает торговца рунами в комнате.
+        """
         return 'Посреди комнаты стоит прилавок торговца рунами. Сам он суетится вокруг.'
     
     
@@ -428,6 +513,9 @@ class PotionsMerchant(Trader):
     
     
     def get_goods(self) -> bool:
+        """
+        Функция генерирует книги для продажи у торговца зельями.
+        """
         self.shop = []
         how_many_potions = roll([PotionsMerchant._potions_quantity_die])
         for _ in range(how_many_potions):
@@ -440,10 +528,16 @@ class PotionsMerchant(Trader):
 
     
     def evaluate(self, potion:Potion) -> int:
+        """
+        Функция оценивает зелье для продажи.
+        """
         return potion.base_price + roll(PotionsMerchant._sell_price_modifier)
 
 
     def generate_selling_text(self) -> list[str]:
+        """
+        Функция генерирует текст с зельями на продажу.
+        """
         if not self.shop:
             return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
         message = ['На витрине стоят бутылочки с различными зельями:']
@@ -455,6 +549,9 @@ class PotionsMerchant(Trader):
 
 
     def generate_buying_text(self) -> list[str]:
+        """
+        Функция генерирует текст с зельями, которые торговец готов купить.
+        """
         if not self.goods_to_buy:
             return ['Торговец зельями не хочет ничего покупать у героя.']
         message = ['Торговец зельями с удовольствием приобрел бы у героя следующие напитки:']
@@ -466,6 +563,9 @@ class PotionsMerchant(Trader):
         
     
     def evaluate_items(self, backpack:Backpack) -> bool:
+        """
+        Функция оценивает зелья в рюкзаке героя для покупки.
+        """
         potions:list[Potion] = backpack.get_items_by_class('Potion')
         if not potions:
             self.goods_to_buy.clear()
@@ -481,4 +581,7 @@ class PotionsMerchant(Trader):
     
     
     def show(self) -> str:
+        """
+        Функция показывает торговца зельями в комнате.
+        """
         return 'Посреди комнаты стоит прилавок торговца зельями. Торговец занимается приготовлением какой-то микстуры.'
