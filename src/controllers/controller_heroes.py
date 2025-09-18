@@ -54,10 +54,16 @@ class HeroController(Controller):
     
         
     def additional_actions(self, hero: Hero) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке героя.
+        """
         self.give_items(hero)
         return True
     
     
     def give_items(self, hero: Hero) -> None:
+        """
+        Функция добавляет герою ключ в инвентарь.
+        """
         new_key = Key(self.game)
         hero.backpack + new_key 

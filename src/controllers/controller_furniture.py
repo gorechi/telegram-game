@@ -43,6 +43,9 @@ class FurnitureController(Controller):
     
     
     def additional_actions(self, item) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке мебели.
+        """
         self.add_loot(item)
         self.add_trap(item)
         self.generate_state(item)
@@ -52,24 +55,39 @@ class FurnitureController(Controller):
     
     
     def generate_state(self, furniture: Furniture):
+        """
+        Функция случайным образом выбирает состояние мебели из доступных состояний.
+        """
         furniture.state = randomitem(furniture.states)
         
         
     def generate_where(self, furniture: Furniture):
+        """
+        Функция случайным образом выбирает место расположения мебели из доступных мест.
+        """
         furniture.where = randomitem(furniture.wheres)
         
         
     def add_money(self, furniture: Furniture):
+        """
+        Функция случайным образом добавляет деньги в мебель с определенной вероятностью.
+        """
         if FurnitureController._money_probability_dice.roll() == 1:
             new_money = Money(self.game, FurnitureController._money_dice.roll())
             furniture.loot.pile.append(new_money)
             
     
     def add_loot(self, furniture: Furniture):
+        """
+        Функция добавляет в мебель новый лут.
+        """
         new_loot = Loot(self.game)
         furniture.loot = new_loot
         
     
     def add_trap(self, furniture: Furniture):
+        """
+        Функция добавляет в мебель новую ловушку.
+        """
         new_trap = self.game.traps_controller.get_random_object_by_filters()
         furniture.trap = new_trap

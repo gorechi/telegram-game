@@ -35,10 +35,16 @@ class TrapsController(Controller):
     
     
     def additional_actions(self, trap) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке ловушки.
+        """
         self.set_detection_text(trap)
         return True
     
 
     def set_detection_text(self, trap):
+        """
+        Функция устанавливает текст обнаружения ловушки.
+        """
         trap.detection_text = randomitem(TrapsController.detection_texts)
         return
