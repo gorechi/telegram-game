@@ -31,14 +31,23 @@ class Trap:
     
     
     def get_disarm_difficulty(self) -> int:
+        """ 
+        Метод возвращает сложность обезвреживания ловушки.
+        """
         return self.difficulty * 2
     
 
     def get_detection_text(self) -> str:
+        """ 
+        Метод возвращает текст обнаружения ловушки.
+        """
         return self.detection_text
     
     
     def deactivate(self) -> bool:
+        """ 
+        Деактивирует ловушку.
+        """
         if not self.activated:
             return False
         self.activated = False
@@ -46,6 +55,9 @@ class Trap:
     
     
     def activate(self) -> bool:
+        """ 
+        Активирует ловушку.
+        """
         if self.activated:
             return False
         self.activated = True
@@ -85,6 +97,9 @@ class Trap:
     
     
     def disarm(self) -> list[str]:
+        """ 
+        Обезвреживает ловушку.
+        """
         self.deactivate()
         self.seen = True
         self.triggered = False
@@ -92,18 +107,30 @@ class Trap:
     
     
     def damage_intel(self, target) -> str:
+        """ 
+        Метод наносит урон интеллекту цели.
+        """
         return target.intel_wound()
     
     
     def damage_stren(self, target) -> str:
+        """ 
+        Метод наносит урон силе цели.
+        """
         return target.stren_wound()
       
     
     def damage_dex(self, target) -> str:
+        """ 
+        Метод наносит урон ловкости цели.
+        """
         return target.dex_wound()
         
 
     def damage_armor(self, target) -> bool|str:
+        """ 
+        Метод наносит урон броне цели.
+        """
         if target.armor.empty:
             return False
         return True

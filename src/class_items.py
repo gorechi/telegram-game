@@ -3,6 +3,9 @@ from src.functions.functions import randomitem, tprint, roll, pprint
 
 
 class Spell:
+    """ 
+    Класс Заклинание. 
+    """
     def __init__(self, 
                  game, 
                  name='Обычное заклинание', 
@@ -25,14 +28,23 @@ class Spell:
 
     
     def __str__(self):
+        """ 
+        Возвращает строковое представление заклинания. 
+        """
         return self.name
 
 
     def __format__(self, format:str) -> str:
+        """ 
+        Возвращает лексему заклинания в нужном падеже.
+        """
         return self.lexemes.get(format, '')
 
     
     def take(self, who=''):
+        """ 
+        Метод вызывается когда кто-то забирает заклинание себе.
+        """
         if who == '':
             return False
         if not who.backpack.no_backpack:
@@ -41,11 +53,17 @@ class Spell:
             
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Проверяет, соответствует ли сообщение названию заклинания.
+        """
         names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список имен заклинания в разных падежах.
+        """
         names_list = ['заклинание']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -158,14 +176,23 @@ class Matches:
 
 
     def __format__(self, format:str) -> str:
+        """ 
+        Возвращает лексему спичек в нужном падеже.
+        """
         return self.lexemes.get(format, '')
         
  
     def check_name(self, message:str) -> bool:
+        """ 
+        Проверяет, соответствует ли сообщение названию спичек.
+        """
         return message.lower() in ['спички', 'коробок']
     
     
     def get_quantity(self) -> int:
+        """ 
+        Метод определяет, сколько спичек в коробке.
+        """
         return roll(Matches._max_quantity)
 
     
@@ -182,6 +209,9 @@ class Matches:
     
     
     def __add__(self, other) -> bool:
+        """ 
+        Метод сложения двух коробков спичек.
+        """
         if not isinstance(other, Matches):
             return False
         self.quantity += other.quantity
@@ -189,6 +219,9 @@ class Matches:
     
     
     def __str__(self) -> str:
+        """ 
+        Возвращает строковое представление спичек.
+        """
         return f'Коробок спичек, {self.quantity}'    
     
     
@@ -249,6 +282,9 @@ class Matches:
     
     
     def check_if_empty(self, who) -> str:
+        """ 
+        Метод проверяет, остались ли спички в коробке после использования.
+        """
         if self.quantity <= 0:
             who.backpack.remove(self)
             return f'{who.g("Герой", "Героиня")} зашвыривает пустую коробочку от спичек в угол комнаты.'
@@ -280,6 +316,9 @@ class Matches:
 
   
 class Map:
+    """ 
+    Класс Карта.
+    """
 
     _width_coefficient = 72
     """Коэффициент для расчета ширины карты."""
@@ -379,16 +418,25 @@ class Map:
     
 
     def __format__(self, format:str) -> str:
+        """ 
+        Возвращает лексему карты в нужном падеже.
+        """
         return self.lexemes.get(format, '')
 
     
     def decorate(self) -> None:
+        """ 
+        Метод добавляет в описание карты номер этажа замка.
+        """
         self.description = f'Карта, показывающая расположение комнат {self.floor.floor_number} этажа замка'
         for lexeme in self.lexemes:
             self.lexemes[lexeme] += f' {self.floor.floor_number} этажа'
     
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Проверяет, соответствует ли сообщение названию карты.
+        """
         return message.lower() in ['карта', 'карту', 'карты']
     
     
@@ -431,6 +479,9 @@ class Map:
 
     
     def generate_map_text(self, who, in_action: bool = False) -> list[bool, str]:
+        """ 
+        Метод генерирует текст, который будет выведен при использовании карты.
+        """
         if not in_action:
             if not who.check_fear:
                 return False, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.'
@@ -481,6 +532,9 @@ class Map:
             
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список имен карты в разных падежах.
+        """
         names_list = []
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -500,6 +554,9 @@ class Map:
 
 
 class Key:
+    """ 
+    Класс Ключ.     
+    """
     
     def __init__(self, game):
         self.game = game
@@ -564,26 +621,44 @@ class Key:
 
 
     def __format__(self, format:str) -> str:
+        """ 
+        Возвращает лексему ключа в нужном падеже.
+        """
         return self.lexemes.get(format, '')
 
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Проверяет, соответствует ли сообщение названию ключа.
+        """
         return message.lower() in ['ключ']
     
     
     def __str__(self) -> str:
+        """ 
+        Возвращает строковое представление ключа.
+        """
         return self.description
 
     
     def show(self):
+        """ 
+        Метод возвращает описание ключа в виде строки.
+        """
         return self.description
 
     
     def on_create(self):
+        """ 
+        Метод вызывается при создании ключа.
+        """
         return True
 
     
     def place(self, floor, room=None) -> bool:
+        """ 
+        Метод размещения ключа в замке.
+        """
         if not room:
             room = floor.get_random_unlocked_room()
         furniture = room.get_random_unlocked_furniture()
@@ -595,6 +670,9 @@ class Key:
 
     
     def take(self, who):
+        """ 
+        Метод вызывается когда кто-то забирает ключ себе.
+        """
         if not who.backpack.no_backpack:
             who.put_in_backpack(self)
             return f'{who.name} забирает {self.name} себе.'
@@ -602,6 +680,9 @@ class Key:
             
         
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Возвращает список имен ключа в разных падежах.
+        """
         names_list = []
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())

@@ -162,15 +162,24 @@ class Monster:
         }
         
     def is_not_hiding(self):
+        """ 
+        Метод проверяет, не прячется ли монстр в засаде.
+        """
         return not self.hide
     
     
     def attack_from_ambush(self, who):
+        """ 
+        Монстр атакует из засады.
+        """
         self.stop_hiding()
         self.fight(who)
         
         
     def stop_hiding(self):
+        """ 
+        Монстр выходит из засады.
+        """
         self.hide = False
         self.hiding_place = None
     
@@ -204,15 +213,24 @@ class Monster:
     
     
     def calm_down(self):
+        """ 
+        Метод успокаивает монстра после боя.
+        """
         self.disturbed = False
     
     
     def be_attacked(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод обрабатывает ситуацию, когда монстра атакуют.
+        """
         who.fight(self)
         return ''
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод возвращает список имен монстра в разных падежах.
+        """
         names_list = ['монстр', 'монстра', 'враг', 'врага', 'противник', 'противника']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -220,12 +238,18 @@ class Monster:
     
     
     def get_name_for_being_attacked(self, who) -> str:
+        """ 
+        Метод возвращает имя монстра, когда его атакуют.
+        """
         if who.current_position.check_light():
             return f'{self:accus}'.capitalize()
         return 'Кого-то, прячущегося в темноте'
 
     
     def __format__(self, format:str) -> str:
+        """ 
+        Метод возвращает лексему монстра в нужном падеже.
+        """
         if format == 'pronoun':
             if self.gender == 0:
                 return 'он'
@@ -234,6 +258,7 @@ class Monster:
     
     
     def make_noise_when_dead(self):
+        """Метод возвращает уровень шума, который издает монстр при смерти."""
         return 0
     
     
@@ -253,14 +278,19 @@ class Monster:
     
     
     def generate_initiative(self) -> int:
+        """Метод генерирует инициативу монстра для боя."""
         return self.initiative.roll()
 
     
     def is_hero(self) -> bool:
+        """Метод проверяет, является ли объект героем."""
         return False
     
     
     def generate_in_fight_description(self, index:int) -> str:
+        """ 
+        Метод возвращает описание монстра в бою.
+        """
         if self.current_position.light:
             line = f'{index}: {self.name}: сила - d{self.stren}'
             line += self.generate_weapon_text()
@@ -271,12 +301,18 @@ class Monster:
     
     
     def generate_weapon_text(self) -> str:
+        """ 
+        Метод возвращает текстовое описание оружия монстра.
+        """
         if not self.weapon.empty:
             return f'+{self.weapon.damage.text()}'
         return ''
     
     
     def generate_protection_text(self) -> str:
+        """ 
+        Метод возвращает текстовое описание защиты монстра.
+        """
         if not self.shield.empty and self.armor.empty:
             return f', защита - {self.shield.protection.text()}'
         elif self.shield.empty and not self.armor.empty:
@@ -335,6 +371,9 @@ class Monster:
 
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Метод проверяет, совпадает ли введенное сообщение с именем монстра
+        """
         room = self.current_position
         if room.light:
             names_list = self.get_names_list(['nom', "accus"])
@@ -359,6 +398,9 @@ class Monster:
     
     
     def get_poison_protection(self) -> int:
+        """ 
+        Метод возвращает защиту от отравления монстра.
+        """
         protection = self.poison_protection.roll()
         if self.armor.is_poisoned() or self.shield.is_poisoned():
             protection += 2
@@ -405,6 +447,9 @@ class Monster:
     
     
     def choose_what_to_enchant(self, rune:Rune):
+        """ 
+        Метод выбирает, какой предмет экипировки монстра будет зачарован рунной.
+        """
         items = [
             self.weapon,
             self.armor,
@@ -609,6 +654,9 @@ class Monster:
     
     
     def attack(self, fight:Fight) -> list[str]:
+        """ 
+        Метод обрабатывает атаку монстра в бою.
+        """
         target = self.choose_target(fight)
         hero = fight.hero
         self_name = self.get_name_in_darkness(hero)
@@ -636,6 +684,9 @@ class Monster:
         
         
     def choose_target(self, fight:Fight):
+        """ 
+        Метод выбирает цель для атаки монстра в бою.
+        """
         targets = fight.get_targets(self)
         if not targets:
             return False
@@ -649,10 +700,16 @@ class Monster:
 
     
     def choose_target_in_darkness(self, targets:list):
+        """ 
+        Метод выбирает цель для атаки монстра в темноте.
+        """
         return randomitem(targets)
     
     
     def generate_attack(self, target, self_name:str) -> list[int, list[str]]:
+        """ 
+        Генерирует атаку монстра на цель, возвращая общий урон и сообщение об атаке.
+        """
         message = []
         mele_attack = self.generate_mele_attack(target)
         weapon_attack = self.generate_weapon_attack(target=target)
@@ -667,6 +724,10 @@ class Monster:
     
     
     def get_name_in_darkness(self, target):
+        """ 
+        Возвращает имя монстра в зависимости от освещенности в комнате.
+        Если монстр виден, возвращается его имя. Если монстр не виден, возвращается общее описание в темноте.
+        """
         if not target:
             return self.name
         if target.check_light():
@@ -682,6 +743,10 @@ class Monster:
     
     
     def defence(self, attacker):
+        """ 
+        Метод обрабатывает защиту монстра от атаки.
+        Возвращает значение защиты, или -1 если атака не попала.
+        """
         result = 0
         weapon = attacker.weapon
         parry_chance = self.parry_chance.roll()
@@ -1020,6 +1085,9 @@ class Plant(Monster):
 
 
     def grow(self):
+        """ 
+        Метод для размножения растения в соседние комнаты.
+        """
         available_rooms = self.floor.get_rooms_around(self.current_position)
         target_rooms = randomitem(available_rooms, how_many=2)
         for room in target_rooms:
@@ -1027,6 +1095,9 @@ class Plant(Monster):
 
 
     def choose_target(self, fight:Fight):
+        """ 
+        Метод выбирает цель для атаки растения в бою.
+        """
         targets = fight.get_targets(self)
         if self.last_attacker and self.last_attacker in targets:
             return self.last_attacker
@@ -1093,6 +1164,9 @@ class Berserk(Monster):
     
     
     def generate_mele_attack(self, target):
+        """ 
+        Генерирует атаку в ближнем бою на цель, учитывая ярость берсерка.
+        """
         self.rage = (int(self.start_health) - int(self.health)) // Berserk._rage_coefficient
         base_stren_die = self.stren.dice[0]
         poison_die = base_stren_die // 3
@@ -1104,6 +1178,9 @@ class Berserk(Monster):
     
     
     def choose_target(self, fight:Fight):
+        """ 
+        Метод выбирает цель для атаки берсерка в бою.
+        """
         targets = fight.get_targets(self)
         if targets:
             return randomitem(targets)
@@ -1139,6 +1216,10 @@ class Vampire(Monster):
 
     
     def choose_target(self, fight:Fight):
+        """ 
+        Метод выбирает цель для атаки вампира в бою.
+        1. Исключает из возможных целей определенные классы монстров.
+        """
         classes_to_exclude = [
             'Vampire',
             'Plant',
@@ -1304,6 +1385,9 @@ class Skeleton(Monster):
     
     
     def choose_target(self, fight:Fight):
+        """ 
+        Метод выбирает цель для атаки скелета в бою.
+        """
         not_undead = fight.get_fighter_by_health(self, exclude=['Skeleton', 'WalkingDead'], mode='Min')
         if not_undead:
             return not_undead
@@ -1311,10 +1395,16 @@ class Skeleton(Monster):
     
     
     def make_noise_when_dead(self):
+        """ 
+        Метод возвращает значение, указывающее, издает ли скелет шум при смерти.
+        """
         return 1
     
     
     def get_poison_protection(self) -> int:
+        """ 
+        Метод возвращает значение защиты от яда для скелета.
+        """
         return 100
 
 
@@ -1394,6 +1484,9 @@ class Corpse():
         
     
     def after_search(self, who):
+        """ 
+        Метод вызывается после обыска трупа.
+        """
         return
     
     
@@ -1442,10 +1535,16 @@ class Corpse():
         return description
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Проверяет, соответствует ли введенное имя имени трупа.
+        """
         return message.lower() == self.name
     
     
     def examine(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод изучения трупа.
+        """
         if self.examined:
             return f'{who.name} уже осматривал {self.name} и не находит ничего нового.'
         if self.try_to_rise():
@@ -1454,6 +1553,9 @@ class Corpse():
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод возвращает список имен трупа в различных падежах.
+        """
         return ['труп', self.name]
     
     
