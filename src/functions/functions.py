@@ -76,6 +76,11 @@ def randomitem_dict(dictionary):
 
 
 def howmany(number:int, options_list:list[str]) -> str:
+    """
+    Функция получает на вход число и три вариант перечисляемого слова
+    (например, "монета", "монеты", "монет") и возвращает строку,
+    состоящую из числа и правильной формы слова.    
+    """
     last_digit, last_two_digits = int(number % 10), int(number % 100)
     if last_digit == 1 and last_two_digits != 11:
         return f'{number} {options_list[0]}'
@@ -85,6 +90,9 @@ def howmany(number:int, options_list:list[str]) -> str:
 
 
 def generate_keyboard(keys:list, keys_in_row:int):
+    """
+    Функция генерирует раскладку клавиатуры для телеграм.    
+    """
     for i in range(0, len(keys), keys_in_row):
         yield keys[i : i + keys_in_row]
 
@@ -115,6 +123,9 @@ def get_fight_markup(game) -> types.ReplyKeyboardMarkup:
 
 
 def get_direction_markup() -> types.ReplyKeyboardMarkup:
+    """
+    Функция генерирует раскладку клавиатуры для выбора направления движения героя.    
+    """
     keyboard = [['идти вверх', 'идти вниз'], ['идти налево', 'идти направо']]
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
     markup.keyboard = keyboard
@@ -122,6 +133,9 @@ def get_direction_markup() -> types.ReplyKeyboardMarkup:
 
 
 def get_levelup_markup() -> types.ReplyKeyboardMarkup:
+    """
+    Функция генерирует раскладку клавиатуры для выбора характеристики героя при повышении уровня.
+    """
     keyboard = [['здоровье', 'силу'], ['ловкость', 'интеллект']]
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=False)
     markup.keyboard = keyboard
@@ -129,12 +143,18 @@ def get_levelup_markup() -> types.ReplyKeyboardMarkup:
 
 
 def get_cancel_markup() -> types.ReplyKeyboardMarkup:
+    """
+    Функция генерирует раскладку клавиатуры с одной кнопкой "Отмена".    
+    """
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=False)
     markup.add(types.KeyboardButton('Отмена'))
     return markup
 
 
 def get_markup(game, state:str):
+    """
+    Функция возвращает нужную раскладку клавиатуры в зависимости от состояния игры.    
+    """
     if state == 'off':
         return types.ReplyKeyboardRemove(selective=False)
     elif state == 'fight':
@@ -150,6 +170,9 @@ def get_markup(game, state:str):
 
 
 def cprint(text:str):
+    """
+    Функция печатает текст в консоль.    
+    """
     if not text:
         return False
     if isinstance(text, str):
@@ -164,6 +187,9 @@ def cprint(text:str):
 
 
 def tprint(game, text, state=''):
+    """
+    Функция печатает текст в чат телеграм.    
+    """
     if not text:
         return False
     markup = get_markup(game, state)
@@ -179,6 +205,9 @@ def tprint(game, text, state=''):
 
 
 def pprint(game, text, width=200, height=200, color='#FFFFFF'):
+    """
+    Функция печатает текст в чат телеграм в виде картинки.    
+    """
     pic = Image.new('RGB', (width, height), color=color)
     font = ImageFont.truetype('resources/PTMono-Regular.ttf', size=18)
     draw_text = ImageDraw.Draw(pic)

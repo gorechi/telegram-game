@@ -3,7 +3,9 @@
 from src.functions.functions import randomitem, tprint, howmany
 
 class Protection:
-    
+    """ 
+    Родительский класс для всех видов защиты.     
+    """
     _elements_dictionary = {1: 'огня',
                         2: 'пламени',
                         3: 'воздуха',
@@ -45,28 +47,45 @@ class Protection:
     
     
     def __format__(self, format:str) -> str:
+        """ 
+        Метод форматирования имени защиты в зависимости от падежа.
+        """
         return self.lexemes.get(format, '')
     
 
     def __str__(self):
+        """ 
+        Метод строкового представления защиты.
+        """
         name_string = f'{self:nom}' + self.enchantment()
         return f'{name_string} ({self.protection.text()})'
     
     
     def show_for_examine_hero(self, who) -> str:
+        """ 
+        Метод отображения защиты при осмотре героя.
+        """
         return f'{self.name} (в руках у героя)'
     
     
     def show_for_examine_room(self, who) -> str:
+        """ 
+        Метод отображения защиты при осмотре комнаты.
+        """
         return f'{self.name} (лежит в комнате)'
 
     
-    
     def on_create(self):
+        """ 
+        Метод, вызываемый при создании защиты.
+        """
         return True
 
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Метод проверки, относится ли сообщение к этой защите.
+        """
         if self.empty:
             return False
         names_list = self.get_names_list(['nom', "accus"])
@@ -74,12 +93,19 @@ class Protection:
     
     
     def is_poisoned(self):
+        """ 
+        Метод проверки, есть ли в защите руны с ядом.
+        """
         for i in self.runes:
             if i.poison:
                 return True
         return False
     
     def element(self):
+        """ 
+        Метод определения общей стихии защиты.
+        0 - нет стихии
+        """
         element_sum = 0
         for rune in self.runes:
             element_sum += rune.element
@@ -87,12 +113,18 @@ class Protection:
 
     
     def can_be_enchanted(self) -> bool:
+        """ 
+        Метод проверки, можно ли зачаровать защиту.
+        """
         if len(self.runes) > 1 or self.empty or not self.enchatable:
             return False
         return True
     
     
     def enchant(self, rune):
+        """ 
+        Метод зачарования защиты.
+        """
         if self.can_be_enchanted():
             self.runes.append(rune)
             self.protection.increase_modifier(rune.defence)
@@ -101,6 +133,9 @@ class Protection:
 
 
     def enchantment(self):
+        """ 
+        Метод получения строкового представления стихийной части защиты.
+        """
         if len(self.runes) not in [1, 2]:
             return ''
         else:
@@ -108,6 +143,9 @@ class Protection:
 
 
     def protect(self, who, mastery:int=0):
+        """ 
+        Метод защиты персонажа.
+        """
         if who.hide:
             who.hide = False
             return self.protection.roll(add=[mastery])
@@ -122,6 +160,9 @@ class Protection:
 
     
     def show(self) -> str:
+        """ 
+        Метод отображения защиты при осмотре.
+        """
         if self.empty:
             return None
         full_name = self.get_full_names('nom')
@@ -129,6 +170,9 @@ class Protection:
 
     
     def get_full_names(self, key:str=None) -> str|list:
+        """ 
+        Метод получения полного имени защиты с учетом ее стихии.
+        """
         if self.element() != 0:
             return self.get_element_names(key)
         if key:
@@ -147,10 +191,16 @@ class Protection:
     
     
     def get_element_decorator(self) -> str|None:
+        """ 
+        Метод получения строкового представления стихии защиты.
+        """
         return Protection._elements_dictionary.get(self.element(), None)
         
         
     def get_element_names(self, key:str=None) -> str|dict:
+        """ 
+        Метод получения имени защиты с учетом ее стихии.
+        """
         names = {}
         element_decorator = self.get_element_decorator()
         if not element_decorator:
@@ -165,6 +215,9 @@ class Protection:
 
 #Класс Доспех (подкласс Защиты)
 class Armor(Protection):
+    """ 
+    Класс доспехов.     
+    """
     def __init__(self, game):
         super().__init__(game)
         self.hero_actions = {
@@ -218,10 +271,16 @@ class Armor(Protection):
   
     
     def on_create(self):
+        """ 
+        Метод, вызываемый при создании доспехов.
+        """
         return True
 
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод получения списка имен доспехов для распознавания команд.
+        """
         names_list = ['защита', 'защиту', 'доспех', 'доспехи']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -230,10 +289,19 @@ class Armor(Protection):
     
     
     def examine(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод осмотра доспехов.
+        """
         return self.show()
     
     
     def place(self, castle, room_to_place = None):
+        """ 
+        Метод размещения доспехов в комнате замка.
+        1. Если в комнате есть монстр, который может носить доспехи, он надевает их.
+        2. Иначе, если в комнате есть мебель, которая может содержать оружие, доспехи помещаются туда.
+        3. Иначе доспехи становятся частью лута комнаты.
+        """
         if room_to_place:
             room = room_to_place
         else:
@@ -253,6 +321,9 @@ class Armor(Protection):
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who, in_action:bool=False) -> list[str]:
+        """ 
+        Метод надевания доспехов.
+        """
         old_armor = who.armor
         message = [f'{who.name} использует {self:accus} как защиту.']
         if not old_armor.empty:
@@ -280,6 +351,9 @@ class Armor(Protection):
 
 #Класс Щит (подкласс Защиты)
 class Shield (Protection):
+    """ 
+    Класс щитов.     
+    """
     
     _crushed_upper_limit = 10
     """Верхняя планка случайных значений при проверке того, что щит сломан."""
@@ -457,10 +531,16 @@ class Shield (Protection):
     
     
     def on_create(self):
+        """ 
+        Метод, вызываемый при создании щита.
+        """
         return True
  
     
     def get_damaged_names(self, key:str=None) -> str|dict:
+        """ 
+        Метод получения имени щита с учетом его повреждений.
+        """
         names = {}
         damage_decorator = self.get_damage_decorator()
         if not damage_decorator:
@@ -473,6 +553,9 @@ class Shield (Protection):
     
     
     def get_full_names(self, key:str=None) -> str|dict:
+        """ 
+        Метод получения полного имени щита с учетом его повреждений и стихии.
+        """
         names = {}
         damage_decorator = self.get_damage_decorator()
         element_decorator = self.get_element_decorator()
@@ -489,6 +572,10 @@ class Shield (Protection):
           
     
     def take_away(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод убирания щита за спину.
+        1. Если щит уже за спиной, ничего не происходит.
+        """
         if not who.shield.empty:
             who.shield, who.removed_shield = who.removed_shield, who.shield
             return f'{who.name} убирает {self.get_full_names("accus")} за спину.'
@@ -506,6 +593,11 @@ class Shield (Protection):
     
     
     def drop(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод выбрасывания щита.
+        1. Если щит в руке, персонаж выбрасывает его и он становится частью лута комнаты.
+        2. Если щит за спиной, персонаж достает его и ставит его к стене.
+        """
         room = who.current_position
         if who.shield == self:
             message = f'{who.name} швыряет {self.name} на пол комнаты.'
@@ -520,6 +612,9 @@ class Shield (Protection):
             
     
     def examine(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод осмотра щита.
+        """
         return self.show()
     
     
@@ -539,10 +634,17 @@ class Shield (Protection):
     
     
     def get_damage_decorator(self) -> list|None:
+        """ 
+        Метод получения строкового представления повреждений щита.
+        """
         return Shield._states_dictionary.get(self.accumulated_damage // 1, None)
     
     
     def check_if_broken(self, attack:int=0, mastery:int=0) -> bool:
+        """ 
+        Метод проверки, сломан ли щит.
+        Если щит сломан, он удаляется из игры.
+        """
         damage_limit = dice(1, Shield._crushed_upper_limit)
         damage_to_shield = (attack + mastery) * self.accumulated_damage
         if damage_limit < damage_to_shield:
@@ -553,6 +655,10 @@ class Shield (Protection):
     
     
     def take_damage(self, is_hiding:bool=False) -> None:
+        """ 
+        Метод нанесения щиту урона.
+        1. Если персонаж спрятался, щит получает больший урон.
+        """
         if is_hiding:
             dice_result = dice(Shield._damage_when_hiding_min, Shield._damage_when_hiding_max) / 100
         else:
@@ -561,10 +667,16 @@ class Shield (Protection):
     
     
     def get_repair_price(self):
+        """ 
+        Метод получения стоимости починки щита.
+        """
         return self.accumulated_damage * Shield._repair_multiplier // 1
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод получения списка имен щита для распознавания команд.
+        """
         names_list = ['щит']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -575,6 +687,12 @@ class Shield (Protection):
 
     
     def place(self, castle, room_to_place = None):
+        """ 
+        Метод размещения щита в комнате замка.
+        1. Если в комнате есть монстр, который может носить щиты, он берет его.
+        2. Иначе, если в комнате есть мебель, которая может содержать оружие, щит помещается туда.
+        3. Иначе щит становится частью лута комнаты.
+        """
         if room_to_place:
             room = room_to_place
         else:
@@ -593,6 +711,12 @@ class Shield (Protection):
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):
+        """ 
+        Метод взятия щита в руку.
+        1. Если в руке уже есть щит, персонаж выбрасывает его и берет новый.
+        2. Если в руке двуручное оружие, щит помещается за спину.
+        3. Иначе щит берется в руку.
+        """
         old_shield = None
         if not who.shield.empty:
             old_shield = who.shield

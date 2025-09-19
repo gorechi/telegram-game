@@ -75,20 +75,32 @@ class Rune:
          
     
     def __str__(self) -> str:
+        """ 
+        Метод строкового представления руны.
+        """
         return f'{self.name} {Rune._elements_dictionary[self.element]} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
     
     
     def __format__(self, format:str) -> str:
+        """ 
+        Метод форматирования руны.
+        """
         return self.lexemes.get(format, '')
 
       
     def check_name(self, message:str) -> bool:
+        """ 
+        Метод проверки, относится ли сообщение к руне.
+        """
         names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод получения списка имен руны для распознавания команд.
+        """
         names_list = ['руна', 'руну']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -116,7 +128,11 @@ class Rune:
         return self.place_in_room(room)
           
         
-    def place_in_room(self, room) -> bool:    
+    def place_in_room(self, room) -> bool:
+        """ 
+        Метод раскидывания руны по комнате замка. 
+        1. Если в комнате есть секретное место, руна помещается туда. 
+        """    
         secret = self.game.secret_places_controller.get_random_secret_by_room(room)
         if secret:
             secret.loot.add(self)

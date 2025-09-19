@@ -39,4 +39,7 @@ class PotionsController(Controller):
     
     
     def additional_actions(self, object) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке зелья.
+        """
         return True

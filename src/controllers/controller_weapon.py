@@ -408,12 +408,18 @@ class WeaponController(Controller):
         
     
     def additional_actions(self, weapon) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке оружия.
+        """
         if type(weapon) is not Torch:
             self.decorate(weapon)
         return True
     
     
     def decorate(self, weapon) -> bool:
+        """
+        Функция добавляет украшение к оружию.
+        """
         decorators = WeaponController._decorators.get(weapon.weapon_type, [])
         decorator = randomitem(decorators)
         if not decorator:
@@ -430,6 +436,9 @@ class WeaponController(Controller):
         return True
     
     def get_empty_object_by_class_name(self, class_name:str):
+        """
+        Функция возвращает пустой объект по имени класса.
+        """
         new_class = self.__class__._classes[class_name]
         new_object = new_class(game=self.game)
         new_object.empty = True

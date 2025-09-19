@@ -47,18 +47,30 @@ class Furniture:
 
     
     def __str__(self):
+        """
+        Возвращает строковое представление мебели.
+        """
         return self.where + ' ' + self.state + ' ' + self.name
     
     
     def after_unlock(self, who):
+        """
+        Выполняется после отпирания мебели.
+        """
         return
     
     
     def after_search(self, who):
+        """
+        Выполняется после обыска мебели.
+        """
         return
     
     
     def is_locked(self, room=None) -> bool:
+        """
+        Проверяет, заперта ли мебель.
+        """
         return self.locked
 
     
@@ -77,24 +89,39 @@ class Furniture:
 
     
     def __format__(self, format:str) -> str:
+        """
+        Возвращает строку с названием мебели в нужном падеже.
+        """
         return self.lexemes.get(format, '')
     
     
     def on_create(self):
+        """
+        Выполняется при создании мебели.
+        """
         return True
 
     
     def put(self, item):
+        """
+        Помещает предмет в мебель.
+        """
         self.loot.pile.append(item)
     
     
     def check_trap(self) -> bool:
+        """
+        Проверяет, есть ли в мебели ловушка.
+        """
         if self.trap.activated:
             return True
         return False
    
     
     def monster_in_ambush(self):
+        """
+        Проверяет, прячется ли в мебели монстр.
+        """
         monsters = self.room.monsters()
         if monsters:
             for monster in monsters:
@@ -104,6 +131,9 @@ class Furniture:
     
     
     def get_names_list(self, cases:list=[], room=None) -> list:
+        """
+        Возвращает список имен мебели в разных падежах.
+        """
         names_list = self.basic_lexemes
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -111,11 +141,17 @@ class Furniture:
 
 
     def check_name(self, message:str) -> bool:
+        """
+        Проверяет, соответствует ли сообщение названию мебели.
+        """
         names_list = self.get_names_list(['nom', "accus"])
         return message.lower() in names_list
     
     
     def show(self):
+        """
+        Возвращает описание мебели.
+        """
         message = []
         message.append(f'{self.where} {self.state} {self.name}.')
         if self.monster_in_ambush():
@@ -124,6 +160,9 @@ class Furniture:
 
     
     def place(self, floor=None, room_to_place=None):
+        """
+        Размещает мебель в комнате.
+        """
         if room_to_place:
             if self.furniture_type not in room_to_place.furniture_types():
                 room_to_place.furniture.append(self)

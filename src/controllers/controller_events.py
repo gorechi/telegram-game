@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from collections import deque
 
 class EventsController():
-    
+    """
+    Класс для управления событиями.
+    """    
     @dataclass
     class Event():
         event_subject: object
@@ -18,6 +20,9 @@ class EventsController():
 
 
     def check_pending_events(self, counter:int) -> None:
+        """
+        Проверяет ожидающие события и перемещает их в очередь, если их счетчик достиг нуля.
+        """
         for event in self.pending_events:
             event.counter -= counter
             if event.counter <= 0:
@@ -32,6 +37,9 @@ class EventsController():
                      counter: int = 0,
                      parameters: dict = None
                      ) -> None:
+        """
+        Создает новое событие и добавляет его в очередь или в список ожидающих событий.
+        """
         new_event = EventsController.Event(
             event_subject=event_subject,
             event_object=event_object,
@@ -46,6 +54,9 @@ class EventsController():
 
     
     def execute_all_events(self, counter:int) -> None:
+        """
+        Выполняет все события в очереди, обновляя счетчики ожидающих событий.
+        """
         self.check_pending_events(counter)
         while self.queue:
             event = self.queue.popleft()
@@ -53,11 +64,17 @@ class EventsController():
 
     
     def execute_event(self, event) -> None:
+        """
+        Выполняет одно событие, вызывая соответствующий метод у субъекта события.
+        """
         method = getattr(event.subject, event.subject_method_name, None)
         if method and callable(method):
             method(event.object)
 
     
     def delete_pending_events_by_subject(self, subject:object) -> None:
+        """
+        Удаляет все ожидающие события, связанные с определенным субъектом.
+        """
         new_list = [event for event in self.pending_events if event.subject is not subject]
         self.pending_events = new_list

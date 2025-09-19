@@ -3,7 +3,9 @@ from src.class_dice import Dice
 
 
 class Weapon:
-    
+    """ 
+    Класс Оружие.     
+    """
     _elements_dictionary = {1: 'огня',
                         2: 'пламени',
                         3: 'воздуха',
@@ -130,18 +132,30 @@ class Weapon:
 
     
     def examine(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод осмотра оружия.
+        """
         return self.show()
     
     
     def show_for_examine_hero(self, who) -> str:
+        """ 
+        Метод возвращает строку для отображения оружия в инвентаре героя.
+        """
         return f'{self.name} (в руках у героя)'
     
     
     def show_for_examine_room(self, who) -> str:
+        """ 
+        Метод возвращает строку для отображения оружия в комнате.
+        """
         return f'{self.name} (лежит в комнате)'
     
     
     def name_for_change(self, who) -> str:
+        """ 
+        Метод возвращает строку для отображения оружия при смене оружия.
+        """
         second_weapon = who.get_second_weapon()
         if not second_weapon.empty:
             return f'{self.show()} (меняется на {second_weapon.show()})'
@@ -149,6 +163,10 @@ class Weapon:
     
     
     def can_be_changed(self, who) -> bool:
+        """ 
+        Метод проверяет, можно ли сменить оружие.
+        Возвращает True если можно, False если нельзя.
+        """
         second_weapon = who.get_second_weapon()
         if who.weapon == self and not second_weapon.empty:
             return True
@@ -177,26 +195,44 @@ class Weapon:
     
     
     def place_into_backpack(self, who):
+        """ 
+        Метод помещает оружие в рюкзак героя.
+        """
         who.backpack.append(self)
     
     
     def __format__(self, format:str) -> str:
+        """ 
+        Обрабатывает запрос на отображение экземпляра класса в виде форматированной строки
+        """
         return self.lexemes.get(format, '')
     
     
     def on_create(self) -> bool:
+        """ 
+        Метод вызывается после создания экземпляра класса. Ничего не делает.
+        """
         return True
 
     
     def get_hit_chance(self) -> int:
+        """ 
+        Метод возвращает шанс попадания оружием.
+        """
         return self.hit_chance.roll()
     
     
     def __str__(self) -> str:
+        """ 
+        Метод возвращает полное имя оружия с характеристиками.
+        """
         return f'{self.name}{self.enchantment()} ({self.damage.text()})'
     
     
     def get_full_names(self, key:str=None) -> str|list:
+        """ 
+        Метод возвращает полное имя оружия с элементом, если он есть.
+        """
         if self.element() != 0:
             return self.get_element_names(key)
         if key:
@@ -217,10 +253,17 @@ class Weapon:
     
     
     def get_element_decorator(self) -> str|None:
+        """ 
+        Метод возвращает название элемента оружия для добавления к названию оружия.
+        """
         return Weapon._elements_dictionary.get(self.element(), None)
         
         
     def get_element_names(self, key:str=None) -> str|dict|None:
+        """ 
+        Метод возвращает имена оружия с элементом для распознавания команд.
+        Если key задан, возвращает имя для конкретного падежа.
+        """
         names = {}
         element_decorator = self.get_element_decorator()
         if not element_decorator:
@@ -233,6 +276,9 @@ class Weapon:
     
     
     def check_name(self, message:str) -> bool:
+        """ 
+        Метод проверки, относится ли сообщение к оружию.
+        """
         if self.empty:
             return False
         names_list = self.get_names_list(['nom', "accus"])
@@ -240,6 +286,10 @@ class Weapon:
 
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """ 
+        Метод возвращает список имен оружия для распознавания команд.
+        Если указаны падежи, возвращает имена только в этих падежах.
+        """
         names_list = ['оружие']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
@@ -250,6 +300,10 @@ class Weapon:
     
     
     def element(self):
+        """ 
+        Метод возвращает элемент оружия.
+        Если оружие не зачаровано, возвращает 0.
+        """
         element_sum = 0
         for rune in self.runes:
             element_sum += rune.element
@@ -257,6 +311,10 @@ class Weapon:
 
     
     def get_poison_level(self):
+        """ 
+        Метод возвращает уровень отравления оружия.
+        Если оружие не отравлено, возвращает 0.
+        """
         poison_level = 0
         for rune in self.runes:
             if rune.poison:
@@ -265,12 +323,18 @@ class Weapon:
     
     
     def can_be_enchanted(self) -> bool:
+        """ 
+        Метод проверяет, можно ли зачаровать оружие.
+        """
         if len(self.runes) > 1 or self.empty or not self.enchatable:
             return False
         return True
     
     
     def enchant(self, rune):
+        """ 
+        Метод добавляет руну к оружию, если это возможно.
+        """
         if self.can_be_enchanted():
             self.runes.append(rune)
             self.damage.increase_modifier(rune.damage)
@@ -313,6 +377,9 @@ class Weapon:
 
     
     def take(self, who, in_action=False) -> list[str]:
+        """ 
+        Метод взятия оружия.
+        """
         message = [f'{who.name} берет {self:accus}.']
         second_weapon = who.get_second_weapon()
         if who.weapon.empty:
@@ -336,6 +403,9 @@ class Weapon:
 
     
     def show(self):
+        """ 
+        Метод возвращает описание оружия в виде строки.
+        """
         damage_string = self.damage.text()
         if self.twohanded:
             name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
@@ -345,6 +415,9 @@ class Weapon:
 
     
     def use(self, who, in_action=False) -> list[str]:
+        """ 
+        Метод использования оружия.
+        """
         if not who.weapon.empty:
             if who.weapon == self:
                 return [f'{who.name} уже использует {self:accus} в качестве оружия.']
@@ -366,6 +439,10 @@ class Weapon:
 
     
     def place(self, floor, room_to_place = None):
+        """ 
+        Метод раскидывания оружия по замку. 
+        1. Если указана комната, оружие помещается туда.
+        """
         if room_to_place:
             room = room_to_place
         else:
@@ -385,6 +462,10 @@ class Weapon:
         
 
 class Torch(Weapon):
+    """ 
+    Класс Факел.     
+    1. Факел можно зажигать и тушить.     
+    """
     
     def __init__(self, game):
         super().__init__(game)
@@ -450,6 +531,9 @@ class Torch(Weapon):
 
 
     def extinguish(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод тушит факел в руках героя.
+        """
         self.burning = False
         if who.check_light():
             return f'{who.name} тушит факел, который держит руке.'
@@ -457,6 +541,9 @@ class Torch(Weapon):
     
     
     def extinguish_in_room(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод тушит факел, находящийся в комнате.
+        """
         self.burning = False
         if who.check_light():
             return f'{who.name} тушит факел, который освещает комнату.'
@@ -464,6 +551,9 @@ class Torch(Weapon):
     
     
     def fire(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод зажигает факел в руках героя.
+        """
         matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
         if matches_in_backpack and matches_in_backpack.quantity > 0:
             matches_in_backpack.use_one()
@@ -473,6 +563,11 @@ class Torch(Weapon):
     
     
     def fire_in_room(self, who, in_action:bool=False) -> str:
+        """ 
+        Метод зажигает факел, находящийся в комнате.
+        1. Если в комнате нет света, то после зажигания факела в комнате становится светло.
+        2. Если в комнате уже есть свет, то просто зажигается факел
+        """
         matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
         if matches_in_backpack and matches_in_backpack.quantity > 0:
             matches_in_backpack.use_one()
@@ -483,41 +578,74 @@ class Torch(Weapon):
     
     
     def is_not_burning(self, room=None) -> bool:
+        """ 
+        Метод проверяет, не горит ли факел.
+        1. Если факел не горит, возвращает True.
+        """
         return not self.burning
     
     
     def is_burning(self, room=None) -> bool:
+        """ 
+        Метод проверяет, горит ли факел.
+        1. Если факел горит, возвращает True.
+        """
         return self.burning
     
     
     def place_into_backpack(self, who):
+        """ 
+        Метод помещает факел в рюкзак героя.
+        1. При помещении факела в рюкзак, он автоматически тушится.
+        """
         who.backpack.append(self)
         self.burning = False
         
 
     def show_for_examine_hero(self, who) -> str:
+        """ 
+        Метод возвращает строку для отображения факела в инвентаре героя.
+        """
         if self.burning:
             return f'горящий {self:nom} в руках у {who:gen}'
         return f'потухший {self:nom}, принадлежащий {who:dat}'
     
     
     def show_for_examine_room(self, who) -> str:
+        """ 
+        Метод возвращает строку для отображения факела в комнате.
+        1. Если факел горит, возвращает "горящий факел, находящийся в комнате".
+        2. Если факел потух, возвращает "потухший факел, находящийся в комнате".
+        """
         if self.burning:
             return f'горящий {self:nom}, находящийся в комнате'
         return f'потухший {self:nom}, находящийся в комнате'
     
     
     def light(self):
+        """ 
+        Метод зажигает факел.
+        """
         self.burning = True
         
     
     def element(self):
+        """ 
+        Метод возвращает элемент факела.
+        1. Если факел горит, возвращает 2 (элемент пламени).
+        2. Если факел потух, возвращает 0 (факел не зачарован).
+        """
         if self.burning:
             return 2
         return 0
     
     
     def show(self):
+        """ 
+        Метод возвращает описание факела в виде строки.
+        1. Если факел горит, возвращает "Горящий факел (характеристики), тип".
+        2. Если факел потух, возвращает "Потухший факел (характеристики), тип".
+        """
         damage_string = self.damage.text()
         if self.burning:
             name = 'Горящий факел'
@@ -527,6 +655,10 @@ class Torch(Weapon):
     
     
     def place(self, floor, room_to_place = None) -> bool:
+        """ 
+        Метод раскидывания факелов по замку. 
+        1. Если указана комната, факел помещается туда.
+        """
         if room_to_place:
             room = room_to_place
         else:

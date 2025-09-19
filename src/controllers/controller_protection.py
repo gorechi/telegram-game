@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.class_protection import Armor, Shield, Protection
+from src.class_protection import Armor, Shield
 from src.class_controller import Controller
 from src.functions.functions import randomitem
 
@@ -301,16 +301,25 @@ class ProtectionController(Controller):
         
     
     def additional_actions(self, protection) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке доспехов.
+        """
         self.decorate(protection)
         return True
     
     
     def decorate(self, protection) -> None:
+        """
+        Функция выполняет декорирование доспехов.
+        """
         if isinstance(protection, Armor):
             self.decorate_armor(protection)
     
     
     def decorate_armor(self, armor) -> bool:
+        """
+        Функция выполняет декорирование доспехов.
+        """
         decorators = ProtectionController._armor_decorators.get(armor.protection_type, [])
         decorator = randomitem(decorators)
         if not decorator:

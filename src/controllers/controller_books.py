@@ -5,7 +5,7 @@ from src.class_controller import Controller
 from src.functions.functions import randomitem
 
 class BooksController(Controller):
-    """Класс для управления героями."""
+    """Класс для управления книгами."""
 
     @dataclass
     class Template():
@@ -113,12 +113,18 @@ class BooksController(Controller):
     
     
     def additional_actions(self, object) -> bool:
+        """
+        Выполняет дополнительные действия с объектом после его создания.
+        """
         self.decorate(object)
         self.define_price(object)
         return True
     
     
     def decorate(self, book):
+        """
+        Украшает книгу, создавая её имя и текст.
+        """
         description_dict = randomitem(BooksController._descriptions)
         name_dict = BooksController._names
         book.lexemes = {}
@@ -130,4 +136,7 @@ class BooksController(Controller):
     
     
     def define_price(self, book):
+        """
+        Определяет цену книги, используя базовую цену и бросок кубика.
+        """
         book.base_price += book.price_dice.roll()

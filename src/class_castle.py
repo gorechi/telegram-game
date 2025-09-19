@@ -5,6 +5,9 @@ from src.functions.functions import randomitem
 
 
 class Floor:
+    """
+    Класс этажа замка.    
+    """
             
     def __init__(self, game):
         """

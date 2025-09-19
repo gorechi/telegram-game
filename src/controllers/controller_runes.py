@@ -68,6 +68,9 @@ class RunesController(Controller):
     
     
     def additional_actions(self, item) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке руны.
+        """
         self.generate_element(item)
         self.generate_base_price(item)
         self.generate_description(item)
@@ -79,6 +82,9 @@ class RunesController(Controller):
     
     
     def generate_lexemes(self, rune:Rune):
+        """
+        Функция генерирует лексемы для руны.
+        """
         lexemes = {}
         for key in RunesController._lexemes:
             lexemes[key] = f'{RunesController._lexemes[key]} {RunesController._elements_dictionary[rune.element]}'
@@ -86,22 +92,37 @@ class RunesController(Controller):
         
     
     def generate_damage(self, rune:Rune):
+        """
+        Функция генерирует урон для руны.
+        """
         rune.damage = RunesController._damage_dice.roll()
     
     
     def generate_defence(self, rune:Rune):
+        """
+        Функция генерирует защиту для руны.
+        """
         rune.defence = RunesController._defence_dice.roll()
         
     
     def generate_element(self, rune:Rune):
+        """
+        Функция случайным образом выбирает стихию руны из доступных стихий.
+        """
         rune.element = randomitem(RunesController._elements)
         
         
     def generate_description(self, rune:Rune):
+        """
+        Функция генерирует описание для руны.
+        """
         rune.description = f'{rune.name} {RunesController._elements_dictionary[rune.element]}'
         
         
-    def generate_poison(self, rune:Rune) -> bool:    
+    def generate_poison(self, rune:Rune) -> bool:
+        """
+        Функция случайным образом определяет, будет ли руна отравленной.
+        """    
         if RunesController._poison_probability.roll() == 1:
             rune.poison = True
             rune.description = f'ядовитая {rune.description}'
@@ -112,5 +133,8 @@ class RunesController(Controller):
         
     
     def generate_base_price(self, rune:Rune):
+        """
+        Функция генерирует базовую цену для руны.
+        """
         rune.base_price += RunesController._base_price_dice.roll()
     

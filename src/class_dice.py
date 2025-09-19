@@ -1,6 +1,9 @@
 from random import randint
 
 class Dice():
+    """
+    Класс кубиков.    
+    """
     
     def __init__(self, dice:list[int], modifier:int=0, dice_type:str=''):
         self.dice:list[int] = dice
@@ -12,6 +15,9 @@ class Dice():
         self.initial_modifier = self.modifier
 
     def __str__(self):
+        """
+        Метод возвращает строковое представление кубиков.
+        """
         return self.text()
     
     
@@ -57,6 +63,9 @@ class Dice():
     
     
     def get_monster_modifier(self, monster) -> int:
+        """
+        Функция возвращает модификатор в зависимости от класса монстра.
+        """
         monster_class = type(monster).__name__
         modifier = self.monster_class_modifiers.get(monster_class, 0)
         return modifier
@@ -119,10 +128,16 @@ class Dice():
     
     
     def set_dice(self, dice:list[int]):
+        """
+        Устанавливает новый набор кубиков.
+        """
         self.dice = dice
         
     
     def set_modifier(self, modifier:int):
+        """
+        Устанавливает новый модификатор.
+        """
         self.modifier = modifier
     
     
@@ -132,6 +147,9 @@ class Dice():
     
     
     def reset(self):
+        """
+        Сбрасывает кубики и модификатор к изначальным значениям.
+        """
         self.dice = self.initial_dice.copy()
         self.modifier = self.initial_modifier
         

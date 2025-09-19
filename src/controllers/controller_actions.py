@@ -42,6 +42,9 @@ class ActionController():
         
     
     def get_room(self):
+        """
+        Получает текущую комнату из доступного источника.
+        """
         if self.room:
             return self.room
         if self.hero:
@@ -64,6 +67,9 @@ class ActionController():
     
     
     def add_actions(self, item:ItemProtocol) -> bool:
+        """
+        Добавляет действия в контроллер для определенного предмета.
+        """
         actions = self.extract_actions(item)
         for action, value in actions.items():
             new_item = self.make_new_action_item(item, value)
@@ -75,6 +81,9 @@ class ActionController():
     
     
     def make_new_action_item(self, item:ItemProtocol, value:dict) -> Item:
+        """
+        Создает новый экземпляр дата-класса Item для действия.
+        """
         item_name = item.name
         item_names = item.get_names_list(['nom', "accus"], room=self.get_room())
         method = getattr(item, value.get("method", ''))

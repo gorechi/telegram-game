@@ -84,14 +84,23 @@ class Backpack:
 
     
     def get_name_for_show(self, who) -> str:
+        """
+        Метод возвращает имя рюкзака для отображения в действии осмотра.
+        """
         return "Рюкзак героя"
     
     
     def __format__(self, format:str) -> str:
+        """
+        Метод форматирования имени рюкзака в различных падежах.
+        """
         return self.lexemes.get(format, '')
     
     
     def check_name(self, message:str) -> bool:
+        """
+        Метод проверяет, соответствует ли введенное имя имени рюкзака.
+        """
         return message.lower() in [self.name, self.lexemes["accus"]]
     
     
@@ -130,10 +139,17 @@ class Backpack:
         
     
     def get_items_by_class(self, item_class:str) -> list:
+        """
+        Метод принимает на вход класс вещи и
+        и возвращает список вещей в рюкзаке этого класса.
+        """
         return [item for item in self.insides if type(item).__name__ == item_class]
 
     
     def get_items_list(self) -> list:
+        """
+        Метод возвращает список всех вещей в рюкзаке.
+        """
         return self.insides
     
     
@@ -162,24 +178,40 @@ class Backpack:
 
     
     def count_items(self) -> int:
+        """
+        Метод возвращает количество вещей в рюкзаке.
+        """
         return len(self.insides)
     
     
     def is_empty(self) -> bool:
+        """
+        Метод проверяет, пуст ли рюкзак.
+        """
         return len(self.insides) == 0
     
     
     def get_items_except_class(self, item_class:str) -> list:
+        """
+        Метод возвращает список вещей,
+        исключая вещи определенного класса.
+        """
         return [item for item in self.insides if not type(item).__name__ == item_class]
     
     
     def get_random_item(self):
+        """
+        Метод возвращает случайную вещь из рюкзака.
+        """
         if not self.is_empty():
             return randomitem(self.insides)
         return False
 
 
     def get_random_item_by_class(self, item_class:str):
+        """
+        Метод возвращает случайную вещь определенного класса из рюкзака.
+        """
         items_list = [item for item in self.insides if type(item).__name__ == item_class]
         if items_list:
             return randomitem(items_list)
@@ -220,6 +252,10 @@ class Backpack:
     
 
     def get_item_by_number(self, number:int):
+        """
+        Метод принимает на вход номер вещи в рюкзаке и
+        возвращает эту вещь, если номер корректен.
+        """
         if not isinstance (number, int):
             return False
         item_index = number - 1
@@ -229,6 +265,9 @@ class Backpack:
     
     
     def take(self, who, in_action:bool=False) -> str:
+        """
+        Метод надевания рюкзака.
+        """
         room = who.current_position
         if not who.backpack.no_backpack:
             return f'{who.name} не может надеть новый рюкзак поверх своего рюкзака. Это уже слишком.'
@@ -240,4 +279,7 @@ class Backpack:
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
+        """
+        Метод возвращает список имен рюкзака в различных падежах.
+        """
         return ['рюкзак']

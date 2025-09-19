@@ -37,6 +37,9 @@ class FloorsController(Controller):
     
     
     def additional_actions(self, floor) -> bool:
+        """
+        Функция выполняет дополнительные действия по настройке этажа замка.
+        """
         self.create_rooms(floor)
         self.lock_doors(floor)
         self.lights_off(floor)
@@ -153,6 +156,9 @@ class FloorsController(Controller):
     
             
     def create_castle(self):
+        """
+        Функция создает этажи замка на основе шаблонов.
+        """
         self.floors = []
         sorted_templates = sorted(self.templates, key=lambda floor: floor.floor_number)
         for template in sorted_templates:
@@ -164,6 +170,9 @@ class FloorsController(Controller):
     
     
     def create_ladders(self):
+        """
+        Функция создает лестницы между этажами замка.
+        """
         self.floors[0].plan[0].enter_point = True
         for index, floor in enumerate(self.floors[:-1]):
             floor.create_ladders(next_floor=self.floors[index + 1])
@@ -171,12 +180,18 @@ class FloorsController(Controller):
             
     
     def inhabit_floors(self):
+        """
+        Функция населяет этажи замка монстрами и предметами.
+        """
         for floor in self.floors:
             floor.inhabit()
         return True
     
     
     def generate_directions(self, floor):
+        """
+        Функция создает словарь направлений для этажа замка.
+        """
         directions_dict = {
             0: -floor.rooms,
             1: 1,
