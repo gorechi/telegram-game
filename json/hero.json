@@ -85,27 +85,33 @@
     "mastery": {
       "рубящее оружие": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 5
         }, 
       "колющее оружие": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 5
         }, 
       "ударное оружие": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 5
         }, 
       "": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 1
         },
       "щиты": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 5
         },
       "доспехи": {
         "counter": 0,
-        "level": 0
+        "level": 0,
+        "max_level": 5
         }  
     },
     "monster_knowledge": {}

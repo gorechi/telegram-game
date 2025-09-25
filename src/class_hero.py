@@ -1256,6 +1256,8 @@ class Hero:
             return None
         weapon_type = self.weapon.type
         mastery = self.mastery.get(weapon_type)
+        if mastery['level'] == mastery['max_level']:
+            return None
         mastery['counter'] += randint(1, 10)/100
         if mastery['counter'] > mastery['level']:
             mastery['counter'] = 0
