@@ -13,7 +13,8 @@
             "prep": "зелье исцеления",
             "inst": "зельем исцеления"
         },
-        "base_price": 10
+        "base_price": 10,
+        "enchantable": false
     },
     {
         "class_name": "HealthPotion",
@@ -29,7 +30,8 @@
             "prep": "зелье здоровья",
             "inst": "зельем здоровья"
         },
-        "base_price": 20
+        "base_price": 20,
+        "enchantable": false
     },
     {
         "class_name": "StrengthPotion",
@@ -45,7 +47,8 @@
             "prep": "зелье силы",
             "inst": "зельем силы"
         },
-        "base_price": 30
+        "base_price": 30,
+        "enchantable": false
     },
     {
         "class_name": "StrengtheningPotion",
@@ -61,7 +64,8 @@
             "prep": "зелье усиления",
             "inst": "зельем усиления"
         },
-        "base_price": 15
+        "base_price": 15,
+        "enchantable": false
     },
     {
         "class_name": "DexterityPotion",
@@ -77,7 +81,8 @@
             "prep": "зелье ловкости",
             "inst": "зельем ловкости"
         },
-        "base_price": 20
+        "base_price": 20,
+        "enchantable": false
     },
     {
         "class_name": "EvasionPotion",
@@ -93,7 +98,8 @@
             "prep": "зелье увертливости",
             "inst": "зельем увертливости"
         },
-        "base_price": 15
+        "base_price": 15,
+        "enchantable": false
     },
     {
         "class_name": "IntelligencePotion",
@@ -109,7 +115,8 @@
             "prep": "зелье ума",
             "inst": "зельем ума"
         },
-        "base_price": 25
+        "base_price": 25,
+        "enchantable": false
     },
     {
         "class_name": "EnlightmentPotion",
@@ -125,7 +132,8 @@
             "prep": "зелье просветления",
             "inst": "зельем просветления"
         },
-        "base_price": 10
+        "base_price": 10,
+        "enchantable": false
     },
     {
         "class_name": "Antidote",
@@ -141,6 +149,7 @@
             "prep": "противоядие",
             "inst": "противоядием"
         },
-        "base_price": 5
+        "base_price": 5,
+        "enchantable": false
     }
 ]

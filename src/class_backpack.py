@@ -283,3 +283,17 @@ class Backpack:
         Метод возвращает список имен рюкзака в различных падежах.
         """
         return ['рюкзак']
+    
+
+    def get_items_to_enchant(self) -> list:
+        """
+        Метод возвращает список вещей, 
+        которые герой может использовать в бою. 
+        
+        """
+        
+        can_enchant = []
+        for i in self.insides:
+            if hasattr(i, 'enchantable') and i.enchantable:
+                can_enchant.append(i)
+        return can_enchant
