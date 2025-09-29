@@ -10,6 +10,7 @@ from src.controllers.controller_furniture import FurnitureController
 from src.controllers.controller_floors import FloorsController
 from src.controllers.controller_events import EventsController
 from src.controllers.controller_traps import TrapsController
+from src.controllers.controller_processes import ProcessesController
 from src.controllers.controller_secret_places import SecretPlacesController
 
 
@@ -59,6 +60,7 @@ class Game():
         self.floors_controller = FloorsController(self)
         self.events_controller = EventsController(self)
         self.traps_controller = TrapsController(self)
+        self.processes_controller = ProcessesController(self)
         self.secret_places_controller = SecretPlacesController(self)
         self.all_corpses = []
         self.all_traders = []
@@ -72,8 +74,16 @@ class Game():
         self.player.place(self.current_floor.plan[0])
         self.game_is_on = False
         self.traders_update_counter = Game._traders_update_counter
+        self.current_process = None
         
 
+    def navigat_action(self, command, request_text):
+        current_process = self.processes_controller.get_current_process()
+        if current_process:
+            current_process.proceed(request_text)
+        self.player.action(command, request_text)
+    
+    
     def check_endgame(self) -> bool:
         """
         Проверяет, достигнут ли конец игры.
