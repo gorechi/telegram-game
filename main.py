@@ -55,8 +55,9 @@ def all_commands(message):
     if not game:
         bot.reply_to(message, 'В этом чате нет активной игры, начните новую игру командой "Новая игра".')
         return False
-    game.player.action(command, text)
+    game.navigate_action(command, text)
     return True
+
 
 if __name__ == "__main__":
     bot.polling(none_stop=True, interval=0)

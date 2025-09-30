@@ -14,6 +14,7 @@ class RunesController(Controller):
         can_use_in_fight: bool
         name: str
         base_price: int
+        enchantable: bool
                    
     _classes = {
         "Rune": Rune,

@@ -326,7 +326,7 @@ class Weapon:
         """ 
         Метод проверяет, можно ли зачаровать оружие.
         """
-        if len(self.runes) > 1 or self.empty or not self.enchatable:
+        if len(self.runes) > 1 or self.empty or not self.enchantable:
             return False
         return True
     
@@ -407,11 +407,8 @@ class Weapon:
         Метод возвращает описание оружия в виде строки.
         """
         damage_string = self.damage.text()
-        if self.twohanded:
-            name = self.twohanded_dict[self.gender] + ' ' + self.name + self.enchantment()
-        else:
-            name = self.name + self.enchantment()
-        return f'{name} ({damage_string}), {self.type}'.capitalize()
+        name = self.name + self.enchantment()
+        return f'{name} ({damage_string}), {self.weapon_type}'.capitalize()
 
     
     def use(self, who, in_action=False) -> list[str]:
@@ -651,7 +648,7 @@ class Torch(Weapon):
             name = 'Горящий факел'
         else:
             name = 'Потухший факел'
-        return f'{name} ({damage_string}), {self.type}'.capitalize()
+        return f'{name} ({damage_string}), {self.weapon_type}'.capitalize()
     
     
     def place(self, floor, room_to_place = None) -> bool:

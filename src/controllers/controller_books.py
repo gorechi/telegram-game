@@ -15,7 +15,8 @@ class BooksController(Controller):
         price_dice: dict
         texts: list
         can_use_in_fight: bool
-        examine_text: str      
+        examine_text: str
+        enchantable: bool      
     
     
     _classes = {

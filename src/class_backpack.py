@@ -244,7 +244,7 @@ class Backpack:
         for i, item in enumerate(self.insides):
             description = f'{str(i + 1)}: {item.show()}'
             if type(item).__name__ == 'Weapon':
-                mastery = who.mastery[item.type]['level']
+                mastery = who.mastery.get(item.weapon_type)['level']
                 if mastery > 0:
                     description += f', мастерство - {mastery}'
             message.append(description)
@@ -283,3 +283,17 @@ class Backpack:
         Метод возвращает список имен рюкзака в различных падежах.
         """
         return ['рюкзак']
+    
+
+    def get_items_to_enchant(self) -> list:
+        """
+        Метод возвращает список вещей, 
+        которые герой может использовать в бою. 
+        
+        """
+        
+        can_enchant = []
+        for i in self.insides:
+            if hasattr(i, 'enchantable') and i.enchantable:
+                can_enchant.append(i)
+        return can_enchant

@@ -1849,28 +1849,36 @@ class Hero:
         return False
     
     
-    def enchant(self, item='') -> bool:
-        """
-        Метод обрабатывает команду "улучшить".
+    # def enchant(self, item='') -> bool:
+    #     """
+    #     Метод обрабатывает команду "улучшить".
 
-        Входящие параметры:
-        - item - наименование предмета, который нужно улучшить.
-        Поддерживаются следующие значения:
-            - 'оружие'
-            - 'щит'
-            - 'доспех' или 'доспехи'
+    #     Входящие параметры:
+    #     - item - наименование предмета, который нужно улучшить.
+    #     Поддерживаются следующие значения:
+    #         - 'оружие'
+    #         - 'щит'
+    #         - 'доспех' или 'доспехи'
         
-        """
+    #     """
+    #     game = self.game
+    #     self.rune_list = self.backpack.get_items_by_class('Rune')
+    #     message = []
+    #     self.selected_item = self.chose_what_to_enchant(item)
+    #     message.append(f'{self.name} может использовать следующие руны:')
+    #     for rune in self.rune_list:
+    #         message.append(f'{str(self.rune_list.index(rune) + 1)}: {str(rune)}')
+    #     message.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
+    #     self.state = state_enum.ENCHANT
+    #     tprint(game, message, 'enchant')
+    
+    def enchant(self, item='') -> bool:
         game = self.game
-        self.rune_list = self.backpack.get_items_by_class('Rune')
-        message = []
-        self.selected_item = self.chose_what_to_enchant(item)
-        message.append(f'{self.name} может использовать следующие руны:')
-        for rune in self.rune_list:
-            message.append(f'{str(self.rune_list.index(rune) + 1)}: {str(rune)}')
-        message.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
-        self.state = state_enum.ENCHANT
-        tprint(game, message, 'enchant')
+        game.processes_controller.create_process(
+            owner = self,
+            type = 'enchantment',
+            request_text = item
+        )
 
     
     def check_if_can_read(self) -> bool:

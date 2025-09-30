@@ -3,6 +3,7 @@
         "class_name": "Rune",
         "can_use_in_fight": false,
         "name": "руна",
-        "base_price": 15
+        "base_price": 15,
+        "enchantable": false
     }
 ]

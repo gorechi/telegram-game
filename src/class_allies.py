@@ -10,8 +10,10 @@ from dataclasses import dataclass
 from typing import Union, Literal, Optional
 
 class Trader:
-    """Класс Торговец"""
-    
+    """Базовый класс для торговцев в игре. 
+    Определяет общую логику торговли, хранения товаров, взаимодействия с игроком и генерации ассортимента.
+    """
+
     _how_many_runes_trader_can_have = 4
     """Кубик, который надо кинуть чтобы определить количество рун у торговца"""
 
@@ -26,36 +28,55 @@ class Trader:
 
     @dataclass
     class ItemInShop:
+        """Структура для хранения информации о товаре в магазине торговца."""
         item: Book | Rune | Potion | Matches
         price: int
         index: Optional[int] = None
-    
-    
+
     @classmethod
     def random_trader(cls, game, floor) -> 'Trader':
         """
-        Функция возвращает случайного торговца.
+        Создает и возвращает случайного торговца (одного из подклассов Trader).
+
+        Args:
+            game: Экземпляр текущей игры.
+            floor: Этаж, на котором будет размещён торговец.
+
+        Returns:
+            Trader: Экземпляр случайного торговца.
         """
         trader_class = randomitem(cls.__subclasses__())
         new_trader = trader_class(game, floor)
         return new_trader
-    
-    
+
     @staticmethod
-    def search_item_by_index(items_list:list, index:int) -> Union[Book, Rune, Potion, Matches, None]:
+    def search_item_by_index(items_list: list, index: int) -> Union[Book, Rune, Potion, Matches, None]:
         """
-        Функция ищет предмет в списке по его индексу.
+        Ищет предмет в списке товаров по его индексу.
+
+        Args:
+            items_list (list): Список товаров (ItemInShop).
+            index (int): Индекс искомого предмета.
+
+        Returns:
+            ItemInShop | None: Найденный товар или None, если не найден.
         """
         for item in items_list:
             if item.index == index:
                 return item
         return None
-    
-    
+
     @staticmethod
-    def search_item_by_name(items_list:list, name:str) -> Union[Book, Rune, Potion, Matches, None]:
+    def search_item_by_name(items_list: list, name: str) -> Union[Book, Rune, Potion, Matches, None]:
         """
-        Функция ищет предмет в списке по его имени.
+        Ищет предмет в списке товаров по его имени.
+
+        Args:
+            items_list (list): Список товаров (ItemInShop).
+            name (str): Имя искомого предмета.
+
+        Returns:
+            ItemInShop | None: Найденный товар или None, если не найден.
         """
         if not name or not isinstance(name, str):
             raise ValueError('В метод randomitem передан пустой массив')
@@ -63,13 +84,23 @@ class Trader:
             if item.item.check_name(name):
                 return item
         return None
-    
 
-    def __init__(self,
-                 game,
-                 floor,
-                 name:str = '',
-                 lexemes:dict = None):
+    def __init__(
+        self,
+        game,
+        floor,
+        name: str = '',
+        lexemes: dict = None
+    ):
+        """
+        Инициализирует торговца, задаёт его имя, этаж, стартовые деньги и добавляет в список всех торговцев.
+
+        Args:
+            game: Экземпляр текущей игры.
+            floor: Этаж, на котором находится торговец.
+            name (str, optional): Имя торговца.
+            lexemes (dict, optional): Словарь с падежными формами имени.
+        """
         self.game = game
         self.floor = floor
         self.name = name
@@ -78,19 +109,30 @@ class Trader:
         self.shop = []
         self.goods_to_buy = []
         self.money = self.generate_money()
-        self.game.all_traders.append(self)    
-    
-    
-    def __format__(self, format:str) -> str:
+        self.game.all_traders.append(self)
+
+    def __format__(self, format: str) -> str:
         """
-        Функция форматирует имя торговца в зависимости от падежа.
+        Форматирует имя торговца в зависимости от падежа.
+
+        Args:
+            format (str): Ключ падежа (например, 'nom', 'gen').
+
+        Returns:
+            str: Имя торговца в нужном падеже.
         """
         return self.lexemes.get(format, '')
-    
-    
-    def sell(self, item_text:str, who) -> bool:
+
+    def sell(self, item_text: str, who) -> bool:
         """
-        Функция продает предмет у торговца.
+        Продаёт предмет из магазина торговца герою.
+
+        Args:
+            item_text (str): Текстовое описание или индекс предмета.
+            who: Герой, совершающий покупку.
+
+        Returns:
+            bool: True, если продажа успешна, иначе False.
         """
         item_in_shop = self.get_item_by_text(item_text, 'sell')
         if not item_in_shop:
@@ -107,11 +149,17 @@ class Trader:
         tprint(self.game, f'{who:gen} платит {howmany(item_price, ["монета", "монеты", "монет"])} и кладет {item:accus} в свой рюкзак')
         self.update_indexes()
         return True
-     
-     
-    def buy(self, item_text:str, who) -> bool:
+
+    def buy(self, item_text: str, who) -> bool:
         """
-        Функция покупает предмет у торговца.
+        Покупает предмет у героя (герой продаёт торговцу).
+
+        Args:
+            item_text (str): Текстовое описание или индекс предмета.
+            who: Герой, продающий предмет.
+
+        Returns:
+            bool: True, если покупка успешна, иначе False.
         """
         item_to_buy = self.get_item_by_text(item_text, 'buy')
         if not item_to_buy:
@@ -127,40 +175,64 @@ class Trader:
         tprint(self.game, f'{who:gen} продает {item:accus} {self:dat} и получает {howmany(item_price, ["монета", "монеты", "монет"])}.')
         self.update_indexes()
         return True
-   
-        
+
     def take_money(self, who, amount) -> bool:
         """
-        Функция принимает деньги от героя.
+        Принимает деньги от героя (уменьшает деньги героя, увеличивает свои).
+
+        Args:
+            who: Герой, отдающий деньги.
+            amount (int): Сумма.
+
+        Returns:
+            bool: True всегда.
         """
         who.money -= amount
         self.money += amount
         return True
-    
-    
+
     def give_money(self, who, amount) -> bool:
         """
-        Функция отдает деньги герою.
+        Отдаёт деньги герою (увеличивает деньги героя, уменьшает свои).
+
+        Args:
+            who: Герой, получающий деньги.
+            amount (int): Сумма.
+
+        Returns:
+            bool: True всегда.
         """
         who.money += amount
         self.money -= amount
         return True
 
-    
-    def give_item(self, who, item_to_give:ItemInShop) -> bool:
+    def give_item(self, who, item_to_give: ItemInShop) -> bool:
         """
-        Функция отдает предмет герою.
+        Передаёт предмет герою, удаляет его из магазина и добавляет в список товаров, которые торговец готов купить обратно.
+
+        Args:
+            who: Герой, получающий предмет.
+            item_to_give (ItemInShop): Товар для передачи.
+
+        Returns:
+            bool: True всегда.
         """
         item = item_to_give.item
         who.backpack.append(item)
         self.shop.remove(item_to_give)
         self.goods_to_buy.append(item_to_give)
         return True
-    
-    
-    def take_item(self, who, item_to_take:ItemInShop) -> bool:
+
+    def take_item(self, who, item_to_take: ItemInShop) -> bool:
         """
-        Функция принимает предмет от героя.
+        Принимает предмет от героя, добавляет его в магазин и удаляет из списка товаров на покупку.
+
+        Args:
+            who: Герой, отдающий предмет.
+            item_to_take (ItemInShop): Товар для приёма.
+
+        Returns:
+            bool: True всегда.
         """
         item = item_to_take.item
         price = self.evaluate(item)
@@ -170,27 +242,29 @@ class Trader:
         self.goods_to_buy.remove(item_to_take)
         who.backpack.remove(item)
         return True
-    
-    
+
     def generate_money(self) -> Money:
         """
-        Генерирует объект денег для торговца.
-
-        Метод вычисляет случайное количество денег в пределах заданных настроек (минимум и максимум),
-        создает и возвращает объект Money с этим количеством денег.
+        Генерирует случайное количество денег для торговца в заданных пределах.
 
         Returns:
-            Money: Объект денег с сгенерированным количеством.
+            Money: Объект денег с сгенерированной суммой.
         """
         delta = Trader._maximum_money - Trader._minimum_money
         money_amount = Trader._minimum_money + roll([delta])
         new_money = Money(self.game, money_amount)
         return new_money
-      
-    
-    def get_item_by_text(self, text:str, mode: Literal['buy', 'sell']) -> Union[Book, Rune, Potion, Matches, None]:
+
+    def get_item_by_text(self, text: str, mode: Literal['buy', 'sell']) -> Union[Book, Rune, Potion, Matches, None]:
         """
-        Функция ищет предмет по тексту в зависимости от режима (покупка или продажа).
+        Ищет предмет по тексту (имя или индекс) в зависимости от режима (покупка или продажа).
+
+        Args:
+            text (str): Имя или индекс предмета.
+            mode (Literal['buy', 'sell']): Режим поиска ('buy' — покупка у героя, 'sell' — продажа герою).
+
+        Returns:
+            ItemInShop | None: Найденный товар или None.
         """
         if mode == 'sell':
             items_list = self.shop
@@ -202,30 +276,36 @@ class Trader:
             index = int(text)
             return Trader.search_item_by_index(items_list, index)
         return Trader.search_item_by_name(items_list, text)
-    
-    
-    def update_index(self, list_of_items:list) -> bool:
+
+    def update_index(self, list_of_items: list) -> bool:
         """
-        Функция обновляет индексы предметов в списке.
+        Обновляет индексы товаров в переданном списке.
+
+        Args:
+            list_of_items (list): Список товаров (ItemInShop).
+
+        Returns:
+            bool: True всегда.
         """
         index = 0
         for item in list_of_items:
             index += 1
             item.index = index
         return True
-    
-    
+
     def update_indexes(self) -> None:
         """
-        Функция обновляет индексы предметов в списках товаров и покупок.
+        Обновляет индексы товаров в списках товаров на продажу и на покупку.
         """
         self.update_index(self.goods_to_buy)
         self.update_index(self.shop)
-     
-    
+
     def place(self, room=None):
         """
-        Функция размещает торговца в комнате.
+        Размещает торговца в комнате. Если комната не указана, выбирает случайную запертую комнату на этаже.
+
+        Args:
+            room (optional): Комната для размещения торговца.
         """
         if room:
             traders_room = room
@@ -239,28 +319,34 @@ class Trader:
         if not self.room.can_rest(mode='simple'):
             new_rest_place = self.game.furniture_controller.get_random_object_by_filters(name="кресло")
             new_rest_place.place(room_to_place=self.room)
-    
-    
-    def show_through_key_hole(self) -> str|list:
+
+    def show_through_key_hole(self) -> str | list:
         """
-        Функция показывает торговца через замочную скважину.
+        Возвращает описание того, что видно через замочную скважину в комнате с торговцем.
+
+        Returns:
+            str | list: Описание витрины торговца.
         """
         return 'Видно кусок витрины, наполненной разноцветными непонятными вещицами.'
-    
-    
-    def get_prices(self, backpack:Backpack) -> list[str]:
+
+    def get_prices(self, backpack: Backpack) -> list[str]:
         """
-        Функция оценивает вещи в рюкзаке героя и генерирует текст с ценами.
+        Оценивает вещи в рюкзаке героя и возвращает список строк с ценами на продажу и покупку.
+
+        Args:
+            backpack (Backpack): Рюкзак героя.
+
+        Returns:
+            list[str]: Список строк с описанием цен.
         """
         self.evaluate_items(backpack)
         message = self.generate_selling_text()
         message.extend(self.generate_buying_text())
-        return message 
-    
-            
+        return message
+
 class Scribe(Trader):
-    """Класс Книжник"""
-    
+    """Торговец-книжник. Продаёт и покупает книги."""
+
     _books_quantity_die = 10
     """Кубик, который надо кинуть чтобы определить количество книг у книжника"""
 
@@ -272,18 +358,26 @@ class Scribe(Trader):
         "prep": "Книжнике",
         "inst": "Книжником"
     }
-    
+
     _buy_price_modifier = [3]
-    
     _sell_price_modifier = [3]
-    
-    
-    def __init__(self,
-                 game,
-                 floor,
-                 name:str = '',
-                 lexemes:dict = None
-                 ):
+
+    def __init__(
+        self,
+        game,
+        floor,
+        name: str = '',
+        lexemes: dict = None
+    ):
+        """
+        Инициализирует книжника, задаёт имя, падежные формы и генерирует ассортимент книг.
+
+        Args:
+            game: Экземпляр текущей игры.
+            floor: Этаж, на котором находится книжник.
+            name (str, optional): Имя книжника.
+            lexemes (dict, optional): Словарь с падежными формами имени.
+        """
         super().__init__(game, floor, name, lexemes)
         self.name = name
         if not self.name:
@@ -292,11 +386,13 @@ class Scribe(Trader):
         if not self.lexemes:
             self.lexemes = Scribe._lexemes
         self.get_goods()
-    
-    
+
     def get_goods(self) -> bool:
         """
-        Функция генерирует книги для продажи у книжника.
+        Генерирует случайный ассортимент книг для продажи у книжника.
+
+        Returns:
+            bool: True всегда.
         """
         self.shop = []
         how_many_books = roll([Scribe._books_quantity_die])
@@ -308,17 +404,24 @@ class Scribe(Trader):
         self.update_index(self.shop)
         return True
 
-    
-    def evaluate(self, book:Book) -> int:
+    def evaluate(self, book: Book) -> int:
         """
-        Функция оценивает книгу для продажи.
+        Оценивает стоимость книги для продажи.
+
+        Args:
+            book (Book): Книга для оценки.
+
+        Returns:
+            int: Цена книги.
         """
         return book.base_price + roll(Scribe._sell_price_modifier)
 
-
     def generate_selling_text(self) -> list[str]:
         """
-        Функция генерирует текст с книгами на продажу.
+        Генерирует текстовое описание ассортимента книг на продажу.
+
+        Returns:
+            list[str]: Список строк с описанием книг и цен.
         """
         if not self.shop:
             return ['На полках торговца пусто. Ему нечего предложить на продажу.']
@@ -329,10 +432,12 @@ class Scribe(Trader):
             message.append(f'{item.index} - {name}: {price_text}')
         return message
 
-
     def generate_buying_text(self) -> list[str]:
         """
-        Функция генерирует текст с книгами, которые книжник готов купить.
+        Генерирует текстовое описание книг, которые книжник готов купить у героя.
+
+        Returns:
+            list[str]: Список строк с описанием книг и цен.
         """
         if not self.goods_to_buy:
             return ['Книжник не хочет ничего покупать у героя.']
@@ -342,13 +447,18 @@ class Scribe(Trader):
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
-        
-    
-    def evaluate_items(self, backpack:Backpack) -> bool:
+
+    def evaluate_items(self, backpack: Backpack) -> bool:
         """
-        Функция оценивает книги в рюкзаке героя для покупки.
+        Оценивает книги в рюкзаке героя для покупки книжником.
+
+        Args:
+            backpack (Backpack): Рюкзак героя.
+
+        Returns:
+            bool: True, если есть книги для покупки, иначе False.
         """
-        books:list[Book] = backpack.get_items_by_class('Book')
+        books: list[Book] = backpack.get_items_by_class('Book')
         if not books:
             self.goods_to_buy.clear()
             return False
@@ -360,18 +470,19 @@ class Scribe(Trader):
         self.update_index(books_list)
         self.goods_to_buy = books_list
         return True
-    
-    
+
     def show(self) -> str:
         """
-        Функция показывает книжника в комнате.
+        Возвращает описание книжника в комнате.
+
+        Returns:
+            str: Описание книжника.
         """
         return 'У стены, под лампой среди пыльных томов сидит торговец книгами.'
 
-
 class RuneMerchant(Trader):
-    """Класс Торговец рунами"""
-    
+    """Торговец рунами. Продаёт и покупает руны."""
+
     _runes_quantity_die = 15
     """Кубик, который надо кинуть чтобы определить количество рун у торговца"""
 
@@ -383,29 +494,39 @@ class RuneMerchant(Trader):
         "prep": "Торговце рунами",
         "inst": "Торговцем рунами"
     }
-    
+
     _buy_price_modifier = [8]
-    
     _sell_price_modifier = [5]
-    
-    
-    def __init__(self,
-                 game,
-                 floor,
-                 name:str = 'Торговец рунами',
-                 lexemes:dict = None
-                 ):
+
+    def __init__(
+        self,
+        game,
+        floor,
+        name: str = 'Торговец рунами',
+        lexemes: dict = None
+    ):
+        """
+        Инициализирует торговца рунами, задаёт имя, падежные формы и генерирует ассортимент рун.
+
+        Args:
+            game: Экземпляр текущей игры.
+            floor: Этаж, на котором находится торговец.
+            name (str, optional): Имя торговца.
+            lexemes (dict, optional): Словарь с падежными формами имени.
+        """
         super().__init__(game, floor, name, lexemes)
         self.name = name
         self.lexemes = lexemes
         if not self.lexemes:
             self.lexemes = RuneMerchant._lexemes
         self.get_goods()
-    
-    
+
     def get_goods(self) -> bool:
         """
-        Функция генерирует книги для продажи у торговца рунами.
+        Генерирует случайный ассортимент рун для продажи у торговца.
+
+        Returns:
+            bool: True всегда.
         """
         self.shop = []
         how_many_runes = roll([RuneMerchant._runes_quantity_die])
@@ -417,17 +538,24 @@ class RuneMerchant(Trader):
         self.update_index(self.shop)
         return True
 
-    
-    def evaluate(self, rune:Rune) -> int:
+    def evaluate(self, rune: Rune) -> int:
         """
-        Функция оценивает руну для продажи.
+        Оценивает стоимость руны для продажи.
+
+        Args:
+            rune (Rune): Руна для оценки.
+
+        Returns:
+            int: Цена руны.
         """
         return rune.base_price + roll(RuneMerchant._sell_price_modifier)
 
-
     def generate_selling_text(self) -> list[str]:
         """
-        Функция генерирует текст с рунами на продажу.
+        Генерирует текстовое описание ассортимента рун на продажу.
+
+        Returns:
+            list[str]: Список строк с описанием рун и цен.
         """
         if not self.shop:
             return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
@@ -438,10 +566,12 @@ class RuneMerchant(Trader):
             message.append(f'{item.index} - {name}: {price_text}')
         return message
 
-
     def generate_buying_text(self) -> list[str]:
         """
-        Функция генерирует текст с рунами, которые торговец готов купить.
+        Генерирует текстовое описание рун, которые торговец готов купить у героя.
+
+        Returns:
+            list[str]: Список строк с описанием рун и цен.
         """
         if not self.goods_to_buy:
             return ['Торговец рунами не хочет ничего покупать у героя.']
@@ -451,13 +581,18 @@ class RuneMerchant(Trader):
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
-        
-    
-    def evaluate_items(self, backpack:Backpack) -> bool:
+
+    def evaluate_items(self, backpack: Backpack) -> bool:
         """
-        Функция оценивает руны в рюкзаке героя для покупки.
+        Оценивает руны в рюкзаке героя для покупки торговцем рунами.
+
+        Args:
+            backpack (Backpack): Рюкзак героя.
+
+        Returns:
+            bool: True, если есть руны для покупки, иначе False.
         """
-        runes:list[Rune] = backpack.get_items_by_class('Rune')
+        runes: list[Rune] = backpack.get_items_by_class('Rune')
         if not runes:
             self.goods_to_buy.clear()
             return False
@@ -469,18 +604,19 @@ class RuneMerchant(Trader):
         self.update_indexes()
         self.goods_to_buy = runes_list
         return True
-    
-    
+
     def show(self) -> str:
         """
-        Функция показывает торговца рунами в комнате.
+        Возвращает описание торговца рунами в комнате.
+
+        Returns:
+            str: Описание торговца рунами.
         """
         return 'Посреди комнаты стоит прилавок торговца рунами. Сам он суетится вокруг.'
-    
-    
+
 class PotionsMerchant(Trader):
-    """Класс Торговец зельями"""
-    
+    """Торговец зельями. Продаёт и покупает зелья."""
+
     _potions_quantity_die = 10
     """Кубик, который надо кинуть чтобы определить количество зелий у торговца"""
 
@@ -492,51 +628,68 @@ class PotionsMerchant(Trader):
         "prep": "Торговце зельями",
         "inst": "Торговцем зельями"
     }
-    
+
     _buy_price_modifier = [5]
-    
     _sell_price_modifier = [5]
-    
-    
-    def __init__(self,
-                 game,
-                 floor,
-                 name:str = 'Торговец зельями',
-                 lexemes:dict = None
-                 ):
+
+    def __init__(
+        self,
+        game,
+        floor,
+        name: str = 'Торговец зельями',
+        lexemes: dict = None
+    ):
+        """
+        Инициализирует торговца зельями, задаёт имя, падежные формы и генерирует ассортимент зелий.
+
+        Args:
+            game: Экземпляр текущей игры.
+            floor: Этаж, на котором находится торговец.
+            name (str, optional): Имя торговца.
+            lexemes (dict, optional): Словарь с падежными формами имени.
+        """
         super().__init__(game, floor, name, lexemes)
         self.name = name
         self.lexemes = lexemes
         if not self.lexemes:
             self.lexemes = PotionsMerchant._lexemes
         self.get_goods()
-    
-    
+
     def get_goods(self) -> bool:
         """
-        Функция генерирует книги для продажи у торговца зельями.
+        Генерирует случайный ассортимент зелий для продажи у торговца.
+
+        Returns:
+            bool: True всегда.
         """
         self.shop = []
         how_many_potions = roll([PotionsMerchant._potions_quantity_die])
         for _ in range(how_many_potions):
             potion = self.game.potions_controller.get_random_object_by_filters()
             price = self.evaluate(potion)
-            new_potion = Trader.ItemInShop(item= potion, price=price)
+            new_potion = Trader.ItemInShop(item=potion, price=price)
             self.shop.append(new_potion)
         self.update_index(self.shop)
         return True
 
-    
-    def evaluate(self, potion:Potion) -> int:
+    def evaluate(self, potion: Potion) -> int:
         """
-        Функция оценивает зелье для продажи.
+        Оценивает стоимость зелья для продажи.
+
+        Args:
+            potion (Potion): Зелье для оценки.
+
+        Returns:
+            int: Цена зелья.
         """
         return potion.base_price + roll(PotionsMerchant._sell_price_modifier)
 
-
     def generate_selling_text(self) -> list[str]:
         """
-        Функция генерирует текст с зельями на продажу.
+        Генерирует текстовое описание ассортимента зелий на продажу.
+
+        Returns:
+            list[str]: Список строк с описанием зелий и цен.
         """
         if not self.shop:
             return ['В сундуках торговца пусто. Ему нечего предложить на продажу.']
@@ -547,10 +700,12 @@ class PotionsMerchant(Trader):
             message.append(f'{item.index} - {name}: {price_text}')
         return message
 
-
     def generate_buying_text(self) -> list[str]:
         """
-        Функция генерирует текст с зельями, которые торговец готов купить.
+        Генерирует текстовое описание зелий, которые торговец готов купить у героя.
+
+        Returns:
+            list[str]: Список строк с описанием зелий и цен.
         """
         if not self.goods_to_buy:
             return ['Торговец зельями не хочет ничего покупать у героя.']
@@ -560,13 +715,18 @@ class PotionsMerchant(Trader):
             price_text = howmany(item.price, ["монета", "монеты", "монет"])
             message.append(f'{item.index} - {name}: {price_text}')
         return message
-        
-    
-    def evaluate_items(self, backpack:Backpack) -> bool:
+
+    def evaluate_items(self, backpack: Backpack) -> bool:
         """
-        Функция оценивает зелья в рюкзаке героя для покупки.
+        Оценивает зелья в рюкзаке героя для покупки торговцем зельями.
+
+        Args:
+            backpack (Backpack): Рюкзак героя.
+
+        Returns:
+            bool: True, если есть зелья для покупки, иначе False.
         """
-        potions:list[Potion] = backpack.get_items_by_class('Potion')
+        potions: list[Potion] = backpack.get_items_by_class('Potion')
         if not potions:
             self.goods_to_buy.clear()
             return False
@@ -578,10 +738,12 @@ class PotionsMerchant(Trader):
         self.update_indexes()
         self.goods_to_buy = potions_list
         return True
-    
-    
+
     def show(self) -> str:
         """
-        Функция показывает торговца зельями в комнате.
+        Возвращает описание торговца зельями в комнате.
+
+        Returns:
+            str: Описание торговца зельями.
         """
         return 'Посреди комнаты стоит прилавок торговца зельями. Торговец занимается приготовлением какой-то микстуры.'

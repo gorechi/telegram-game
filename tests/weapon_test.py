@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from src.controller_weapon import WeaponController
+from src.controllers.controller_weapon import WeaponController
 
 
 class TestWeaponCheckName(unittest.TestCase):

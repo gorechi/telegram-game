@@ -15,6 +15,7 @@ class PotionsController(Controller):
         description: str
         lexemes: dict
         base_price: int
+        enchantable: bool
               
     
     _classes = {
