@@ -244,7 +244,7 @@ class Backpack:
         for i, item in enumerate(self.insides):
             description = f'{str(i + 1)}: {item.show()}'
             if type(item).__name__ == 'Weapon':
-                mastery = who.mastery[item.type]['level']
+                mastery = who.mastery.get(item.weapon_type)['level']
                 if mastery > 0:
                     description += f', мастерство - {mastery}'
             message.append(description)

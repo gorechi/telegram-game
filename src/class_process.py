@@ -26,6 +26,7 @@ class Process:
     
     
     def terminate(self, termination_text:str | list):
+        self.game.processes_controller.terminate_process(self)
         tprint(self.game, termination_text)
         return
     
@@ -69,8 +70,7 @@ class EnchantmentProcess(Process):
         self.init_text = init_text
         self.items_list = self.get_items_list()
         self.runes_list = self.get_runes_list()
-        if self.status == EnchantmentProcess.status_enum.WAITING_FOR_ITEM and init_text:
-            self.item = self.try_to_find_item(init_text)
+        self.item = self.try_to_find_item(init_text)
         self.rune = None
         self.proceed()
         
@@ -92,13 +92,13 @@ class EnchantmentProcess(Process):
              list: Список предметов владельца, которые могут быть использованы для наложения чар.
         """
         items_list = []
-        if not self.owner.weapon.empty:
+        if self.owner.weapon.can_be_enchanted():
             items_list.append(self.owner.weapon)
-        if not self.owner.shield.empty:
+        if self.owner.shield.can_be_enchanted():
             items_list.append(self.owner.shield)
-        elif not self.owner.removed_shield.empty:
+        elif self.owner.removed_shield.can_be_enchanted():
             items_list.append(self.owner.removed_shield)
-        if not self.owner.armor.empty:
+        if self.owner.armor.can_be_enchanted():
             items_list.append(self.owner.armor)
         if self.owner.check_backpack():
             items_list.extend(self.owner.backpack.get_items_to_enchant())
@@ -150,7 +150,7 @@ class EnchantmentProcess(Process):
             found_item = self.owner.armor
         elif request_text.isdigit() and 1 <= int(request_text) <= len(self.items_list):
             found_item = self.items_list[int(request_text)-1]
-        else:
+        elif request_text:
             for item in self.items_list:
                 if item.check_name(request_text):
                     self.set_status(EnchantmentProcess.status_enum.WAITING_FOR_RUNE)
@@ -197,8 +197,17 @@ class EnchantmentProcess(Process):
             self.rune = self.try_to_find_rune(request_text)
         if self.status == EnchantmentProcess.status_enum.READY_TO_ENCHANT:
             self.enchant_item()
+        self.send_message()
+        
+
+    def send_message(self):    
         message = self.generate_message()
-        if self.status in [EnchantmentProcess.status_enum.NO_AVAILABLE_ITEMS, EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES]:
+        if self.status in [
+            EnchantmentProcess.status_enum.NO_AVAILABLE_ITEMS, 
+            EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES,
+            EnchantmentProcess.status_enum.ENCHANTMENT_ERROR,
+            EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS,
+            ]:
             self.terminate(message)
             return
         tprint(self.game, message)
@@ -233,7 +242,7 @@ class EnchantmentProcess(Process):
             EnchantmentProcess.status_enum.NO_AVAILABLE_ITEMS: self.generate_no_items_message,
             EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES: self.generate_no_runes_message,
             EnchantmentProcess.status_enum.ENCHANTMENT_ERROR: self.generate_error_message,
-            EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS: self.generate_success_message
+            EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS: self.generate_success_message,
             }
         return states[self.status]()
     
@@ -244,7 +253,7 @@ class EnchantmentProcess(Process):
         for index, item in enumerate(self.items_list):
             description = f'{str(index + 1)}: {item.show()}'
             if type(item).__name__ == 'Weapon' and hasattr(self.owner, 'mastery'):
-                mastery = self.owner.mastery[item.type]['level']
+                mastery = self.owner.mastery[item.weapon_type]['level']
                 if mastery > 0:
                     description += f', мастерство - {mastery}'
             message.append(description)
@@ -254,7 +263,7 @@ class EnchantmentProcess(Process):
 
     def generate_rune_message(self) -> list[str]:
         message = list()
-        message.append(f"{self.owner.name} {self.owner.g('выбрал', 'выбрала')} для зачарования {self.item.show()}")
+        message.append(f"{self.owner.name} {self.owner.g('выбрал', 'выбрала')} для зачарования {self.item.show()}") #Добавить винительный падеж оружию
         message.append(f"Теперь {self.owner.g('ему', 'ей')} нужно выбрать руну для наложения на этот предмет:")
         for index, rune in enumerate(self.runes_list):
             message.append(f"{str(index + 1)}: {rune.show()}")

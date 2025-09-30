@@ -1,4 +1,4 @@
-from class_process import EnchantmentProcess
+from src.class_process import EnchantmentProcess
 
 class ProcessesController():
     """
@@ -24,7 +24,7 @@ class ProcessesController():
         new_process = process_class(
             game = self.game,
             owner = owner,
-            request_text = request_text
+            init_text = request_text
         )
         self.register_process(new_process)
     

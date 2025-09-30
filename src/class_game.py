@@ -77,11 +77,12 @@ class Game():
         self.current_process = None
         
 
-    def navigat_action(self, command, request_text):
+    def navigate_action(self, command, request_text):
         current_process = self.processes_controller.get_current_process()
         if current_process:
             current_process.proceed(request_text)
-        self.player.action(command, request_text)
+        else:
+            self.player.action(command, request_text)
     
     
     def check_endgame(self) -> bool:
@@ -142,8 +143,12 @@ class Game():
         """
             Метод для тестирования игры.
         """
-        book1 = self.books_controller.get_random_object_by_filters()
-        book2 = self.books_controller.get_random_object_by_filters()
-        book1.take(self.player)
-        book2.take(self.player)
-        self.current_floor.plan[0].light = False
+        rune1 = self.runes_controller.get_random_object_by_filters()
+        rune2 = self.runes_controller.get_random_object_by_filters()
+        rune1.take(self.player)
+        rune2.take(self.player)
+        weapon1 = self.weapon_controller.get_random_object_by_filters()
+        weapon1.take(self.player)
+        weapon2 = self.weapon_controller.get_random_object_by_filters()
+        weapon2.take(self.player)
+        self.current_floor.plan[0].light = True
