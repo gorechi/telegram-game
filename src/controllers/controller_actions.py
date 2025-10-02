@@ -143,9 +143,6 @@ class ActionController():
         for item in items_list:
             if item.condition is None or (callable(item.condition) and item.condition(self.get_room())):
                 temporary_list.append(item)
-        filtered_by_name = list()
         if name:
-            filtered_by_name = [item for item in temporary_list if (name.lower() in item.names)]
-        if filtered_by_name:
-            return filtered_by_name
+            return [item for item in temporary_list if (name.lower() in item.names)]
         return temporary_list
