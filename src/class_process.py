@@ -40,7 +40,6 @@ class Process:
         """
         self.status = new_status
 
-
 class EnchantmentProcess(Process):
     """Процесс улучшения предмета."""
 
@@ -54,6 +53,8 @@ class EnchantmentProcess(Process):
         - READY_TO_ENCHANT: готов к наложению чар
         - ENCHANTMENT_ERROR: ошибка при наложении чар
         - ENCHANTMENT_SUCCESS: успешное наложение чар
+        - TOO_DARK: слишком темно чтобы налагать чары
+        - FEAR: герой напуган
         """
         WAITING_FOR_ITEM = 0
         WAITING_FOR_RUNE = 1
@@ -62,6 +63,17 @@ class EnchantmentProcess(Process):
         READY_TO_ENCHANT = 4
         ENCHANTMENT_ERROR = 5
         ENCHANTMENT_SUCCESS = 6
+        TOO_DARK = 7
+        FEAR = 8
+
+    _termination_statuses = [
+            status_enum.NO_AVAILABLE_ITEMS, 
+            status_enum.NO_AVAILABLE_RUNES,
+            status_enum.ENCHANTMENT_ERROR,
+            status_enum.ENCHANTMENT_SUCCESS,
+            status_enum.TOO_DARK,
+            status_enum.FEAR,
+            ]
 
     
     def __init__(self, game, owner, init_text=None):
@@ -70,10 +82,21 @@ class EnchantmentProcess(Process):
         self.init_text = init_text
         self.items_list = self.get_items_list()
         self.runes_list = self.get_runes_list()
+        self.set_owner_status()
         self.item = self.try_to_find_item(init_text)
         self.rune = None
         self.proceed()
         
+    
+    def set_owner_status(self) -> bool:
+        if not self.owner.check_light():
+            self.status = EnchantmentProcess.status_enum.TOO_DARK
+            return False
+        if self.owner.check_fear():
+            self.status = EnchantmentProcess.status_enum.FEAR
+            return False
+        return True
+    
     
     def get_items_list(self) -> list:
         """
@@ -202,12 +225,7 @@ class EnchantmentProcess(Process):
 
     def send_message(self):    
         message = self.generate_message()
-        if self.status in [
-            EnchantmentProcess.status_enum.NO_AVAILABLE_ITEMS, 
-            EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES,
-            EnchantmentProcess.status_enum.ENCHANTMENT_ERROR,
-            EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS,
-            ]:
+        if self.status in EnchantmentProcess._termination_statuses:
             self.terminate(message)
             return
         tprint(self.game, message)
@@ -243,6 +261,8 @@ class EnchantmentProcess(Process):
             EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES: self.generate_no_runes_message,
             EnchantmentProcess.status_enum.ENCHANTMENT_ERROR: self.generate_error_message,
             EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS: self.generate_success_message,
+            EnchantmentProcess.status_enum.TOO_DARK: self.generate_too_dark_message,
+            EnchantmentProcess.status_enum.FEAR: self.generate_fear_message,
             }
         return states[self.status]()
     
@@ -287,6 +307,18 @@ class EnchantmentProcess(Process):
     def generate_no_items_message(self) -> list[str]:
         message = list()
         message.append(f"{self.owner.name} {self.owner.g('не нашел', 'не нашла')} у себя никаких штук, которые можно улучшить.")
+        return message
+    
+
+    def generate_too_dark_message(self) -> list[str]:
+        message = list()
+        message.append(f'{self.owner.name} не может ничего улучшать в такой темноте.')
+        return message
+    
+
+    def generate_fear_message(self) -> list[str]:
+        message = list()
+        message.append(f'{self.owner.name} дрожащими от страха руками пытается достать из рюкзака руну, но ничего не получается.')
         return message
     
     

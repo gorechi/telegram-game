@@ -123,7 +123,6 @@ class Hero:
             'тест': self.test,
             'обезвредить': self.disarm,
             'торговать': self.trade,
-            'улучшить': self.enchant
             }
         self.hero_actions = {
             "отдохнуть": {
@@ -180,6 +179,34 @@ class Hero:
                 "presentation": "name_for_examine",
                 "duration": 3
                 },
+            "улучшить": {
+                "method": "enchant",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 10
+                },
+            "улучшать": {
+                "method": "enchant",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 10
+                },
+            "зачаровать": {
+                "method": "enchant",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 10
+                },
+            "зачаровывать": {
+                "method": "enchant",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 10
+                }
             }
         
         
@@ -449,7 +476,6 @@ class Hero:
                 self.do(message)
             return True
         actions = {
-            state_enum.ENCHANT: self.rune_actions,
             state_enum.TRADE: self.trade_actions,
             state_enum.USE_IN_FIGHT: self.in_fight_actions,
             state_enum.FIGHT: self.fight_actions,
@@ -463,48 +489,6 @@ class Hero:
             return action(message)
         tprint (self.game, f'{self.name} такого не умеет.', 'direction')
         return False
-
-
-    def rune_actions(self, message:str) -> bool:
-        
-        """
-        Метод обрабатывает команды игрока когда он улучшает предметы при помощи рун.
-        
-        Возвращает:
-        - True - если удалось улучшить предмет
-        - False - если предмет по любой причине не улучшился
-        
-        """
-        
-        rune_list = self.rune_list
-        game = self.game
-        self.state = state_enum.NO_STATE
-        if message == 'отмена':
-            tprint(game, f'{self.name} передумывает что-то улучшать и решает просто жить дальше.', 'direction')
-            self.state = state_enum.NO_STATE
-            return False
-        if not message.isdigit():
-            tprint(game, f'Чтобы все заработало {self:dat} нужно просто выбрать руну по ее номеру. Проще говоря, просто ткнуть в нее пальцем', 'enchant')
-            return False
-        message = int(message) - 1
-        if not message < len(rune_list):
-            tprint(game, f'{self.name} не находит такую руну у себя в рюкзаке.', 'enchant')
-            return False
-        if not self.selected_item:
-            tprint(game, f'{self.name} вертит руну в руках, но не может вспомнить, куда {self.g("он хотел", "она хотела")} ее поместить.', 'direction')
-            self.state = state_enum.NO_STATE
-            return False
-        chosen_rune = rune_list[message]
-        rune_is_placed = self.selected_item.enchant(chosen_rune)
-        if not rune_is_placed:
-            tprint(game, f'Похоже, что {self.name} не может вставить руну в {self.selected_item:accus}.', 'direction')
-            self.state = state_enum.NO_STATE
-            return False
-        tprint(game, f'{self.name} улучшает {self.selected_item:accus} новой руной.', 'direction')
-        self.backpack.remove(chosen_rune)
-        self.rune_list = self.backpack.get_items_by_class('Rune')
-        self.state = state_enum.NO_STATE
-        return True
     
     
     def in_fight_actions(self, message:str) -> bool:
@@ -1746,17 +1730,13 @@ class Hero:
         return True
     
     
-    def check_fear(self) -> str|bool:
+    def check_fear(self) -> bool:
         """
         Метод проверки того, что герой испытывает страх.
-        Если страх выше лимита, то на экран выводится сообщение, что ничего не получилось.
-        Если в метод передан print_message=False, то сообщение не выводится.
         
         """
         
-        if self.fear >= Hero._fear_limit:
-            return f'{self.name} не может ничего сделать из-за того, что руки дрожат от страха.'
-        return False
+        return self.fear >= Hero._fear_limit
     
     
     def use_item_from_backpack(self, item_string:str) -> bool:
@@ -1798,79 +1778,30 @@ class Hero:
         if self.removed_shield.check_name(item):
             return self.take_out_shield()
         return self.use_item_from_backpack(item)
+    
 
     
-    def check_if_hero_can_enchant(self, item:str) -> bool:
-        """Метод проверки, может ли герой что-то улучшать."""
+    # def check_if_hero_can_enchant(self, item:str) -> bool:
+    #     """Метод проверки, может ли герой что-то улучшать."""
         
-        game = self.game
-        rune_list = self.backpack.get_items_by_class('Rune')
-        if item == '':
-            tprint(game, f'{self.name} не понимает, что {self.g("ему", "ей")} надо улучшить.')
-            return False
-        if self.fear >= Hero._fear_limit:
-            tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, \
-                но ничего не получается.')
-            return False
-        if len(rune_list) == 0:
-            tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
-            return False
-        if not self.check_light():
-            tprint(game, f'{self.name} не может ничего улучшать в такой темноте.')
-            return False
-        return True
-    
-    
-    def chose_what_to_enchant(self, item:str) -> bool:
-        """
-        Метод возвращает вещь, которую герой будет улучшать.
-        Принимает на вход строку из команды игрока, ищет эту строку 
-        среди оружия, щитов и защиты, и возвращает найденную вещь.
-        
-        """
-        
-        game = self.game
-        if item == 'оружие' and not self.weapon.empty:
-            return self.weapon
-        if item == 'щит':
-            if not self.shield.empty:
-                return self.shield
-            elif not self.removed_shield.empty:
-                return self.removed_shield
-        if item in ['дооспех', 'доспехи'] and not self.armor.empty:
-            return self.armor
-        if item.isdigit():
-            selected_item = self.backpack.get_item_by_number(int(item))
-        else:
-            selected_item = self.backpack.get_first_item_by_name(item)
-        if isinstance(selected_item, Weapon):
-                return selected_item
-        tprint(game, f'{self.name} не умеет улучшать такую штуку.')
-        return False
-    
-    
-    # def enchant(self, item='') -> bool:
-    #     """
-    #     Метод обрабатывает команду "улучшить".
-
-    #     Входящие параметры:
-    #     - item - наименование предмета, который нужно улучшить.
-    #     Поддерживаются следующие значения:
-    #         - 'оружие'
-    #         - 'щит'
-    #         - 'доспех' или 'доспехи'
-        
-    #     """
     #     game = self.game
-    #     self.rune_list = self.backpack.get_items_by_class('Rune')
-    #     message = []
-    #     self.selected_item = self.chose_what_to_enchant(item)
-    #     message.append(f'{self.name} может использовать следующие руны:')
-    #     for rune in self.rune_list:
-    #         message.append(f'{str(self.rune_list.index(rune) + 1)}: {str(rune)}')
-    #     message.append('Выберите номер руны или скажите "отмена" для прекращения улучшения')
-    #     self.state = state_enum.ENCHANT
-    #     tprint(game, message, 'enchant')
+    #     rune_list = self.backpack.get_items_by_class('Rune')
+    #     if item == '':
+    #         tprint(game, f'{self.name} не понимает, что {self.g("ему", "ей")} надо улучшить.')
+    #         return False
+    #     if self.fear >= Hero._fear_limit:
+    #         tprint(game, f'{self.name} дрожащими от страха руками пытается достать из рюкзака руну, \
+    #             но ничего не получается.')
+    #         return False
+    #     if len(rune_list) == 0:
+    #         tprint(game, f'{self.name} не может ничего улучшать. В рюкзаке не нашлось ни одной руны.')
+    #         return False
+    #     if not self.check_light():
+    #         tprint(game, f'{self.name} не может ничего улучшать в такой темноте.')
+    #         return False
+    #     return True
+    
+    
     
     def enchant(self, item='') -> bool:
         game = self.game
