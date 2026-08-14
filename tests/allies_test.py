@@ -185,5 +185,60 @@ class TestTraderFormatMethod(unittest.TestCase):
         self.assertEqual(f'{self.trader:nonexistent}', '')
         
 
+class TestTraderPlace(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_game = MagicMock()
+        self.mock_game.all_traders = []
+        self.mock_game.furniture_controller = MagicMock()
+        self.mock_floor = MagicMock()
+
+    def make_room(self, locked=False, trader=None):
+        room = MagicMock()
+        room.locked = locked
+        room.trader = trader
+        room.light = False
+        room.can_rest.return_value = True
+        return room
+
+    def test_place_in_locked_room(self):
+        free_room = self.make_room(locked=False)
+        locked_room = self.make_room(locked=True)
+        self.mock_floor.plan = [free_room, locked_room]
+        trader = Trader(game=self.mock_game, floor=self.mock_floor)
+        result = trader.place()
+        self.assertTrue(result)
+        self.assertEqual(trader.room, locked_room)
+        self.assertEqual(locked_room.trader, trader)
+
+    def test_place_without_locked_rooms_falls_back_to_free_room(self):
+        first = self.make_room(locked=False)
+        second = self.make_room(locked=False)
+        self.mock_floor.plan = [first, second]
+        trader = Trader(game=self.mock_game, floor=self.mock_floor)
+        result = trader.place()
+        self.assertTrue(result)
+        self.assertIsNotNone(trader.room)
+        self.assertIn(trader.room, [first, second])
+        self.assertTrue(trader.room.light)
+
+    def test_place_with_no_free_rooms_returns_false(self):
+        occupied = self.make_room(locked=True, trader=object())
+        self.mock_floor.plan = [occupied]
+        trader = Trader(game=self.mock_game, floor=self.mock_floor)
+        result = trader.place()
+        self.assertFalse(result)
+        self.assertIsNone(trader.room)
+
+    def test_place_explicit_occupied_room_is_ignored(self):
+        locked_room = self.make_room(locked=True)
+        occupied_room = self.make_room(locked=True, trader=object())
+        self.mock_floor.plan = [locked_room, occupied_room]
+        trader = Trader(game=self.mock_game, floor=self.mock_floor)
+        result = trader.place(room=occupied_room)
+        self.assertTrue(result)
+        self.assertEqual(trader.room, locked_room)
+
+
 if __name__ == '__main__':
     unittest.main()

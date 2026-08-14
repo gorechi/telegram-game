@@ -311,7 +311,11 @@ class Trader:
             traders_room = room
         else:
             locked_rooms = [room for room in self.floor.plan if room.locked and not room.trader]
-            traders_room = randomitem(locked_rooms)
+            free_rooms = [room for room in self.floor.plan if not room.trader]
+            available_rooms = locked_rooms or free_rooms
+            if not available_rooms:
+                return False
+            traders_room = randomitem(available_rooms)
         traders_room.trader = self
         traders_room.clear_from_monsters()
         traders_room.light = True
@@ -319,6 +323,7 @@ class Trader:
         if not self.room.can_rest(mode='simple'):
             new_rest_place = self.game.furniture_controller.get_random_object_by_filters(name="кресло")
             new_rest_place.place(room_to_place=self.room)
+        return True
 
     def show_through_key_hole(self) -> str | list:
         """
