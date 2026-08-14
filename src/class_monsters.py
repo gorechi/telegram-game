@@ -633,14 +633,17 @@ class Monster:
     
     def get_weakness(self, weapon:Weapon) -> float: 
         """
-        Метод возвращает значение коэффициента ославбления/усиления 
+        Метод возвращает коэффициент ослабления/усиления 
         при использовании против монстра определенного оружия.
+        Коэффициент применяется как множитель к урону оружия:
+        больше 1 - монстр уязвим к элементу, меньше 1 - сопротивляется.
+        Если записи для элемента нет, возвращается нейтральный множитель 1.
         
         """
         
         element = str(weapon.element())
         weakness = self.weakness.get(element, None)
-        return weakness if weakness else 0
+        return weakness if weakness else 1
         
             
     def generate_mele_attack(self, target) -> int:

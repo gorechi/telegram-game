@@ -713,10 +713,12 @@ class Hero:
     def get_weakness(self, weapon:Weapon) -> float:
         """
         Метод возвращает коэффициент уязвимости героя к элементу оружия.
+        Коэффициент применяется как множитель к урону оружия.
+        Если записи для элемента нет, возвращается нейтральный множитель 1.
         """
         element = str(weapon.element())
         weakness = self.weakness.get(element, None)
-        return weakness if weakness else 0
+        return weakness if weakness else 1
     
     
     def get_shield(self) -> Shield|None:

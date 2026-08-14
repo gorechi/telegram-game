@@ -1,3 +1,4 @@
+import math
 from src.functions.functions import randomitem
 from src.class_dice import Dice
 
@@ -362,7 +363,11 @@ class Weapon:
 
     
     def attack(self, who=None):
-        """Функция рассчитывает урон, который наносит оружие конкретному монстру
+        """Функция рассчитывает урон, который наносит оружие конкретному монстру.
+
+        Коэффициент слабости цели применяется как множитель к базовому урону оружия.
+        Результат округляется до целого числа: если дробная часть меньше 0.5,
+        число округляется в меньшую сторону, если равна или больше 0.5 - в большую.
 
         Args:
             who (object Monster, optional): Монстр, которого атакуют оружием. Defaults to None.
@@ -370,12 +375,9 @@ class Weapon:
         Returns:
             integer: Значение нанесенного урона
         """
-        target_weakness = who.get_weakness(self)
-        if target_weakness < 0:
-            return self.damage.roll(subtract=[target_weakness*-1])
-        elif target_weakness > 0: 
-            return self.damage.roll(add=[target_weakness])
-        return self.damage.roll()
+        coefficient = who.get_weakness(self)
+        base_damage = self.damage.roll()
+        return math.floor(base_damage * coefficient + 0.5)
 
     
     def take(self, who, in_action=False) -> list[str]:

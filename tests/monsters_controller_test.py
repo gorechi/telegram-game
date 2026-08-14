@@ -1,10 +1,14 @@
 import json
 import unittest
+from unittest.mock import MagicMock
 from src.controllers.controller_monsters import MonstersController
+from src.controllers.controller_weapon import WeaponController
 from src.class_monsters import Monster, Animal, Corpse
 from src.class_dice import Dice
 from src.class_basic import Loot, Money
 from src.class_hero import Hero
+from src.class_weapon import Weapon
+from src.class_rune import Rune
 
 
 class FakeGame:
@@ -351,6 +355,53 @@ class TestMonsterTakeMoney(unittest.TestCase):
         result = monster.take_money(item)
         self.assertFalse(result)
         self.assertEqual(monster.loot.pile, [])
+
+
+class TestWeaponWeaknessMultiplier(unittest.TestCase):
+    """Weakness монстра применяется как множитель к урону оружия."""
+
+    def setUp(self):
+        self.game = FakeGame()
+        self.controller = MonstersController(self.game)
+        self.weapon_controller = WeaponController(MagicMock())
+
+    def make_weapon_with_element(self, element):
+        weapon = self.weapon_controller.get_random_object_by_filters()
+        weapon.damage.set_dice([10])
+        weapon.damage.set_modifier(0)
+        rune = Rune(game=self.game)
+        rune.element = element
+        weapon.runes.append(rune)
+        return weapon
+
+    def make_monster_by_name(self, name):
+        template = self.controller.get_template_by_name(name)
+        return self.controller.create_object_from_template(template)
+
+    def test_mukholovka_weakness_to_fire(self):
+        monster = self.make_monster_by_name('Мухоловка')
+        weapon = self.make_weapon_with_element(1)
+        damage = weapon.attack(monster)
+        self.assertIsInstance(damage, int)
+        self.assertIn(damage, range(1, 12))
+
+    def test_mukholovka_resists_to_water(self):
+        monster = self.make_monster_by_name('Мухоловка')
+        weapon = self.make_weapon_with_element(12)
+        damage = weapon.attack(monster)
+        self.assertIsInstance(damage, int)
+        self.assertIn(damage, range(1, 9))
+
+    def test_get_weakness_neutral_without_entry(self):
+        monster = self.make_monster_by_name('Мухоловка')
+        weapon = self.make_weapon_with_element(3)
+        self.assertEqual(monster.get_weakness(weapon), 1)
+
+    def test_hero_get_weakness_neutral(self):
+        weapon = self.make_weapon_with_element(1)
+        hero = Hero(game=MagicMock())
+        hero.weakness = {}
+        self.assertEqual(hero.get_weakness(weapon), 1)
 
 
 if __name__ == '__main__':
