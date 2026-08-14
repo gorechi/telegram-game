@@ -811,7 +811,7 @@ class Monster:
         room = self.current_position
         self.floor.all_monsters.append(self)
         self.floor.monsters_in_rooms[room].append(self)
-        self.game.monsters_controller.resurect_monster(self)
+        self.game.monsters_controller.resurrect_monster(self)
         self.alive = True
         self.get_weaker()
         room.action_controller.add_actions(self)

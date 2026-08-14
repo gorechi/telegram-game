@@ -164,13 +164,13 @@ class MonstersController(Controller):
         return True
         
     
-    def resurect_monster(self, monster:Monster) -> bool:
+    def resurrect_monster(self, monster:Monster) -> bool:
         """
         Воскрешает монстра
         """
         if not isinstance(monster, Monster):
             raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
-        self.how_many_monsters += 1
+        self.how_many += 1
         self.all_monsters.append(monster)
         return True
     
