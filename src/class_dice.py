@@ -26,6 +26,59 @@ class Dice():
         if not self.dice:
             return 0
         return self.dice[0]
+
+
+    def _comparison_value(self) -> int:
+        """Возвращает значение кубика, по которому происходит сравнение: сумма базового кубика и модификатора."""
+        return self.base_die() + self.modifier
+
+
+    def _check_comparable(self, other) -> None:
+        """Проверяет, что другой объект является кубиком Dice. Иначе выбрасывает TypeError."""
+        if not isinstance(other, Dice):
+            raise TypeError(f"Кубик можно сравнивать только с кубиком, а передан {type(other)} {other}.")
+
+
+    def __eq__(self, other) -> bool:
+        """Сравнение на равенство.
+
+        Кубики считаются равными, если равны суммы их базового кубика и модификатора.
+        Сравнивать можно только с другим кубиком Dice, иначе выбрасывается TypeError.
+        """
+        self._check_comparable(other)
+        return self._comparison_value() == other._comparison_value()
+
+
+    def __ne__(self, other) -> bool:
+        """Сравнение на неравенство.
+
+        Кубики считаются не равными, если различаются суммы их базового кубика и модификатора.
+        Сравнивать можно только с другим кубиком Dice, иначе выбрасывается TypeError.
+        """
+        self._check_comparable(other)
+        return self._comparison_value() != other._comparison_value()
+
+
+    def __lt__(self, other) -> bool:
+        """Сравнение "меньше".
+
+        Кубик меньше другого, если сумма его базового кубика и модификатора
+        меньше суммы базового кубика и модификатора другого кубика.
+        Сравнивать можно только с другим кубиком Dice, иначе выбрасывается TypeError.
+        """
+        self._check_comparable(other)
+        return self._comparison_value() < other._comparison_value()
+
+
+    def __gt__(self, other) -> bool:
+        """Сравнение "больше".
+
+        Кубик больше другого, если сумма его базового кубика и модификатора
+        больше суммы базового кубика и модификатора другого кубика.
+        Сравнивать можно только с другим кубиком Dice, иначе выбрасывается TypeError.
+        """
+        self._check_comparable(other)
+        return self._comparison_value() > other._comparison_value()
     
     
     def add_temporary(self, die:int):

@@ -1,6 +1,6 @@
 import unittest
 from src.controllers.controller_monsters import MonstersController
-from src.class_monsters import Monster
+from src.class_monsters import Monster, Animal
 from src.class_dice import Dice
 
 
@@ -19,6 +19,13 @@ class FakeWeaponController:
     def get_random_object_by_filters(self, **filters):
         self.calls += 1
         return object()
+
+
+class FakeFight:
+    """Заглушка схватки с заданным списком бойцов."""
+
+    def __init__(self, fighters):
+        self.fighters = fighters
 
 class TestGenerateValue(unittest.TestCase):
 
@@ -181,6 +188,39 @@ class TestMonsterOnCreate(unittest.TestCase):
                              f'Монстр {template.name}: start_health != health')
             self.assertTrue(monster.exp > 0,
                             f'Монстр {template.name} не получил exp')
+
+
+class TestAnimalWantToFight(unittest.TestCase):
+    """Регрессионные тесты решения животного о вступлении в схватку (сравнение Dice)."""
+
+    def setUp(self):
+        self.game = FakeGame()
+
+    def make_fighter(self, stren_value, modifier=0):
+        fighter = Monster(game=self.game)
+        fighter.stren = Dice([stren_value], modifier=modifier)
+        return fighter
+
+    def test_animal_refuses_fight_with_stronger_enemy(self):
+        animal = Animal(game=self.game)
+        animal.stren = Dice([5])
+        self.assertFalse(animal.want_to_fight(FakeFight([self.make_fighter(10)])))
+
+    def test_animal_fights_weaker_enemy(self):
+        animal = Animal(game=self.game)
+        animal.stren = Dice([5])
+        self.assertTrue(animal.want_to_fight(FakeFight([self.make_fighter(3)])))
+
+    def test_animal_fights_equal_enemy(self):
+        animal = Animal(game=self.game)
+        animal.stren = Dice([5])
+        self.assertTrue(animal.want_to_fight(FakeFight([self.make_fighter(5)])))
+
+    def test_animal_considers_modifier(self):
+        # Зверь с базовым кубиком 3 и модификатором +5 (итого 8) не слабее врага с базой 6.
+        animal = Animal(game=self.game)
+        animal.stren = Dice([3], modifier=5)
+        self.assertTrue(animal.want_to_fight(FakeFight([self.make_fighter(6)])))
 
 
 if __name__ == '__main__':

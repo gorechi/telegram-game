@@ -179,5 +179,53 @@ class TestDiceDecreaseModificator(unittest.TestCase):
         dice.decrease_modifier(4)
         self.assertEqual(dice.modifier, -1)  # Ожидаемое значение: 0
         
+class TestDiceComparison(unittest.TestCase):
+    """Тесты операторов сравнения Dice: сравнение по сумме базового кубика и модификатора."""
+
+    def test_eq_considers_base_die_and_modifier(self):
+        # 6 + 2 == 7 + 1
+        self.assertEqual(Dice([6], modifier=2), Dice([7], modifier=1))
+
+    def test_eq_unequal(self):
+        self.assertNotEqual(Dice([6]), Dice([6], modifier=1))
+
+    def test_eq_different_base_die(self):
+        self.assertNotEqual(Dice([6]), Dice([8]))
+
+    def test_ne_considers_base_die_and_modifier(self):
+        # 6 != 6 + 1
+        self.assertTrue(Dice([6]) != Dice([6], modifier=1))
+        self.assertFalse(Dice([6]) != Dice([6]))
+
+    def test_lt_by_base_die(self):
+        self.assertTrue(Dice([6]) < Dice([8]))
+
+    def test_lt_considers_modifier(self):
+        # 6 + 2 = 8 < 4 + 5 = 9
+        self.assertTrue(Dice([6], modifier=2) < Dice([4], modifier=5))
+
+    def test_gt_by_base_die(self):
+        self.assertTrue(Dice([8]) > Dice([6]))
+
+    def test_gt_considers_modifier(self):
+        # 4 + 5 = 9 > 6 + 2 = 8
+        self.assertTrue(Dice([4], modifier=5) > Dice([6], modifier=2))
+
+    def test_equal_dice_are_neither_less_nor_greater(self):
+        self.assertFalse(Dice([6]) < Dice([6]))
+        self.assertFalse(Dice([6]) > Dice([6]))
+
+    def test_compare_with_non_dice_raises(self):
+        dice = Dice([6])
+        with self.assertRaises(TypeError):
+            dice < 5
+        with self.assertRaises(TypeError):
+            dice > 5
+        with self.assertRaises(TypeError):
+            dice == 5
+        with self.assertRaises(TypeError):
+            dice != 5
+
+
 if __name__ == '__main__':
     unittest.main()
