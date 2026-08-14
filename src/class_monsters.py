@@ -161,7 +161,7 @@ class Monster:
                 },
         }
         
-    def is_not_hiding(self):
+    def is_not_hiding(self, room=None):
         """ 
         Метод проверяет, не прячется ли монстр в засаде.
         """
@@ -241,7 +241,7 @@ class Monster:
         """ 
         Метод возвращает имя монстра, когда его атакуют.
         """
-        if who.current_position.check_light():
+        if who.check_light():
             return f'{self:accus}'.capitalize()
         return 'Кого-то, прячущегося в темноте'
 

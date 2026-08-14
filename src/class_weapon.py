@@ -29,6 +29,8 @@ class Weapon:
     def __init__(self, game):
         self.game = game
         self.runes = []
+        self.weapon_type = None
+        self.hit_chance = Dice([0])
         self.empty = False
         self.hero_actions = {
             "использовать": {

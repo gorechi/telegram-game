@@ -288,6 +288,13 @@ class Door:
         }
     
     
+    def check_disturbed_monsters(self, who) -> None:
+        """ 
+        Метод проверяет, есть ли в комнате взбудораженные монстры, и начинает с ними схватку.
+        """
+        who.check_disturbed_monsters(who)
+    
+    
     def go(self, who, in_action:bool=False) -> list[str]:
         """
         Метод обрабатывает команду Идти
