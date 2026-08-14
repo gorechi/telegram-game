@@ -159,8 +159,9 @@ class MonstersController(Controller):
         """
         if not isinstance(monster, Monster):
             raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
-        self.how_many_monsters -= 1
-        self.all_monsters.remove(monster)
+        if monster in self.all_objects:
+            self.all_objects.remove(monster)
+            self.how_many -= 1
         return True
         
     
@@ -170,8 +171,8 @@ class MonstersController(Controller):
         """
         if not isinstance(monster, Monster):
             raise TypeError(f"Параметр 'monster' должен быть экземпляром класса Monster, а передан {type(monster)} {monster}.")
+        self.all_objects.append(monster)
         self.how_many += 1
-        self.all_monsters.append(monster)
         return True
     
     
