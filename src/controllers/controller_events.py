@@ -23,7 +23,7 @@ class EventsController():
         """
         Проверяет ожидающие события и перемещает их в очередь, если их счетчик достиг нуля.
         """
-        for event in self.pending_events:
+        for event in list(self.pending_events):
             event.counter -= counter
             if event.counter <= 0:
                 self.queue.append(event)
@@ -60,21 +60,21 @@ class EventsController():
         self.check_pending_events(counter)
         while self.queue:
             event = self.queue.popleft()
-            self.excecute_event(event)
+            self.execute_event(event)
 
     
     def execute_event(self, event) -> None:
         """
         Выполняет одно событие, вызывая соответствующий метод у субъекта события.
         """
-        method = getattr(event.subject, event.subject_method_name, None)
+        method = getattr(event.event_subject, event.subject_method_name, None)
         if method and callable(method):
-            method(event.object)
+            method(event.event_object)
 
     
     def delete_pending_events_by_subject(self, subject:object) -> None:
         """
         Удаляет все ожидающие события, связанные с определенным субъектом.
         """
-        new_list = [event for event in self.pending_events if event.subject is not subject]
+        new_list = [event for event in self.pending_events if event.event_subject is not subject]
         self.pending_events = new_list
