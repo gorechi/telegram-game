@@ -383,13 +383,19 @@ class Hero:
         return self.check_dext(against=3, add=[2])
     
     
-    def increase_monster_knowledge(self, monster_type) -> bool:
+    def increase_monster_knowledge(self, monster_type) -> str:
         """
         Метод увеличивает знание героя о типе монстра.
+
+        Если тип монстра отсутствует в Monster._types, используется
+        запасная формулировка вместо исключения KeyError.
         """
         knowledge = self.monster_knowledge.get(monster_type, 0)
         self.monster_knowledge[monster_type] = knowledge + 1
-        return f'{self.name} больше узнает про {Monster._types[monster_type]["accus"]}'
+        type_lexemes = Monster._types.get(monster_type)
+        if type_lexemes:
+            return f'{self.name} больше узнает про {type_lexemes["accus"]}'
+        return f'{self.name} больше узнает про неведомого противника.'
     
     
     # def go_down(self, what:str) -> bool:

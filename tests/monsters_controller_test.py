@@ -1,7 +1,10 @@
+import json
 import unittest
 from src.controllers.controller_monsters import MonstersController
-from src.class_monsters import Monster, Animal
+from src.class_monsters import Monster, Animal, Corpse
 from src.class_dice import Dice
+from src.class_basic import Loot
+from src.class_hero import Hero
 
 
 class FakeGame:
@@ -221,6 +224,97 @@ class TestAnimalWantToFight(unittest.TestCase):
         animal = Animal(game=self.game)
         animal.stren = Dice([3], modifier=5)
         self.assertTrue(animal.want_to_fight(FakeFight([self.make_fighter(6)])))
+
+
+class TestMonsterTypes(unittest.TestCase):
+    """Тесты полноты словаря типов монстров Monster._types."""
+
+    def test_all_template_types_present(self):
+        with open('json/monsters.json', encoding='utf-8') as data:
+            templates = json.load(data)
+        for template in templates:
+            self.assertIn(template['monster_type'], Monster._types,
+                          f'Тип {template["monster_type"]} ({template["name"]}) отсутствует в Monster._types')
+
+    def test_every_type_has_accus(self):
+        for type_name, lexemes in Monster._types.items():
+            self.assertIn('accus', lexemes, f'У типа {type_name} нет падежа accus')
+
+    def test_was_broken_types_present(self):
+        for type_name in ('human', 'demon', 'shapeshifter'):
+            self.assertIn(type_name, Monster._types)
+
+
+class TestIncreaseMonsterKnowledge(unittest.TestCase):
+    """Тесты метода увеличения знания героя о типе монстра."""
+
+    def make_hero(self):
+        hero = object.__new__(Hero)
+        hero.name = 'Герой'
+        hero.monster_knowledge = {}
+        return hero
+
+    def test_known_type_increments_and_returns_text(self):
+        hero = self.make_hero()
+        result = hero.increase_monster_knowledge('vampire')
+        self.assertEqual(hero.monster_knowledge, {'vampire': 1})
+        self.assertIn('вампиров', result)
+
+    def test_was_broken_types_now_work(self):
+        for type_name in ('human', 'demon', 'shapeshifter'):
+            hero = self.make_hero()
+            result = hero.increase_monster_knowledge(type_name)
+            self.assertEqual(hero.monster_knowledge[type_name], 1)
+            self.assertIn('узнает', result)
+
+    def test_unknown_type_falls_back_without_crash(self):
+        hero = self.make_hero()
+        result = hero.increase_monster_knowledge('неизвестный_тип')
+        self.assertEqual(hero.monster_knowledge['неизвестный_тип'], 1)
+        self.assertIn('неведомого', result)
+
+    def test_counter_accumulates(self):
+        hero = self.make_hero()
+        hero.increase_monster_knowledge('human')
+        hero.increase_monster_knowledge('human')
+        self.assertEqual(hero.monster_knowledge['human'], 2)
+
+
+class TestCorpseExamine(unittest.TestCase):
+    """Интеграционные тесты осмотра трупа для всех типов монстров."""
+
+    def make_hero(self):
+        hero = object.__new__(Hero)
+        hero.name = 'Герой'
+        hero.monster_knowledge = {}
+        return hero
+
+    def make_room(self):
+        class FakeActionController:
+            def add_actions(self, item):
+                pass
+
+        class FakeRoom:
+            def __init__(self):
+                self.morgue = []
+                self.action_controller = FakeActionController()
+
+        return FakeRoom()
+
+    def test_examine_works_for_all_template_types(self):
+        with open('json/monsters.json', encoding='utf-8') as data:
+            templates = json.load(data)
+        for template in templates:
+            game = FakeGame()
+            game.all_corpses = []
+            creature = Monster(game=FakeGame())
+            creature.monster_type = template['monster_type']
+            corpse = Corpse(game=game, name='труп', loot=Loot(game), room=self.make_room(), creature=creature)
+            hero = self.make_hero()
+            result = corpse.examine(hero)
+            self.assertIn('узнает', result,
+                          f'Осмотр трупа {template["name"]} не вернул сообщение о знании')
+            self.assertEqual(hero.monster_knowledge.get(template['monster_type']), 1)
 
 
 if __name__ == '__main__':
