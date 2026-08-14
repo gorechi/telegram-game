@@ -224,9 +224,9 @@ class Fight:
         """
         filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
         if mode == 'Max':
-            return max(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+            return max(filtered_fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
         if mode == 'Min':
-            return min(self.fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
+            return min(filtered_fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
         return False
     
     
@@ -236,9 +236,9 @@ class Fight:
         """
         filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
         if mode == 'Max':
-            return max(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+            return max(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
         if mode == 'Min':
-            return min(self.fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
+            return min(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
         return False
     
     

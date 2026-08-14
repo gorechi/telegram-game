@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import MagicMock
 
 from src.class_dice import Dice
+from src.class_fight import Fight
 from src.class_game import Game
 from src.class_hero import Hero
 from src.class_monsters import Monster
@@ -225,6 +226,65 @@ class TestNoWeaponDefaults(unittest.TestCase):
         weapon = self.controller.get_random_object_by_filters()
         self.assertIsInstance(weapon.hit_chance, Dice)
         self.assertIsNotNone(weapon.weapon_type)
+
+
+class TestFightGetFighterByMethods(unittest.TestCase):
+    """Выбор бойца по силе и здоровью должен уважать фильтр exclude."""
+
+    class WeakSkeleton:
+        def __init__(self, stren=0, health=0):
+            self.stren = stren
+            self.health = health
+
+    class WeakGoblin:
+        def __init__(self, stren=0, health=0):
+            self.stren = stren
+            self.health = health
+
+    class StrongGoblin:
+        def __init__(self, stren=0, health=0):
+            self.stren = stren
+            self.health = health
+
+    @staticmethod
+    def make_fight(fighters):
+        fight = Fight.__new__(Fight)
+        fight.fighters = fighters
+        return fight
+
+    def test_get_fighter_by_health_min_excludes_classes(self):
+        excluded = self.WeakSkeleton(stren=10, health=1)
+        target = self.WeakGoblin(stren=5, health=10)
+        fight = self.make_fight([excluded, target])
+        result = fight.get_fighter_by_health(who=None, exclude=['WeakSkeleton'], mode='Min')
+        self.assertIs(result, target)
+
+    def test_get_fighter_by_health_max_excludes_classes(self):
+        excluded = self.StrongGoblin(stren=5, health=100)
+        target = self.WeakSkeleton(stren=10, health=50)
+        fight = self.make_fight([excluded, target])
+        result = fight.get_fighter_by_health(who=None, exclude=['StrongGoblin'], mode='Max')
+        self.assertIs(result, target)
+
+    def test_get_fighter_by_strength_excludes_classes(self):
+        excluded = self.WeakSkeleton(stren=100, health=10)
+        target = self.WeakGoblin(stren=5, health=5)
+        fight = self.make_fight([excluded, target])
+        result = fight.get_fighter_by_strength(who=None, exclude=['WeakSkeleton'], mode='Max')
+        self.assertIs(result, target)
+
+    def test_excludes_who_itself(self):
+        who = self.StrongGoblin(stren=100, health=100)
+        target = self.WeakGoblin(stren=5, health=5)
+        fight = self.make_fight([who, target])
+        result = fight.get_fighter_by_strength(who=who, mode='Max')
+        self.assertIs(result, target)
+
+    def test_returns_false_when_all_excluded(self):
+        excluded = self.WeakSkeleton(stren=10, health=10)
+        fight = self.make_fight([excluded])
+        result = fight.get_fighter_by_health(who=None, exclude=['WeakSkeleton'], mode='Max')
+        self.assertFalse(result)
 
 
 if __name__ == '__main__':

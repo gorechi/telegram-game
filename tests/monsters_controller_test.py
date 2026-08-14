@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import MagicMock
 from src.controllers.controller_monsters import MonstersController
 from src.controllers.controller_weapon import WeaponController
-from src.class_monsters import Monster, Animal, Corpse
+from src.class_monsters import Monster, Animal, Corpse, Skeleton
 from src.class_dice import Dice
 from src.class_basic import Loot, Money
 from src.class_hero import Hero
@@ -402,6 +402,47 @@ class TestWeaponWeaknessMultiplier(unittest.TestCase):
         hero = Hero(game=MagicMock())
         hero.weakness = {}
         self.assertEqual(hero.get_weakness(weapon), 1)
+
+
+class TestSkeletonGetWeakness(unittest.TestCase):
+    """Слабости скелета зависят от типа оружия."""
+
+    def setUp(self):
+        self.game = FakeGame()
+
+    def make_skeleton(self):
+        return Skeleton(game=self.game)
+
+    def make_weapon_with_type(self, weapon_type):
+        weapon = Weapon(game=self.game)
+        weapon.weapon_type = weapon_type
+        return weapon
+
+    def test_weakness_to_blunt(self):
+        skeleton = self.make_skeleton()
+        weapon = self.make_weapon_with_type('ударное')
+        self.assertEqual(skeleton.get_weakness(weapon), 2)
+
+    def test_weakness_to_piercing(self):
+        skeleton = self.make_skeleton()
+        weapon = self.make_weapon_with_type('колющее')
+        self.assertEqual(skeleton.get_weakness(weapon), 0.3)
+
+    def test_weakness_to_cutting(self):
+        skeleton = self.make_skeleton()
+        weapon = self.make_weapon_with_type('рубящее')
+        self.assertEqual(skeleton.get_weakness(weapon), 0.5)
+
+    def test_neutral_with_empty_weapon(self):
+        skeleton = self.make_skeleton()
+        empty_weapon = Weapon(game=self.game)
+        empty_weapon.empty = True
+        self.assertEqual(skeleton.get_weakness(empty_weapon), 1)
+
+    def test_neutral_with_unknown_type(self):
+        skeleton = self.make_skeleton()
+        weapon = self.make_weapon_with_type('колдовское')
+        self.assertEqual(skeleton.get_weakness(weapon), 1)
 
 
 if __name__ == '__main__':
