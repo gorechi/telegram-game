@@ -307,10 +307,10 @@ class Trader:
         Args:
             room (optional): Комната для размещения торговца.
         """
-        if room:
+        if room and not room.trader:
             traders_room = room
         else:
-            locked_rooms = [room for room in self.floor.plan if room.locked]
+            locked_rooms = [room for room in self.floor.plan if room.locked and not room.trader]
             traders_room = randomitem(locked_rooms)
         traders_room.trader = self
         traders_room.clear_from_monsters()
@@ -601,8 +601,8 @@ class RuneMerchant(Trader):
             price = rune.base_price - roll(RuneMerchant._buy_price_modifier)
             new_rune = Trader.ItemInShop(item=rune, price=price)
             runes_list.append(new_rune)
-        self.update_indexes()
         self.goods_to_buy = runes_list
+        self.update_indexes()
         return True
 
     def show(self) -> str:
@@ -735,8 +735,8 @@ class PotionsMerchant(Trader):
             price = potion.base_price - roll(PotionsMerchant._buy_price_modifier)
             new_potion = Trader.ItemInShop(item=potion, price=price)
             potions_list.append(new_potion)
-        self.update_indexes()
         self.goods_to_buy = potions_list
+        self.update_indexes()
         return True
 
     def show(self) -> str:
