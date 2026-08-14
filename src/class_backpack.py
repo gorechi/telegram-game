@@ -143,7 +143,7 @@ class Backpack:
         Метод принимает на вход класс вещи и
         и возвращает список вещей в рюкзаке этого класса.
         """
-        return [item for item in self.insides if type(item).__name__ == item_class]
+        return [item for item in self.insides if item_class in [cls.__name__ for cls in type(item).__mro__]]
 
     
     def get_items_list(self) -> list:

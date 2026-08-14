@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from src.class_items import Matches
-from src.class_basic import Money
+from src.class_basic import Money, Loot
 from src.class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
 from src.class_backpack import Backpack
 from src.class_book import Book
@@ -617,6 +617,15 @@ class TestScribeMethods(unittest.TestCase):
         self.assertEqual(len(self.scribe.goods_to_buy), 1)
         self.assertEqual(self.scribe.goods_to_buy[0].index, 1)
 
+    def test_evaluate_items_with_subclass_books(self):
+        hero = make_hero(self.game, 100)
+        book = self.game.books_controller.get_random_object_by_filters()
+        hero.backpack.append(book)
+        result = self.scribe.evaluate_items(hero.backpack)
+        self.assertTrue(result)
+        self.assertEqual(len(self.scribe.goods_to_buy), 1)
+        self.assertIs(self.scribe.goods_to_buy[0].item, book)
+
     def test_evaluate_items_without_books(self):
         hero = make_hero(self.game, 100)
         result = self.scribe.evaluate_items(hero.backpack)
@@ -685,6 +694,15 @@ class TestRuneMerchantMethods(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
         self.assertEqual(self.merchant.goods_to_buy[0].index, 1)
+
+    def test_evaluate_items_with_subclass_runes(self):
+        hero = make_hero(self.game, 100)
+        rune = self.game.runes_controller.get_random_object_by_filters()
+        hero.backpack.append(rune)
+        result = self.merchant.evaluate_items(hero.backpack)
+        self.assertTrue(result)
+        self.assertEqual(len(self.merchant.goods_to_buy), 1)
+        self.assertIs(self.merchant.goods_to_buy[0].item, rune)
 
     def test_evaluate_items_without_runes(self):
         hero = make_hero(self.game, 100)
@@ -755,6 +773,15 @@ class TestPotionsMerchantMethods(unittest.TestCase):
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
         self.assertEqual(self.merchant.goods_to_buy[0].index, 1)
 
+    def test_evaluate_items_with_subclass_potions(self):
+        hero = make_hero(self.game, 100)
+        potion = self.game.potions_controller.get_random_object_by_filters()
+        hero.backpack.append(potion)
+        result = self.merchant.evaluate_items(hero.backpack)
+        self.assertTrue(result)
+        self.assertEqual(len(self.merchant.goods_to_buy), 1)
+        self.assertIs(self.merchant.goods_to_buy[0].item, potion)
+
     def test_evaluate_items_without_potions(self):
         hero = make_hero(self.game, 100)
         result = self.merchant.evaluate_items(hero.backpack)
@@ -772,6 +799,47 @@ class TestPotionsMerchantMethods(unittest.TestCase):
         merchant = PotionsMerchant(self.game, MagicMock(), name='Алхимик', lexemes=lexemes)
         self.assertEqual(merchant.name, 'Алхимик')
         self.assertEqual(merchant.lexemes, lexemes)
+
+
+class TestGetItemsByClassSubclassMatching(unittest.TestCase):
+
+    def setUp(self):
+        self.game = make_game()
+        self.backpack = Backpack(self.game)
+        self.loot = Loot(self.game)
+
+    def test_backpack_matches_base_class(self):
+        book = make_book(self.game)
+        self.backpack.append(book)
+        self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
+
+    def test_backpack_matches_subclasses(self):
+        book = self.game.books_controller.get_random_object_by_filters()
+        self.backpack.append(book)
+        self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
+
+    def test_backpack_with_multiple_classes(self):
+        book = make_book(self.game)
+        rune = make_rune(self.game)
+        self.backpack.append(book)
+        self.backpack.append(rune)
+        self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
+        self.assertEqual(self.backpack.get_items_by_class('Rune'), [rune])
+
+    def test_backpack_with_unknown_class(self):
+        book = make_book(self.game)
+        self.backpack.append(book)
+        self.assertEqual(self.backpack.get_items_by_class('Map'), [])
+
+    def test_loot_matches_subclasses(self):
+        book = self.game.books_controller.get_random_object_by_filters()
+        self.loot.pile.append(book)
+        self.assertEqual(self.loot.get_items_by_class('Book'), [book])
+
+    def test_loot_matches_base_class(self):
+        book = make_book(self.game)
+        self.loot.pile.append(book)
+        self.assertEqual(self.loot.get_items_by_class('Book'), [book])
 
 
 if __name__ == '__main__':

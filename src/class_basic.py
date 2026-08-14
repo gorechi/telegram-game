@@ -114,7 +114,7 @@ class Loot:
         Метод принимает на вход класс вещи и
         и возвращает список вещей в луте этого класса.
         """
-        return [item for item in self.pile if type(item).__name__ == item_class]
+        return [item for item in self.pile if item_class in [cls.__name__ for cls in type(item).__mro__]]
 
 
     def get_first_item_by_class(self, item_class):
