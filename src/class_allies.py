@@ -79,7 +79,7 @@ class Trader:
             ItemInShop | None: Найденный товар или None, если не найден.
         """
         if not name or not isinstance(name, str):
-            raise ValueError('В метод randomitem передан пустой массив')
+            raise ValueError('В метод search_item_by_name передано неверное имя объекта')
         for item in items_list:
             if item.item.check_name(name):
                 return item
@@ -251,7 +251,7 @@ class Trader:
             Money: Объект денег с сгенерированной суммой.
         """
         delta = Trader._maximum_money - Trader._minimum_money
-        money_amount = Trader._minimum_money + roll([delta])
+        money_amount = Trader._minimum_money + roll([delta + 1]) - 1
         new_money = Money(self.game, money_amount)
         return new_money
 
