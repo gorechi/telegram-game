@@ -493,7 +493,7 @@ class Monster:
         
         if not self.weapon.empty or not self.carry_weapon:
             return False
-        if self.preferred_weapon and self.preferred_weapon != item.type:
+        if self.preferred_weapon and self.preferred_weapon != item.weapon_type:
             self.loot.add(item)
             return True
         return self.equip_weapon(item)
@@ -504,13 +504,13 @@ class Monster:
         
         all_weapons = loot.get_items_by_class('Weapon')
         if self.preferred_weapon:
-            weapons = [i for i in all_weapons if i.type == self.preferred_weapon]
+            weapons = [i for i in all_weapons if i.weapon_type == self.preferred_weapon]
         else:
             weapons = all_weapons
         if not self.weapon.empty or not self.carry_weapon or not weapons:
             return False
         weapon = randomitem(weapons)
-        self.eqip_weapon(weapon)
+        self.equip_weapon(weapon)
         loot.remove(weapon)
         return True
         
@@ -618,7 +618,7 @@ class Monster:
         if isinstance(item, Armor):
             return self.take_armor(item=item)
         if isinstance(item, Rune):
-            return self.take_rune(item=item)
+            return self.take_rune(rune=item)
         if isinstance(item, Money):
             return self.take_money(item=item)
         self.loot.add(item)
