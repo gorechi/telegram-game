@@ -1,5 +1,5 @@
 import unittest
-from src.controller_monsters import MonstersController
+from src.controllers.controller_monsters import MonstersController
 from src.class_dice import Dice
 
 class TestGenerateValue(unittest.TestCase):
@@ -30,13 +30,13 @@ class TestGenerateValue(unittest.TestCase):
     
     def test_random_range(self):
         # Тестирование случая, когда входные данные содержат диапазон случайных значений
-        data = {'random': [1, 10]}
+        data = {'random': True, 'value': [1, 10]}
         result = self.controller.generate_value(data)
         self.assertIn(result, range(1, 11))
     
     def test_random_range_with_value(self):
         # Тестирование случая, когда входные данные содержат диапазон случайных значений
-        data = {'random': [1, 10], 'value': 12}
+        data = {'random': True, 'value': [1, 10]}
         result = self.controller.generate_value(data)
         self.assertIn(result, range(1, 11))# Ожидаемое значение: в диапазоне от 1 до 10
 
@@ -49,7 +49,7 @@ class TestGenerateValue(unittest.TestCase):
         
     def test_random_die(self):
         # Тестирование случая, когда входные данные содержат значение для кубика
-        data = {'dice': True, 'random': [1, 10]}
+        data = {'dice': True, 'random': True, 'value': [1, 10]}
         result = self.controller.generate_value(data)
         self.assertIsInstance(result, Dice)
         self.assertEqual(len(result.dice), 1)

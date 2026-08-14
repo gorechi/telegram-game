@@ -1,11 +1,11 @@
 import unittest
-from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 from src.class_items import Matches
 from src.class_basic import Money
 from src.class_allies import Trader
-from src.controller_books import BooksController
-from src.controller_runes import RunesController
-from src.controller_potions import PotionsController
+from src.controllers.controller_books import BooksController
+from src.controllers.controller_runes import RunesController
+from src.controllers.controller_potions import PotionsController
 from src.functions.functions import howmany
 
 class TestItemInShop(unittest.TestCase):

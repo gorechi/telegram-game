@@ -21,6 +21,7 @@
       "value": [16, 20]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -98,6 +99,7 @@
       "value": [30, 45]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 4]
       },
@@ -176,6 +178,7 @@
       "value": [25, 35]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 7]
       },
@@ -254,6 +257,7 @@
       "value": [28, 35]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 6]
       },
@@ -332,6 +336,7 @@
       "value": [20, 25]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -410,6 +415,7 @@
       "value": [20, 30]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -488,6 +494,7 @@
       "value": [28, 32]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 6]
       },
@@ -566,6 +573,7 @@
       "value": [28, 35]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [3, 4]
       },
@@ -643,6 +651,7 @@
       "value": [25, 28]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 5]
       },
@@ -728,6 +737,7 @@
       "value": [28, 35]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 5]
       },
@@ -813,6 +823,7 @@
       "value": [35, 45]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 8]
       },
@@ -895,6 +906,7 @@
       "value": [18, 27]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 7]
       },
@@ -977,6 +989,7 @@
       "value": [25, 30]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [3, 5]
       },
@@ -1054,6 +1067,7 @@
       "value": [25, 30]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -1131,6 +1145,7 @@
       "value": [16, 25]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 6]
       },
@@ -1208,6 +1223,7 @@
       "value": [23, 27]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [6, 7]
       },
@@ -1285,6 +1301,7 @@
       "value": [25, 28]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -1362,6 +1379,7 @@
       "value": [16, 22]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [3, 5]
       },
@@ -1439,6 +1457,7 @@
       "value": [25, 28]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [2, 4]
       },
@@ -1516,6 +1535,7 @@
       "value": [24, 27]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 7]
       },
@@ -1593,6 +1613,7 @@
       "value": [22, 33]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [3, 5]
       },
@@ -1670,6 +1691,7 @@
       "value": [16, 20]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [5, 6]
       },
@@ -1745,6 +1767,7 @@
       "value": [16, 20]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -1819,6 +1842,7 @@
       "value": [9, 11]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -1894,6 +1918,7 @@
       "value": [20, 25]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [4, 5]
       },
@@ -1969,6 +1994,7 @@
       "value": [40, 60]
       },
     "hit_chance": {
+      "dice": true,
       "random": true,
       "value": [6, 8]
       },
