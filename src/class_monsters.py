@@ -337,15 +337,15 @@ class Monster:
     def on_create(self):
         """Метод вызывается после создания экземпляра класса Монстр."""
         
+        self.start_health = self.health
         if self.preferred_weapon:
             self.weapon = self.game.weapon_controller.get_random_object_by_filters(weapon_type=self.preferred_weapon)
-            self.start_health = self.health
-            stren_dice = self.stren.dice
-            multiplier = roll([Monster._exp_multiplier_limit])
-            health_appendix = roll([self.health])
-            dice = stren_dice * multiplier + [health_appendix]
-            exp_dice = Dice(dice=dice)
-            self.exp = exp_dice.roll()
+        stren_dice = self.stren.dice
+        multiplier = roll([Monster._exp_multiplier_limit])
+        health_appendix = roll([self.health])
+        dice = stren_dice * multiplier + [health_appendix]
+        exp_dice = Dice(dice=dice)
+        self.exp = exp_dice.roll()
         return True
 
     

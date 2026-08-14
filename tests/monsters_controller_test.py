@@ -9,6 +9,17 @@ class FakeGame:
     no_shield = None
     no_armor = None
 
+
+class FakeWeaponController:
+    """Заглушка weapon_controller: on_create присваивает результат атрибуту weapon и не использует его дальше."""
+
+    def __init__(self):
+        self.calls = 0
+
+    def get_random_object_by_filters(self, **filters):
+        self.calls += 1
+        return object()
+
 class TestGenerateValue(unittest.TestCase):
 
     def setUp(self):
@@ -131,6 +142,45 @@ class TestMonsterAccounting(unittest.TestCase):
         self.controller.resurrect_monster(self.monster_1)
         self.assertEqual(self.controller.all_objects, [self.monster_1])
         self.assertEqual(self.controller.how_many, 1)
+
+
+class TestMonsterOnCreate(unittest.TestCase):
+    """Тесты инициализации start_health в on_create для всех монстров."""
+
+    def setUp(self):
+        self.game = FakeGame()
+        self.game.weapon_controller = FakeWeaponController()
+
+    def test_on_create_sets_start_health_without_weapon(self):
+        monster = Monster(game=self.game)
+        monster.preferred_weapon = ''
+        monster.health = 20
+        monster.stren = Dice([5])
+        monster.on_create()
+        self.assertEqual(monster.start_health, 20)
+        self.assertTrue(monster.exp > 0)
+        self.assertEqual(self.game.weapon_controller.calls, 0)
+
+    def test_on_create_sets_start_health_with_weapon(self):
+        monster = Monster(game=self.game)
+        monster.preferred_weapon = 'колющее'
+        monster.health = 20
+        monster.stren = Dice([5])
+        monster.on_create()
+        self.assertEqual(monster.start_health, 20)
+        self.assertEqual(self.game.weapon_controller.calls, 1)
+        self.assertTrue(monster.exp > 0)
+
+    def test_all_templates_get_start_health(self):
+        controller = MonstersController(game=self.game)
+        for template in controller.templates:
+            monster = controller.create_object_from_template(template)
+            self.assertTrue(hasattr(monster, 'start_health'),
+                            f'Монстр {template.name} не получил start_health')
+            self.assertEqual(monster.start_health, monster.health,
+                             f'Монстр {template.name}: start_health != health')
+            self.assertTrue(monster.exp > 0,
+                            f'Монстр {template.name} не получил exp')
 
 
 if __name__ == '__main__':
