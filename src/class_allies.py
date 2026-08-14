@@ -14,12 +14,6 @@ class Trader:
     Определяет общую логику торговли, хранения товаров, взаимодействия с игроком и генерации ассортимента.
     """
 
-    _how_many_runes_trader_can_have = 4
-    """Кубик, который надо кинуть чтобы определить количество рун у торговца"""
-
-    _how_many_potions_trader_can_have = 6
-    """Кубик, который надо кинуть чтобы определить количество зелий у торговца"""
-
     _maximum_money = 50
     """Максимальное количество денег у торговца"""
 
@@ -121,6 +115,8 @@ class Trader:
         Returns:
             str: Имя торговца в нужном падеже.
         """
+        if not self.lexemes:
+            return self.name
         return self.lexemes.get(format, '')
 
     def sell(self, item_text: str, who) -> bool:

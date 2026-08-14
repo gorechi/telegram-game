@@ -183,6 +183,13 @@ class TestTraderFormatMethod(unittest.TestCase):
         # Test for a non-existing key in lexemes
         self.assertEqual(format(self.trader, 'nonexistent'), '')
         self.assertEqual(f'{self.trader:nonexistent}', '')
+
+    def test_format_without_lexemes_returns_name(self):
+        # Test that formatting does not crash when lexemes is None
+        trader = Trader(game=self.mock_game, floor=self.mock_floor, name='Торговец')
+        self.assertIsNone(trader.lexemes)
+        self.assertEqual(format(trader, 'nom'), 'Торговец')
+        self.assertEqual(f'{trader:nom}', 'Торговец')
         
 
 class TestTraderPlace(unittest.TestCase):
