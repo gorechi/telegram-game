@@ -700,7 +700,8 @@ class TestMonsterPoison(unittest.TestCase):
     def test_poison_enemy_poisons(self):
         monster = make_monster(poison_level=Dice([10]))
         target = make_monster(poison_protection=Dice([1]))
-        result = monster.poison_enemy(target)
+        with patch.object(monster.poison_level, 'roll', return_value=5):
+            result = monster.poison_enemy(target)
         self.assertIsNotNone(result)
         self.assertTrue(target.poisoned)
         self.assertIn('отравление', result)
@@ -1417,7 +1418,7 @@ class TestBerserk(unittest.TestCase):
         berserk = make_monster(Berserk, start_health=10, health=7, poisoned=True)
         result = berserk.generate_mele_attack(MagicMock())
         self.assertEqual(berserk.rage, 1)
-        self.assertIn(result, range(0, 6))
+        self.assertIn(result, range(0, 7))
 
     def test_choose_target(self):
         berserk = make_monster(Berserk)

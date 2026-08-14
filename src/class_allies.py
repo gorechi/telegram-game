@@ -469,7 +469,7 @@ class Scribe(Trader):
             return False
         books_list = []
         for book in books:
-            price = book.base_price - roll(Scribe._buy_price_modifier)
+            price = max(1, book.base_price - roll(Scribe._buy_price_modifier))
             new_book = Trader.ItemInShop(item=book, price=price)
             books_list.append(new_book)
         self.update_index(books_list)
@@ -603,7 +603,7 @@ class RuneMerchant(Trader):
             return False
         runes_list = []
         for rune in runes:
-            price = rune.base_price - roll(RuneMerchant._buy_price_modifier)
+            price = max(1, rune.base_price - roll(RuneMerchant._buy_price_modifier))
             new_rune = Trader.ItemInShop(item=rune, price=price)
             runes_list.append(new_rune)
         self.goods_to_buy = runes_list
@@ -737,7 +737,7 @@ class PotionsMerchant(Trader):
             return False
         potions_list = []
         for potion in potions:
-            price = potion.base_price - roll(PotionsMerchant._buy_price_modifier)
+            price = max(1, potion.base_price - roll(PotionsMerchant._buy_price_modifier))
             new_potion = Trader.ItemInShop(item=potion, price=price)
             potions_list.append(new_potion)
         self.goods_to_buy = potions_list

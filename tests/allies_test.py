@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from src.class_items import Matches
 from src.class_basic import Money
-from src.class_allies import Trader
+from src.class_allies import Trader, Scribe, RuneMerchant, PotionsMerchant
 from src.controllers.controller_books import BooksController
 from src.controllers.controller_runes import RunesController
 from src.controllers.controller_potions import PotionsController
@@ -238,6 +238,28 @@ class TestTraderPlace(unittest.TestCase):
         result = trader.place(room=occupied_room)
         self.assertTrue(result)
         self.assertEqual(trader.room, locked_room)
+
+
+class TestEvaluateItemsPriceFloor(unittest.TestCase):
+
+    def make_game(self):
+        game = MagicMock()
+        game.all_traders = []
+        game.books_controller.get_random_object_by_filters.side_effect = lambda: MagicMock(base_price=1)
+        game.runes_controller.get_random_object_by_filters.side_effect = lambda: MagicMock(base_price=1)
+        game.potions_controller.get_random_object_by_filters.side_effect = lambda: MagicMock(base_price=1)
+        return game
+
+    @patch('src.class_allies.roll', return_value=99)
+    def test_buy_prices_never_below_one(self, mock_roll):
+        game = self.make_game()
+        floor = MagicMock()
+        for cls in (Scribe, RuneMerchant, PotionsMerchant):
+            merchant = cls(game, floor)
+            backpack = MagicMock()
+            backpack.get_items_by_class.return_value = [MagicMock(base_price=1)]
+            merchant.evaluate_items(backpack)
+            self.assertEqual(merchant.goods_to_buy[0].price, 1, cls.__name__)
 
 
 if __name__ == '__main__':
