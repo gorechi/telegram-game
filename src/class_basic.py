@@ -115,6 +115,18 @@ class Loot:
         и возвращает список вещей в луте этого класса.
         """
         return [item for item in self.pile if type(item).__name__ == item_class]
+
+
+    def get_first_item_by_class(self, item_class):
+        """
+        Метод принимает на вход класс вещи и
+        возвращает первый найденный объект этого класса.
+        Если вещей этого класса в луте нет, возвращает None.
+        """
+        for item in self.pile:
+            if type(item).__name__ == item_class:
+                return item
+        return None
         
         
     def show_sorted(self) -> list:

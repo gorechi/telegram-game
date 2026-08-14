@@ -596,9 +596,9 @@ class Monster:
         """
         if not self.carry_money:
             return False
-        current_money = self.loot.get_items_by_class('Money')
+        current_money = self.loot.get_first_item_by_class('Money')
         if current_money:
-            current_money = current_money + item
+            current_money + item
         else:
             self.loot.add(item)
         return True

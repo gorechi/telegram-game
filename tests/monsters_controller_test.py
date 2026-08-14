@@ -3,7 +3,7 @@ import unittest
 from src.controllers.controller_monsters import MonstersController
 from src.class_monsters import Monster, Animal, Corpse
 from src.class_dice import Dice
-from src.class_basic import Loot
+from src.class_basic import Loot, Money
 from src.class_hero import Hero
 
 
@@ -315,6 +315,42 @@ class TestCorpseExamine(unittest.TestCase):
             self.assertIn('узнает', result,
                           f'Осмотр трупа {template["name"]} не вернул сообщение о знании')
             self.assertEqual(hero.monster_knowledge.get(template['monster_type']), 1)
+
+
+class TestMonsterTakeMoney(unittest.TestCase):
+    """Тесты взятия денег монстром."""
+
+    def setUp(self):
+        self.game = FakeGame()
+
+    def make_monster(self, carry_money=True):
+        monster = Monster(game=self.game)
+        monster.carry_money = carry_money
+        return monster
+
+    def test_adds_money_when_no_money_in_loot(self):
+        monster = self.make_monster()
+        item = Money(game=self.game, how_much_money=15)
+        result = monster.take_money(item)
+        self.assertTrue(result)
+        self.assertEqual(monster.loot.pile, [item])
+
+    def test_merges_into_existing_money(self):
+        monster = self.make_monster()
+        existing = Money(game=self.game, how_much_money=10)
+        monster.loot.add(existing)
+        incoming = Money(game=self.game, how_much_money=15)
+        monster.take_money(incoming)
+        self.assertEqual(len(monster.loot.pile), 1)
+        self.assertIs(monster.loot.pile[0], existing)
+        self.assertEqual(existing.how_much_money, 25)
+
+    def test_no_money_when_carry_money_false(self):
+        monster = self.make_monster(carry_money=False)
+        item = Money(game=self.game, how_much_money=15)
+        result = monster.take_money(item)
+        self.assertFalse(result)
+        self.assertEqual(monster.loot.pile, [])
 
 
 if __name__ == '__main__':
