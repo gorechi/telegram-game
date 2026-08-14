@@ -1,48 +1,9 @@
 from enum import Enum
-from src.functions.functions import tprint
-
-class Process:
-    """Базовый класс для процессов в игре."""
-    
-    termination_commands = [
-        'отмена', 
-        'выход', 
-        'закончить'
-        ]
-    
-    def __init__(self, game, owner):
-        self.game = game
-        self.owner = owner
-
-    
-    def check_termination(self, request_text):
-        """
-        Проверяет, содержит ли запрос команду для завершения процесса.
-
-        Аргументы:
-            request_text (str): Текст запроса, который нужно проверить.
-        """
-        return request_text in Process.termination_commands
-    
-    
-    def terminate(self, termination_text:str | list):
-        self.game.processes_controller.terminate_process(self)
-        tprint(self.game, termination_text)
-        return
-    
-
-    def set_status(self, new_status):
-        """
-        Устанавливает новый статус процесса наложения чар.
-
-        Аргументы:
-            new_status (status_enum): Новый статус, который нужно установить.
-        """
-        self.status = new_status
+from src.processes.process import Process
 
 class EnchantmentProcess(Process):
     """Процесс улучшения предмета."""
-
+   
     class status_enum(Enum):
         """
         Статусы процесса улучшения предмета:
@@ -75,29 +36,29 @@ class EnchantmentProcess(Process):
             status_enum.FEAR,
             ]
 
+    _message_generators = {
+            status_enum.WAITING_FOR_ITEM: 'generate_item_message',
+            status_enum.WAITING_FOR_RUNE: 'generate_rune_message',
+            status_enum.NO_AVAILABLE_ITEMS: 'generate_no_items_message',
+            status_enum.NO_AVAILABLE_RUNES: 'generate_no_runes_message',
+            status_enum.ENCHANTMENT_ERROR: 'generate_error_message',
+            status_enum.ENCHANTMENT_SUCCESS: 'generate_success_message',
+            status_enum.TOO_DARK: 'generate_too_dark_message',
+            status_enum.FEAR: 'generate_fear_message',
+            }
+    
     
     def __init__(self, game, owner, init_text=None):
-        super().__init__(game, owner)
+        super().__init__(game, owner, init_text)
         self.status = EnchantmentProcess.status_enum.WAITING_FOR_ITEM
-        self.init_text = init_text
         self.items_list = self.get_items_list()
         self.runes_list = self.get_runes_list()
         self.set_owner_status()
         self.item = self.try_to_find_item(init_text)
         self.rune = None
         self.proceed()
-        
-    
-    def set_owner_status(self) -> bool:
-        if not self.owner.check_light():
-            self.status = EnchantmentProcess.status_enum.TOO_DARK
-            return False
-        if self.owner.check_fear():
-            self.status = EnchantmentProcess.status_enum.FEAR
-            return False
-        return True
-    
-    
+
+
     def get_items_list(self) -> list:
         """
         Возвращает список предметов, доступных для наложения чар.
@@ -221,14 +182,6 @@ class EnchantmentProcess(Process):
         if self.status == EnchantmentProcess.status_enum.READY_TO_ENCHANT:
             self.enchant_item()
         self.send_message()
-        
-
-    def send_message(self):    
-        message = self.generate_message()
-        if self.status in EnchantmentProcess._termination_statuses:
-            self.terminate(message)
-            return
-        tprint(self.game, message)
 
 
     def enchant_item(self):
@@ -245,28 +198,8 @@ class EnchantmentProcess(Process):
             return False
         self.set_status(EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS)
         return True
-    
-    
-    def generate_message(self) -> list[str]:
-        """
-        Генерирует текстовое сообщение для пользователя в зависимости от текущего статуса процесса зачарования.
-        Возвращает:
-            list[str]: Сообщение или список сообщений, соответствующих текущему этапу взаимодействия.
-        """
 
-        states = {
-            EnchantmentProcess.status_enum.WAITING_FOR_ITEM: self.generate_item_message,
-            EnchantmentProcess.status_enum.WAITING_FOR_RUNE: self.generate_rune_message,
-            EnchantmentProcess.status_enum.NO_AVAILABLE_ITEMS: self.generate_no_items_message,
-            EnchantmentProcess.status_enum.NO_AVAILABLE_RUNES: self.generate_no_runes_message,
-            EnchantmentProcess.status_enum.ENCHANTMENT_ERROR: self.generate_error_message,
-            EnchantmentProcess.status_enum.ENCHANTMENT_SUCCESS: self.generate_success_message,
-            EnchantmentProcess.status_enum.TOO_DARK: self.generate_too_dark_message,
-            EnchantmentProcess.status_enum.FEAR: self.generate_fear_message,
-            }
-        return states[self.status]()
-    
-    
+
     def generate_item_message(self) -> list[str]:
         message = list()
         message.append(f"{self.owner.name} может улучшить такие вещи:")

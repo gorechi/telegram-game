@@ -1,4 +1,5 @@
-from src.class_process import EnchantmentProcess
+from src.processes.process_enchantment import EnchantmentProcess
+from src.processes.process_trade import TradeProcess, BuyProcess, SellProcess
 
 class ProcessesController():
     """
@@ -6,7 +7,10 @@ class ProcessesController():
     """    
 
     process_types = {
-        'enchantment': EnchantmentProcess
+        'enchantment': EnchantmentProcess,
+        'trade': TradeProcess,
+        'buy': BuyProcess,
+        'sell': SellProcess
     }
     
     def __init__(self, game):
@@ -18,15 +22,22 @@ class ProcessesController():
             self,
             owner,
             type: str,
-            request_text: str = None
+            request_text: str = None,
+            **kwargs
             ) -> None:
         process_class = ProcessesController.process_types[type]
-        new_process = process_class(
-            game = self.game,
-            owner = owner,
-            init_text = request_text
-        )
+        new_process = process_class.__new__(process_class)
         self.register_process(new_process)
+        try:
+            new_process.__init__(
+                game = self.game,
+                owner = owner,
+                init_text = request_text,
+                **kwargs
+            )
+        except Exception:
+            self.terminate_process(new_process)
+            raise
     
 
     def register_process(self, process):
