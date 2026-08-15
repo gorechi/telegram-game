@@ -124,7 +124,7 @@ class Loot:
         Если вещей этого класса в луте нет, возвращает None.
         """
         for item in self.pile:
-            if type(item).__name__ == item_class:
+            if item_class in [cls.__name__ for cls in type(item).__mro__]:
                 return item
         return None
         
@@ -191,6 +191,14 @@ class Money:
             "prep": "много монет",
             "inst": "много монет"
         },
+        {
+            "nom": "деньги",
+            "accus": "деньги",
+            "gen": "денег",
+            "dat": "деньгам",
+            "prep": "деньгах",
+            "inst": "деньгами"
+        },
     )
     """Текстовые обозначения для кучек с разным количеством монет"""
     
@@ -238,7 +246,8 @@ class Money:
             0 <= self.how_much_money and self.how_much_money <= Money._groups[0]: 0,
             Money._groups[0] < self.how_much_money and self.how_much_money <= Money._groups[1]: 1,
             Money._groups[1] < self.how_much_money and self.how_much_money <= Money._groups[2]: 2, 
-            Money._groups[2] < self.how_much_money: 3
+            Money._groups[2] < self.how_much_money: 3,
+            0 > self.how_much_money: 4
         }
         self.lexemes = Money._piles[piles[True]]
         self.name = self.lexemes['nom']
@@ -377,6 +386,7 @@ class Money:
         Метод возвращает список имен денег в различных падежах.
         """
         names_list = ['деньги', 'монеты']
-        for case in cases:
-            names_list.append(self.lexemes.get(case, '').lower())
+        if cases and isinstance(cases, list):
+            for case in cases:
+                names_list.append(self.lexemes.get(case, '').lower())
         return names_list
