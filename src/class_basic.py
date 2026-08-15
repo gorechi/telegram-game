@@ -27,14 +27,14 @@ class Loot:
         if not isinstance(other, Loot):
             return False
         self.pile.extend(other.pile)
-        return True
+        return self
     
     
-    def add(self, obj):
+    def add(self, item):
         """
         Метод добавляет объект в лут.
         """
-        self.pile.append(obj)
+        self.pile.append(item)
 
 
     def remove(self, obj):
@@ -50,6 +50,7 @@ class Loot:
         """
         if isinstance(other, int):
             return len(self.pile) == other
+        return False
         
     
     def is_item_in_loot(self, item) -> bool:
@@ -93,11 +94,10 @@ class Loot:
         Метод принимает на вход строку имени вещи и
         и возвращает первую найденную  по этому имени вещь.
         """
-        name_lower = name.lower()
         for item in self.pile:
-            if (name_lower in item.name.lower()) or (name_lower in item.lexemes['accus'].lower()):
+            if item.check_name(name):
                 return item
-        return False
+        return None
     
     
     def get_all_items_by_name(self, name:str) -> list:
@@ -105,8 +105,7 @@ class Loot:
         Метод принимает на вход строку имени вещи и
         и возвращает все найденные по этому имени вещи.
         """
-        name_lower = name.lower()
-        return [item for item in self.pile if (name_lower in item.name.lower()) or (name_lower in item.lexemes['accus'].lower())]
+        return [item for item in self.pile if item.check_name(name)]
 
     
     def get_items_by_class(self, item_class) -> list:
@@ -137,7 +136,10 @@ class Loot:
         items_dict = {}
         sorted_list = []
         for item in items:
-            item_name = item.name.capitalize()
+            item_name = getattr(item, 'name', None)
+            if not item_name:
+                continue
+            item_name = item_name.capitalize()
             if item_name in items_dict.keys():
                 items_dict[item_name] += 1
             else:

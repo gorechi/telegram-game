@@ -127,14 +127,14 @@ class Book:
         return names_list
 
             
-    def place(self, floor, room=None):
+    def place(self, floor, place=None):
         """
-        Метод помещает книгу в комнату определенного этажа.
+        Метод помещает книгу в указанное место или в комнату с мебелью.
         """
-        if not room:
+        if not place:
             room = floor.get_random_room_with_furniture()
-        furniture = randomitem(room.furniture)
-        furniture.put(self)
+            place = randomitem(room.furniture)
+        place.add(self)
         return True
     
     

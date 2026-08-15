@@ -105,19 +105,19 @@ class Potion:
         return self.description
 
     
-    def place(self, castle, room=None):
+    def place(self, castle, place=None):
         """ 
-        Метод размещения зелья в комнате замка.
+        Метод размещения зелья в указанном месте или в комнате замка.
         """
-        if not room:
-            rooms = castle.plan
-            room = randomitem(rooms)
-        if room.furniture:
-            furniture = randomitem(room.furniture)
-            furniture.put(self)
-        else:
-            room.loot.add(self)
-            room.action_controller.add_actions(self)
+        if not place:
+            room = randomitem(castle.plan)
+            if room.furniture:
+                place = randomitem(room.furniture)
+            else:
+                place = room
+        place.add(self)
+        if getattr(place, 'action_controller', None):
+            place.action_controller.add_actions(self)
         return True
 
        

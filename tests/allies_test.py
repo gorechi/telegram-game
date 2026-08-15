@@ -371,7 +371,7 @@ class TestTraderBuy(unittest.TestCase):
         self.merchant = Scribe(self.game, MagicMock())
         self.book = make_book(self.game)
         self.hero = make_hero(self.game, 100)
-        self.hero.backpack.append(self.book)
+        self.hero.backpack.add(self.book)
         self.merchant.evaluate_items(self.hero.backpack)
 
     @patch('src.class_allies.tprint')
@@ -476,7 +476,7 @@ class TestTraderGetItemByText(unittest.TestCase):
     def test_buy_mode(self):
         hero = make_hero(self.game, 100)
         book = make_book(self.game)
-        hero.backpack.append(book)
+        hero.backpack.add(book)
         self.merchant.evaluate_items(hero.backpack)
         item = self.merchant.goods_to_buy[0]
         result = self.merchant.get_item_by_text(str(item.index), 'buy')
@@ -597,7 +597,7 @@ class TestScribeMethods(unittest.TestCase):
     def test_generate_buying_text_with_items(self):
         hero = make_hero(self.game, 100)
         book = make_book(self.game)
-        hero.backpack.append(book)
+        hero.backpack.add(book)
         self.scribe.evaluate_items(hero.backpack)
         message = self.scribe.generate_buying_text()
         self.assertIsInstance(message, list)
@@ -611,7 +611,7 @@ class TestScribeMethods(unittest.TestCase):
     def test_evaluate_items_with_books(self):
         hero = make_hero(self.game, 100)
         book = make_book(self.game)
-        hero.backpack.append(book)
+        hero.backpack.add(book)
         result = self.scribe.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.scribe.goods_to_buy), 1)
@@ -620,7 +620,7 @@ class TestScribeMethods(unittest.TestCase):
     def test_evaluate_items_with_subclass_books(self):
         hero = make_hero(self.game, 100)
         book = self.game.books_controller.get_random_object_by_filters()
-        hero.backpack.append(book)
+        hero.backpack.add(book)
         result = self.scribe.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.scribe.goods_to_buy), 1)
@@ -675,7 +675,7 @@ class TestRuneMerchantMethods(unittest.TestCase):
     def test_generate_buying_text_with_items(self):
         hero = make_hero(self.game, 100)
         rune = make_rune(self.game)
-        hero.backpack.append(rune)
+        hero.backpack.add(rune)
         self.merchant.evaluate_items(hero.backpack)
         message = self.merchant.generate_buying_text()
         self.assertIsInstance(message, list)
@@ -689,7 +689,7 @@ class TestRuneMerchantMethods(unittest.TestCase):
     def test_evaluate_items_with_runes(self):
         hero = make_hero(self.game, 100)
         rune = make_rune(self.game)
-        hero.backpack.append(rune)
+        hero.backpack.add(rune)
         result = self.merchant.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
@@ -698,7 +698,7 @@ class TestRuneMerchantMethods(unittest.TestCase):
     def test_evaluate_items_with_subclass_runes(self):
         hero = make_hero(self.game, 100)
         rune = self.game.runes_controller.get_random_object_by_filters()
-        hero.backpack.append(rune)
+        hero.backpack.add(rune)
         result = self.merchant.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
@@ -753,7 +753,7 @@ class TestPotionsMerchantMethods(unittest.TestCase):
     def test_generate_buying_text_with_items(self):
         hero = make_hero(self.game, 100)
         potion = make_potion(self.game)
-        hero.backpack.append(potion)
+        hero.backpack.add(potion)
         self.merchant.evaluate_items(hero.backpack)
         message = self.merchant.generate_buying_text()
         self.assertIsInstance(message, list)
@@ -767,7 +767,7 @@ class TestPotionsMerchantMethods(unittest.TestCase):
     def test_evaluate_items_with_potions(self):
         hero = make_hero(self.game, 100)
         potion = make_potion(self.game)
-        hero.backpack.append(potion)
+        hero.backpack.add(potion)
         result = self.merchant.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
@@ -776,7 +776,7 @@ class TestPotionsMerchantMethods(unittest.TestCase):
     def test_evaluate_items_with_subclass_potions(self):
         hero = make_hero(self.game, 100)
         potion = self.game.potions_controller.get_random_object_by_filters()
-        hero.backpack.append(potion)
+        hero.backpack.add(potion)
         result = self.merchant.evaluate_items(hero.backpack)
         self.assertTrue(result)
         self.assertEqual(len(self.merchant.goods_to_buy), 1)
@@ -810,25 +810,25 @@ class TestGetItemsByClassSubclassMatching(unittest.TestCase):
 
     def test_backpack_matches_base_class(self):
         book = make_book(self.game)
-        self.backpack.append(book)
+        self.backpack.add(book)
         self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
 
     def test_backpack_matches_subclasses(self):
         book = self.game.books_controller.get_random_object_by_filters()
-        self.backpack.append(book)
+        self.backpack.add(book)
         self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
 
     def test_backpack_with_multiple_classes(self):
         book = make_book(self.game)
         rune = make_rune(self.game)
-        self.backpack.append(book)
-        self.backpack.append(rune)
+        self.backpack.add(book)
+        self.backpack.add(rune)
         self.assertEqual(self.backpack.get_items_by_class('Book'), [book])
         self.assertEqual(self.backpack.get_items_by_class('Rune'), [rune])
 
     def test_backpack_with_unknown_class(self):
         book = make_book(self.game)
-        self.backpack.append(book)
+        self.backpack.add(book)
         self.assertEqual(self.backpack.get_items_by_class('Map'), [])
 
     def test_loot_matches_subclasses(self):

@@ -1731,7 +1731,7 @@ class Hero:
         """
         if self.current_position.loot.is_item_in_loot(item):
             self.current_position.loot.remove(item)
-        self.backpack.append(item)
+        self.backpack.add(item)
         item.owner = self
         self.action_controller.add_actions(item)
         self.current_position.action_controller.delete_actions_by_item(item)

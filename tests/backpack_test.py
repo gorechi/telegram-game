@@ -105,9 +105,9 @@ class TestBackpackAddRemove(unittest.TestCase):
     def setUp(self):
         self.backpack = Backpack(MagicMock())
 
-    def test_append_sets_place(self):
+    def test_add_sets_place(self):
         item = FakeItem()
-        self.backpack.append(item)
+        self.backpack.add(item)
         self.assertIn(item, self.backpack.insides)
         self.assertIs(item.place, self.backpack)
 
@@ -125,7 +125,7 @@ class TestBackpackAddRemove(unittest.TestCase):
 
     def test_remove_with_place(self):
         item = FakeItem()
-        self.backpack.append(item)
+        self.backpack.add(item)
         target = MagicMock()
         self.backpack.remove(item, place=target)
         self.assertNotIn(item, self.backpack.insides)
@@ -133,7 +133,7 @@ class TestBackpackAddRemove(unittest.TestCase):
 
     def test_remove_default_place_none(self):
         item = FakeItem()
-        self.backpack.append(item)
+        self.backpack.add(item)
         self.backpack.remove(item)
         self.assertIsNone(item.place)
 
@@ -189,64 +189,64 @@ class TestBackpackItemSearch(unittest.TestCase):
     def test_get_items_list(self):
         first = FakeItem()
         second = FakeItem()
-        self.backpack.append(first)
-        self.backpack.append(second)
+        self.backpack.add(first)
+        self.backpack.add(second)
         self.assertEqual(self.backpack.get_items_list(), self.backpack.insides)
 
     def test_get_items_by_class_base(self):
         item = FakeItem()
-        self.backpack.append(item)
+        self.backpack.add(item)
         self.assertEqual(self.backpack.get_items_by_class('FakeItem'), [item])
 
     def test_get_items_by_class_subclass(self):
         axe = Axe()
-        self.backpack.append(axe)
+        self.backpack.add(axe)
         self.assertEqual(self.backpack.get_items_by_class('Weapon'), [axe])
 
     def test_get_first_item_by_name_found(self):
         first = FakeItem(name='книга')
         second = FakeItem(name='руна')
-        self.backpack.append(first)
-        self.backpack.append(second)
+        self.backpack.add(first)
+        self.backpack.add(second)
         self.assertIs(self.backpack.get_first_item_by_name('книга'), first)
 
     def test_get_first_item_by_name_not_found(self):
-        self.backpack.append(FakeItem(name='книга'))
+        self.backpack.add(FakeItem(name='книга'))
         self.assertFalse(self.backpack.get_first_item_by_name('руна'))
 
     def test_get_first_item_by_class_found(self):
         axe = Axe()
-        self.backpack.append(FakeItem())
-        self.backpack.append(axe)
+        self.backpack.add(FakeItem())
+        self.backpack.add(axe)
         self.assertIs(self.backpack.get_first_item_by_class('Weapon'), axe)
 
     def test_get_first_item_by_class_not_found(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_first_item_by_class('Weapon'))
 
     def test_count_items(self):
         self.assertEqual(self.backpack.count_items(), 0)
-        self.backpack.append(FakeItem())
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertEqual(self.backpack.count_items(), 2)
 
     def test_is_empty(self):
         self.assertTrue(self.backpack.is_empty())
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.is_empty())
 
     def test_get_items_except_class(self):
         axe = Axe()
         book = FakeItem(name='книга')
-        self.backpack.append(axe)
-        self.backpack.append(book)
+        self.backpack.add(axe)
+        self.backpack.add(book)
         result = self.backpack.get_items_except_class('Weapon')
         self.assertEqual(result, [book])
 
     @patch('src.class_backpack.randomitem')
     def test_get_random_item(self, mock_randomitem):
         item = FakeItem()
-        self.backpack.append(item)
+        self.backpack.add(item)
         mock_randomitem.return_value = item
         self.assertIs(self.backpack.get_random_item(), item)
         mock_randomitem.assert_called_once_with(self.backpack.insides)
@@ -257,12 +257,12 @@ class TestBackpackItemSearch(unittest.TestCase):
     @patch('src.class_backpack.randomitem')
     def test_get_random_item_by_class(self, mock_randomitem):
         axe = Axe()
-        self.backpack.append(axe)
+        self.backpack.add(axe)
         mock_randomitem.return_value = axe
         self.assertIs(self.backpack.get_random_item_by_class('Weapon'), axe)
 
     def test_get_random_item_by_class_no_match(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_random_item_by_class('Weapon'))
 
     def test_get_random_item_by_class_empty(self):
@@ -271,25 +271,25 @@ class TestBackpackItemSearch(unittest.TestCase):
     def test_get_item_by_number(self):
         first = FakeItem(name='первый')
         second = FakeItem(name='второй')
-        self.backpack.append(first)
-        self.backpack.append(second)
+        self.backpack.add(first)
+        self.backpack.add(second)
         self.assertIs(self.backpack.get_item_by_number(1), first)
         self.assertIs(self.backpack.get_item_by_number(2), second)
 
     def test_get_item_by_number_out_of_range(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_item_by_number(2))
 
     def test_get_item_by_number_zero(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_item_by_number(0))
 
     def test_get_item_by_number_negative(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_item_by_number(-1))
 
     def test_get_item_by_number_non_int(self):
-        self.backpack.append(FakeItem())
+        self.backpack.add(FakeItem())
         self.assertFalse(self.backpack.get_item_by_number('1'))
 
 
@@ -299,8 +299,8 @@ class TestBackpackFightAndEnchant(unittest.TestCase):
         backpack = Backpack(MagicMock())
         usable = FakeItem(can_use_in_fight=True)
         useless = FakeItem(can_use_in_fight=False)
-        backpack.append(usable)
-        backpack.append(useless)
+        backpack.add(usable)
+        backpack.add(useless)
         self.assertEqual(backpack.get_items_for_fight(), [usable])
 
     def test_get_items_for_fight_empty(self):
@@ -311,8 +311,8 @@ class TestBackpackFightAndEnchant(unittest.TestCase):
         backpack = Backpack(MagicMock())
         enchantable = FakeItem(enchantable=True)
         plain = FakeItem(enchantable=False)
-        backpack.append(enchantable)
-        backpack.append(plain)
+        backpack.add(enchantable)
+        backpack.add(plain)
         self.assertEqual(backpack.get_items_to_enchant(), [enchantable])
 
     def test_get_items_to_enchant_empty(self):
@@ -342,8 +342,8 @@ class TestBackpackShow(unittest.TestCase):
         game = MagicMock()
         backpack = Backpack(game)
         who, _ = make_who(game, backpack)
-        backpack.append(FakeItem(name='книга'))
-        backpack.append(FakeItem(name='руна'))
+        backpack.add(FakeItem(name='книга'))
+        backpack.add(FakeItem(name='руна'))
         message = backpack.show(who)
         self.assertEqual(len(message), 3)
         self.assertEqual(message[0], 'Герой осматривает свой рюкзак и обнаруживает в нем:')
@@ -354,7 +354,7 @@ class TestBackpackShow(unittest.TestCase):
         game = MagicMock()
         backpack = Backpack(game)
         who, _ = make_who(game, backpack, mastery={'топор': {'level': 3}})
-        backpack.append(Axe())
+        backpack.add(Axe())
         message = backpack.show(who)
         self.assertEqual(message[1], '1: топор, мастерство - 3')
 
@@ -362,7 +362,7 @@ class TestBackpackShow(unittest.TestCase):
         game = MagicMock()
         backpack = Backpack(game)
         who, _ = make_who(game, backpack, mastery={'топор': {'level': 0}})
-        backpack.append(Axe())
+        backpack.add(Axe())
         message = backpack.show(who)
         self.assertEqual(message[1], '1: топор')
 
@@ -370,7 +370,7 @@ class TestBackpackShow(unittest.TestCase):
         game = MagicMock()
         backpack = Backpack(game)
         who, _ = make_who(game, backpack, mastery={})
-        backpack.append(Axe())
+        backpack.add(Axe())
         message = backpack.show(who)
         self.assertEqual(message[1], '1: топор')
 

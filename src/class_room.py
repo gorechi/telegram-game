@@ -93,7 +93,13 @@ class Ladder:
                 },
         }
     
-    
+    def add(self, item):
+        """
+        Метод добавляет объект в лут.
+        """
+        self.loot.add(item)
+
+
     def going_down(self, room=None) -> bool:
         """ 
         Возвращает True если лестница ведет вниз
@@ -647,7 +653,14 @@ class Room:
         self.decorate()
         self.generate_actions()
 
-    
+
+    def add(self, item):
+        """
+        Метод добавления предмета в комнату.
+        """
+        self.loot.add(item)
+
+
     def generate_actions(self):
         """ 
         Генерирует действия, которые можно совершить с комнатой.

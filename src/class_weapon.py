@@ -201,7 +201,7 @@ class Weapon:
         """ 
         Метод помещает оружие в рюкзак героя.
         """
-        who.backpack.append(self)
+        who.backpack.add(self)
     
     
     def __format__(self, format:str) -> str:
@@ -422,7 +422,7 @@ class Weapon:
         if not who.weapon.empty:
             if who.weapon == self:
                 return [f'{who.name} уже использует {self:accus} в качестве оружия.']
-            who.backpack.append(who.weapon)
+            who.backpack.add(who.weapon)
             who.backpack.remove(self, who)
         who.weapon = self
         message = [f'{who.name} теперь использует {self:accus} в качестве оружия.']
@@ -439,27 +439,29 @@ class Weapon:
         return message
 
     
-    def place(self, floor, room_to_place = None):
+    def place(self, floor, place = None):
         """ 
-        Метод раскидывания оружия по замку. 
-        1. Если указана комната, оружие помещается туда.
+        Метод размещения оружия в указанном месте или раскидывания по замку. 
+        1. Если в комнате есть монстр, который может носить оружие, он берет его.
+        2. Иначе, если в комнате есть мебель, которая может содержать оружие, оружие помещается туда.
+        3. Иначе оружие становится частью лута комнаты.
         """
-        if room_to_place:
-            room = room_to_place
-        else:
+        if not place:
             room = randomitem(floor.plan)
-        monster = room.monsters('random')
-        if monster:
-            if monster.carry_weapon:
-                monster.take(self)
-                return True
-        elif len(room.furniture) > 0:
-            furniture = randomitem(room.furniture)
-            if furniture.can_contain_weapon:
-                furniture.put(self)
-                return True
-        room.action_controller.add_actions(self)
-        room.loot.add(self)
+            monster = room.monsters('random')
+            if monster:
+                if monster.carry_weapon:
+                    monster.take(self)
+                    return True
+            elif room.furniture:
+                furniture = randomitem(room.furniture)
+                if furniture.can_contain_weapon:
+                    place = furniture
+            if not place:
+                place = room
+        place.add(self)
+        if getattr(place, 'action_controller', None):
+            place.action_controller.add_actions(self)
         
 
 class Torch(Weapon):
@@ -599,7 +601,7 @@ class Torch(Weapon):
         Метод помещает факел в рюкзак героя.
         1. При помещении факела в рюкзак, он автоматически тушится.
         """
-        who.backpack.append(self)
+        who.backpack.add(self)
         self.burning = False
         
 
@@ -655,19 +657,17 @@ class Torch(Weapon):
         return f'{name} ({damage_string}), {self.weapon_type}'.capitalize()
     
     
-    def place(self, floor, room_to_place = None) -> bool:
+    def place(self, floor, place = None) -> bool:
         """ 
-        Метод раскидывания факелов по замку. 
+        Метод размещения факела в указанном месте или раскидывания по замку. 
         1. Если указана комната, факел помещается туда.
         """
-        if room_to_place:
-            room = room_to_place
-        else:
+        if not place:
             rooms_without_torches = [room for room in floor.plan if not room.torch]
-            room = randomitem(rooms_without_torches)
-        if not room:
+            place = randomitem(rooms_without_torches)
+        if not place:
             return False
-        room.torch = self
-        room.light = True
-        room.action_controller.add_actions(self)
+        place.torch = self
+        place.light = True
+        place.action_controller.add_actions(self)
         return True
