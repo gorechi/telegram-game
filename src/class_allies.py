@@ -214,7 +214,7 @@ class Trader:
             bool: True всегда.
         """
         item = item_to_give.item
-        who.backpack.append(item)
+        who.backpack.add(item)
         self.shop.remove(item_to_give)
         self.goods_to_buy.append(item_to_give)
         return True

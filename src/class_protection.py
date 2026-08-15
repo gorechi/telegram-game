@@ -184,7 +184,7 @@ class Protection:
     #     if who.shield.empty:
     #         who.shield = self
     #     else:
-    #         who.backpack.append(who.shield)
+    #         who.backpack.add(who.shield)
     #         who.shield = self
     #         who.backpack.remove(self, who)
     #     tprint(self.game, f'{who.name} теперь использует {self:accus} в качестве защиты!')
@@ -295,28 +295,27 @@ class Armor(Protection):
         return self.show()
     
     
-    def place(self, castle, room_to_place = None):
+    def place(self, castle, place = None):
         """ 
-        Метод размещения доспехов в комнате замка.
+        Метод размещения доспехов в указанном месте или в комнате замка.
         1. Если в комнате есть монстр, который может носить доспехи, он надевает их.
         2. Иначе, если в комнате есть мебель, которая может содержать оружие, доспехи помещаются туда.
         3. Иначе доспехи становятся частью лута комнаты.
         """
-        if room_to_place:
-            room = room_to_place
-        else:
+        if not place:
             room = randomitem(castle.plan)
-        monster = room.monsters('random')
-        if monster:
-            if monster.wear_armor:
-                monster.take(self)
-                return True
-        elif len(room.furniture) > 0:
-            furniture = randomitem(room.furniture)
-            if furniture.can_contain_weapon:
-                furniture.put(self)
-                return True
-        room.loot.add(self)
+            monster = room.monsters('random')
+            if monster:
+                if monster.wear_armor:
+                    monster.take(self)
+                    return True
+            elif room.furniture:
+                furniture = randomitem(room.furniture)
+                if furniture.can_contain_weapon:
+                    place = furniture
+            if not place:
+                place = room
+        place.add(self)
 
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
@@ -686,28 +685,27 @@ class Shield (Protection):
         return names_list
 
     
-    def place(self, castle, room_to_place = None):
+    def place(self, castle, place = None):
         """ 
-        Метод размещения щита в комнате замка.
+        Метод размещения щита в указанном месте или в комнате замка.
         1. Если в комнате есть монстр, который может носить щиты, он берет его.
         2. Иначе, если в комнате есть мебель, которая может содержать оружие, щит помещается туда.
         3. Иначе щит становится частью лута комнаты.
         """
-        if room_to_place:
-            room = room_to_place
-        else:
+        if not place:
             room = randomitem(castle.plan)
-        monster = room.monsters('random')
-        if monster:
-            if monster.carry_shield:
-                monster.take(self)
-                return True
-        elif len(room.furniture) > 0:
-            furniture = randomitem(room.furniture)
-            if furniture.can_contain_weapon:
-                furniture.put(self)
-                return True
-        room.loot.add(self)
+            monster = room.monsters('random')
+            if monster:
+                if monster.carry_shield:
+                    monster.take(self)
+                    return True
+            elif room.furniture:
+                furniture = randomitem(room.furniture)
+                if furniture.can_contain_weapon:
+                    place = furniture
+            if not place:
+                place = room
+        place.add(self)
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
     def take(self, who):

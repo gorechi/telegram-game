@@ -48,7 +48,7 @@ class Spell:
         if who == '':
             return False
         if not who.backpack.no_backpack:
-            who.backpack.append(self)
+            who.backpack.add(self)
             tprint(self.game, f'{who.name} забирает {self.name} себе.')
             
     
@@ -232,19 +232,19 @@ class Matches:
         return self.get_quantity_text(self.quantity)
 
     
-    def place(self, castle, room=None) -> bool:
+    def place(self, castle, place=None) -> bool:
         
-        """ Метод раскидывания спичек по замку. """
+        """ Метод размещения спичек в указанном месте или раскидывания по замку. """
         
-        if not room:
+        if not place:
             rooms = [i for i in castle.plan if not i.locked and i.light]
             room = randomitem(rooms)
-        if room.furniture:
-            furniture = randomitem(room.furniture)
-            furniture.put(self)
-        else:
-            room.loot.add(self)
-        self.room = room
+            if room.furniture:
+                place = randomitem(room.furniture)
+            else:
+                place = room.loot
+            self.room = room
+        place.add(self)
         return True
 
     
@@ -440,18 +440,17 @@ class Map:
         return message.lower() in ['карта', 'карту', 'карты']
     
     
-    def place(self, room=None) -> bool:
+    def place(self, place=None) -> bool:
         
-        """ Метод размещения карты в замке. """
+        """ Метод размещения карты в указанном месте или в замке. """
         
-        if not room:
-            rooms = self.floor.plan
-            room = randomitem(rooms)
-        if room.furniture:
-            furniture = randomitem(room.furniture)
-            furniture.put(self)
-        else:
-            room.loot.add(self)
+        if not place:
+            room = randomitem(self.floor.plan)
+            if room.furniture:
+                place = randomitem(room.furniture)
+            else:
+                place = room.loot
+        place.add(self)
         return True
 
     
@@ -655,17 +654,18 @@ class Key:
         return True
 
     
-    def place(self, floor, room=None) -> bool:
+    def place(self, floor, place=None) -> bool:
         """ 
-        Метод размещения ключа в замке.
+        Метод размещения ключа в указанном месте или в замке.
         """
-        if not room:
+        if not place:
             room = floor.get_random_unlocked_room()
-        furniture = room.get_random_unlocked_furniture()
-        if furniture:
-            furniture.put(self)
-        else:
-            room.loot.add(self)
+            furniture = room.get_random_unlocked_furniture()
+            if furniture:
+                place = furniture
+            else:
+                place = room.loot
+        place.add(self)
         return True
 
     

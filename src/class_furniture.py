@@ -102,11 +102,11 @@ class Furniture:
         return True
 
     
-    def put(self, item):
+    def add(self, item):
         """
         Помещает предмет в мебель.
         """
-        self.loot.pile.append(item)
+        self.loot.add(item)
     
     
     def check_trap(self) -> bool:

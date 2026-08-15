@@ -104,7 +104,7 @@ class Backpack:
         return message.lower() in [self.name, self.lexemes["accus"]]
     
     
-    def append(self, item):
+    def add(self, item):
         """Метод добавления вещи в рюкзак"""
         
         self.insides.append(item)
@@ -114,7 +114,7 @@ class Backpack:
     def __add__(self, item):
         """Метод добавления вещи в рюкзак"""
         
-        self.append(item)
+        self.add(item)
         return self
     
         
