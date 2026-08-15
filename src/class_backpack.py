@@ -135,6 +135,7 @@ class Backpack:
         room.loot.add(self)
         who.action_controller.delete_actions_by_item(self)
         room.action_controller.add_actions(self)
+        self.owner = None
         who.backpack = who.game.no_backpack
         return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
         
