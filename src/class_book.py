@@ -50,6 +50,20 @@ class Book:
                 "in_darkness": True,
                 "duration": 0
                 },
+            "осмотреть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "duration": 1
+                },
+            "оглядеть": {
+                "method": "examine",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": True,
+                "duration": 1
+                },
             }
         self.room_actions = {
             "взять": {
@@ -122,17 +136,20 @@ class Book:
         Метод возвращает список имен книги в различных падежах.
         """
         names_list = ['книга', 'книгу', 'книжка', 'книжку']
-        for case in cases:
-            names_list.append(self.lexemes.get(case, '').lower())
+        if cases and isinstance(cases, list):
+            for case in cases:
+                names_list.append(self.lexemes.get(case, '').lower())
         return names_list
 
             
-    def place(self, floor, place=None):
+    def place(self, floor, place=None) -> bool:
         """
         Метод помещает книгу в указанное место или в комнату с мебелью.
         """
         if not place:
             room = floor.get_random_room_with_furniture()
+            if not room:
+                return False
             place = randomitem(room.furniture)
         place.add(self)
         return True
@@ -212,13 +229,13 @@ class CuttingWeaponBook(Book):
         """
         Метод увеличивает навык героя по рубящему оружию.
         """
-        if who.mastery['рубящее']['level'] == who.mastery['рубяще']['max_level']:
+        if who.mastery['рубящее']['level'] == who.mastery['рубящее']['max_level']:
             return f'{who.name} {who.g('достиг','достигла')} вершины мастерства в рубящем оружии и не узнает ничего нового из этой книги.'
         who.mastery['рубящее']['level'] += 1
         return f'{who.name} теперь немного лучше знает, как использовать рубящее оружие.'
     
     
-class BluntgWeaponBook(Book):
+class BluntWeaponBook(Book):
     """
     Класс книги по ударному оружию.    
     """
@@ -269,7 +286,7 @@ class WisdomBook(Book):
         """
         who.intel.increase_modifier(1)
         who.start_intel.increase_modifier(1)
-        return f'{who.name} чувствует, что {who.g("стал", "стала")} немного умнее'
+        return f'{who.name} чувствует, что {who.g("стал", "стала")} немного умнее.'
     
 
 class ShieldsBook(Book):
@@ -285,9 +302,9 @@ class ShieldsBook(Book):
         """
         Метод увеличивает знания героя о щитах.
         """
-        if who.mastery['щит']['level'] == who.mastery['щит']['max_level']:
+        if who.mastery['щиты']['level'] == who.mastery['щиты']['max_level']:
             return f'{who.name} управляется со щитом с непревзойденным мастерством. Эта книга не может научить {who.g("его", "ее")} ничему новому.'
-        who.mastery['щит']['level'] += 1
+        who.mastery['щиты']['level'] += 1
         return f'{who.name} теперь немного лучше знает, как использовать щиты.'
     
 

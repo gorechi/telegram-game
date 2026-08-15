@@ -660,6 +660,8 @@ class Key:
         """
         if not place:
             room = floor.get_random_unlocked_room()
+            if not room:
+                return False
             furniture = room.get_random_unlocked_furniture()
             if furniture:
                 place = furniture

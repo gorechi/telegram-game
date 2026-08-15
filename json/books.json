@@ -34,7 +34,7 @@
         ]
     },
     {
-        "class_name": "BluntgWeaponBook",
+        "class_name": "BluntWeaponBook",
         "decoration": "о викингах",
         "examine_text": "Эта книга написана для всех, кто предпочитает ударное оружие в бою.",
         "can_use_in_fight": false,
