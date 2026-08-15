@@ -1820,14 +1820,24 @@ class Hero:
         )
 
     
-    def check_if_can_read(self) -> bool:
+    def check_if_can_read(self) -> tuple[bool, str | list[str]]:
         """Метод проверки, может ли герой сейчас читать."""
         
-        if self.fear >= Hero._fear_limit:
+        if not self.check_fear():
             return False, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.'
         if not self.check_light():
             return False, f'{self.name} решает, что читать в такой темноте вредно для зрения.'
         return True, []
+
+
+    def check_if_can_examine(self) -> tuple[bool, str | list[str]]:
+            """Метод проверки, может ли герой сейчас что-то осматривать."""
+            
+            if not self.check_fear():
+                return False, f'{self.name} не может сосредоточиться от страха.'
+            if not self.check_light():
+                return False, f'{self.name} не видит дальше собственного носа - такая тут темнота.'
+            return True, []
     
         
     def check_light(self) -> bool:

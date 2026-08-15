@@ -269,22 +269,26 @@ class Floor:
                 floor = f'{floor + str(self.plan[i*self.rooms + j].stink)} '
 
     
-    def get_random_room_with_furniture(self) -> Room:
+    def get_random_room_with_furniture(self) -> Room | None:
     
         """ 
         Возвращает случайную комнату с мебелью. 
         """
         rooms = [a for a in self.plan if a.furniture]
-        return randomitem(rooms)
+        if rooms:
+            return randomitem(rooms)
+        return None
     
     
-    def get_random_unlocked_room(self) -> Room:
+    def get_random_unlocked_room(self) -> Room | None:
         
         """
         Возвращает случайную незапертую комнату.
         """
         rooms = [a for a in self.plan if (not a.locked)]
-        return randomitem(rooms)
+        if rooms:
+            return randomitem(rooms)
+        return None
     
     
     def get_enter_points(self) -> list[Room]:
