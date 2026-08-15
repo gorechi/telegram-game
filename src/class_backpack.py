@@ -115,6 +115,7 @@ class Backpack:
         """Метод добавления вещи в рюкзак"""
         
         self.append(item)
+        return self
     
         
     def remove(self, item, place=None):
@@ -134,6 +135,7 @@ class Backpack:
         room.loot.add(self)
         who.action_controller.delete_actions_by_item(self)
         room.action_controller.add_actions(self)
+        self.owner = None
         who.backpack = who.game.no_backpack
         return f'{who.name} снимает рюкзак и кладет в угол комнаты.'
         
@@ -172,7 +174,7 @@ class Backpack:
         """
         
         for item in self.insides:
-            if type(item).__name__ == item_class:
+            if item_class in [cls.__name__ for cls in type(item).__mro__]:
                 return item
         return False
 
@@ -196,7 +198,7 @@ class Backpack:
         Метод возвращает список вещей,
         исключая вещи определенного класса.
         """
-        return [item for item in self.insides if not type(item).__name__ == item_class]
+        return [item for item in self.insides if item_class not in [cls.__name__ for cls in type(item).__mro__]]
     
     
     def get_random_item(self):
@@ -212,7 +214,7 @@ class Backpack:
         """
         Метод возвращает случайную вещь определенного класса из рюкзака.
         """
-        items_list = [item for item in self.insides if type(item).__name__ == item_class]
+        items_list = [item for item in self.insides if item_class in [cls.__name__ for cls in type(item).__mro__]]
         if items_list:
             return randomitem(items_list)
         return False
@@ -243,10 +245,10 @@ class Backpack:
         message.append(f'{who.name} осматривает свой рюкзак и обнаруживает в нем:')
         for i, item in enumerate(self.insides):
             description = f'{str(i + 1)}: {item.show()}'
-            if type(item).__name__ == 'Weapon':
-                mastery = who.mastery.get(item.weapon_type)['level']
-                if mastery > 0:
-                    description += f', мастерство - {mastery}'
+            if 'Weapon' in [cls.__name__ for cls in type(item).__mro__]:
+                mastery = who.mastery.get(item.weapon_type)
+                if mastery and mastery['level'] > 0:
+                    description += f', мастерство - {mastery["level"]}'
             message.append(description)
         return message
     
@@ -256,7 +258,7 @@ class Backpack:
         Метод принимает на вход номер вещи в рюкзаке и
         возвращает эту вещь, если номер корректен.
         """
-        if not isinstance (number, int):
+        if not isinstance (number, int) or number < 1:
             return False
         item_index = number - 1
         if item_index < self.count_items():
