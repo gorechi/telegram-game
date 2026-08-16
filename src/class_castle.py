@@ -31,24 +31,30 @@ class Floor:
         for _ in range(self.how_many['лестницы']):
             room = self.get_room_to_place_ladder_up()
             room_to_go = next_floor.get_room_to_place_ladder_down()
+            if not room or not room_to_go:
+                return False
             new_ladder = Ladder(room, room_to_go)
             room_to_go.enter_point = True
         return True
     
     
-    def get_room_to_place_ladder_up(self) -> Room:
+    def get_room_to_place_ladder_up(self) -> Room | None:
         """
         Возвращает случайную комнату, в которую можно поставить лестницу вверх.
         """
         rooms = [room for room in self.plan if not room.ladder_up]
+        if not rooms:
+            return None
         return randomitem(rooms)
     
     
-    def get_room_to_place_ladder_down(self) -> Room:
+    def get_room_to_place_ladder_down(self) -> Room | None:
         """
         Возвращает случайную комнату, в которую можно поставить лестницу вниз.
         """
         rooms = [room for room in self.plan if not room.ladder_down]
+        if not rooms:
+            return None
         return randomitem(rooms)
     
     
@@ -100,8 +106,9 @@ class Floor:
         """
         Раскидывает по этажу спички
         """
-        matches = Matches(self.game)
-        matches.place(self)
+        for _ in range(self.how_many['спички']):
+            matches = Matches(self.game)
+            matches.place(self)
 
     
     def place_traders(self):
@@ -195,7 +202,6 @@ class Floor:
         )
         for weapon in self.all_weapon:
             weapon.place(self)
-            print(weapon)
 
     
     def place_monsters(self):
@@ -236,8 +242,7 @@ class Floor:
         """
         Возвращает список комнат, в которых есть секретные тайные места
         """
-        return list()
-        # return [i for i in self.plan if i.has_secrets()]
+        return [room for room in self.plan if room.has_secrets]
     
     
     # def stink(self, room:Room, stink_level:int):

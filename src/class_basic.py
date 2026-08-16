@@ -30,11 +30,26 @@ class Loot:
         return self
     
     
-    def add(self, item):
+    def add(self, item) -> bool:
         """
         Метод добавляет объект в лут.
         """
+        if isinstance(item, Money):
+            self.add_money(item)
+            return True
         self.pile.append(item)
+        return True
+
+
+    def add_money(self, item) -> bool:
+        if not isinstance(item, Money):
+            return False
+        money = self.get_first_item_by_class('Money')
+        if not money:
+            self.pile.append(item)
+            return True
+        money += item
+        return True
 
 
     def remove(self, obj):
@@ -381,6 +396,10 @@ class Money:
         Метод возвращает количество денег как целое число.
         """
         return self.how_much_money
+
+
+    def place(self, room):
+        room.loot.add(self)
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
