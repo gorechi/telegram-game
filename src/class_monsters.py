@@ -1062,14 +1062,24 @@ class Monster:
             places_to_hide.append(room)
             self.hiding_place = randomitem(places_to_hide)
         if self.stink:
-            print(f'Монстр воняет в комнате {room.position}.')
             room.set_stink(3)
             floor.stink_map()
         self.floor = floor
         room.action_controller.add_actions(self)
-        print(f'Монстр {self.name} помещен в комнату {room.position} этажа {floor.floor_number}.')
+        self.take_money_from_room()
         return True
 
+
+    def take_money_from_room(self) -> bool:
+        if not self.carry_money:
+            return False
+        money = self.current_position.loot.get_first_item_by_class('Money')
+        if not money:
+            return False
+        self.current_position.loot.remove(money)
+        self.loot.add(money)
+        return True
+        
 
 class Plant(Monster):
     """

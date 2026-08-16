@@ -130,11 +130,7 @@ class FloorsController(Controller):
             room = randomitem([r for r in floor.plan[1::] if not r.locked])
             new_money = Money(self.game, floor.money_in_locked_rooms.roll())
             room.lock()
-            monster = room.monsters('random')
-            if not monster:
-                room.loot.add(new_money)
-            else:
-                monster.take(new_money)
+            new_money.place(room)
             new_key = Key(self.game)
             new_key.place(floor)
         return True
