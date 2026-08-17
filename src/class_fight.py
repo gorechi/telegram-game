@@ -26,7 +26,6 @@ class Fight:
         self.light:bool = self.check_light()
         self.queue = self.create_queue()
         self.hero_in_fight:bool = self.check_hero_in_fight()
-        print(self)
     
     
     def __repr__(self) -> str:
@@ -156,6 +155,7 @@ class Fight:
         Метод добавляет бойца в схватку.
         """
         self.fighters.append(fighter)
+        self.queue.append(fighter)
     
     
     def start(self):
@@ -183,7 +183,8 @@ class Fight:
         """
         Метод проверяет, есть ли погибшие бойцы.
         """
-        for fighter in self.fighters:
+        fighters_to_check = self.fighters.copy()
+        for fighter in fighters_to_check:
             if fighter == self.hero and fighter.health <= 0:
                 self.hero_loses()
             if not fighter == self.hero and fighter.health <= 0:
@@ -215,31 +216,36 @@ class Fight:
         Метод накапливает опыт за побежденного монстра.
         """
         self.exp += fighter.exp
-        print(f'exp = {self.exp}')
         
     
-    def get_fighter_by_strength(self, who=None, exclude:list[str]=[], mode:str='Max'):
+    def get_fighter_by_strength(self, who=None, exclude:list[str]=None, mode:str='Max'):
         """
         Метод возвращает бойца по силе.
         """
-        filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        if not isinstance(exclude, list):
+            filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
+        else:
+            filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
         if mode == 'Max':
             return max(filtered_fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
         if mode == 'Min':
             return min(filtered_fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
-        return False
+        return None
     
     
-    def get_fighter_by_health(self, who=None, exclude:list[str]=[], mode:str='Max'):
+    def get_fighter_by_health(self, who=None, exclude:list[str]=None, mode:str='Max'):
         """
         Метод возвращает бойца по здоровью.
         """
-        filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        if not isinstance(exclude, list):
+            filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
+        else:
+            filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
         if mode == 'Max':
             return max(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
         if mode == 'Min':
             return min(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
-        return False
+        return None
     
     
     def get_targets(self, who) -> list:
