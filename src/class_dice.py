@@ -93,17 +93,17 @@ class Dice():
         self.temporary = []
     
     
-    def roll(self, add:list[int]=[], subtract:list[int]=[], multiplier:int=1, monster=None) -> int:
+    def roll(self, add:list[int]=None, subtract:list[int]=None, multiplier:int=1, monster=None) -> int:
         """Функция имитирует бросок кубиков"""
         
         self_result = self.roll_set(self.dice * multiplier + self.temporary)
-        if not isinstance(add, list) or not isinstance(subtract, list):
+        if (add and not isinstance(add, list)) or (subtract and not isinstance(subtract, list)):
             raise ValueError("В качестве аргумента 'add' или 'subtract' должен быть передан список целых чисел")
-        if add:
+        if add and isinstance(add, list):
             add_result = self.roll_set(add)
         else:
             add_result = 0
-        if subtract:
+        if subtract and isinstance(subtract, list):
             subtract_result = self.roll_set(subtract)
         else:
             subtract_result = 0
@@ -128,7 +128,7 @@ class Dice():
         """Функция имитирует бросок нескольких кубиков сразу"""
         result = 0
         for die in dice_set:
-            if not isinstance(die, int):
+            if not isinstance(die, int) or die < 0:
                 raise ValueError("Все значения кубиков должны быть целыми числами больше нуля, а передано {die} как часть {dice_set}")
             if die > 0:
                 result += randint(1, die)
@@ -149,7 +149,7 @@ class Dice():
         if die in self.dice:
             self.dice.remove(die)
         else:
-            raise ValueError(f"Кубик {die} не найден в кубиках.")
+            raise KeyError(f"Кубик {die} не найден в кубиках.")
     
     
     def text(self):
@@ -211,5 +211,7 @@ class Dice():
         """Увеличивает базовый кубик на значение"""
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
+        if value < 0:
+            raise ValueError(f"Значение должно быть больше или равно 0, а передано {value}.")
         self.dice[0] += value
         return self.dice[0]
