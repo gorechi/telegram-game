@@ -222,10 +222,7 @@ class Fight:
         """
         Метод возвращает бойца по силе.
         """
-        if not isinstance(exclude, list):
-            filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
-        else:
-            filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        filtered_fighters = self.get_filtered_fighters_list(who, exclude)
         if mode == 'Max':
             return max(filtered_fighters, key=lambda fighter: fighter.stren) if filtered_fighters else False
         if mode == 'Min':
@@ -237,15 +234,19 @@ class Fight:
         """
         Метод возвращает бойца по здоровью.
         """
-        if not isinstance(exclude, list):
-            filtered_fighters = [fighter for fighter in self.fighters if fighter != who]
-        else:
-            filtered_fighters = [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
+        filtered_fighters = self.get_filtered_fighters_list(who, exclude)
         if mode == 'Max':
             return max(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
         if mode == 'Min':
             return min(filtered_fighters, key=lambda fighter: fighter.health) if filtered_fighters else False
         return None
+
+
+    def get_filtered_fighters_list(self, who=None, exclude:list[str]=None):
+        if not isinstance(exclude, list):
+            return [fighter for fighter in self.fighters if fighter != who]
+        else:
+            return [fighter for fighter in self.fighters if fighter != who and type(fighter).__name__ not in exclude]
     
     
     def get_targets(self, who) -> list:
