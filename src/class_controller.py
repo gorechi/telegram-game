@@ -119,6 +119,9 @@ class Controller:
         return False
 
     def get_empty_object_by_class_name(self, class_name:str):
+        """Возвращает пустой объект указанного класса"""
+        if class_name not in self.__class__._classes:
+            raise ValueError(f"Класс '{class_name}' не найден в _classes.")
         new_class = self.__class__._classes[class_name]
         new_object = new_class(game=self.game)
         new_object.empty = True
