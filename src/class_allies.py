@@ -4,6 +4,7 @@ from src.class_basic import Money
 from src.class_book import Book
 from src.class_potions import Potion
 from src.class_backpack import Backpack
+from src.class_dice import Dice
 from src.functions.functions import randomitem, tprint, roll, howmany
 
 from dataclasses import dataclass
@@ -19,6 +20,9 @@ class Trader:
 
     _minimum_money = 20
     """Минимальное количество денег у торговца"""
+
+    _refresh_die = Dice([21], modifier=29)
+    """Кубик, который надо кинуть чтобы определить через сколько ходов торговец обновит ассортимент"""
 
     @dataclass
     class ItemInShop:
@@ -104,6 +108,16 @@ class Trader:
         self.goods_to_buy = []
         self.money = self.generate_money()
         self.game.all_traders.append(self)
+
+
+    def create_event(self):
+        self.game.events_controller.create_event(
+                    event_subject=self,
+                    method_name='get_goods',
+                    counter=Trader._refresh_die.roll(),
+                    parameters=None
+                )
+
 
     def __format__(self, format: str) -> str:
         """
@@ -403,6 +417,7 @@ class Scribe(Trader):
             new_book = Trader.ItemInShop(item=book, price=price)
             self.shop.append(new_book)
         self.update_index(self.shop)
+        self.create_event()
         return True
 
     def evaluate(self, book: Book) -> int:
@@ -537,6 +552,7 @@ class RuneMerchant(Trader):
             new_rune = Trader.ItemInShop(item=rune, price=price)
             self.shop.append(new_rune)
         self.update_index(self.shop)
+        self.create_event()
         return True
 
     def evaluate(self, rune: Rune) -> int:
@@ -671,6 +687,7 @@ class PotionsMerchant(Trader):
             new_potion = Trader.ItemInShop(item=potion, price=price)
             self.shop.append(new_potion)
         self.update_index(self.shop)
+        self.create_event() 
         return True
 
     def evaluate(self, potion: Potion) -> int:

@@ -99,45 +99,15 @@ class Game():
     def trigger_on_movement(self):
         """Метод обрабатывает событие движения героя"""
         self.raise_dead()
-        self.check_traders_update()
 
-    
-    def check_traders_update(self) -> bool:
-        """
-        Проверяет, нужно ли обновить товары у торговцев.
-        """
-        if self.traders_update_counter > 0:
-            self.traders_update_counter -= 1
-            return False
-        self.update_traders()
-        return True
-    
-    
-    def update_traders(self) -> bool:
-        """
-        Обновляет товары у всех торговцев.
-        """
-        for trader in self.all_traders:
-            trader.get_goods()
-        return True
-    
-    
+       
     def raise_dead(self):
         """Метод воскрешения мертвецов"""
         
         for corpse in self.all_corpses: 
             if corpse.can_resurrect:
                 corpse.try_to_rise()
-        
-    
-    def __del__ (self):
-        """
-        Метод вызывается при удалении объекта игры.
-        """
-        print("=" * 40)
-        print('Игра удалена')
-        print("=" * 40)
-     
+           
     
     def test(self, hero):
         """
