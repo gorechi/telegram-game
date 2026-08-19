@@ -113,7 +113,7 @@ class Furniture:
         """
         Проверяет, есть ли в мебели ловушка.
         """
-        if self.trap.activated:
+        if self.trap and self.trap.activated:
             return True
         return False
    
@@ -127,16 +127,17 @@ class Furniture:
             for monster in monsters:
                 if monster.hiding_place == self:
                     return monster 
-        return False
+        return None
     
     
-    def get_names_list(self, cases:list=[], room=None) -> list:
+    def get_names_list(self, cases:list=None, room=None) -> list:
         """
         Возвращает список имен мебели в разных падежах.
         """
-        names_list = self.basic_lexemes
-        for case in cases:
-            names_list.append(self.lexemes.get(case, '').lower())
+        names_list = self.basic_lexemes.copy()
+        if cases and isinstance(cases, list):
+            for case in cases:
+                names_list.append(self.lexemes.get(case, '').lower())
         return names_list
 
 
@@ -159,7 +160,7 @@ class Furniture:
         return message
 
     
-    def place(self, floor=None, room_to_place=None):
+    def place(self, floor=None, room_to_place=None) -> bool:
         """
         Размещает мебель в комнате.
         """
@@ -170,13 +171,12 @@ class Furniture:
             else:
                 return False
         else:
-            can_place = False
-            while not can_place:
-                room = randomitem(floor.plan)
-                if self.furniture_type not in room.furniture_types():
-                    can_place = True
-            room.furniture.append(self)
-            self.room = room
+            room = floor.get_room_to_place_furniture(self.furniture_type)
+            if room:
+                room.furniture.append(self)
+                self.room = room
+            else:
+                return False
         if Furniture._lock_dice.roll() == 1 and self.lockable:
             self.locked = True
             very_new_key = Key(self.game)
@@ -185,7 +185,7 @@ class Furniture:
         return True
     
     
-    def search(self, who, in_action:bool=False) -> list[str]:
+    def search(self, who, in_action:bool=False) -> list[str]|str:
         """
         Метод обыскивания мебели.
         """
@@ -203,7 +203,7 @@ class Furniture:
                 method_name = 'attack_from_ambush',
                 event_object = who
             )
-            return False
+            return ''
         if self.loot == 0:
             return f'{self.name} {self.empty_text}'.capitalize()
         message = [f'{who.name} осматривает {self:accus} и находит:']
@@ -219,6 +219,6 @@ class Furniture:
         """
         message = list()
         message += (self.show())
-        if self.trap.activated and who.detect_trap(self.trap):
+        if self.trap and self.trap.activated and who.detect_trap(self.trap):
             message.append(self.trap.get_detection_text())
         return message

@@ -383,5 +383,32 @@ class TestGetEnterPoints(unittest.TestCase):
         self.assertEqual(floor.get_enter_points(), [floor.plan[0], floor.plan[2]])
 
 
+class TestGetRoomToPlaceFurniture(unittest.TestCase):
+    def setUp(self):
+        self.game = make_game()
+        self.floor = make_floor(self.game, 0)
+
+    def test_returns_room_without_that_furniture_type(self):
+        for room in self.floor.plan:
+            room.furniture.clear()
+        result = self.floor.get_room_to_place_furniture(1)
+        self.assertIsNotNone(result)
+        self.assertNotIn(1, result.furniture_types())
+
+    def test_returns_none_when_all_rooms_have_that_type(self):
+        for room in self.floor.plan:
+            mock_furniture = MagicMock()
+            mock_furniture.furniture_type = 1
+            room.furniture = [mock_furniture]
+        result = self.floor.get_room_to_place_furniture(1)
+        self.assertIsNone(result)
+
+    def test_returns_any_available_room(self):
+        for room in self.floor.plan:
+            room.furniture.clear()
+        results = {self.floor.get_room_to_place_furniture(1) for _ in range(20)}
+        self.assertTrue(len(results) > 1, "Должен возвращать разные комнаты")
+
+
 if __name__ == '__main__':
     unittest.main()

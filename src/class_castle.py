@@ -36,6 +36,16 @@ class Floor:
             new_ladder = Ladder(room, room_to_go)
             room_to_go.enter_point = True
         return True
+
+
+    def get_room_to_place_furniture(self, furniture_type:str) -> Room | None:
+        """
+        Возвращает случайную комнату, в которую можно поставить мебель определенного типа.
+        """
+        rooms = [room for room in self.plan if furniture_type not in room.furniture_types()]
+        if not rooms:
+            return None
+        return randomitem(rooms)
     
     
     def get_room_to_place_ladder_up(self) -> Room | None:
