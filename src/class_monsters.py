@@ -1481,6 +1481,10 @@ class Corpse():
         'скрюченный'
     )
     """Массив возможный прилагательных для трупа"""
+
+
+    _resurection_die = Dice ([5])
+
     
     def __init__(self,
                  game,
@@ -1522,9 +1526,19 @@ class Corpse():
                 },
         }
         self.place(room)
+        self.create_event()
         
-        
+
+    def create_event(self):
+        if self.creature and self.can_resurrect:
+            self.game.events_controller.create_event(
+                        event_subject=self,
+                        method_name='try_to_rise',
+                        counter=Corpse._resurection_die.roll(),
+                        parameters=None
+                )    
     
+
     def after_search(self, who):
         """ 
         Метод вызывается после обыска трупа.
