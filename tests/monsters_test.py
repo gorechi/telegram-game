@@ -77,6 +77,17 @@ class FakeActionController:
             self.actions.remove(item)
 
 
+class FakeEventsController:
+    def __init__(self):
+        self.pending_events = []
+
+    def create_event(self, **kwargs):
+        pass
+
+    def delete_pending_events_by_subject(self, subject):
+        self.pending_events = [e for e in self.pending_events if e.get('event_subject') is not subject]
+
+
 class FakeGame:
     def __init__(self):
         self.all_corpses = []
@@ -84,6 +95,7 @@ class FakeGame:
         self.no_shield = EmptyItem()
         self.no_armor = EmptyItem()
         self.monsters_controller = FakeMonstersController()
+        self.events_controller = FakeEventsController()
         self.weapon_controller = None
 
 

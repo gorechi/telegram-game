@@ -40,13 +40,10 @@ class Game():
     Содержит методы создания объектов игры, а также методы обработки комманд игрока.
     
     """
-          
-    _traders_update_counter = 30
-    
+            
 
     def __init__(self, chat_id:str, bot):
         self.empty_thing = Empty()
-        self.selected_item = self.empty_thing
         self.chat_id = chat_id
         self.bot = bot
         self.monsters_controller = MonstersController(self)
@@ -73,8 +70,6 @@ class Game():
         self.player = self.hero_controller.get_random_object_by_filters()
         self.player.place(self.current_floor.plan[0])
         self.game_is_on = False
-        self.traders_update_counter = Game._traders_update_counter
-        self.current_process = None
         
 
     def navigate_action(self, command, request_text):
@@ -94,20 +89,7 @@ class Game():
             ]:
             return True
         return False
-    
-    
-    def trigger_on_movement(self):
-        """Метод обрабатывает событие движения героя"""
-        self.raise_dead()
-
-       
-    def raise_dead(self):
-        """Метод воскрешения мертвецов"""
-        
-        for corpse in self.all_corpses: 
-            if corpse.can_resurrect:
-                corpse.try_to_rise()
-           
+               
     
     def test(self, hero):
         """
