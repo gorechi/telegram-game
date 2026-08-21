@@ -124,7 +124,7 @@ class Trap:
         """ 
         Метод наносит урон ловкости цели.
         """
-        return target.dex_wound()
+        return target.dext_wound()
         
 
     def damage_armor(self, target) -> bool|str:

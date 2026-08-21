@@ -44,7 +44,7 @@ class Hero:
     _critical_multiplier = 2
     """Коэффициент увеличения урона при критическом ударе."""
     
-    _dark_damage_divider_die = 3
+    _dark_damage_divider_die = Dice([3])
     """Кубик, который кидается, чтобы выяснить, во сколько раз уменьшится урон от атаки в темноте."""
     
     _doors_dict = {'наверх': 0,
@@ -228,8 +228,9 @@ class Hero:
         Возвращает список имен героя в различных падежах.
         """
         names_list = ['себя', 'себе', 'героя', 'героиню']
-        for case in cases:
-            names_list.append(self.lexemes.get(case, '').lower())
+        if cases:
+            for case in cases:
+                names_list.append(self.lexemes.get(case, '').lower())
         return names_list
     
     
@@ -539,7 +540,8 @@ class Hero:
         fight = self.current_fight
         action, enemy_text = split_actions(message)
         enemy = self.select_enemy(enemy_text)
-        message = self.attack(enemy, action)
+        if enemy:
+            message = self.attack(enemy, action)
         fight.continue_after_hero()
         return True
     
@@ -554,16 +556,17 @@ class Hero:
                 enemy = enemies[int(enemy_text)-1]
             except Exception:
                 tprint(self.game, 'В схватке нет такого врага.')
-                return False
+                return None
             if enemy == self:
                 tprint(self.game, 'Герой не может атаковать сам себя.')
-                return False
+                return None
             return enemy
         if not enemy_text:
             return randomitem(enemies)
         for enemy in enemies:
             if enemy.check_name(enemy_text.lower()):
                 return enemy
+        return None
         
     
     def trade_actions(self, message:str) -> bool:
@@ -595,7 +598,7 @@ class Hero:
         return True
     
     
-    def buy_item(self, target:str) -> bool:
+    def buy_item(self, target:str):
         """
         Метод обрабатывает команду "купить" у торговца.
         """
@@ -604,7 +607,7 @@ class Hero:
             tprint(self.game, self.trader.get_prices(self.backpack))
     
     
-    def sell_item(self, target:str) -> bool:
+    def sell_item(self, target:str):
         """
         Метод обрабатывает команду "продать" торговцу.
         """
@@ -631,7 +634,7 @@ class Hero:
         return True
     
     
-    def disarm(self, what:str) -> bool:
+    def disarm(self, what:str='') -> bool:
         """
         Пытается обезвредить указанный объект. В текущей реализации поддерживается обезвреживание ловушек.
         
@@ -640,6 +643,7 @@ class Hero:
         """
         if what in ['ловушку', 'ловушка', '']:
             return self.disarm_trap()
+        return False
     
     
     def disarm_trap(self) -> bool:
@@ -653,6 +657,7 @@ class Hero:
         message = [f'{self.name} пытается обезвредить ловушку, прикрепленную к {trap.where:dat}.']
         message.extend(self.try_to_disarm_trap(trap))
         tprint(self.game, message)
+        return True
     
     
     def try_to_disarm_trap(self, trap) -> list[str]:
@@ -701,12 +706,12 @@ class Hero:
         return f'{self.name} получает ранение и теряет много крови. Из-за раны {self:pronoun} сильно слабеет.'
     
     
-    def dex_wound(self) -> str:
+    def dext_wound(self) -> str:
         """
         Наносит персонажу ранение, влияющее на ловкость, увеличивая счетчик таких ранений на 1.
         """
-        wound = self.wounds.get('dex', 0)
-        self.wounds['dex'] = wound + 1
+        wound = self.wounds.get('dext', 0)
+        self.wounds['dext'] = wound + 1
         return f'{self.name} получает ранение в ногу и теперь двигается как-то неуклюже и гораздо медленнее.'
         
             
@@ -888,7 +893,7 @@ class Hero:
         Метод рассчитывает и возвращает значение защиты героя от отравления.
         """
         protection = self.poison_protection.roll()
-        if self.armor.is_poisoned() or self.shield.is_poisoned():
+        if (not self.armor.empty and self.armor.is_poisoned()) or (not self.shield.empty and self.shield.is_poisoned()):
             protection += 2
         return protection
     
@@ -991,6 +996,8 @@ class Hero:
         steal_count = Hero._steal_probability.roll()
         if steal_count == 1 and not self.backpack.is_empty():
             all_monsters = [monster for monster in self.floor.all_monsters if (not monster.stink and monster.can_steal)]
+            if not all_monsters:
+                return None
             stealing_monster = randomitem(all_monsters)
             all_items = self.backpack.get_items_except_class('Key')
             if all_items:
@@ -1110,19 +1117,21 @@ class Hero:
         room = self.current_position
         a = randint(1, 2)
         if a == 1 and not self.weapon.empty:
+            message = f'Убегая {self.name} роняет из рук {self.weapon:accus}.'
             if target.weapon.empty and target.carryweapon:
                 target.weapon = self.weapon
             else:
                 room.loot.add(self.weapon)
             self.weapon = self.game.no_weapon
-            return f'Убегая {self.name} роняет из рук {self.weapon:accus}.'
+            return message
         elif a == 2 and not self.shield.empty:
+            message = f'Убегая {self.name} теряет {self.shield:accus}.'
             if target.shield.empty and target.carryshield:
                 target.shield = self.shield
             else:
                 room.loot.add(self.shield)
             self.shield = self.game.no_shield
-            return f'Убегая {self.name} теряет {self.shield:accus}.'
+            return message
         return None
     
     
@@ -1148,7 +1157,7 @@ class Hero:
         return items_list
       
     
-    def run_away(self, target: Monster) -> list:
+    def run_away(self, target: Monster) -> bool:
         """
         Метод обрабатывает команду "убежать". 
         Запускается когда герой сбегает из боя.
@@ -1169,7 +1178,7 @@ class Hero:
             if direction not in available_directions:
                 message.append(f'{self.name} с разбега врезается в стену и отлетает в сторону. Схватка продолжается.')
                 tprint(self.game, message)
-                return
+                return False
         new_position = self.current_position.position + self.floor.directions_dict[direction]
         self.current_position = self.floor.plan[new_position]
         self.current_position.visited = True
@@ -1177,6 +1186,7 @@ class Hero:
         message.append('На этом схватка заканчивается.')
         self.restless = 0
         tprint (self.game, message)
+        return True
 
     
     def get_target_name(self, target:Monster) ->str:
@@ -1206,7 +1216,7 @@ class Hero:
         if isinstance(target, Vampire) and self.weapon.element() == 4:
             return target.health
         weapon_attack = self.weapon.attack(target)
-        mastery = self.mastery[self.weapon.type]['level']
+        mastery = self.mastery[self.weapon.weapon_type]['level']
         critical_probability = mastery * Hero._critical_step
         if randint(1, 100) <= critical_probability and not self.poisoned:
             weapon_attack = weapon_attack * Hero._critical_multiplier
@@ -1297,20 +1307,17 @@ class Hero:
         self.run = False
         if action == '' or action == 'у' or action == 'ударить':
             self.hit_enemy(target=target)
-            return
-        if action in ['з', 'защититься', 'защита']:
+        elif action in ['з', 'защититься', 'защита']:
             self.use_shield(target)
-            return
-        if action in ['б', 'бежать', 'убежать']:
+        elif action in ['б', 'бежать', 'убежать']:
             self.run_away(target)
-            return
-        if action in ['и', 'использовать']:
+        elif action in ['и', 'использовать']:
             self.use_in_fight()
-            return
-        if action in ['с', 'сменить оружие', 'сменить']:
+        elif action in ['с', 'сменить оружие', 'сменить']:
             self.change_weapon()
             tprint(self.game, f'\n{self.name} продолжает бой.')
-            return
+        else:
+            return False
         return True
 
     
@@ -1356,10 +1363,11 @@ class Hero:
         """
         message = []
         money_text = self.show_me_money()
+        health_status = self.get_health_percentage()
         message.append(f'{self.name} - это {self.g("смелый герой", "смелая героиня")} {str(self.level)} уровня. ' 
                        f'{self.g("Его", "Ее")} сила - {self.stren.text()}, ловкость - {self.dext.text()}, интеллект - {self.intel.text()} и сейчас'
                        f' у {self.g("него", "нее")} {howmany(self.health, ["единица", "единицы", "единиц"])} здоровья, что составляет '
-                       f'{str(self.health * 100 // self.start_health)} % от максимально возможного. {money_text}')
+                       f'{health_status} % от максимально возможного. {money_text}')
         message.append(self.show_weapon())
         message.append(self.show_protection())
         message.append(self.show_mastery())
@@ -1367,7 +1375,14 @@ class Hero:
             return message
         tprint(self.game, message)
 
-    
+
+    def get_health_percentage(self) -> int:
+        """Метод возвращает сколько процентов здоровья осталось у героя"""
+        if not self.start_health:
+            return 0
+        return self.health * 100 // self.start_health
+
+ 
     def show_mastery(self) -> str:
         """Метод генерирует описание мастерства персонажа."""
         
@@ -1544,6 +1559,7 @@ class Hero:
         self.stren.increase_base_die(amount)
         self.start_stren.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою силу на {amount}.', 'direction')
+        return True
     
     
     def increase_dexterity(self, amount:int=1) -> bool:
@@ -1553,6 +1569,7 @@ class Hero:
         self.dext.increase_base_die(amount)
         self.start_dext.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свою ловкость на {amount}.', 'direction')
+        return True
     
     
     def increase_intelligence(self, amount:int=1) -> bool:
@@ -1562,6 +1579,7 @@ class Hero:
         self.intel.increase_base_die(amount)
         self.start_intel.increase_base_die(amount)
         tprint(self.game, f'{self.name} увеличивает свой интеллект на {amount}.', 'direction')
+        return True
     
     
     def detect_trap(self, trap) -> bool:
@@ -1608,7 +1626,7 @@ class Hero:
         return False
     
     
-    def go_with_light_on(self, direction:int) -> bool:
+    def go_with_light_on(self, direction:int) -> str:
         """
         Метод обрабатывает команду "идти" когда свет включен.
         """
@@ -1698,7 +1716,6 @@ class Hero:
         """
         Метод перемещает героя в новую комнату.
         """
-        self.game.trigger_on_movement()
         self.current_position = new_position
         self.current_position.visited = True
         self.current_position.show(self)
@@ -1812,18 +1829,18 @@ class Hero:
     
     
     def enchant(self, item='') -> bool:
-        game = self.game
-        game.processes_controller.create_process(
+        self.game.processes_controller.create_process(
             owner = self,
             type = 'enchantment',
             request_text = item
         )
+        return True
 
     
     def check_if_can_read(self) -> tuple[bool, str | list[str]]:
         """Метод проверки, может ли герой сейчас читать."""
         
-        if not self.check_fear():
+        if self.check_fear():
             return False, f'{self.name} смотрит на буквы, но от страха они не складываются в слова.'
         if not self.check_light():
             return False, f'{self.name} решает, что читать в такой темноте вредно для зрения.'
@@ -1833,7 +1850,7 @@ class Hero:
     def check_if_can_examine(self) -> tuple[bool, str | list[str]]:
             """Метод проверки, может ли герой сейчас что-то осматривать."""
             
-            if not self.check_fear():
+            if self.check_fear():
                 return False, f'{self.name} не может сосредоточиться от страха.'
             if not self.check_light():
                 return False, f'{self.name} не видит дальше собственного носа - такая тут темнота.'
