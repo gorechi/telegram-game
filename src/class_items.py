@@ -1,5 +1,6 @@
 
 from src.functions.functions import randomitem, tprint, roll, pprint
+from src.class_dice import Dice
 
 
 class Spell:
@@ -87,7 +88,7 @@ class Matches:
     
     """ Класс Спички. """
     
-    _max_quantity = (10,)
+    _quantity_die = Dice([10])
     """Кубик, который нужно кинуть чтобы определить, сколько спичек в коробке"""
     
     def __init__(self, game):
@@ -193,7 +194,7 @@ class Matches:
         """ 
         Метод определяет, сколько спичек в коробке.
         """
-        return roll(Matches._max_quantity)
+        return Matches._quantity_die.roll()
 
     
     def get_quantity_text(self, quantity:int) -> str:
@@ -238,6 +239,8 @@ class Matches:
         
         if not place:
             rooms = [i for i in castle.plan if not i.locked and i.light]
+            if not rooms:
+                return False
             room = randomitem(rooms)
             if room.furniture:
                 place = randomitem(room.furniture)
@@ -258,6 +261,8 @@ class Matches:
             matches_in_backpack = who.backpack.get_first_item_by_class('Matches')
             if matches_in_backpack:
                 matches_in_backpack + self
+                self.room.loot.remove(self)
+                self.room = None
             else:
                 who.put_in_backpack(self)
             return f'{who.name} забирает {self:accus} себе.'
@@ -273,7 +278,7 @@ class Matches:
         room = who_is_using.current_position
         if room.light:
             return 'Незачем тратить спички, здесь и так светло.'
-        if who_is_using.check_fear(print_message=False) and roll([2]) == 1:
+        if who_is_using.check_fear() and roll([2]) == 1:
             return f'От страха пальцы {who_is_using.g("героя", "героини")} не слушаются. Спичка ломается и падает на пол.'  
         message = room.turn_on_light(who_is_using)
         self.quantity -= 1
@@ -288,7 +293,7 @@ class Matches:
         if self.quantity <= 0:
             who.backpack.remove(self)
             return f'{who.g("Герой", "Героиня")} зашвыривает пустую коробочку от спичек в угол комнаты.'
-        return f'{who.g("Герой", "Героиня")} бержно убирает оставшиеся спички в рюкзак'
+        return f'{who.g("Герой", "Героиня")} бережно убирает оставшиеся спички в рюкзак'
     
     
     def get_names_list(self, cases:list=None, room=None) -> list:
@@ -340,6 +345,7 @@ class Map:
             "inst": "картой"
         }
         self.empty = False
+        self.decorated = False
         self.decorate()
         self.hero_actions = {
             "смотреть": {
@@ -428,9 +434,11 @@ class Map:
         """ 
         Метод добавляет в описание карты номер этажа замка.
         """
-        self.description = f'Карта, показывающая расположение комнат {self.floor.floor_number} этажа замка'
-        for lexeme in self.lexemes:
-            self.lexemes[lexeme] += f' {self.floor.floor_number} этажа'
+        if not self.decorated:
+            self.description = f'Карта, показывающая расположение комнат {self.floor.floor_number} этажа замка'
+            for lexeme in self.lexemes:
+                self.lexemes[lexeme] += f' {self.floor.floor_number} этажа'
+            self.decorated = True
     
     
     def check_name(self, message:str) -> bool:
@@ -461,7 +469,7 @@ class Map:
         return self.description
 
     
-    def use(self, who, in_action: bool = False) -> bool:
+    def use(self, who, in_action: bool = False) -> str:
         """
         Метод использования карты. Если вызывается в бою, то ничего не происходит. 
         В мирное время выводит на экран карту замка.
@@ -471,18 +479,18 @@ class Map:
         - in_action - признак того, что предмет используется в бою. По умолчанию False.
 
         """
-        read_map, map_text = who.generate_map_text(who, in_action)
+        read_map, map_text = self.generate_map_text(who, in_action)
         if read_map:    
             self.show_map()
         return map_text
 
     
-    def generate_map_text(self, who, in_action: bool = False) -> list[bool, str]:
+    def generate_map_text(self, who, in_action: bool = False) -> tuple[bool, str]:
         """ 
         Метод генерирует текст, который будет выведен при использовании карты.
         """
         if not in_action:
-            if not who.check_fear:
+            if not who.check_fear():
                 return False, f'{who.name} от страха не может сосредоточиться и что-то разобрать на карте.'
             elif not who.current_position.light:
                 return False, 'В комнате слишком темно чтобы разглядывать карту'
@@ -509,7 +517,7 @@ class Map:
             line1 = '║'
             line2 = ''
             for j in range(rooms):
-                room = self.plan[i*rooms+j]
+                room = self.floor.plan[i*rooms+j]
                 symbol = room.get_symbol_for_map()
                 line1 += f'  {symbol}  {room.doors[1]:vertical}'
                 line2 += f'==={room.doors[2]:horizontal}=='
@@ -677,7 +685,7 @@ class Key:
         """
         if not who.backpack.no_backpack:
             who.put_in_backpack(self)
-            return f'{who.name} забирает {self.name} себе.'
+            return f'{who.name} забирает {self:accus} себе.'
         return f'{who.name} не может забрать {self:accus} - {who.g("ему", "ей")} некуда ее положить.'
             
         

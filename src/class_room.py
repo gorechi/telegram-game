@@ -1214,6 +1214,7 @@ class Room:
             return '║#  ║'
         return '║   ║'
     
+
     def lock(self):
         """ 
         Запирает комнату
@@ -1225,20 +1226,20 @@ class Room:
         return None
     
     
-    # def turn_on_light(self, who) -> list[str]:
+    def turn_on_light(self, who) -> list[str]:
         
-    #     """Метод зажигания в комнате света. """
+        """Метод зажигания в комнате света. """
         
-    #     self.light = True
-    #     self.torch = True
-    #     monster = self.monsters('first')
-    #     message = [
-    #             f'{who.name} зажигает факел и комната озаряется светом']
-    #     if monster:
-    #         if monster.frightening:
-    #             message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
-    #             who.fear += 1
-    #     return message
+        self.light = True
+        self.torch = True
+        monster = self.monsters('first')
+        message = [
+                f'{who.name} зажигает факел и комната озаряется светом']
+        if monster:
+            if monster.frightening:
+                message.append(f'{who.name} замирает от ужаса глядя на чудовище перед собой.')
+                who.fear += 1
+        return message
                 
     
     def get_random_unlocked_furniture(self):
