@@ -113,6 +113,7 @@ class FakeRoom:
         self.action_controller = FakeActionController()
         self.monsters_list = []
         self.ambush = False
+        self.torch = None
 
     def monsters(self):
         return self.monsters_list
@@ -386,6 +387,12 @@ class TestMonsterBasics(unittest.TestCase):
         self.assertLess(monster.health, 10)
         self.assertLessEqual(monster.stren.modifier, 0)
 
+    def test_get_weaker_floor_health(self):
+        monster = make_monster(stren=Dice([6]), health=1, start_health=1)
+        result = monster.get_weaker()
+        self.assertTrue(result)
+        self.assertGreaterEqual(monster.health, 1)
+
     def test_get_name_for_being_attacked_in_light(self):
         monster = make_monster()
         who = MagicMock()
@@ -565,9 +572,11 @@ class TestMonsterCombat(unittest.TestCase):
 
     def test_attack_no_target(self):
         monster = make_monster()
+        monster.current_position = FakeRoom(light=True)
         fight = MagicMock()
         fight.get_targets.return_value = []
-        self.assertFalse(monster.attack(fight))
+        result = monster.attack(fight)
+        self.assertIn('не', result)
 
     def test_attack_dodge(self):
         monster = make_monster()
@@ -1147,10 +1156,11 @@ class TestMonsterWounds(unittest.TestCase):
 
     def test_bleed(self):
         monster = make_monster()
+        monster.stren.modifier = 2
         floor, room, rooms = setup_world(monster, n_rooms=2)
         messages = monster.bleed(MagicMock())
         self.assertEqual(monster.health, monster.start_health)
-        self.assertLess(monster.stren.modifier, 0)
+        self.assertLess(monster.stren.modifier, 2)
         self.assertTrue(any('истекает кровью' in m for m in messages))
 
     def test_rage(self):
@@ -1161,12 +1171,20 @@ class TestMonsterWounds(unittest.TestCase):
         self.assertGreater(monster.stren.modifier, 0)
         self.assertTrue(any('приходит в ярость' in m for m in messages))
 
+    def test_rage_floor_health(self):
+        monster = make_monster(start_health=1, health=1)
+        monster.current_position = FakeRoom(light=True)
+        floor, room, rooms = setup_world(monster, n_rooms=2)
+        messages = monster.rage(MagicMock())
+        self.assertGreaterEqual(monster.health, 1)
+
     def test_contusion(self):
         monster = make_monster()
+        monster.stren.modifier = 2
         floor, room, rooms = setup_world(monster, n_rooms=2)
         messages = monster.contusion(MagicMock())
         self.assertEqual(monster.health, 14)
-        self.assertLess(monster.stren.modifier, 0)
+        self.assertLess(monster.stren.modifier, 2)
         self.assertTrue(any('получает контузию' in m for m in messages))
 
     def test_leg_wound(self):
@@ -1361,15 +1379,25 @@ class TestPlant(unittest.TestCase):
 
     def test_grow(self):
         plant = make_monster(Plant)
+        room1 = FakeRoom(floor=FakeFloor())
+        room2 = FakeRoom(floor=FakeFloor())
+        room3 = FakeRoom(floor=FakeFloor())
+        plant.floor = MagicMock()
+        plant.floor.get_rooms_around.return_value = [room1, room2, room3]
+        plant.current_position = room1
+        plant.grow_in_room = MagicMock()
+        plant.grow()
+        self.assertEqual(plant.grow_in_room.call_count, 2)
+
+    def test_grow_single_room(self):
+        plant = make_monster(Plant)
         room = FakeRoom(floor=FakeFloor())
-        floor = MagicMock()
-        floor.get_rooms_around.return_value = [room]
-        plant.floor = floor
+        plant.floor = MagicMock()
+        plant.floor.get_rooms_around.return_value = [room]
         plant.current_position = room
         plant.grow_in_room = MagicMock()
-        with patch('src.class_monsters.randomitem', return_value=[room]):
-            plant.grow()
-        plant.grow_in_room.assert_called_once_with(room)
+        plant.grow()
+        self.assertEqual(plant.grow_in_room.call_count, 0)
 
     def test_choose_target_last_attacker(self):
         plant = make_monster(Plant)
@@ -1511,6 +1539,30 @@ class TestVampire(unittest.TestCase):
         self.assertTrue(result)
         self.assertIs(vampire.current_position, rooms[1])
         self.assertIn(vampire, floor.monsters_in_rooms[rooms[1]])
+
+    def test_place_with_old_place(self):
+        vampire = make_monster(Vampire)
+        floor, old_room, rooms = setup_world(vampire, n_rooms=3)
+        new_room = rooms[2]
+        new_room.furniture = []
+        floor.monsters_in_rooms[new_room] = []
+        self.assertIn(vampire, floor.monsters_in_rooms[old_room])
+        with patch('src.class_monsters.randomitem', return_value=new_room):
+            result = vampire.place(floor, old_place=old_room)
+        self.assertTrue(result)
+        self.assertIs(vampire.current_position, new_room)
+        self.assertNotIn(vampire, floor.monsters_in_rooms[old_room])
+
+    def test_place_stink(self):
+        vampire = make_monster(Vampire, stink=True)
+        floor, room, rooms = setup_world(vampire, n_rooms=2)
+        room.floor = floor
+        room.furniture = []
+        with patch('src.class_monsters.randomitem', return_value=rooms[1]):
+            result = vampire.place(floor)
+        self.assertTrue(result)
+        self.assertTrue(rooms[1].stink == 3)
+        self.assertTrue(floor.stink_mapped)
 
 
 class TestHumanDemonWalkingDead(unittest.TestCase):

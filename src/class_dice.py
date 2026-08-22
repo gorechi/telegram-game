@@ -177,6 +177,8 @@ class Dice():
         if not isinstance(value, int):
             raise ValueError(f"Значение должно быть целым числом, а передан {type(value)} {value}.")
         self.modifier -= value
+        if self.modifier < 0:
+            self.modifier = 0
         return self.modifier
     
     

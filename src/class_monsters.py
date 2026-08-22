@@ -212,11 +212,13 @@ class Monster:
         """
         Монстр инициирует схватку с врагом. 
         """
-        enemies_to_fight = [self, enemy]
-        if enemy.is_hero():
-            hero = enemy
-        else:
-            hero = None
+        enemies_to_fight = [self]
+        if enemy:
+            enemies_to_fight.append(enemy)
+            if enemy.is_hero():
+                hero = enemy
+            else:
+                hero = None
         new_fight = Fight(
             game=self.game, 
             hero=hero, 
@@ -290,7 +292,7 @@ class Monster:
         """Метод проверки, есть ли в комнате свет."""
         
         room = self.current_position
-        if room.light:
+        if room.light or (room.torch and room.torch.burning):
             return True
         if self.weapon.element() in Rune._glowing_elements:
             return True
@@ -354,7 +356,10 @@ class Monster:
         stren_die = self.stren.roll()
         health_die = Monster._weak_health_die.roll()
         self.stren.decrease_modifier(int(stren_die/2))
-        self.health = int(self.health * (1 - health_die/10))
+        new_health = int(self.health * (1 - health_die/10))
+        if new_health < 1:
+            new_health = 1
+        self.health = new_health
         return True
     
     
@@ -426,7 +431,7 @@ class Monster:
         Метод возвращает защиту от отравления монстра.
         """
         protection = self.poison_protection.roll()
-        if self.armor.is_poisoned() or self.shield.is_poisoned():
+        if (not self.armor.empty and self.armor.is_poisoned()) or (not self.shield.empty and self.shield.is_poisoned()):
             protection += 2
         return protection
     
@@ -688,7 +693,7 @@ class Monster:
         hero = fight.hero
         self_name = self.get_name_in_darkness(hero)
         if not target:
-            return False
+            return f'{self_name} не {self.g("смог", "смогла")} найти кого атаковать.'
         total_attack, message = self.generate_attack(target, self_name)
         target_defence = target.defence(self)
         if target_defence < 0:
@@ -706,7 +711,7 @@ class Monster:
             total_damage = 0
             message.append(f'{self_name} не {self.g("смог", "смогла")} пробить защиту {target:accus}.')
         target.health -= total_damage
-        self.last_attacker = None
+        target.last_attacker = self
         return message
         
         
@@ -733,7 +738,7 @@ class Monster:
         return randomitem(targets)
     
     
-    def generate_attack(self, target, self_name:str) -> list[int, list[str]]:
+    def generate_attack(self, target, self_name:str) -> tuple[int, list[str]]:
         """ 
         Генерирует атаку монстра на цель, возвращая общий урон и сообщение об атаке.
         """
@@ -775,21 +780,28 @@ class Monster:
         Возвращает значение защиты, или -1 если атака не попала.
         """
         result = 0
-        weapon = attacker.weapon
-        parry_chance = self.parry_chance.roll()
-        if self.poisoned:
-            parry_chance = parry_chance // 2
+        if self.check_if_parried(attacker):
+            return -1
         if not self.shield.empty:
             result += self.shield.protect(attacker)
             self.shield.take_damage(self.hide)
         if not self.armor.empty:
             result += self.armor.protect(attacker)
-        hit_dice = weapon.hit_chance.roll() + attacker.hit_chance.roll()
-        if parry_chance > hit_dice:
-            result = -1
         return result
 
-    
+
+    def check_if_parried(self, attacker) -> bool:
+        """ 
+        Метод проверяет, смог ли монстр парировать удар.
+        """
+        weapon = attacker.weapon
+        parry_chance = self.parry_chance.roll()
+        if self.poisoned:
+            parry_chance = parry_chance // 2
+        hit_chance = weapon.hit_chance.roll() + attacker.hit_chance.roll()
+        return parry_chance > hit_chance
+
+
     def finally_die(self, fight:Fight) -> bool:
         """
         Обрабатывает смерть монстра, удаляя его из списка монстров на этаже и в комнате, уменьшая общее количество монстров.
@@ -932,7 +944,7 @@ class Monster:
         Обрабатывает получение ранения в руку. Если у монстра есть оружие или щит, он их теряет.
         Возвращает True, указывая на то, что монстр остается в живых.
         """
-        message = [f'{self.get_self_name_in_room()} остается в живых иполучает ранение в руку. ']
+        message = [f'{self.get_self_name_in_room()} остается в живых и получает ранение в руку. ']
         if not self.weapon.empty:
             message.append(self.lose_weapon_text())
             self.current_position.loot.add(self.weapon)
@@ -967,10 +979,13 @@ class Monster:
         strengthening_amount = self.stren.roll()
         ill_amount = ceil(self.start_health * Monster._wounded_monster_health_coefficient)
         self.stren.increase_modifier(strengthening_amount)
-        self.health = self.start_health - ill_amount
+        new_health = self.start_health - ill_amount
+        if new_health < 1:
+            new_health = 1
+        self.health = new_health
         message = [f'{self.get_self_name_in_room()} остается в живых и приходит в ярость, получая при '
                    f'этом {howmany(strengthening_amount, ["единицу", "единицы", "единиц"])} силы и '
-                   f'теряя {howmany(ill_amount, ["жизнь", "жизни", "жизней"])}.']
+                   f'теряя {howmany(self.start_health - self.health, ["жизнь", "жизни", "жизней"])}.']
         message.append(self.try_to_run_away(fight))
         return message
     
@@ -1036,7 +1051,8 @@ class Monster:
             room = room_to_place
         elif old_place:
             rooms = [room for room in floor.plan if (not room.trader 
-                                                     and not room == old_place 
+                                                     and not room == old_place
+                                                     and not room.trader 
                                                      and not room.enter_point)]
             if not bool(rooms):
                 return False
@@ -1044,8 +1060,7 @@ class Monster:
         else:
             empty_rooms = [room for room in floor.plan if (not room.monsters() 
                                                      and not room.monster_in_ambush()
-                                                     and not room.trader 
-                                                     and not room == old_place 
+                                                     and not room.trader  
                                                      and not room.enter_point)]
             if not bool(empty_rooms):
                 return False
@@ -1126,7 +1141,7 @@ class Plant(Monster):
         Метод для размножения растения в соседние комнаты.
         """
         available_rooms = self.floor.get_rooms_around(self.current_position)
-        target_rooms = randomitem(available_rooms, how_many=2)
+        target_rooms = randomitem(available_rooms, how_many=len(available_rooms)-1)
         for room in target_rooms:
             self.grow_in_room(room)
 
@@ -1279,7 +1294,7 @@ class Vampire(Monster):
         return f'{self.name} высасывает себе {str(sucked)} {howmany(sucked, ["жизнь", "жизни", "жизней"])}.'
     
     
-    def place(self, floor, room_to_place = None, old_place = None):
+    def place(self, floor, room_to_place = None, old_place = None) -> bool:
         """
         Размещает вампира в комнате на этаже, учитывая возможность скрыться.
         
@@ -1302,8 +1317,14 @@ class Vampire(Monster):
         self.current_position = room
         self.hiding_place = where_to_hide
         self.floor = floor
+        if old_place:
+            old_place.floor.monsters_in_rooms[old_place].remove(self)
         floor.monsters_in_rooms[room].append(self)
         room.action_controller.add_actions(self)
+        if self.stink:
+            room.set_stink(3)
+            floor.stink_map()
+        self.take_money_from_room()
         return True
 
 
@@ -1353,7 +1374,7 @@ class Human(Monster):
     
 
 class Demon(Monster):
-    """Класс Human наследует класс Monster и представляет собой тип монстра - демон."""
+    """Класс Demon наследует класс Monster и представляет собой тип монстра - демон."""
     
     def __init__(self, game):
         super().__init__(game)

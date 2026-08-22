@@ -50,7 +50,6 @@ class MonstersController(Controller):
         "Plant": Plant,
         "Vampire": Vampire,
         "Animal": Animal,
-        "Corpse": Corpse,
         "WalkingDead": WalkingDead,
         "Skeleton": Skeleton,
         "Berserk": Berserk,

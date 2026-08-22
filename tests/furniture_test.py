@@ -261,6 +261,7 @@ class TestShow(unittest.TestCase):
 
 
 class TestPlace(unittest.TestCase):
+    @patch.object(Furniture, '_lock_dice', MagicMock(return_value=2))
     def test_specific_room(self):
         f = make_furniture()
         room = MagicMock()

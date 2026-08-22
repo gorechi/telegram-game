@@ -94,6 +94,7 @@ class Hero:
         self.action_controller = ActionController(game=self.game, hero=self)
         self.poisoned = False
         self.trader = None
+        self.last_attacker = None
         self.weapon = self.game.no_weapon
         self.armor = self.game.no_armor
         self.shield = self.game.no_shield
@@ -1296,6 +1297,7 @@ class Hero:
                 self.increase_mastery()
             ] 
         target.health -= total_damage
+        target.last_attacker = self
         self.rage.reset()
         tprint(game, message)
         
