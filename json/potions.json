@@ -3,7 +3,11 @@
         "class_name": "HealPotion",
         "can_use_in_fight": true,
         "name": "Зелье исцеления",
-        "effect": 10,
+        "effect": {
+            "dice": true,
+            "random": true,
+            "value": [8, 10]
+                },
         "description": "Лечебное зелье, лечит раны и восстанавливает некоторое количество единиц здоровья.",
         "lexemes": {
             "nom": "зелье исцеления",

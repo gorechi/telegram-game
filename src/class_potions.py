@@ -131,20 +131,6 @@ class Potion:
         return f'{who.name} забирает {self:accus} себе.'
     
     
-    def check_if_can_be_used(self, in_action: bool) -> bool:
-        """ 
-        Метод проверки возможности использования зелья в текущем контексте (в бою или вне его).
-        """
-        game = self.game
-        if not in_action and self.can_use_in_fight:
-            tprint(game, 'Это зелье можно использовать только в бою!')
-            return False
-        if in_action and not self.can_use_in_fight:
-            tprint(game, 'Это зелье нельзя использовать в бою!')
-            return False
-        return True
-    
-    
     def drop(self, who, in_action:bool=False) -> str:
         """
         Метод выбрасывания зелья.
@@ -194,12 +180,11 @@ class HealPotion(Potion):
         """
         if not in_action:
             return 'Это зелье можно использовать только в бою!'
-        if (who.start_health - who.health) < self.effect:
-            heal = dice(1, (who.start_health - who.health))
-        else:
-            heal = dice(1, self.effect)
-        who.health += heal
-        message = f'{who:nom} восполняет {howmany(heal, ["единицу жизни", "единицы жизни", "диниц жизни"])}'
+        effect = self.effect.roll()
+        if (who.start_health - who.health) < effect:
+            effect = who.start_health - who.health
+        who.health += effect
+        message = f'{who:nom} восполняет {howmany(effect, ["единицу жизни", "единицы жизни", "единиц жизни"])}'
         if who.poisoned:
             who.poisoned = False
             message += ' и излечивается от отравления'
@@ -263,19 +248,22 @@ class StrengthPotion(Potion):
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
                 "in_combat": False,
-                "in_darkness": True
+                "in_darkness": True,
+                "duration": 1
                 },
             }
        
@@ -520,21 +508,21 @@ class Antidote(Potion):
             "пить": {
                 "method": "use",
                 "bulk": False,
-                "in_combat": False,
+                "in_combat": True,
                 "in_darkness": True,
                 "duration": 1
                 },
             "выпить": {
                 "method": "use",
                 "bulk": False,
-                "in_combat": False,
+                "in_combat": True,
                 "in_darkness": True,
                 "duration": 1
                 },
             "попить": {
                 "method": "use",
                 "bulk": False,
-                "in_combat": False,
+                "in_combat": True,
                 "in_darkness": True,
                 "duration": 1
                 },

@@ -4,7 +4,7 @@ from src.class_potions import Potion, HealPotion, HealthPotion, StrengtheningPot
 from src.class_controller import Controller
 
 class PotionsController(Controller):
-    """Класс для управления героями."""
+    """Класс для управления зельями."""
 
     @dataclass
     class Template():
