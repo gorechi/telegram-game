@@ -5,7 +5,7 @@ from src.class_controller import Controller
 from src.functions.functions import randomitem
 
 class ProtectionController(Controller):
-    """Класс для управления доспехами."""
+    """Класс для управления доспехами и щитами."""
 
     @dataclass
     class Template():

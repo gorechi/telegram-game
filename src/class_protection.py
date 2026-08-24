@@ -116,7 +116,7 @@ class Protection:
         """ 
         Метод проверки, можно ли зачаровать защиту.
         """
-        if len(self.runes) > 1 or self.empty or not self.enchatable:
+        if len(self.runes) > 1 or self.empty or not self.enchantable:
             return False
         return True
     
@@ -153,9 +153,10 @@ class Protection:
             return self.protection.roll(add=[mastery])
         base_damage = [who.weapon.damage.base_die() // 2]
         if who.weapon.element() in Protection._weakness_dictionary[self.element()]:
-            return self.perm_protection.roll(subtract=base_damage, add=[mastery])
+            return self.protection.roll(subtract=base_damage, add=[mastery])
         elif self.element() in Protection._weakness_dictionary[who.weapon.element()]:
-            return self.perm_protection.roll(add=base_damage.append(mastery))
+            base_damage.append(mastery)
+            return self.protection.roll(add=base_damage)
         return self.protection.roll(add=[mastery])
 
     
@@ -164,7 +165,7 @@ class Protection:
         Метод отображения защиты при осмотре.
         """
         if self.empty:
-            return None
+            return ''
         full_name = self.get_full_names('nom')
         return f'{full_name} ({self.protection.text()})'
 
@@ -305,17 +306,18 @@ class Armor(Protection):
         if not place:
             room = randomitem(castle.plan)
             monster = room.monsters('random')
-            if monster:
-                if monster.wear_armor:
-                    monster.take(self)
-                    return True
-            elif room.furniture:
+            if monster and monster.wear_armor:
+                monster.take(self)
+                return True
+            if room.furniture:
                 furniture = randomitem(room.furniture)
                 if furniture.can_contain_weapon:
                     place = furniture
             if not place:
                 place = room
         place.add(self)
+        if getattr(place, 'action_controller', None):
+            place.action_controller.add_actions(self)
 
 
 # Доспех можно надеть. Если на персонаже уже есть доспех, персонаж выбрасывает его и он становится частью лута комнаты.
@@ -330,6 +332,8 @@ class Armor(Protection):
             old_armor.drop(who)
         who.armor = self
         self.user = who
+        who.action_controller.add_actions(self)
+        who.current_position.action_controller.delete_actions_by_item(self)
         return message
     
     
@@ -679,9 +683,15 @@ class Shield (Protection):
         names_list = ['щит']
         for case in cases:
             names_list.append(self.lexemes.get(case, '').lower())
-            names_list.append(self.get_element_names(case).lower())
-            names_list.append(self.get_damaged_names(case).lower())
-            names_list.append(self.get_full_names(case).lower())
+            element_names = self.get_element_names(case)
+            if element_names:
+                names_list.append(element_names.lower())
+            damaged_names = self.get_damaged_names(case)
+            if damaged_names:
+                names_list.append(damaged_names.lower())
+            full_names = self.get_full_names(case)
+            if full_names:
+                names_list.append(full_names.lower())
         return names_list
 
     
@@ -706,9 +716,11 @@ class Shield (Protection):
             if not place:
                 place = room
         place.add(self)
+        if getattr(place, 'action_controller', None):
+            place.action_controller.add_actions(self)
 
 # Щит можно взять в руку. Если в руке ужесть щит, персонаж выбрасывает его и он становится частью лута комнаты.
-    def take(self, who):
+    def take(self, who) -> list[str] | str:
         """ 
         Метод взятия щита в руку.
         1. Если в руке уже есть щит, персонаж выбрасывает его и берет новый.
@@ -722,12 +734,16 @@ class Shield (Protection):
             old_shield = who.removed_shield
         if not who.weapon.empty and who.weapon.twohanded:
             who.removed_shield = self
+            who.current_position.action_controller.delete_actions_by_item(self)
+            who.action_controller.add_actions(self)
             message = [f'{who.name} помещает {self.get_full_names("accus")} за спину.']
         else:
             who.shield = self
+            who.current_position.action_controller.delete_actions_by_item(self)
+            who.action_controller.add_actions(self)
             message = [f'{who.name} берет {self.get_full_names("accus")} в руку.']
         if old_shield:
             message.append(f'При этом он бросает {old_shield.get_full_names("accus")} и оставляет валяться на полу.')
-            who.drop(old_shield.name)
+            old_shield.drop(who)
         self.user = who
-        tprint(self.game, message)
+        return message
