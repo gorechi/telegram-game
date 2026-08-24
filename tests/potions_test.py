@@ -260,7 +260,8 @@ class TestPotionDrop(unittest.TestCase):
 
 
 class TestHealPotionUse(unittest.TestCase):
-    def test_use_in_combat_heals(self):
+    @patch('src.class_dice.randint', return_value=3)
+    def test_use_in_combat_heals(self, mock_randint):
         hero = make_hero()
         hero.health = 5
         hero.start_health = 10
