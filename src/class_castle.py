@@ -33,7 +33,7 @@ class Floor:
             room_to_go = next_floor.get_room_to_place_ladder_down()
             if not room or not room_to_go:
                 return False
-            new_ladder = Ladder(room, room_to_go)
+            new_ladder = Ladder(self.game, room, room_to_go)
             room_to_go.enter_point = True
         return True
 

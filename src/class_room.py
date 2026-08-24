@@ -56,11 +56,13 @@ class Ladder:
         }
     )
     
-    def __init__(self, room_down:'Room', room_up:Optional['Room']=None, locked:bool=False):
+    def __init__(self, game, room_down:'Room', room_up:Optional['Room']=None, locked:bool=False):
+        self.game = game
         self.room_up = room_up
         self.name = 'лестница'
         self.room_down = room_down
         self.locked = locked
+        self.loot:Loot = Loot(self.game)
         self.decorate()
         self.place()
         self.room_actions = {
@@ -98,6 +100,14 @@ class Ladder:
         Метод добавляет объект в лут.
         """
         self.loot.add(item)
+
+
+    def get_random_room_up(self) -> 'Room':
+        """
+        Возвращает случайную комнату верхнего этажа для подключения лестницы.
+        Метод заглушка — будет реализован позже.
+        """
+        raise NotImplementedError('Метод get_random_room_up() ещё не реализован')
 
 
     def going_down(self, room=None) -> bool:
@@ -413,13 +423,15 @@ class Door:
                 return '-'
             else:
                 return ' '
-        if format_string == 'vertical':
+        elif format_string == 'vertical':
             if self.empty:
                 return '║'
             elif self.locked:
                 return '|'
             else:
                 return ' '
+        else:
+            return '?'
 
     
     def activate(self):
@@ -646,7 +658,8 @@ class Room:
         self.ladder_up:Ladder = self.game.empty_thing
         self.ladder_down:Ladder = self.game.empty_thing
         self.last_seen_trap = None
-        self.torch = self.set_torch()
+        self.torch = False
+        self.set_torch()
         self.secrets:list = list()
         self.has_secrets:bool = False
         self.enter_point = False
@@ -735,7 +748,9 @@ class Room:
         available_rooms = []
         for door in self.doors:
             if door and not door.locked and not door.empty:
-                available_rooms.append(door.get_another_room(self))
+                another_room = door.get_another_room(self)
+                if another_room:
+                    available_rooms.append(another_room)
         if self.ladder_down and not self.ladder_down.locked:
             available_rooms.append(self.ladder_down.room_down)
         if self.ladder_up and not self.ladder_up.locked:
@@ -793,7 +808,7 @@ class Room:
         return ['комната', 'комнату']
     
     
-    def search(self, who, in_action:bool=False) -> list[str]:
+    def search(self, who, in_action:bool=False) -> list[str] | str:
         """
         Метод обыскивания комнаты.
         """
@@ -802,13 +817,13 @@ class Room:
             return ''
         for furniture in self.furniture:
             message.append(str(furniture))
-        if not self.loot.empty and len(self.loot.pile) > 0:
+        if len(self.loot.pile) > 0:
             message.append('В комнате есть:')
             message += self.loot.show_sorted()
         else:
             message.append('В комнате нет ничего интересного.')
         if self.has_a_corpse():
-            message + self.show_corpses()
+            message += self.show_corpses()
         return message
     
     
@@ -839,7 +854,7 @@ class Room:
         return '+'
     
     
-    def set_torch(self):
+    def set_torch(self) -> bool:
         """ 
         Зажигает в комнате факел
         """
@@ -847,7 +862,7 @@ class Room:
             return False
         new_torch = self.game.weapon_controller.get_random_objects_by_class_name('Torch')[0]
         new_torch.place(self.floor, self)
-        return new_torch
+        return True
 
     
     def has_a_corpse(self) -> bool:
@@ -870,7 +885,7 @@ class Room:
             list: Список строк, каждая из которых представляет описание трупа в комнате.
         """
         corpses = [corpse.description for corpse in self.morgue]
-        return(corpses)
+        return corpses
 
     
     def get_trap(self):
@@ -1141,7 +1156,7 @@ class Room:
             for monster in self.monsters():
                 if monster.hiding_place == self:
                     return monster 
-        return False
+        return None
     
     
     def map(self):
@@ -1231,7 +1246,7 @@ class Room:
         """Метод зажигания в комнате света. """
         
         self.light = True
-        self.torch = True
+        self.set_torch()
         monster = self.monsters('first')
         message = [
                 f'{who.name} зажигает факел и комната озаряется светом']
