@@ -105,7 +105,6 @@ class Hero:
         self.state = state_enum.NO_STATE
         self.game_is_over = False
         self.can_use_in_fight = []
-        self.rune_list = []
         self.restless = 0
         self.wins = 0
         self.hide = False

@@ -48,6 +48,20 @@ class Rune:
                 "in_darkness": True,
                 "duration": 0
                 },
+            "осмотреть": {
+                "method": "show",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 1
+                },
+            "изучить": {
+                "method": "show",
+                "bulk": False,
+                "in_combat": False,
+                "in_darkness": False,
+                "duration": 1
+                },
             }
         self.room_actions = {
             "взять": {
@@ -78,7 +92,7 @@ class Rune:
         """ 
         Метод строкового представления руны.
         """
-        return f'{self.name} {Rune._elements_dictionary[self.element]} - ' \
+        return f'{self.name} {Rune._elements_dictionary.get(self.element, '')} - ' \
             f'урон + {str(self.damage)} или защита + {str(self.defence)}'
     
     
@@ -137,21 +151,15 @@ class Rune:
         if secret:
             secret.loot.add(self)
             return True
-        if getattr(place, 'furniture', None):
-            furniture = randomitem(place.furniture)
+        furniture_list = getattr(place, 'furniture', None)
+        if furniture_list:
+            furniture = randomitem(furniture_list)
             furniture.add(self)
             return True
         place.add(self)
         if getattr(place, 'action_controller', None):
             place.action_controller.add_actions(self)
         return True
-
-    
-    def element(self) -> int:
-        """ 
-        Метод возвращает элемент руны в виде целого числа. 
-        """
-        return int(self.element)
 
     
     def take(self, who, in_action:bool=False) -> str:

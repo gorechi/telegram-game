@@ -37,22 +37,6 @@ class RunesController(Controller):
 
     """
 
-    _elements_dictionary = {1: 'огня',
-                        2: 'пламени',
-                        3: 'воздуха',
-                        4: 'света',
-                        6: 'ветра',
-                        7: 'земли',
-                        8: 'лавы',
-                        10: 'пыли',
-                        12: 'воды',
-                        13: 'пара',
-                        14: 'камня',
-                        15: 'дождя',
-                        19: 'грязи',
-                        24: 'потопа'}
-    """Словарь стихий."""
-
     _base_price_dice = Dice([15])
     
     _poison_price_modifier = Dice([5])
@@ -88,7 +72,7 @@ class RunesController(Controller):
         """
         lexemes = {}
         for key in RunesController._lexemes:
-            lexemes[key] = f'{RunesController._lexemes[key]} {RunesController._elements_dictionary[rune.element]}'
+            lexemes[key] = f'{RunesController._lexemes[key]} {Rune._elements_dictionary[rune.element]}'
         rune.lexemes = lexemes
         
     
@@ -117,7 +101,7 @@ class RunesController(Controller):
         """
         Функция генерирует описание для руны.
         """
-        rune.description = f'{rune.name} {RunesController._elements_dictionary[rune.element]}'
+        rune.description = f'{rune.name} {Rune._elements_dictionary[rune.element]}'
         
         
     def generate_poison(self, rune:Rune) -> bool:

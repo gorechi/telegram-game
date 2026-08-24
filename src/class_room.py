@@ -649,7 +649,6 @@ class Room:
         self.locked:bool = False
         self.position:int = -1
         self.visited:bool = False
-        self.rune_place = self.game.empty_thing
         self.light:bool = True
         self.trader = None
         self.morgue:list = []
