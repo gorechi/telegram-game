@@ -13,6 +13,7 @@ class SecretPlacesController(Controller):
         class_name: str
         name: str
         lexemes: dict
+        empty_text: str
     
     _classes = {
         "SecretPlace": SecretPlace,
@@ -57,7 +58,7 @@ class SecretPlacesController(Controller):
         secrets_on_floor = [secret for secret in self.all_objects if secret.floor == floor]
         if secrets_on_floor:
             return randomitem(secrets_on_floor)
-        return False
+        return None
     
 
     def get_random_secret_by_room(self, room) -> SecretPlace:
@@ -67,4 +68,4 @@ class SecretPlacesController(Controller):
         secrets_in_room = [secret for secret in self.all_objects if secret.room == room]
         if secrets_in_room:
             return randomitem(secrets_in_room)
-        return False
+        return None

@@ -48,8 +48,7 @@ def make_small_floor(game):
 def find_placed_items(floor, *classes):
     found = []
     for room in floor.plan:
-        for loot in (room.loot, room.secret_loot):
-            found.extend(i for i in loot.pile if isinstance(i, classes))
+        found.extend(i for i in room.loot.pile if isinstance(i, classes))
         for furniture in room.furniture:
             found.extend(i for i in furniture.loot.pile if isinstance(i, classes))
         for secret in room.secrets:

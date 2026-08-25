@@ -1,7 +1,7 @@
 
 class SecretPlace:
     """ 
-    Класс серетов, которые могут быть размещены в комнате и скрыты в е описании    
+    Класс секретов, которые могут быть размещены в комнате и скрыты в е описании    
     """
     def __init__(self, game):
         self.game = game
@@ -69,7 +69,7 @@ class SecretPlace:
         """
         room = who.current_position
         if self.loot == 0:
-            return self.empty_text
+            return f'{self.name} {self.empty_text}.'.capitalize()
         message = [f'{who.name} осматривает {self:accus} и находит:']
         message += self.loot.show_sorted()
         self.loot.reveal(room)

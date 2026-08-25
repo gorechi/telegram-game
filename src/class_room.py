@@ -645,7 +645,6 @@ class Room:
         self.generate_doors_actions()
         self.money:int = 0
         self.loot:Loot = Loot(self.game)
-        self.secret_loot:Loot = Loot(self.game)
         self.locked:bool = False
         self.position:int = -1
         self.visited:bool = False
