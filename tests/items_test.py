@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.class_items import Matches, Map, Key
+from src.class_items import Spell, Matches, Map, Key
 
 
 def make_game():
@@ -39,6 +39,109 @@ def make_hero(name='Герой', no_backpack=False, fear=0):
     hero.fear = fear
     hero.action_controller = MagicMock()
     return hero
+
+
+# ==================== SPELL ====================
+
+
+class TestSpell(unittest.TestCase):
+
+    def test_init_defaults(self):
+        game = make_game()
+        s = Spell(game)
+        self.assertIs(s.game, game)
+        self.assertEqual(s.name, 'Обычное заклинание')
+        self.assertEqual(s.element, 'магия')
+        self.assertEqual(s.min_damage, 1)
+        self.assertEqual(s.max_damage, 5)
+        self.assertEqual(s.min_damage_mult, 1)
+        self.assertEqual(s.max_damage_mult, 1)
+        self.assertEqual(s.actions, 'кастует')
+        self.assertFalse(s.empty)
+
+    def test_init_custom(self):
+        game = make_game()
+        s = Spell(game, name='Огненный шар', element='огонь',
+                  min_damage=2, max_damage=10, min_damage_mult=2,
+                  max_damage_mult=3, actions='бросает')
+        self.assertEqual(s.name, 'Огненный шар')
+        self.assertEqual(s.element, 'огонь')
+        self.assertEqual(s.min_damage, 2)
+        self.assertEqual(s.max_damage, 10)
+        self.assertEqual(s.min_damage_mult, 2)
+        self.assertEqual(s.max_damage_mult, 3)
+        self.assertEqual(s.actions, 'бросает')
+
+    def test_description_equals_name(self):
+        s = Spell(make_game(), name='Молния')
+        self.assertEqual(s.description, 'Молния')
+
+    def test_str(self):
+        s = Spell(make_game(), name='Молния')
+        self.assertEqual(str(s), 'Молния')
+
+    def test_format_known_case(self):
+        s = Spell(make_game())
+        s.lexemes = {'nom': 'заклинание', 'accus': 'заклинание'}
+        self.assertEqual(f'{s:nom}', 'заклинание')
+        self.assertEqual(f'{s:accus}', 'заклинание')
+
+    def test_format_unknown_case(self):
+        s = Spell(make_game())
+        s.lexemes = {'nom': 'заклинание'}
+        self.assertEqual(f'{s:unknown}', '')
+
+    def test_take_empty_who(self):
+        s = Spell(make_game())
+        self.assertFalse(s.take(''))
+
+    def test_take_put_in_backpack(self):
+        game = make_game()
+        s = Spell(game)
+        who = make_hero()
+        who.backpack.no_backpack = False
+        with patch('src.class_items.tprint'):
+            s.take(who)
+        who.backpack.add.assert_called_once_with(s)
+
+    def test_take_no_backpack(self):
+        game = make_game()
+        s = Spell(game)
+        who = make_hero(no_backpack=True)
+        with patch('src.class_items.tprint'):
+            s.take(who)
+        who.backpack.add.assert_not_called()
+
+    def test_check_name(self):
+        s = Spell(make_game())
+        s.lexemes = {'nom': 'заклинание', 'accus': 'заклинание'}
+        self.assertTrue(s.check_name('заклинание'))
+        self.assertTrue(s.check_name('ЗАКЛИНАНИЕ'))
+
+    def test_check_name_wrong(self):
+        s = Spell(make_game())
+        s.lexemes = {'nom': 'заклинание'}
+        self.assertFalse(s.check_name('меч'))
+
+    def test_get_names_list(self):
+        s = Spell(make_game())
+        s.lexemes = {'nom': 'заклинание', 'accus': 'заклинание', 'gen': 'заклинания'}
+        result = s.get_names_list(['nom', 'accus'])
+        self.assertEqual(result, ['заклинание', 'заклинание', 'заклинание'])
+
+    def test_get_names_list_no_cases(self):
+        s = Spell(make_game())
+        result = s.get_names_list(cases=[])
+        self.assertEqual(result, ['заклинание'])
+
+    def test_use_tprint_message(self):
+        game = make_game()
+        s = Spell(game)
+        who = make_hero()
+        with patch('src.class_items.tprint') as mock_tprint:
+            s.use(who)
+        mock_tprint.assert_called_once()
+        self.assertIn('не знает', mock_tprint.call_args[0][1])
 
 
 class TestMatchesInit(unittest.TestCase):

@@ -2,11 +2,29 @@
 # -*- coding: utf-8 -*-
 # Импортируем необходимые модули
 import telebot
+import socket
+import time
 import os
 from dotenv import find_dotenv, load_dotenv
 from telebot import types
 
 from src.class_game import Game
+
+# Обход блокировки по SNI/DNS для api.telegram.org:
+# оставляем URL как api.telegram.org (корректный SNI, Host и проверка сертификата),
+# но заставляем DNS-резолв этого домена возвращать рабочий IP-адрес Telegram,
+# чтобы TCP-подключение шло напрямую по IP, минуя блокировку имени.
+TELEGRAM_API_IP = "149.154.167.221"
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _telegram_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    if host == "api.telegram.org":
+        host = TELEGRAM_API_IP
+    return _original_getaddrinfo(host, port, family, type, proto, flags)
+
+
+socket.getaddrinfo = _telegram_getaddrinfo
  
 # Константы и настройки
 game_sessions = {}
@@ -60,4 +78,24 @@ def all_commands(message):
 
 
 if __name__ == "__main__":
-    bot.polling(none_stop=True, interval=0)
+    # Сеть нестабильна: укорачиваем таймауты запросов и long-polling,
+    # чтобы соединение не успевало оборваться по read-timeout.
+    telebot.apihelper.CONNECT_TIMEOUT = 10
+    telebot.apihelper.READ_TIMEOUT = 10
+    LONG_POLLING_TIMEOUT = 3  # короткий опрос вместо длинного (20c) соединения
+
+    # Поллинг оборачиваем в цикл с переподключением: кратковременные
+    # сетевые сбои/таймауты не должны ронять весь процесс.
+    while True:
+        try:
+            bot.polling(
+                non_stop=True,
+                interval=0,
+                timeout=10,
+                long_polling_timeout=LONG_POLLING_TIMEOUT,
+            )
+        except Exception as e:
+            print(f"[bot] polling crashed ({type(e).__name__}: {e}), restarting in 3s...")
+            time.sleep(3)
+        else:
+            break

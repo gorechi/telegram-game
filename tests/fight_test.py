@@ -557,6 +557,17 @@ class TestSequence(unittest.TestCase):
         fight = make_fight(monsters=[g])
         fight.sequence()
 
+    @patch.object(Fight, 'check_for_the_end', create=True, return_value=True)
+    @patch.object(Fight, 'end', create=True)
+    def test_returns_early_when_check_for_the_end_true(self, mock_end_check, mock_end, mock_tprint):
+        g = make_goblin('Goblin')
+        g.attack = MagicMock(return_value=['attack msg'])
+        hero = make_hero()
+        g.choose_target = MagicMock(return_value=True)
+        fight = Fight(game=make_game(), hero=hero, who_started=g, fighters=[hero, g])
+        fight.sequence()
+        g.attack.assert_called_once()
+
 
 @patch('src.class_fight.tprint')
 class TestStart(unittest.TestCase):

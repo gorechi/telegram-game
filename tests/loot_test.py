@@ -297,5 +297,26 @@ class TestLootShowSorted(unittest.TestCase):
         self.assertEqual(Loot(None).show_sorted(), [])
 
 
+class TestLootAddMoney(unittest.TestCase):
+    """Тесты добавления денег в лут."""
+
+    def test_add_non_money_returns_false(self):
+        loot = Loot(None)
+        self.assertFalse(loot.add_money(FakeItem('вещь')))
+        self.assertEqual(loot.pile, [])
+
+    def test_add_money_to_empty_loot(self):
+        loot = Loot(None)
+        self.assertTrue(loot.add_money(Money(None, 5)))
+        self.assertEqual(len(loot.pile), 1)
+        self.assertIsInstance(loot.pile[0], Money)
+
+    def test_add_money_merges_with_existing(self):
+        loot = Loot(None)
+        loot.add_money(Money(None, 5))
+        loot.add_money(Money(None, 3))
+        self.assertEqual(loot.pile[0].how_much_money, 8)
+
+
 if __name__ == '__main__':
     unittest.main()

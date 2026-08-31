@@ -4,4 +4,5 @@ pillow==12.3.0
 pyTelegramBotAPI==4.24.0
 python-dotenv==1.2.2
 requests==2.33.0
+telethon==1.44.0
 urllib3==2.7.0

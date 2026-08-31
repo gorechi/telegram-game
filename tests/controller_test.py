@@ -2,7 +2,7 @@ import os
 import json
 import unittest
 from dataclasses import dataclass
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from src.class_controller import Controller
 from src.class_dice import Dice
@@ -308,6 +308,45 @@ class TestGetRandomObjectsByClassName(unittest.TestCase):
     def test_raises_when_no_templates(self):
         with self.assertRaises(ValueError):
             self.ctrl.get_random_objects_by_class_name('Nonexistent', how_many=3)
+
+
+class RealInitController(Controller):
+    Template = FakeTemplate
+    _classes = {'Thing': FakeObject}
+
+    def load_templates(self):
+        return []
+
+
+class TestBaseInit(unittest.TestCase):
+
+    def test_base_init_sets_attributes(self):
+        game = make_game()
+        ctrl = RealInitController(game)
+        self.assertIs(ctrl.game, game)
+        self.assertEqual(ctrl.how_many, 0)
+        self.assertEqual(ctrl.templates, [])
+        self.assertEqual(ctrl.all_controllers, [])
+
+    def test_base_init_does_not_set_all_objects(self):
+        ctrl = RealInitController(make_game())
+        self.assertFalse(hasattr(ctrl, 'all_objects'))
+
+
+class TestCreateObjectFromTemplateMisses(unittest.TestCase):
+    def setUp(self):
+        self.ctrl = make_controller()
+
+    def test_raise_when_object_class_missing_from_classes(self):
+        with patch.object(FakeController, '_classes', {'Thing': None}):
+            with self.assertRaises(ValueError):
+                self.ctrl.create_object_from_template(
+                    FakeTemplate(class_name='Thing', name='x', value=1))
+
+    def test_raise_when_template_not_found_by_name(self):
+        with patch.object(self.ctrl, 'get_template_by_name', return_value=None):
+            with self.assertRaises(ValueError):
+                self.ctrl.create_object_by_name('missing')
 
 
 if __name__ == '__main__':

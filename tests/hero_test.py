@@ -1317,6 +1317,19 @@ class TestIncreaseMastery(unittest.TestCase):
         self.assertEqual(hero.mastery['колющее']['level'], 1)
         self.assertIsNotNone(result)
 
+    def test_creates_new_mastery_when_type_unknown(self):
+        hero = make_hero()
+        weapon = MagicMock()
+        weapon.empty = False
+        weapon.weapon_type = 'рубящее'
+        hero.weapon = weapon
+        hero.mastery.pop('рубящее', None)
+        with patch('src.class_hero.randint', return_value=100):
+            result = hero.increase_mastery()
+        self.assertIn('рубящее', hero.mastery)
+        self.assertEqual(hero.mastery['рубящее']['level'], 1)
+        self.assertIsNotNone(result)
+
 
 class TestHitEnemy(unittest.TestCase):
     def test_hit_without_weapon(self):
@@ -1394,6 +1407,36 @@ class TestRunAway(unittest.TestCase):
         with patch('src.class_hero.randomitem', return_value=0):
             result = hero.run_away(target)
         self.assertIsInstance(result, bool)
+
+    def test_success_with_light(self):
+        hero = make_hero()
+        target = make_enemy()
+        target.weapon = MagicMock()
+        target.weapon.empty = True
+        target.shield = MagicMock()
+        target.shield.empty = True
+        target.carryweapon = False
+        target.carryshield = False
+        hero.weapon = hero.game.no_weapon
+        hero.shield = hero.game.no_shield
+        room = MagicMock()
+        room.light = True
+        room.position = 5
+        room.get_available_directions.return_value = [1, 3]
+        hero.current_position = room
+        floor = MagicMock()
+        floor.directions_dict = {0: -1, 1: 1, 2: 3, 3: -1}
+        new_room = MagicMock()
+        floor.plan = {6: new_room}
+        hero.floor = floor
+        with patch('src.class_hero.randomitem', return_value=1):
+            with patch('src.class_hero.tprint'):
+                result = hero.run_away(target)
+        self.assertTrue(result)
+        self.assertTrue(hero.run)
+        self.assertIs(hero.current_position, new_room)
+        self.assertTrue(new_room.visited)
+        self.assertEqual(hero.restless, 0)
 
 
 class TestUseInFight(unittest.TestCase):

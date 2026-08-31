@@ -17,6 +17,44 @@ class TestCheckEndgame(unittest.TestCase):
             self.assertFalse(self.game.check_endgame())
 
 
+class TestNavigateAction(unittest.TestCase):
+    def setUp(self):
+        self.game = Game(chat_id='test', bot=MagicMock())
+
+    def test_delegates_to_process_when_active(self):
+        process = MagicMock()
+        with patch.object(self.game.processes_controller, 'get_current_process', return_value=process):
+            with patch.object(self.game.player, 'action') as mock_action:
+                self.game.navigate_action('some_command', 'some_text')
+        process.proceed.assert_called_once_with('some_text')
+        mock_action.assert_not_called()
+
+    def test_delegates_to_player_when_no_process(self):
+        with patch.object(self.game.processes_controller, 'get_current_process', return_value=None):
+            with patch.object(self.game.player, 'action') as mock_action:
+                self.game.navigate_action('идти', 'вверх')
+        mock_action.assert_called_once_with('идти', 'вверх')
+
+
+class TestGameTestMethod(unittest.TestCase):
+    def setUp(self):
+        self.game = Game(chat_id='test', bot=MagicMock())
+
+    def test_test_method_gives_runes_and_weapons(self):
+        fake_rune1 = MagicMock()
+        fake_rune2 = MagicMock()
+        fake_weapon1 = MagicMock()
+        fake_weapon2 = MagicMock()
+        self.game.runes_controller.get_random_object_by_filters = MagicMock(side_effect=[fake_rune1, fake_rune2])
+        self.game.weapon_controller.get_random_object_by_filters = MagicMock(side_effect=[fake_weapon1, fake_weapon2])
+        self.game.test(self.game.player)
+        fake_rune1.take.assert_called_once_with(self.game.player)
+        fake_rune2.take.assert_called_once_with(self.game.player)
+        fake_weapon1.take.assert_called_once_with(self.game.player)
+        fake_weapon2.take.assert_called_once_with(self.game.player)
+        self.assertTrue(self.game.current_floor.plan[0].light)
+
+
 class TestTraderCreateEvent(unittest.TestCase):
     def setUp(self):
         self.game = Game(chat_id='test', bot=MagicMock())
