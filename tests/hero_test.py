@@ -291,43 +291,15 @@ class TestGetPoisonProtection(unittest.TestCase):
         self.assertIsInstance(result, int)
 
 
-class TestSelectEnemy(unittest.TestCase):
-    def test_returns_none_for_no_match(self):
-        hero = make_hero()
-        enemy1 = MagicMock()
-        enemy1.check_name.return_value = False
-        fight = MagicMock()
-        fight.get_targets.return_value = [enemy1]
-        hero.current_fight = fight
-        result = hero.select_enemy('несуществующий')
-        self.assertIsNone(result)
-
-    def test_returns_none_for_self_attack(self):
-        hero = make_hero()
-        fight = MagicMock()
-        fight.get_targets.return_value = [hero]
-        hero.current_fight = fight
-        result = hero.select_enemy('1')
-        self.assertIsNone(result)
-
-    def test_returns_none_for_out_of_range_index(self):
-        hero = make_hero()
-        fight = MagicMock()
-        fight.get_targets.return_value = []
-        hero.current_fight = fight
-        result = hero.select_enemy('99')
-        self.assertIsNone(result)
-
-
 class TestFightActions(unittest.TestCase):
     def test_no_enemy_does_not_crash(self):
         hero = make_hero()
         fight = MagicMock()
-        fight.get_targets.return_value = []
+        fight.get_fighter.return_value = None
         hero.current_fight = fight
-        hero.select_enemy = MagicMock(return_value=None)
         result = hero.fight_actions('ударить')
         self.assertTrue(result)
+        fight.get_fighter.assert_called_once_with(text=None, for_hero=True)
 
 
 class TestWeaponTypeConsistency(unittest.TestCase):
@@ -2024,61 +1996,6 @@ class TestCheckMonsterAndFight(unittest.TestCase):
             mf.assert_not_called()
 
 
-class TestSelectEnemy(unittest.TestCase):
-    def test_digit_match(self):
-        hero = make_hero()
-        e1 = MagicMock()
-        e1.check_name.return_value = False
-        fight = MagicMock()
-        fight.get_targets.return_value = [e1]
-        hero.current_fight = fight
-        result = hero.select_enemy('1')
-        self.assertEqual(result, e1)
-
-    def test_name_match(self):
-        hero = make_hero()
-        e1 = MagicMock()
-        e1.check_name.return_value = True
-        fight = MagicMock()
-        fight.get_targets.return_value = [e1]
-        hero.current_fight = fight
-        result = hero.select_enemy('гоблин')
-        self.assertEqual(result, e1)
-
-    def test_empty_text_returns_random(self):
-        hero = make_hero()
-        e1 = MagicMock()
-        fight = MagicMock()
-        fight.get_targets.return_value = [e1]
-        hero.current_fight = fight
-        with patch('src.class_hero.randomitem', return_value=e1):
-            result = hero.select_enemy('')
-        self.assertEqual(result, e1)
-
-    def test_out_of_range(self):
-        hero = make_hero()
-        fight = MagicMock()
-        fight.get_targets.return_value = []
-        hero.current_fight = fight
-        self.assertIsNone(hero.select_enemy('99'))
-
-    def test_self_attack(self):
-        hero = make_hero()
-        fight = MagicMock()
-        fight.get_targets.return_value = [hero]
-        hero.current_fight = fight
-        self.assertIsNone(hero.select_enemy('1'))
-
-    def test_no_match(self):
-        hero = make_hero()
-        e1 = MagicMock()
-        e1.check_name.return_value = False
-        fight = MagicMock()
-        fight.get_targets.return_value = [e1]
-        hero.current_fight = fight
-        self.assertIsNone(hero.select_enemy('xyz'))
-
-
 class TestTradeActions(unittest.TestCase):
     def test_no_trader(self):
         hero = make_hero()
@@ -2300,10 +2217,11 @@ class TestFightActionsWithEnemy(unittest.TestCase):
         fight = MagicMock()
         hero.current_fight = fight
         enemy = MagicMock()
-        with patch.object(hero, 'select_enemy', return_value=enemy):
-            with patch.object(hero, 'attack', return_value=True):
-                with patch('src.class_hero.split_actions', return_value=('', '')):
-                    result = hero.fight_actions('атаковать')
+        fight.get_fighter.return_value = enemy
+        with patch.object(hero, 'attack', return_value=True):
+            with patch('src.class_hero.split_actions', return_value=('', '')):
+                result = hero.fight_actions('атаковать')
+        fight.get_fighter.assert_called_once_with(text='', for_hero=True)
         fight.continue_after_hero.assert_called_once()
 
 

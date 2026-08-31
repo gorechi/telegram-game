@@ -539,36 +539,13 @@ class Hero:
 
         fight = self.current_fight
         action, enemy_text = split_actions(message)
-        enemy = self.select_enemy(enemy_text)
+        enemy = fight.get_fighter(text=enemy_text, for_hero=True)
         if enemy:
             message = self.attack(enemy, action)
         fight.continue_after_hero()
         return True
     
-    
-    def select_enemy(self, enemy_text:str):
-        """
-        Метод выбирает цель для атаки героя.
-        """
-        enemies = self.current_fight.get_targets(self)
-        if str(enemy_text).isdigit():
-            try:
-                enemy = enemies[int(enemy_text)-1]
-            except Exception:
-                tprint(self.game, 'В схватке нет такого врага.')
-                return None
-            if enemy == self:
-                tprint(self.game, 'Герой не может атаковать сам себя.')
-                return None
-            return enemy
-        if not enemy_text:
-            return randomitem(enemies)
-        for enemy in enemies:
-            if enemy.check_name(enemy_text.lower()):
-                return enemy
-        return None
-        
-    
+
     def trade_actions(self, message:str) -> bool:
         """
         Метод обрабатывает команды игрока когда он торгует с торговцем.
