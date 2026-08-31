@@ -1283,7 +1283,7 @@ class TestIncreaseMastery(unittest.TestCase):
         hero = make_hero()
         weapon = MagicMock()
         weapon.empty = False
-        weapon.type = 'колющее'
+        weapon.weapon_type = 'колющее'
         hero.weapon = weapon
         hero.mastery['колющее']['level'] = 10
         hero.mastery['колющее']['max_level'] = 10
@@ -1293,7 +1293,7 @@ class TestIncreaseMastery(unittest.TestCase):
         hero = make_hero()
         weapon = MagicMock()
         weapon.empty = False
-        weapon.type = 'колющее'
+        weapon.weapon_type = 'колющее'
         hero.weapon = weapon
         hero.mastery['колющее']['level'] = 1
         hero.mastery['колющее']['counter'] = 0.0
@@ -1307,7 +1307,7 @@ class TestIncreaseMastery(unittest.TestCase):
         hero = make_hero()
         weapon = MagicMock()
         weapon.empty = False
-        weapon.type = 'колющее'
+        weapon.weapon_type = 'колющее'
         hero.weapon = weapon
         hero.mastery['колющее']['level'] = 0
         hero.mastery['колющее']['counter'] = 0.5

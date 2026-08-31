@@ -165,24 +165,13 @@ class Weapon:
         return self.show()
     
     
-    def can_be_changed(self, who) -> bool:
-        """ 
-        Метод проверяет, можно ли сменить оружие.
-        Возвращает True если можно, False если нельзя.
-        """
-        second_weapon = who.get_second_weapon()
-        if who.weapon == self and not second_weapon.empty:
-            return True
-        return False
-    
-    
     def change(self, who, in_action:bool=False) -> list[str]:
         """
         Метод смены оружия.
         """
         message = []
         second_weapon = who.get_second_weapon()
-        if not self.weapon.empty and second_weapon.empty:
+        if not who.weapon.empty and second_weapon.empty:
             return f'{who.name} не может сменить оружие из-за того, что оно у {who.g("него", "нее")} одно.'
         message.append(f'{who.name} убирает {self:accus} в рюкзак и берет в руки {second_weapon:accus}.')
         if second_weapon.twohanded and not who.shield.empty:
@@ -248,10 +237,11 @@ class Weapon:
         Метод выбрасывания оружия.
         """
         room = who.current_position
+        if who.weapon == self:
+            who.weapon = self.game.no_weapon
         room.loot.add(self)
         room.action_controller.add_actions(self)
         who.action_controller.delete_actions_by_item(self)
-        who.weapon = self.game.no_weapon
         return f'{who.name} бросает {self.name} в угол комнаты.'
     
     
@@ -435,11 +425,11 @@ class Weapon:
             shield = who.removed_shield
             who.shield = shield
             who.removed_shield = self.game.no_shield
-            message.append(f'Из-за того, что новое оружие одноручное, {who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_name("accus")}.')
+            message.append(f'Из-за того, что новое оружие одноручное, {who.g("герой", "героиня")} теперь держит во второй руке {shield.get_full_names("accus")}.')
         return message
 
     
-    def place(self, floor, place = None):
+    def place(self, floor, place = None) -> bool:
         """ 
         Метод размещения оружия в указанном месте или раскидывания по замку. 
         1. Если в комнате есть монстр, который может носить оружие, он берет его.
@@ -449,10 +439,9 @@ class Weapon:
         if not place:
             room = randomitem(floor.plan)
             monster = room.monsters('random')
-            if monster:
-                if monster.carry_weapon:
-                    monster.take(self)
-                    return True
+            if monster and monster.carry_weapon:
+                monster.take(self)
+                return True
             elif room.furniture:
                 furniture = randomitem(room.furniture)
                 if furniture.can_contain_weapon:
@@ -462,6 +451,7 @@ class Weapon:
         place.add(self)
         if getattr(place, 'action_controller', None):
             place.action_controller.add_actions(self)
+        return True
         
 
 class Torch(Weapon):
@@ -539,8 +529,8 @@ class Torch(Weapon):
         """
         self.burning = False
         if who.check_light():
-            return f'{who.name} тушит факел, который держит руке.'
-        return f'{who.name} тушит факел, который держит руке. Комната погружается во тьму.'
+            return f'{who.name} тушит факел, который держит в руке.'
+        return f'{who.name} тушит факел, который держит в руке. Комната погружается во тьму.'
     
     
     def extinguish_in_room(self, who, in_action:bool=False) -> str:

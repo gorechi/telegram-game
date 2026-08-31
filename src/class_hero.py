@@ -1256,8 +1256,10 @@ class Hero:
         
         if self.weapon.empty:
             return None
-        weapon_type = self.weapon.type
-        mastery = self.mastery.get(weapon_type)
+        weapon_type = self.weapon.weapon_type
+        mastery = self.mastery.get(weapon_type, None)
+        if not mastery:
+            mastery = self.create_new_mastery(weapon_type)
         if mastery['level'] == mastery['max_level']:
             return None
         mastery['counter'] += randint(1, 10)/100
@@ -1268,6 +1270,17 @@ class Hero:
         return None
        
     
+    def create_new_mastery(self, weapon_type:str) -> dict:
+        """Метод создает новую запись о мастерстве владения определенным типом оружия."""
+        
+        self.mastery[weapon_type] = {
+            'level': 0,
+            'max_level': 5,
+            'counter': 0
+        }
+        return self.mastery[weapon_type]
+
+
     def hit_enemy(self, target:Monster) -> None:
         """Метод моделирует удар героя по врагу во время схватки."""
         
