@@ -35,6 +35,9 @@ class MockFighter:
     def generate_in_fight_description(self, index):
         return f'{self.name} #{index}'
 
+    def check_name(self, name):
+        return self.name.lower().startswith(name) if isinstance(self.name, str) else False
+
     def attack(self, fight):
         return f'{self.name} атакует'
 
@@ -611,6 +614,55 @@ class TestGetFighterByHealthWithExclude(unittest.TestCase):
         fight = make_fight(monsters=[make_goblin()])
         result = fight.get_fighter_by_health(exclude=['MockFighter', 'Goblin'])
         self.assertFalse(result)
+
+
+@patch('src.class_fight.tprint')
+class TestGetFighter(unittest.TestCase):
+    def test_select_by_index(self, mock_tprint):
+        g1 = make_goblin('First')
+        g2 = make_goblin('Second')
+        fight = make_fight(monsters=[g1, g2])
+        targets = fight.get_targets(fight.hero)
+        self.assertEqual(fight.get_fighter('1'), targets[0])
+        self.assertEqual(fight.get_fighter('2'), targets[1])
+
+    def test_index_is_relative_to_non_hero_targets(self, mock_tprint):
+        hero = make_hero('Hero')
+        g1 = make_goblin('Gob')
+        fight = make_fight(hero=hero, monsters=[g1])
+        self.assertEqual(fight.get_fighter('1'), g1)
+
+    def test_select_by_index_out_of_range(self, mock_tprint):
+        g1 = make_goblin('First')
+        fight = make_fight(monsters=[g1])
+        self.assertIsNone(fight.get_fighter('99'))
+
+    def test_hero_is_never_returned_as_target(self, mock_tprint):
+        hero = make_hero('Hero')
+        g1 = make_goblin('Gob')
+        fight = make_fight(hero=hero, monsters=[g1])
+        for i in range(1, len(fight.fighters) + 1):
+            self.assertNotIn(fight.get_fighter(str(i), for_hero=True), [hero])
+        self.assertIsNone(fight.get_fighter(hero.name.lower(), for_hero=True))
+
+    def test_empty_text_returns_random(self, mock_tprint):
+        g1 = make_goblin('Gob')
+        fight = make_fight(monsters=[g1])
+        with patch('src.class_fight.randomitem') as mock_random:
+            mock_random.return_value = g1
+            self.assertEqual(fight.get_fighter(''), g1)
+
+    def test_select_by_name(self, mock_tprint):
+        g1 = make_goblin('Гоблин Злой')
+        g2 = make_goblin('Орк Страшный')
+        fight = make_fight(monsters=[g1, g2])
+        self.assertEqual(fight.get_fighter('гоблин'), g1)
+        self.assertEqual(fight.get_fighter('орк'), g2)
+
+    def test_select_by_name_not_found(self, mock_tprint):
+        g1 = make_goblin('Гоблин')
+        fight = make_fight(monsters=[g1])
+        self.assertIsNone(fight.get_fighter('несуществующий'))
 
 
 if __name__ == '__main__':

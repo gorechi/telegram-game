@@ -1,4 +1,4 @@
-from src.functions.functions import tprint, cprint
+from src.functions.functions import tprint, cprint, randomitem
 from src.enums import state_enum
 
 from collections import deque
@@ -268,3 +268,26 @@ class Fight:
         Метод возвращает всех бойцов указанных классов.
         """
         return [fighter for fighter in self.fighters if type(fighter).__name__ in classes]
+
+
+    def get_fighter(self, text:str, for_hero:bool = True) -> object:
+        """
+        Метод выбирает участника схватки по тексту.
+        """
+        fighters = self.get_targets(self.hero)
+        if str(text).isdigit():
+            try:
+                enemy = fighters[int(text)-1]
+            except Exception:
+                tprint(self.game, 'В схватке нет такого врага.')
+                return None
+            if for_hero and enemy == self.hero:
+                tprint(self.game, 'Герой не может атаковать сам себя.')
+                return None
+            return enemy
+        if not text:
+            return randomitem(fighters)
+        for enemy in fighters:
+            if enemy.check_name(text.lower()):
+                return enemy
+        return None
