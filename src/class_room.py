@@ -107,7 +107,8 @@ class Ladder:
         Возвращает случайную комнату верхнего этажа для подключения лестницы.
         Метод заглушка — будет реализован позже.
         """
-        raise NotImplementedError('Метод get_random_room_up() ещё не реализован')
+        upper_floor = self.game.floors_controller.get_floor_up(self.room_down.floor)
+        return upper_floor.get_room_to_place_ladder_down()
 
 
     def going_down(self, room=None) -> bool:
@@ -212,7 +213,10 @@ class Ladder:
             raise TypeError(f'К лестнице привязан неправильный объект {self.room_down.__class__.__name__} в качестве нижней комнаты.')
         self.room_down.ladder_up = self
         if not isinstance(self.room_up, Room):
-            self.room_up = self.get_random_room_up()
+            room_up = self.get_random_room_up()
+            if not room_up:
+                return False
+            self.room_up = room_up
         self.room_up.ladder_down = self
         self.room_down.action_controller.add_actions(self)
         self.room_up.action_controller.add_actions(self)

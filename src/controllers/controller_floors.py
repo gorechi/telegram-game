@@ -164,7 +164,21 @@ class FloorsController(Controller):
         self.inhabit_floors()
         return self.floors
     
-    
+
+    def get_floor_up(self, floor:object) -> object:
+        if self.floors[-1] == floor:
+            return None
+        floor_index = self.floors.index(floor)
+        return self.floors[floor_index + 1]
+
+
+    def get_floor_down(self, floor:object) -> object:
+            if self.floors[0] == floor:
+                return None
+            floor_index = self.floors.index(floor)
+            return self.floors[floor_index - 1]
+
+
     def create_ladders(self):
         """
         Функция создает лестницы между этажами замка.
