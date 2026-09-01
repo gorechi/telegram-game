@@ -76,9 +76,13 @@ class TestLadderInit(unittest.TestCase):
         self.assertEqual(ladder.name, 'лестница')
         self.assertIsInstance(ladder.loot, Loot)
 
-    def test_creates_without_room_up_raises(self):
-        with self.assertRaises(NotImplementedError):
-            Ladder(self.game, self.room_down)
+    def test_creates_without_room_up(self):
+        upper = make_bare_floor(self.game)
+        self.game.floors_controller.floors = [self.floor, upper]
+        ladder = Ladder(self.game, self.room_down)
+        self.assertIs(ladder.room_down, self.room_down)
+        self.assertIsInstance(ladder.room_up, Room)
+        self.assertIs(ladder.room_up.floor, upper)
 
     def test_raises_with_invalid_room_down(self):
         with self.assertRaises(TypeError):
@@ -336,14 +340,41 @@ class TestLadderGetNamesList(unittest.TestCase):
 
 
 class TestLadderGetRandomRoomUp(unittest.TestCase):
-    def test_raises_not_implemented(self):
+    def test_returns_room_from_upper_floor(self):
         game = make_game()
         floor = make_bare_floor(game)
+        upper = make_bare_floor(game)
+        game.floors_controller.floors = [floor, upper]
         room_down = floor.plan[0]
         room_up = floor.plan[1]
         ladder = Ladder(game, room_down, room_up)
-        with self.assertRaises(NotImplementedError):
-            ladder.get_random_room_up()
+        result = ladder.get_random_room_up()
+        self.assertIsInstance(result, Room)
+        self.assertIs(result.floor, upper)
+
+    def test_returns_room_without_ladder_down(self):
+        game = make_game()
+        floor = make_bare_floor(game)
+        upper = make_bare_floor(game)
+        game.floors_controller.floors = [floor, upper]
+        room_down = floor.plan[0]
+        room_up = floor.plan[1]
+        ladder = Ladder(game, room_down, room_up)
+        result = ladder.get_random_room_up()
+        self.assertFalse(result.ladder_down)
+
+    def test_returns_none_when_no_free_room_up(self):
+        game = make_game()
+        floor = make_bare_floor(game)
+        upper = make_bare_floor(game)
+        game.floors_controller.floors = [floor, upper]
+        room_down = floor.plan[0]
+        room_up = floor.plan[1]
+        ladder = Ladder(game, room_down, room_up)
+        for room in upper.plan:
+            room.ladder_down = MagicMock()
+        result = ladder.get_random_room_up()
+        self.assertIsNone(result)
 
 
 class TestLadderAdd(unittest.TestCase):
