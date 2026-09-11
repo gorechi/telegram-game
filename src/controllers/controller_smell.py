@@ -45,8 +45,7 @@ class SmellController():
     def distribute_smell(self, room: object, intensity:int) -> dict:
         rooms = dict()
         self.add_room(rooms, room, intensity, None)
-        return rooms
-        
+        return rooms    
 
 
     def add_room(self, rooms:dict, room: object, intensity:int, source_room: object) -> None:
@@ -57,7 +56,11 @@ class SmellController():
                 'source_room': source_room
                 }
         if intensity > 1:
-            available_rooms = room.get_rooms_around()
-            for next_room in available_rooms:
-                if not next_room == source_room:
-                    self.add_room(rooms, next_room, intensity - 1, room)
+            self.spread_smell(rooms, room, intensity, source_room)
+
+
+    def spread_smell(self, rooms:dict, room: object, intensity:int, source_room: object) -> None:
+        available_rooms = room.get_rooms_around()
+        for next_room in available_rooms:
+            if not next_room == source_room:
+                self.add_room(rooms, next_room, intensity - 1, room)
