@@ -64,3 +64,16 @@ class SmellController():
         for next_room in available_rooms:
             if not next_room == source_room:
                 self.add_room(rooms, next_room, intensity - 1, room)
+
+
+    def decrease_intensity(self, source:Source, intensity_delta:int) -> bool:
+        if not isinstance(intensity_delta, int):
+            raise TypeError(f'При уменьшении вони от источника {source.source} в метод передана дельта {intensity_delta} с типом, отличным от int.')
+        to_delete = list()
+        for key, value in source.rooms.items():
+            source.rooms[key]['intensity'] -= intensity_delta
+            if source.rooms[key]['intensity'] < 1:
+                to_delete.append(key)
+        for key in to_delete:
+            source.rooms.pop(key)
+        return True
