@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from collections import deque
+from typing import Optional
+
+from src.functions.functions import normal_count
 
 class SmellController():
     """
@@ -19,6 +22,22 @@ class SmellController():
         'monster',
         'dead'
     ]
+
+    _smell_prefixes = {
+        1: 'немного пахнет',
+        2: 'сильно пахнет',
+        3: 'невыносимо воняет',
+        4: 'страшно воняет'
+    }
+    """Глагольные части описаний вони по уровням."""
+
+    _smell_suffixes = {
+        1: {'monster': 'каким-то существом', 'dead': 'смертью'},
+        2: {'monster': 'звериным потом', 'dead': 'тухлой плотью'},
+        3: {'monster': 'зверем', 'dead': 'мертвечиной'},
+        4: {'monster': 'чем-то нечеловеческим', 'dead': 'разложившейся плотью'}
+    }
+    """Суффиксы описаний вони по уровням и типам."""
     
 
     def __init__(self, game):
@@ -166,3 +185,26 @@ class SmellController():
                 elif smell and smell['intensity'] == smell_intensity:
                     smells_list.append(source)
         return smells_list
+
+
+    def get_smell_text(self, room:object) -> Optional[str]:
+        """ 
+        Генерирует описание комнаты если в ней что-то воняет
+        """
+        by_level = dict()
+        for smell_type in SmellController._smell_types:
+            intensity = self.get_smell_by_smell_type(room, smell_type)
+            if intensity > 0:
+                level = min(intensity, 4)
+                if not level in by_level:
+                    by_level[level] = list()
+                by_level[level].append(SmellController._smell_suffixes[level][smell_type])
+        if not by_level:
+            return None
+        parts = list()
+        for level in sorted(by_level, reverse=True):
+            suffixes = by_level[level]
+            phrase = SmellController._smell_prefixes[level] + ' ' + normal_count('*'.join(suffixes), divider='*')
+            parts.append(phrase)
+        final_output_string = normal_count('*'.join(parts), divider='*') + '.'
+        return final_output_string.capitalize()
