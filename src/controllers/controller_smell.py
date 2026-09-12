@@ -187,7 +187,7 @@ class SmellController():
         return smells_list
 
 
-    def get_smell_text(self, room:object) -> Optional[str]:
+    def get_smell_text(self, room:object, key_hole:bool=False) -> Optional[str]:
         """ 
         Генерирует описание комнаты если в ней что-то воняет
         """
@@ -207,4 +207,14 @@ class SmellController():
             phrase = SmellController._smell_prefixes[level] + ' ' + normal_count('*'.join(suffixes), divider='*')
             parts.append(phrase)
         final_output_string = normal_count('*'.join(parts), divider='*') + '.'
+        if key_hole:
+            final_output_string = 'из замочной скважины ' + final_output_string
         return final_output_string.capitalize()
+
+
+    def compare_smell_intensity(self, room:object, intensity:int=0) -> bool:
+        for smell_type in SmellController._smell_types:
+            current_intensity = self.get_smell_by_smell_type(room, smell_type)
+            if current_intensity > intensity:
+                return True
+        return False

@@ -766,7 +766,6 @@ class TestRoomGetSymbolForMap(unittest.TestCase):
         self.game.player.current_position = self.floor.plan[1]
         self.room.trader = None
         self.room.light = False
-        self.room.stink = 0
         result = self.room.get_symbol_for_map()
         self.assertEqual(result, '+')
 
@@ -954,7 +953,8 @@ class TestRoomCanRest(unittest.TestCase):
     def test_cant_rest_because_stink(self):
         furniture = SimpleNamespace(can_rest=True)
         self.room.furniture.append(furniture)
-        self.room.stink = 2
+        self.game.smell_controller.create_smell_source(
+            room=self.room, source=MagicMock(), intensity=2, smell_type='monster')
         reasons, _ = self.room.can_rest(mode='full')
         self.assertTrue(any('воняет' in r for r in reasons))
 
@@ -992,27 +992,6 @@ class TestRoomNoise(unittest.TestCase):
         with patch.object(Room, 'noise_trigger') as mock_trigger:
             self.room1.noise(2)
             self.assertTrue(mock_trigger.called)
-
-
-class TestRoomSetStink(unittest.TestCase):
-    def setUp(self):
-        self.game = make_game()
-        self.floor = make_bare_floor(self.game)
-        self.room = self.floor.plan[0]
-
-    def test_sets_stink(self):
-        self.room.set_stink(2)
-        self.assertEqual(self.room.stink, 2)
-
-    def test_doesnt_decrease_stink(self):
-        self.room.stink = 3
-        self.room.set_stink(1)
-        self.assertEqual(self.room.stink, 3)
-
-    def test_increases_stink(self):
-        self.room.stink = 1
-        self.room.set_stink(3)
-        self.assertEqual(self.room.stink, 3)
 
 
 class TestRoomGetRoomsAround(unittest.TestCase):
@@ -1149,31 +1128,6 @@ class TestRoomGetRandomUnlockedFurniture(unittest.TestCase):
         self.assertIsNone(self.room.get_random_unlocked_furniture())
 
 
-class TestRoomGetStinkText(unittest.TestCase):
-    def setUp(self):
-        self.game = make_game()
-        self.floor = make_bare_floor(self.game)
-        self.room = self.floor.plan[0]
-
-    def test_no_stink(self):
-        self.assertIsNone(self.room.get_stink_text())
-
-    def test_stink_level_1(self):
-        self.room.stink = 1
-        result = self.room.get_stink_text()
-        self.assertIn('Немного', result)
-
-    def test_stink_level_2(self):
-        self.room.stink = 2
-        result = self.room.get_stink_text()
-        self.assertIn('Сильно', result)
-
-    def test_stink_level_3(self):
-        self.room.stink = 3
-        result = self.room.get_stink_text()
-        self.assertIn('Невыносимо', result)
-
-
 class TestRoomGetDecorationForShow(unittest.TestCase):
     def setUp(self):
         self.game = make_game()
@@ -1255,9 +1209,10 @@ class TestRoomShowWithLightOff(unittest.TestCase):
         self.assertTrue(any('кто-то шумно дышит' in line for line in result))
 
     def test_dark_room_with_stink(self):
-        self.room.stink = 2
+        self.game.smell_controller.create_smell_source(
+            room=self.room, source=MagicMock(), intensity=2, smell_type='monster')
         result = self.room.show_with_light_off()
-        self.assertTrue(any('воняет' in line for line in result))
+        self.assertTrue(any('пахнет' in line for line in result))
 
 
 class TestRoomShowWithLightOn(unittest.TestCase):
@@ -1304,9 +1259,10 @@ class TestRoomShowWithLightOn(unittest.TestCase):
     def test_room_with_stink(self):
         player = MagicMock()
         player.name = 'Герой'
-        self.room.stink = 1
+        self.game.smell_controller.create_smell_source(
+            room=self.room, source=MagicMock(), intensity=1, smell_type='monster')
         result = self.room.show_with_light_on(player)
-        self.assertTrue(any('воняет' in line for line in result))
+        self.assertTrue(any('пахнет' in line for line in result))
 
 
 class TestRoomShowThroughKeyHole(unittest.TestCase):
@@ -1336,9 +1292,10 @@ class TestRoomShowThroughKeyHole(unittest.TestCase):
         self.assertTrue(any('видит что-то ужасное' in line for line in result))
 
     def test_with_stink(self):
-        self.room.stink = 2
+        self.game.smell_controller.create_smell_source(
+            room=self.room, source=MagicMock(), intensity=2, smell_type='monster')
         result = self.room.show_through_key_hole(self.who)
-        self.assertTrue(any('воняет' in line for line in result))
+        self.assertTrue(any('замочной скважины' in line for line in result))
 
 
 class TestRoomExamine(unittest.TestCase):

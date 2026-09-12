@@ -121,9 +121,6 @@ class FakeRoom:
     def monster_in_ambush(self):
         return self.ambush
 
-    def set_stink(self, value):
-        self.stink = value
-
 
 class FakeFloor:
     def __init__(self, plan=None, floor_number=1):
@@ -131,13 +128,6 @@ class FakeFloor:
         self.floor_number = floor_number
         self.monsters_in_rooms = {}
         self.all_monsters = []
-        self.stink_mapped = False
-
-    def set_stink(self, value):
-        self.stink_calls.append(value)
-
-    def stink_map(self):
-        self.stink_mapped = True
 
     def get_rooms_around(self, room):
         return [r for r in self.plan if r is not room]
@@ -1343,13 +1333,6 @@ class TestMonsterPlace(unittest.TestCase):
             monster.place(floor, room_to_place=room)
         self.assertIs(monster.hiding_place, furniture)
 
-    def test_place_stink(self):
-        monster = make_monster(stink=True)
-        floor, room, rooms = setup_world(monster, n_rooms=1)
-        monster.place(floor, room_to_place=room)
-        self.assertEqual(room.stink, 3)
-        self.assertTrue(floor.stink_mapped)
-
 
 class TestPlant(unittest.TestCase):
     """Класс Plant."""
@@ -1552,17 +1535,6 @@ class TestVampire(unittest.TestCase):
         self.assertTrue(result)
         self.assertIs(vampire.current_position, new_room)
         self.assertNotIn(vampire, floor.monsters_in_rooms[old_room])
-
-    def test_place_stink(self):
-        vampire = make_monster(Vampire, stink=True)
-        floor, room, rooms = setup_world(vampire, n_rooms=2)
-        room.floor = floor
-        room.furniture = []
-        with patch('src.class_monsters.randomitem', return_value=rooms[1]):
-            result = vampire.place(floor)
-        self.assertTrue(result)
-        self.assertTrue(rooms[1].stink == 3)
-        self.assertTrue(floor.stink_mapped)
 
 
 class TestHumanDemonWalkingDead(unittest.TestCase):

@@ -628,10 +628,7 @@ class Room:
     (берется выпадение одного конкретного значения).
 
     """
-    
-    _stink_levels = {1: 'Немного', 2: 'Сильно', 3: 'Невыносимо'}
-    """Уровни вони."""
-    
+       
     _plan_picture_width = 100
     """Ширина картинки плана комнаты."""
 
@@ -656,7 +653,6 @@ class Room:
         self.trader = None
         self.morgue:list = []
         self.furniture:list = []
-        self.stink:int = 0
         self.ladder_up:Ladder = self.game.empty_thing
         self.ladder_down:Ladder = self.game.empty_thing
         self.last_seen_trap = None
@@ -728,21 +724,6 @@ class Room:
         return True
     
 
-    def set_stink(self, stink_level:int):
-        """
-        Функция распространения вони по замку.
-        """
-        if self.stink >= stink_level:
-            return True
-        else:
-            self.stink = stink_level
-        available_rooms = self.get_rooms_around()
-        if stink_level > 1:
-            for next_room in available_rooms:
-                next_room.set_stink(stink_level - 1)
-        return True
-    
-    
     def get_rooms_around(self) -> list:
         """
         Возвращает список всех комнат, в которые можно перейти из заданной комнаты.
@@ -982,7 +963,7 @@ class Room:
         monster = self.monsters('first')
         if monster:
             message.append('Враг, который находится в комнате, точно не даст отдохнуть.')
-        if self.stink > 0:
+        if self.game.smell_controller.compare_smell_intensity(self):
             message.append('В комнате слишком сильно воняет чтобы уснуть.')
         if not self.light:
             message.append('В комнате так темно, что нельзя толком устроиться на отдых.')
@@ -1022,7 +1003,7 @@ class Room:
         message = ['В комнате нет ни одного источника света. Невозможно различить ничего определенного.']
         if monster:
             message.append('В темноте слышатся какие-то странные звуки, кто-то шумно дышит и сопит.')
-        message.append(self.get_stink_text())
+        message.append(self.game.smell_controller.get_smell_text(self))
         return message
     
     
@@ -1041,7 +1022,7 @@ class Room:
             message.append(self.trader.show())
         message += self.show_corpses()
         message.extend(monster_text)
-        message.append(self.get_stink_text())
+        message.append(self.game.smell_controller.get_smell_text(self))
         return message
         
 
@@ -1079,15 +1060,6 @@ class Room:
         return self.decoration1
     
     
-    def get_stink_text(self) -> str|None:
-        """ 
-        Генерирует описание комнаты если в ней что-то воняет
-        """
-        if self.stink > 0:
-            return f'{Room._stink_levels[self.stink]} воняет чем-то очень неприятным.'
-        return None
-    
-    
     def show_through_key_hole(self, who):
         """
         Отображает, что можно увидеть через замочную скважину двери.
@@ -1100,8 +1072,7 @@ class Room:
             message.append(f'{who.name} заглядывает в замочную скважину двери, но не может ничего толком разглядеть.')
         else:
             message.append(f'{who.name} заглядывает в замочную скважину двери и {monster.key_hole}')
-        if self.stink > 0:
-            message.append(f'Из замочной скважины {Room._stink_levels[self.stink].lower()} воняет чем-то омерзительным.')
+        message.append(self.game.smell_controller.get_smell_text(self, key_hole=True))
         return message
 
     

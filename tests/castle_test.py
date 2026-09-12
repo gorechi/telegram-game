@@ -336,13 +336,6 @@ class TestSecretRooms(unittest.TestCase):
         self.assertEqual(self.floor.secret_rooms(), [])
 
 
-class TestStinkMap(unittest.TestCase):
-    def test_does_not_crash(self):
-        floor = make_floor(make_game(), 0)
-        floor.plan[0].stink = 2
-        self.assertIsNone(floor.stink_map())
-
-
 class TestGetRandomRoomWithFurniture(unittest.TestCase):
     def test_returns_none_without_furniture(self):
         floor = make_floor(make_game(), 0)

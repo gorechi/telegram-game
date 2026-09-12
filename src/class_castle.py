@@ -255,35 +255,6 @@ class Floor:
         return [room for room in self.plan if room.has_secrets]
     
     
-    # def stink(self, room:Room, stink_level:int):
-    #     """
-    #     Функция распространения вони по замку.\n
-    #     Распространяет вонь через открытые и закрытые двери, постепенно уменьшая уровень.\n
-    #     Уровень вони записывается в параметр stink комнаты.
-    #     """
-    #     if room.stink >= stink_level:
-    #         return True
-    #     else:
-    #         room.stink = stink_level
-    #     available_rooms = self.get_rooms_around(room)
-    #     if stink_level > 1:
-    #         for next_room in available_rooms:
-    #             self.stink(next_room, stink_level - 1)
-    #     return True
-
-    
-    def stink_map(self):
-        
-        """
-        Генерирует карту вони этажа замка. 
-        Нужна в основном для отладки, но может потом и понадобится.
-        """
-        for i in range(self.rows):
-            floor = ''
-            for j in range(self.rooms):
-                floor = f'{floor + str(self.plan[i*self.rooms + j].stink)} '
-
-    
     def get_random_room_with_furniture(self) -> Room | None:
     
         """ 

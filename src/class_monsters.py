@@ -1076,9 +1076,6 @@ class Monster:
                     places_to_hide.append(i)
             places_to_hide.append(room)
             self.hiding_place = randomitem(places_to_hide)
-        if self.stink:
-            room.set_stink(3)
-            floor.stink_map()
         self.floor = floor
         room.action_controller.add_actions(self)
         self.take_money_from_room()
@@ -1321,9 +1318,6 @@ class Vampire(Monster):
             old_place.floor.monsters_in_rooms[old_place].remove(self)
         floor.monsters_in_rooms[room].append(self)
         room.action_controller.add_actions(self)
-        if self.stink:
-            room.set_stink(3)
-            floor.stink_map()
         self.take_money_from_room()
         return True
 
