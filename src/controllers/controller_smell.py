@@ -7,6 +7,9 @@ class SmellController():
     """    
     @dataclass
     class Source():
+        """
+        Dataclass источника вони в замке.
+        """
         source: object
         rooms: dict
         smell_type: str
@@ -19,6 +22,9 @@ class SmellController():
     
 
     def __init__(self, game):
+        """
+        Инициирует экземпляр класса SmellController.
+        """
         self.game = game
         self.smells = list()
 
@@ -31,6 +37,7 @@ class SmellController():
                      ) -> None:
         """
         Создает новый источник вони.
+        Проверяет существование типа вони и записывает карту ее распространения.
         """
         if not smell_type in SmellController._smell_types:
             raise ValueError(f'При создании источника запаха передан несуществующий тип {smell_type}')
@@ -43,12 +50,20 @@ class SmellController():
 
 
     def distribute_smell(self, room: object, intensity:int) -> dict:
+        """
+        Распределяет вонь от указанной комнаты по графу замка с убыванием интенсивности.
+        Возвращает словарь комнат с уровнем вони и комнатой-предшественником.
+        """
         rooms = dict()
         self.add_room(rooms, room, intensity, None)
         return rooms    
 
 
     def add_room(self, rooms:dict, room: object, intensity:int, source_room: object) -> None:
+        """
+        Добавляет комнату в словарь вони, сохраняя максимальную интенсивность.
+        При интенсивности выше единицы распространяет вонь в соседние комнаты.
+        """
         stored = rooms.get(room)
         if not stored or intensity > stored['intensity']:
             rooms[room] = {
@@ -60,6 +75,9 @@ class SmellController():
 
 
     def spread_smell(self, rooms:dict, room: object, intensity:int, source_room: object) -> None:
+        """
+        Распространяет вонь из комнаты в соседние, не возвращаясь в комнату, откуда она пришла.
+        """
         available_rooms = room.get_rooms_around()
         for next_room in available_rooms:
             if not next_room == source_room:
@@ -67,6 +85,11 @@ class SmellController():
 
 
     def decrease_intensity(self, source:Source, intensity_delta:int) -> bool:
+        """
+        Уменьшает интенсивность вони всех комнат источника на величину дельты.
+        Удаляет записи с интенсивностью ниже единицы.
+        Возвращает True при успешном уменьшении.
+        """
         if not isinstance(intensity_delta, int):
             raise TypeError(f'При уменьшении вони от источника {source.source} в метод передана дельта {intensity_delta} с типом, отличным от int.')
         to_delete = list()
@@ -80,6 +103,11 @@ class SmellController():
 
 
     def increase_intensity(self, source:Source, intensity_delta:int) -> bool:
+        """
+        Увеличивает интенсивность вони всех комнат источника на величину дельты.
+        До-распространяет вонь от границы распространения в новые комнаты.
+        Возвращает True при успешном увеличении.
+        """
         if not isinstance(intensity_delta, int):
             raise TypeError(f'При увеличении вони от источника {source.source} в метод передана дельта {intensity_delta} с типом, отличным от int.')
         to_spread = list()
@@ -95,7 +123,10 @@ class SmellController():
         return True
 
 
-    def get_smell_by_type(self, room:object, smell_type:str) -> int:
+    def get_smell_by_smell_type(self, room:object, smell_type:str) -> int:
+        """
+        Возвращает максимальную интенсивность вони указанного типа в комнате.
+        """
         smell_intensity = 0
         for source in self.smells:
             if source.smell_type == smell_type:
@@ -103,3 +134,35 @@ class SmellController():
                 if smell and smell['intensity'] > smell_intensity:
                     smell_intensity = smell['intensity']
         return smell_intensity
+
+
+    def get_max_smells(self, room:object) -> dict:
+        """
+        Возвращает словарь типов вони с максимальной интенсивностью для указанной комнаты.
+        """
+        smells_dic = dict()
+        for source in self.smells:
+            smell = source.rooms.get(room, None)
+            if smell:
+                smell_level_to_compare = smells_dic.get(source.smell_type, 0)
+                if smell['intensity'] > smell_level_to_compare:
+                    smells_dic[source.smell_type] = smell['intensity']
+        return smells_dic
+
+
+    def get_max_smell_objects_by_smell_type(self, room:object, smell_type:str) -> list[object]:
+        """
+        Возвращает список источников вони указанного типа с максимальной интенсивностью в комнате.
+        """
+        smell_intensity = 0
+        smells_list = list()
+        for source in self.smells:
+            if source.smell_type == smell_type:
+                smell = source.rooms.get(room, None)
+                if smell and smell['intensity'] > smell_intensity:
+                    smells_list = []
+                    smells_list.append(source)
+                    smell_intensity = smell['intensity']
+                elif smell and smell['intensity'] == smell_intensity:
+                    smells_list.append(source)
+        return smells_list
