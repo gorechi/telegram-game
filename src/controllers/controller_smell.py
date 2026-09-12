@@ -93,3 +93,13 @@ class SmellController():
             source_room = source.rooms[room]['source_room']
             self.spread_smell(rooms, room, intensity, source_room)
         return True
+
+
+    def get_smell_by_type(self, room:object, smell_type:str) -> int:
+        smell_intensity = 0
+        for source in self.smells:
+            if source.smell_type == smell_type:
+                smell = source.rooms.get(room, None)
+                if smell and smell['intensity'] > smell_intensity:
+                    smell_intensity = smell['intensity']
+        return smell_intensity
