@@ -74,6 +74,22 @@ class SmellController():
             source.rooms[key]['intensity'] -= intensity_delta
             if source.rooms[key]['intensity'] < 1:
                 to_delete.append(key)
-        for key in to_delete:
-            source.rooms.pop(key)
+        for room in to_delete:
+            source.rooms.pop(room)
+        return True
+
+
+    def increase_intensity(self, source:Source, intensity_delta:int) -> bool:
+        if not isinstance(intensity_delta, int):
+            raise TypeError(f'При увеличении вони от источника {source.source} в метод передана дельта {intensity_delta} с типом, отличным от int.')
+        to_spread = list()
+        for key, value in source.rooms.items():
+            if source.rooms[key]['intensity'] == 1:
+                to_spread.append(key)
+            source.rooms[key]['intensity'] += intensity_delta
+        for room in to_spread:
+            rooms = source.rooms
+            intensity = source.rooms[room]['intensity']
+            source_room = source.rooms[room]['source_room']
+            self.spread_smell(rooms, room, intensity, source_room)
         return True
