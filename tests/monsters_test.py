@@ -11,6 +11,7 @@ from src.class_monsters import (
     WalkingDead, Skeleton, Corpse,
 )
 from src.controllers.controller_monsters import MonstersController
+from src.controllers.controller_smell import SmellController
 
 
 class EmptyItem:
@@ -96,6 +97,7 @@ class FakeGame:
         self.no_armor = EmptyItem()
         self.monsters_controller = FakeMonstersController()
         self.events_controller = FakeEventsController()
+        self.smell_controller = SmellController(self)
         self.weapon_controller = None
 
 
@@ -170,6 +172,7 @@ def make_monster(cls=Monster, game=None, **attrs):
         'monster_type': 'basic',
         'corpse': True,
         'stink': False,
+        'smell_intensity': 0,
         'alive': True,
         'floor': None,
         'current_position': None,
@@ -1050,6 +1053,37 @@ class TestMonsterDeathAndResurrect(unittest.TestCase):
         self.assertFalse(monster.alive)
         self.assertEqual(result, 'монстр падает замертво на пол комнаты.')
 
+    def test_finally_die_removes_smell(self):
+        monster = make_monster(stink=True, smell_intensity=1)
+        floor, room, rooms = setup_world(monster, n_rooms=1)
+        monster.place(floor, room_to_place=room)
+        self.assertEqual(len(monster.game.smell_controller.smells), 1)
+        monster.finally_die(MagicMock())
+        self.assertEqual(monster.game.smell_controller.smells, [])
+
+    def test_finally_die_removes_only_own_smell(self):
+        monster = make_monster(game=FakeGame(), stink=True, smell_intensity=1)
+        other = make_monster(game=monster.game, stink=True, smell_intensity=1)
+        floor, room, rooms = setup_world(monster, n_rooms=1)
+        other.current_position = room
+        other.floor = floor
+        floor.all_monsters.append(other)
+        floor.monsters_in_rooms[room].append(other)
+        monster.place(floor, room_to_place=room)
+        other.place(floor, room_to_place=room)
+        self.assertEqual(len(monster.game.smell_controller.smells), 2)
+        monster.finally_die(MagicMock())
+        controller = monster.game.smell_controller
+        self.assertEqual(len(controller.smells), 1)
+        self.assertIs(controller.smells[0].source, other)
+
+    def test_become_a_zombie_keeps_smell(self):
+        monster = make_monster(stink=True, smell_intensity=1)
+        floor, room, rooms = setup_world(monster, n_rooms=1)
+        monster.place(floor, room_to_place=room)
+        monster.become_a_zombie(MagicMock())
+        self.assertEqual(len(monster.game.smell_controller.smells), 1)
+
     def test_become_a_zombie(self):
         monster = make_monster()
         floor, room, rooms = setup_world(monster, n_rooms=1)
@@ -1332,6 +1366,21 @@ class TestMonsterPlace(unittest.TestCase):
                 patch.object(Monster, '_hide_possibility', Dice([1])):
             monster.place(floor, room_to_place=room)
         self.assertIs(monster.hiding_place, furniture)
+
+    def test_place_stink_creates_smell(self):
+        monster = make_monster(stink=True, smell_intensity=1)
+        floor, room, rooms = setup_world(monster, n_rooms=1)
+        monster.place(floor, room_to_place=room)
+        controller = monster.game.smell_controller
+        self.assertEqual(len(controller.smells), 1)
+        self.assertIs(controller.smells[0].source, monster)
+        self.assertEqual(controller.smells[0].smell_type, 'monster')
+
+    def test_place_no_stink_creates_no_smell(self):
+        monster = make_monster(stink=False, smell_intensity=1)
+        floor, room, rooms = setup_world(monster, n_rooms=1)
+        monster.place(floor, room_to_place=room)
+        self.assertEqual(monster.game.smell_controller.smells, [])
 
 
 class TestPlant(unittest.TestCase):

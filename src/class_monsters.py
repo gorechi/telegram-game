@@ -819,6 +819,8 @@ class Monster:
         self.game.monsters_controller.kill_monster(self)
         self.alive = False
         self.become_a_corpse(for_good=True)
+        if self.stink:
+            self.game.smell_controller.delete_smell_by_source(self)
         return f'{self:nom} падает замертво на пол комнаты.'
     
     
