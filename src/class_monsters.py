@@ -1079,6 +1079,8 @@ class Monster:
         self.floor = floor
         room.action_controller.add_actions(self)
         self.take_money_from_room()
+        if self.stink:
+            self.game.smell_controller.create_smell_source(room=room, source=self, intensity=self.smell_intensity, smell_type='monster')
         return True
 
 
@@ -1319,6 +1321,8 @@ class Vampire(Monster):
         floor.monsters_in_rooms[room].append(self)
         room.action_controller.add_actions(self)
         self.take_money_from_room()
+        if self.stink:
+            self.game.smell_controller.create_smell_source(room=room, source=self, intensity=self.smell_intensity, smell_type='monster')
         return True
 
 

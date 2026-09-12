@@ -1716,7 +1716,7 @@ class TestMonstersControllerErrors(unittest.TestCase):
             poison_protection={}, gender=0, size={}, corpse=True,
             monster_type='basic', initiative={}, min_floor=1, max_floor=1,
             specific_floors=[], wear_armor=False, preferred_weapon='',
-            stink=False, can_resurrect=False, weakness={}, carry_money=False,
+            stink=False, smell_intensity=0, can_resurrect=False, weakness={}, carry_money=False,
             money=0, boss=boss)
 
     def test_generate_money_non_monster_raises(self):

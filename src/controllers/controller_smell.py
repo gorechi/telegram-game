@@ -218,3 +218,16 @@ class SmellController():
             if current_intensity > intensity:
                 return True
         return False
+
+
+    def delete_smell(self, smell:object) -> None:
+        self.smells.remove(smell)
+
+
+    def delete_smell_by_source(self, smell_source:object) -> None:
+        to_delete = list()
+        for smell in self.smells:
+            if smell.source == smell_source:
+                to_delete.append(smell)
+        for smell in to_delete:
+            self.delete_smell(smell)

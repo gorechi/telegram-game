@@ -46,6 +46,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -127,6 +128,7 @@
     "frightening": true,
     "aggressive": false,
     "stink": true,
+    "smell_intensity": 2,
     "carry_money": true,
     "money": {
       "random": true,
@@ -203,6 +205,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -282,6 +285,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -361,6 +365,7 @@
     "state": "притаился",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -440,6 +445,7 @@
     "state": "притаилась",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -519,6 +525,7 @@
     "state": "прячется",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -598,6 +605,7 @@
     "state": "рычит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -684,6 +692,7 @@
         "24": 0.6
       },
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -770,6 +779,7 @@
       "24": 0.6
     },
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -853,6 +863,7 @@
       "24": 1.4
       },
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -936,6 +947,7 @@
       "24": 1.4
       },
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1014,6 +1026,7 @@
     "state": "переминается с лапы на лапу",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1092,6 +1105,7 @@
     "state": "вальяжно лежит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1170,6 +1184,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1248,6 +1263,7 @@
     "state": "ревет",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1326,6 +1342,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1404,6 +1421,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1482,6 +1500,7 @@
     "state": "стоит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1560,6 +1579,7 @@
     "state": "что-то ищет",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1638,6 +1658,7 @@
     "state": "чего-то ждет",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,
@@ -1714,6 +1735,7 @@
     "state": "лежит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1789,6 +1811,7 @@
     "state": "сидит",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1865,6 +1888,7 @@
     "state": "шныряет",
     "weakness": {},
     "stink": true,
+    "smell_intensity": 1,
     "carry_money": false,
     "money": {
       "random": true,
@@ -1941,6 +1965,7 @@
     "state": "прячется",
     "weakness": {},
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": false,
     "money": {
       "random": true,
@@ -2023,6 +2048,7 @@
       "24": 1.8
       },
     "stink": false,
+    "smell_intensity": 0,
     "carry_money": true,
     "money": {
       "random": true,

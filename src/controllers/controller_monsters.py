@@ -38,6 +38,7 @@ class MonstersController(Controller):
         wear_armor: bool
         preferred_weapon: str
         stink: bool
+        smell_intensity: int
         can_resurrect: bool
         weakness: dict
         carry_money: bool
